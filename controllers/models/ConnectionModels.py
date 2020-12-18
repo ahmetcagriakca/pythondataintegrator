@@ -1,0 +1,214 @@
+import json
+from typing import List
+
+from flask_restplus import fields
+
+from controllers.models.CommonModels import EntityModel, CommonModels
+from infrastructor.IocManager import IocManager
+from models.dao.connection.Connection import Connection
+from models.dao.connection.ConnectionDatabase import ConnectionDatabase
+from models.dao.connection.ConnectorType import ConnectorType
+from models.dao.connection.ConnectionType import ConnectionType
+
+
+class ConnectionTypeModel(EntityModel):
+
+    def __init__(self,
+                 Id=None,
+                 Name=None,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Id = Id
+        self.Name = Name
+
+
+class ConnectorTypeModel(EntityModel):
+
+    def __init__(self,
+                 Id=None,
+                 Name=None,
+                 ConnectionType=None,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Id = Id
+        self.Name = Name
+        self.ConnectionType = ConnectionType
+
+
+class ConnectionModel(EntityModel):
+    def __init__(self,
+                 Id=None,
+                 Name=None,
+                 ConnectionType=None,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Id = Id
+        self.Name = Name
+        self.ConnectionType = ConnectionType
+
+
+class ConnectionDatabaseModel(EntityModel):
+
+    def __init__(self,
+                 Id=None,
+                 Host: str = None,
+                 Port: int = None,
+                 Sid: str = None,
+                 DatabaseName: str = None,
+                 User: str = None,
+                 Password: str = None,
+                 Connection=None,
+                 ConnectorType=None,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Id = Id
+        self.Host: str = Host
+        self.Port: int = Port
+        self.Sid: str = Sid
+        self.DatabaseName: str = DatabaseName
+        self.User: str = User
+        self.Password: str = Password
+        self.Connection = Connection
+        self.ConnectorType = ConnectorType
+
+
+class ConnectionModels:
+    ns = IocManager.api.namespace('Connection', description='Connection endpoints',
+                                  path='/api/Connection')
+
+    create_connection_database_model = IocManager.api.model('CreateConnectionDatabaseModel', {
+        'Name': fields.String(description='Operation code value', required=True),
+        'ConnectionTypeId': fields.Integer(description='ConnectionTypeId'),
+        'ConnectorTypeId': fields.Integer(description='ConnectorTypeId'),
+        'Host': fields.String(description='Host'),
+        'Port': fields.Integer(description='Port'),
+        'Sid': fields.String(description='Sid'),
+        'DatabaseName': fields.String(description='DatabaseName'),
+        'User': fields.String(description='User'),
+        'Password': fields.String(description='Password'),
+    })
+    update_connection_database_model = IocManager.api.model('UpdateConnectionDatabaseModel', {
+        'Id': fields.Integer(description='Operation code value', required=True),
+        'Name': fields.String(description='Operation code value'),
+        'ConnectorTypeId': fields.Integer(description='ConnectorTypeId'),
+        'Host': fields.String(description='Host'),
+        'Port': fields.Integer(description='Port'),
+        'Sid': fields.String(description='Sid'),
+        'DatabaseName': fields.String(description='DatabaseName'),
+        'User': fields.String(description='User'),
+        'Password': fields.String(description='Password'),
+    })
+    delete_connection_database_model = IocManager.api.model('DeleteConnectionDatabaseModel', {
+        'Id': fields.Integer(description='Connection Database Id', required=True),
+    })
+
+    @staticmethod
+    def get_connection_type_model(connection_type: ConnectionType) -> ConnectionTypeModel:
+        entity_model = ConnectionTypeModel(
+            Id=connection_type.Id,
+            Name=connection_type.Name,
+        )
+        result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+        return result_model
+
+    @staticmethod
+    def get_connection_type_models(connection_types: List[ConnectionType]) -> List[ConnectionTypeModel]:
+
+        entities = []
+        for connection_type in connection_types:
+            entity = ConnectionModels.get_connection_type_model(connection_type)
+            entities.append(entity)
+        return entities
+
+    @staticmethod
+    def get_connector_type_model(connector_type: ConnectorType) -> ConnectorTypeModel:
+        connection_type = ConnectionModels.get_connection_type_model(connector_type.ConnectionType)
+        entity_model = ConnectorTypeModel(
+            Id=connector_type.Id,
+            Name=connector_type.Name,
+        )
+        result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+        result_model['ConnectionType'] = connection_type,
+
+        return result_model
+
+    @staticmethod
+    def get_connector_type_models(connector_types: List[ConnectorType]) -> List[ConnectorTypeModel]:
+
+        entities = []
+        for connector_type in connector_types:
+            entity = ConnectionModels.get_connector_type_model(connector_type)
+            entities.append(entity)
+        return entities
+
+    @staticmethod
+    def get_connection_model(connection: Connection) -> ConnectionModel:
+        connection_type = ConnectionModels.get_connection_type_model(connection.ConnectionType)
+        entity_model = ConnectionModel(
+            Id=connection.Id,
+            Name=connection.Name,
+        )
+        result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+        result_model['ConnectionType'] = connection_type,
+        return result_model
+
+    @staticmethod
+    def get_connection_database_entity_model(connection_database: ConnectionDatabase) -> ConnectionDatabaseModel:
+        entity_model = ConnectionDatabaseModel(
+            Id=connection_database.Id,
+            Host=connection_database.Host,
+            Port=connection_database.Port,
+            Sid=connection_database.Sid,
+            DatabaseName=connection_database.DatabaseName,
+            User='***',  # connection_database.User
+            Password='***'  # connection_database.Password
+        )
+        return entity_model
+
+    @staticmethod
+    def get_connection_database_model(connection_database: ConnectionDatabase) -> ConnectionDatabaseModel:
+        connection = ConnectionModels.get_connection_model(connection_database.Connection)
+        connector_type = ConnectionModels.get_connector_type_model(connection_database.ConnectorType)
+        entity_model = ConnectionModels.get_connection_database_entity_model(connection_database)
+        result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+        result_model['ConnectorType'] = connector_type,
+        result_model['Connection'] = connection,
+        return result_model
+
+    @staticmethod
+    def get_connection_database_models(connection_databases: List[ConnectionDatabase]) -> List[ConnectionDatabaseModel]:
+
+        entities = []
+        for connection_database in connection_databases:
+            entity = ConnectionModels.get_connection_database_model(connection_database)
+            entities.append(entity)
+        return entities
+
+    @staticmethod
+    def get_connection_database_result_model(connection_database: ConnectionDatabase) -> ConnectionDatabaseModel:
+        connector_type = ConnectionModels.get_connector_type_model(connection_database.ConnectorType)
+        entity_model = ConnectionModels.get_connection_database_entity_model(connection_database)
+        result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+        result_model['ConnectorType'] = connector_type,
+        return result_model
+
+    @staticmethod
+    def get_connection_result_model(connection: Connection) -> ConnectionModel:
+        connection_type = ConnectionModels.get_connection_type_model(connection.ConnectionType)
+        entity_model = ConnectionModel(
+            Id=connection.Id,
+            Name=connection.Name,
+        )
+        result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+        result_model['ConnectionType'] = connection_type,
+        connection_database = ConnectionModels.get_connection_database_result_model(connection.Database)
+        result_model['Database'] = connection_database,
+        return result_model
+
+    @staticmethod
+    def get_connection_result_models(connections: List[Connection]) -> List[ConnectionModel]:
+        entities = []
+        for connection in connections:
+            entity = ConnectionModels.get_connection_result_model(connection)
+            entities.append(entity)
+        return entities

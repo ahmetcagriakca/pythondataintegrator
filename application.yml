@@ -1,0 +1,21 @@
+DATABASE:
+  #POSTGRESQL local environment
+  TYPE: POSTGRESQL
+  HOST: localhost
+  PORT: 5432
+  DATABASE: pdi
+  USERNAME: postgres
+  PASSWORD: 123456
+  SCHEMA: Common
+
+API:
+  ENVIRONMENT: DEVELOPMENT
+  NAME: Pdi Application(Python Data Integrator)
+  IS_DEBUG: False
+  PORT: 7100
+  SECRET_KEY: verycomplexsecret
+
+PDI:
+  LIMIT: 10000
+  PROCESS_COUNT: 10
+  DO_PARALLEL: True
