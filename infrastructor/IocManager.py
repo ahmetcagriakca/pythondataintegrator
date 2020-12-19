@@ -28,14 +28,12 @@ class IocManager:
     def configure_startup(root_directory, app_wrapper=None, job_scheduler=None):
         IocManager.config_manager = ConfigManager(root_directory)
         # ApiConfig getting with type
-        database_config = IocManager.config_manager.get(DatabaseConfig)
         IocManager.app_wrapper = app_wrapper
         IocManager.job_scheduler = job_scheduler
         # Configuration initialize
         IocManager.config_manager = IocManager.config_manager
         # ApiConfig gettin with type
         api_config = IocManager.config_manager.get(ApiConfig)
-        # database_config = IocManager.config_manager.get(DatabaseConfig)
 
         # Flask instantiate
         IocManager.app = Flask(api_config.name)

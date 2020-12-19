@@ -9,6 +9,7 @@ from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegra
 from models.dao.integration.PythonDataIntegrationConnection import PythonDataIntegrationConnection
 from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
 from models.dao.integration.PyhtonDataIntegrationExecutionJob import PythonDataIntegrationExecutionJob
+from models.dao.operation.DataOperationIntegration import DataOperationIntegration
 
 
 class PythonDataIntegration(Entity, IocManager.Base):
@@ -21,12 +22,13 @@ class PythonDataIntegration(Entity, IocManager.Base):
                                                               back_populates="PythonDataIntegration")
     Connections: List[PythonDataIntegrationConnection] = relationship("PythonDataIntegrationConnection",
                                                                       back_populates="PythonDataIntegration")
-
     Jobs: List[PythonDataIntegrationJob] = relationship("PythonDataIntegrationJob",
                                                         back_populates="PythonDataIntegration")
     ExecutionJobs: List[PythonDataIntegrationExecutionJob] = relationship("PythonDataIntegrationExecutionJob",
                                                                         back_populates="PythonDataIntegration")
     
+    DataOperationIntegrations: List[DataOperationIntegration] = relationship("DataOperationIntegration",
+                                                                        back_populates="PythonDataIntegration")
     def __init__(self,
                  Code: str = None,
                  IsTargetTruncate: bool = None,

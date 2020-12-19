@@ -6,7 +6,7 @@ from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.connection.Connection import Connection
 from models.dao.integration.PythonDataIntegrationConnection import PythonDataIntegrationConnection
-from models.viewmodels.CreateIntegrationDataModel import CreateIntegrationDataModel
+from models.viewmodels.integration.CreateIntegrationDataModel import CreateIntegrationDataModel
 from models.dao.integration.PythonDataIntegration import PythonDataIntegration
 from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegrationColumn
 from models.dao.integration.PyhtonDataIntegrationExecutionJob import PythonDataIntegrationExecutionJob

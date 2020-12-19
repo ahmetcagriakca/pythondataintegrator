@@ -73,7 +73,7 @@ class JobOperationService(IScoped):
         trigger.end_date = end_date
         if founded_cron_job.ApSchedulerJob.IsDeleted == 0:
             self.job_scheduler.remove_job(job_id=founded_cron_job.ApSchedulerJob.JobId)
-        self.python_data_integration_job_repository.delete(founded_cron_job.Id)
+        self.python_data_integration_job_repository.delete_by_id(founded_cron_job.Id)
         ap_scheduler_job = self.add_job_with_cron(job_function=JobOperationService.job_pdi_start_operation,
                                                   cron=cron, start_date=start_date, end_date=end_date,
                                                   args=(None, code,))

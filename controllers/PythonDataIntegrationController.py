@@ -10,7 +10,7 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from models.dao.integration.PythonDataIntegration import PythonDataIntegration
 from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
-from models.viewmodels.CreateIntegrationDataModel import CreateIntegrationDataModel
+from models.viewmodels.integration.CreateIntegrationDataModel import CreateIntegrationDataModel
 
 @PythonDataIntegrationModels.ns.route("/IntegrationData")
 class CreateIntegrationDataResource(ResourceBase):

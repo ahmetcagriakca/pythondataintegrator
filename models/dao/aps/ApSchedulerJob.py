@@ -4,6 +4,7 @@ from models.dao.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
 from models.dao.Entity import Entity
 from sqlalchemy import Column, String, TEXT, Unicode, DateTime
 from infrastructor.IocManager import IocManager
+from models.dao.operation.DataOperationJob import DataOperationJob
 
 
 class ApSchedulerJob(Entity, IocManager.Base):
@@ -14,7 +15,7 @@ class ApSchedulerJob(Entity, IocManager.Base):
     NextRunTime = Column(DateTime)
     FuncRef = Column(String(500), nullable=False)
     JobEvents: List[ApSchedulerJobEvent] = relationship("ApSchedulerJobEvent", back_populates="ApSchedulerJob")
-
+    DataOperationJobs: List[DataOperationJob] = relationship("DataOperationJob", back_populates="ApSchedulerJob")
     def __init__(self,
                  JobId: TEXT = None,
                  NextRunTime: float = None,

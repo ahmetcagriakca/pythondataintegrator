@@ -28,6 +28,7 @@ database_config: DatabaseConfig = config_manager.get(DatabaseConfig)
 connection_string = Utils.get_connection_string(database_config=database_config)
 
 from infrastructor.IocManager import IocManager
+# IocManager.Base = declarative_base(metadata=MetaData(schema=database_config.schema))
 #this is the Alembic Config object, which provides
 #access to the values within the .ini file in use.
 
@@ -44,8 +45,14 @@ from models.dao.integration.PythonDataIntegrationConnection import PythonDataInt
 from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegrationColumn
 from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
 from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
+from models.dao.operation.DataOperation import DataOperation
+from models.dao.operation.DataOperationExecution import DataOperationExecution
+from models.dao.operation.DataOperationExecutionProcess import DataOperationExecutionProcess
+from models.dao.operation.DataOperationExecutionProcessStatus import DataOperationExecutionProcessStatus
+from models.dao.operation.DataOperationExecutionStatus import DataOperationExecutionStatus
+from models.dao.operation.DataOperationIntegration import DataOperationIntegration
 
-schema ='Common'
+
 config = context.config
 
 # Interpret the config file for Python logging.
@@ -79,7 +86,7 @@ def run_migrations_offline():
     """
     print(f"run_migrations_offline")
     print(f"environment:{api_config.environment}")
-    print(f"schema:{schema}")
+    print(f"schema:{database_config.schema}")
     print(f"connection string:{connection_string}")
     
     if connection_string is not None and connection_string != "":
@@ -121,12 +128,13 @@ def run_migrations_online():
     connectible = None
     print(f"run_migrations_online")
     print(f"environment:{api_config.environment}")
-    print(f"schema:{schema}")
+    print(f"schema:{database_config.schema}")
     print(f"connection string:{connection_string}")
     connectible = create_engine(connection_string, poolclass=pool.NullPool)
     SCHEMA_NAME = "NOT_test_fktdb"
 
     def include_object(object, name, type_, reflected, compare_to):
+        # print(object.schema)
         if False:#(type_ == "table"):
             return object.schema == 'Common'
         else:
@@ -134,7 +142,7 @@ def run_migrations_online():
     if connectible is not None:
         # Create schema; if it already exists, skip this
         try:
-            connectible.execute(CreateSchema(schema))
+            connectible.execute(CreateSchema(database_config.schema))
         except sqlalchemy.exc.ProgrammingError:
             pass
         with connectible.connect() as connection:
@@ -145,7 +153,7 @@ def run_migrations_online():
                 compare_server_default=True,
                 include_schemas=True,
                 version_table='AlembicVersion',
-                version_table_schema=schema,
+                version_table_schema='Common',
                 include_object=include_object
             )
 

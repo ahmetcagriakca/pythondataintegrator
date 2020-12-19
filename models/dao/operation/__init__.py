@@ -1,0 +1,7 @@
+from models.dao.operation.DataOperation import DataOperation
+from models.dao.operation.DataOperationIntegration import DataOperationIntegration
+from models.dao.operation.DataOperationExecution import DataOperationExecution
+from models.dao.operation.DataOperationExecutionProcess import DataOperationExecutionProcess
+from models.dao.operation.DataOperationExecutionStatus import DataOperationExecutionStatus
+from models.dao.operation.DataOperationExecutionProcessStatus import DataOperationExecutionProcessStatus
+

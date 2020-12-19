@@ -12,8 +12,8 @@ from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from models.dao.connection.ConnectorType import ConnectorType
 from models.dao.connection.ConnectionType import ConnectionType
-from models.viewmodels.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel
-from models.viewmodels.UpdateConnectionDatabaseModel import UpdateConnectionDatabaseModel
+from models.viewmodels.connection.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel
+from models.viewmodels.connection.UpdateConnectionDatabaseModel import UpdateConnectionDatabaseModel
 
 
 class ConnectionService(IScoped):
@@ -137,8 +137,8 @@ class ConnectionService(IScoped):
         if connection_database is None:
             raise OperationalException("Database Connection Not Found")
 
-        self.connection_repository.delete(connection_database.ConnectionId)
-        self.connection_database_repository.delete(connection_database.Id)
+        self.connection_repository.delete_by_id(connection_database.ConnectionId)
+        self.connection_database_repository.delete_by_id(connection_database.Id)
         message = f'{connection_database.Connection.Name} connection deleted'
         self.sql_logger.info(message)
         self.database_session_manager.commit()

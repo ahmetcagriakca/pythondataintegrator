@@ -6,8 +6,8 @@ from controllers.models.ConnectionModels import ConnectionModels
 from domain.pdi.services.ConnectionService import ConnectionService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
-from models.viewmodels.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel
-from models.viewmodels.UpdateConnectionDatabaseModel import UpdateConnectionDatabaseModel
+from models.viewmodels.connection.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel
+from models.viewmodels.connection.UpdateConnectionDatabaseModel import UpdateConnectionDatabaseModel
 
 
 @ConnectionModels.ns.route("/GetConnectionTypes")
@@ -59,8 +59,8 @@ class GetConnectionResource(ResourceBase):
         """
         Get All Connections
         """
-        connections = self.connection_service.get_connections()
-        result = ConnectionModels.get_connection_result_models(connections)
+        entities = self.connection_service.get_connections()
+        result = ConnectionModels.get_connection_result_models(entities)
         return CommonModels.get_response(result=result)
 
 @ConnectionModels.ns.route("/ConectionDatabase")

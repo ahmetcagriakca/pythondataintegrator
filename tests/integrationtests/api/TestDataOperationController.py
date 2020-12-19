@@ -18,7 +18,7 @@ class PdiControllerTests(TestCase):
         from infrastructor.scheduler.JobScheduler import JobScheduler
 
         os.environ["PYTHON_ENVIRONMENT"] = 'test'
-        root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir))
+        root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),  os.pardir,os.pardir, os.pardir))
         IocManager.configure_startup(root_directory=root_directory, 
                                      app_wrapper=FlaskAppWrapper,
                                      job_scheduler=JobScheduler)

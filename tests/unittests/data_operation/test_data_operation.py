@@ -5,7 +5,6 @@ from unittest import TestCase
 from infrastructor.IocManager import IocManager
 from infrastructor.utils.Utils import Utils
 from models.dto.LimitModifier import LimitModifier
-from models.configs.PdiConfig import PdiConfig
 
 
 class TestDataOperation(TestCase):

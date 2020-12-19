@@ -36,6 +36,9 @@ class Repository(Generic[T], IScoped):
     def update(self, id: int, update_entity: T):
         entity = self.get_by_id(id)
 
-    def delete(self, id: int):
+    def delete_by_id(self, id: int):
         entity = self.get_by_id(id)
+        entity.IsDeleted = 1
+
+    def delete(self, entity: T):
         entity.IsDeleted = 1

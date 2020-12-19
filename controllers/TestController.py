@@ -14,7 +14,7 @@ from infrastructor.logging.SqlLogger import SqlLogger
 from models.configs.DatabaseConfig import DatabaseConfig
 
 
-@TestModels.ns.route('/path/<int:value>/<int:value_for_sum>')
+@TestModels.ns.route('/path/<int:value>/<int:value_for_sum>', doc=False)
 class TestResource(ResourceBase):
     @inject
     def __init__(self, *args, **kwargs):

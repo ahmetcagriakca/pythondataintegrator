@@ -3,7 +3,7 @@ DATABASE:
   TYPE: POSTGRESQL
   HOST: localhost
   PORT: 5432
-  DATABASE: pdi
+  DATABASE: ddi
   USERNAME: postgres
   PASSWORD: 123456
   SCHEMA: Common
@@ -14,8 +14,3 @@ API:
   IS_DEBUG: False
   PORT: 7100
   SECRET_KEY: verycomplexsecret
-
-PDI:
-  LIMIT: 10000
-  PROCESS_COUNT: 10
-  DO_PARALLEL: True

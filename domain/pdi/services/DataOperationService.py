@@ -9,11 +9,15 @@ from infrastructor.data.ConnectionProvider import ConnectionProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
+from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.multi_processing.ParallelMultiProcessing import TaskData
 from infrastructor.utils.PdiUtils import PdiUtils
 from models.configs.PdiConfig import PdiConfig
 from models.dao.integration.PythonDataIntegration import PythonDataIntegration
+from models.dao.operation import DataOperation, DataOperationIntegration
+from models.viewmodels.operation import CreateDataOperationModel
+from models.viewmodels.operation.UpdateDataOperationModel import UpdateDataOperationModel
 
 
 class DataOperationService(IScoped):
@@ -31,8 +35,20 @@ class DataOperationService(IScoped):
         self.database_session_manager = database_session_manager
         self.python_data_integration_repository: Repository[PythonDataIntegration] = Repository[PythonDataIntegration](
             database_session_manager)
+        self.data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
+            database_session_manager)
+        self.data_operation_integration_repository: Repository[DataOperationIntegration] = Repository[
+            DataOperationIntegration](
+            database_session_manager)
         self.connection_provider: ConnectionProvider = connection_provider
         self.sql_logger: SqlLogger = sql_logger
+
+    def get_data_operations(self) -> List[DataOperation]:
+        """
+        Data integration data preparing
+        """
+        data_operations = self.data_operation_repository.filter_by(IsDeleted=0).all()
+        return data_operations
 
     def get_integration_datas(self, integration_code=None) -> List[PythonDataIntegration]:
         """
@@ -43,89 +59,88 @@ class DataOperationService(IScoped):
             integration_datas = integration_datas.filter_by(Code=integration_code)
         return integration_datas.all()
 
-    def start_operation_old(self, integration_code: str = None, job_id=None):
+    def check_data_operation_name(self, name) -> DataOperation:
+        data_operation = self.data_operation_repository.first(Name=name, IsDeleted=0)
+        return data_operation is not None
+
+    def create_data_operation(self, data_operation_model: CreateDataOperationModel) -> DataOperation:
         """
-        Integration starting operation
+        Create Data Operation
         """
-        self.sql_logger.info(f'Data Integration is Begin with data:{integration_code}', job_id=job_id)
-        integration_datas = self.get_integration_datas(integration_code)
+        if self.check_data_operation_name(data_operation_model.Name):
+            raise OperationalException("Name already defined for other data operation")
+        data_operation = DataOperation(Name=data_operation_model.Name, Limit=data_operation_model.Limit,
+                                       ProcessCount=data_operation_model.ProcessCount)
 
-        if integration_datas is None or len(integration_datas) == 0:
-            self.sql_logger.info('Data Integration is completed with no result', job_id=job_id)
-            return None
-        for integration_data in integration_datas:
+        self.data_operation_repository.insert(data_operation)
+        for integration in data_operation_model.Integrations:
+            pdi = self.python_data_integration_repository.first(IsDeleted=0, Code=integration.Code)
+            if pdi is None:
+                raise OperationalException(f"{integration.Code} integration can not be found")
 
-            # Source and target database managers instantiate
-            source_connection = [x for x in integration_data.Connections if x.SourceOrTarget == 0][0]
-            target_connection = [x for x in integration_data.Connections if x.SourceOrTarget == 1][0]
-            source_connection_manager = self.connection_provider.get_connection(source_connection)
-            target_connection_manager = self.connection_provider.get_connection(target_connection)
+            data_operation_integration = DataOperationIntegration(Order=integration.Order, PythonDataIntegration=pdi,
+                                                                  DataOperation=data_operation)
+            self.data_operation_integration_repository.insert(data_operation_integration)
 
-            # Pre exec job
-            pre_execution = [x for x in integration_data.ExecutionJobs if x.IsPre == 1]
-            if len(pre_execution) > 0:
-                if pre_execution[0].ExecutionProcedure != '':
-                    pre_execution_procedure = pre_execution[0].ExecutionProcedure
-                    self.sql_logger.info(
-                        f'{integration_code} Pre Execution Job is Start. {pre_execution_procedure} procedure call start.',
-                        job_id=job_id)
-                    target_connection_manager.run_query(f'EXEC {pre_execution_procedure}')
-                    self.sql_logger.info(
-                        f'{integration_code} Pre Execution Job is End. {pre_execution_procedure} procedure call end.',
-                        job_id=job_id)
+        self.database_session_manager.commit()
 
-            # Integration Start
-            self.sql_logger.info(
-                f"{integration_data.Code} - {target_connection.Schema}.{target_connection.TableName} integration is began",
-                job_id=job_id)
+        data_operation = self.data_operation_repository.first(Id=data_operation.Id)
+        return data_operation
 
-            column_rows, final_executable, related_columns = PdiUtils.get_row_column_and_values(
-                target_connection.Connection.Database.ConnectorType.Name, target_connection.Schema,
-                target_connection.TableName, integration_data.Columns)
+    def update_data_operation(self,
+                              data_operation_model: UpdateDataOperationModel) -> DataOperation:
+        """
+        Update Data Operation
+        """
+        if not self.check_data_operation_name(data_operation_model.Name):
+            raise OperationalException("Data Operation not found")
+        data_operation = self.data_operation_repository.first(Name=data_operation_model.Name)
+        # insert or update integration
+        for integration in data_operation_model.Integrations:
+            pdi = self.python_data_integration_repository.first(IsDeleted=0, Code=integration.Code)
+            if pdi is None:
+                raise OperationalException(f"{integration.Code} integration can not be found")
 
-            data_count = \
-                source_connection_manager.fetch(
-                    PdiUtils.count_table(source_connection.Schema, source_connection.TableName,
-                                         source_connection.Connection.Database.ConnectorType.Name))[0][0]
-            self.pdi_config.limit = 10000
-            executable_scripts = PdiUtils.prepare_executable_scripts(data_count=data_count,
-                                                                     source_connector_type=source_connection.Connection.Database.ConnectorType.Name,
-                                                                     source_schema=source_connection.Schema,
-                                                                     source_table_name=source_connection.TableName,
-                                                                     column_rows=column_rows,
-                                                                     limit=self.pdi_config.limit)
+            data_operation_integration = self.data_operation_integration_repository.first(PythonDataIntegrationId=pdi.Id)
+            if data_operation_integration is None:
+                new_data_operation_integration = DataOperationIntegration(Order=integration.Order,
+                                                                      PythonDataIntegration=pdi,
+                                                                      DataOperation=data_operation)
+                self.data_operation_integration_repository.insert(new_data_operation_integration)
+            else:
+                data_operation_integration.Order = integration.Order
+                data_operation_integration.IsDeleted=0
 
-            # Delete if target data truncate is true
-            if integration_data.IsTargetTruncate:
-                target_connection_manager.delete(
-                    PdiUtils.truncate_table(target_connection.Schema, target_connection.TableName,
-                                            target_connection.Connection.Database.ConnectorType.Name))
-            for executable_script in executable_scripts:
-                # Extracted data fetched from source database
-                extracted_data = source_connection_manager.fetch(executable_script)
-                # Insert rows preparing
-                inserted_rows = PdiUtils.prepare_insert_row(extracted_data, related_columns)
-                # rows inserted to database
-                target_connection_manager.insert_many(final_executable, inserted_rows)
+        check_existing_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
+                                                                                       DataOperationId=data_operation.Id)
+        for existing_integration in check_existing_integrations:
+            founded = False
+            for integration in data_operation_model.Integrations:
+                if existing_integration.PythonDataIntegration.Code == integration.Code:
+                    founded = True
+            if not founded:
+                self.data_operation_integration_repository.delete_by_id(existing_integration.Id)
+        self.database_session_manager.commit()
 
-            # Post exec job
-            post_execution = [x for x in integration_data.ExecutionJobs if x.IsPost == 1]
-            if len(post_execution) > 0:
-                if post_execution[0].ExecutionProcedure != '':
-                    post_execution_procedure = post_execution[0].ExecutionProcedure
-                    self.sql_logger.info(
-                        f'{integration_code} Post Execution Job is Start. {post_execution_procedure} procedure call start.',
-                        job_id=job_id)
-                    target_connection.run_query(f'EXEC {post_execution_procedure}')
-                    self.sql_logger.info(
-                        f'{integration_code} Post Execution Job is End. {post_execution_procedure} procedure call end.',
-                        job_id=job_id)
+        data_operation = self.data_operation_repository.first(Id=data_operation.Id)
+        return data_operation
 
-            self.sql_logger.info(
-                f"{integration_data.Code} - {target_connection.Schema}.{target_connection.TableName} integration is completed",
-                job_id=job_id)
+    def delete_data_operation(self, id: int):
+        """
+        Delete Data operation
+        """
+        data_operation = self.data_operation_repository.first(Id=id, IsDeleted=0)
+        if data_operation is None:
+            raise OperationalException("Data Operation Not Found")
 
-        self.sql_logger.info('Data Integration is completed', job_id=job_id)
+        self.data_operation_repository.delete_by_id(data_operation.Id)
+        check_existing_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
+                                                                                       DataOperationId=data_operation.Id)
+        for existing_integration in check_existing_integrations:
+            self.data_operation_integration_repository.delete_by_id(existing_integration.Id)
+        message = f'{data_operation.Name} data operation deleted'
+        self.sql_logger.info(message)
+        self.database_session_manager.commit()
 
     @staticmethod
     def parallel_operation(process_id, process_name, tasks, results):
