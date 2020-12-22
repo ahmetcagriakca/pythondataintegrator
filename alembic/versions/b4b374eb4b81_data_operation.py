@@ -1,8 +1,8 @@
 """data_operation
 
-Revision ID: 8ca2550ae4ac
+Revision ID: b4b374eb4b81
 Revises: ddc1c049a9f7
-Create Date: 2020-12-19 20:40:22.373130
+Create Date: 2020-12-22 07:42:13.552486
 
 """
 from alembic import op
@@ -10,99 +10,120 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8ca2550ae4ac'
+revision = 'b4b374eb4b81'
 down_revision = 'ddc1c049a9f7'
 branch_labels = None
 depends_on = None
 
-
-def insert_connection_types():
-    from models.dao.operation.DataOperationExecutionStatus import DataOperationExecutionStatus
-    from models.dao.operation.DataOperationExecutionProcessStatus import DataOperationExecutionProcessStatus
+def insert_statuses():
+    from models.dao.common.Status import Status
     bind = op.get_bind()
     from sqlalchemy import orm
     session = orm.Session(bind=bind)
-    data_operation_execution_status_list = [
+    status_list = [
         {
             "Id":1,
-            "Name": "ExecutionInitialize",
-            "Description": "ExecutionInitialize",
+            "Name": "Initialized",
+            "Description": "Initialized",
         },
         {
             "Id":2,
-            "Name": "ExecutionStart",
-            "Description": "ExecutionStart",
+            "Name": "Start",
+            "Description": "Start",
         },
         {
             "Id":3,
-            "Name": "ExecutionFinish",
-            "Description": "ExecutionFinish",
-        },
-    ]
-    data_operation_execution_process_status_list = [
-        {
-            "Id":1,
-            "Name": "ProcessInitialize",
-            "Description": "ProcessInitialize",
-        },
-        {
-            "Id":2,
-            "Name": "ProcessStart",
-            "Description": "ProcessStart",
-        },
-        {
-            "Id":3,
-            "Name": "ProcessFinish",
-            "Description": "ProcessFinish",
+            "Name": "Finish",
+            "Description": "Finish",
         },
         {
             "Id":4,
-            "Name": "DataReadStart",
-            "Description": "DataReadStart",
-        },
-        {
-            "Id":5,
-            "Name": "DataReadEnd",
-            "Description": "ProcessEnd",
-        },
-        {
-            "Id":6,
-            "Name": "DataWriteStart",
-            "Description": "DataWriteStart",
-        },
-        {
-            "Id":7,
-            "Name": "DataWriteEnd",
-            "Description": "DataWriteEnd",
+            "Name": "Error",
+            "Description": "Error",
         },
     ]
-    data_operation_execution_statuses = []
-    for data_operation_execution_status_json in data_operation_execution_status_list:
-        data_operation_execution_status = DataOperationExecutionStatus(
-            Name=data_operation_execution_status_json["Name"],
-            Description=data_operation_execution_status_json["Description"]
+    statuses = []
+    for status_json in status_list:
+        status = Status(
+            Name=status_json["Name"],
+            Description=status_json["Description"]
         )
-        data_operation_execution_statuses.append(data_operation_execution_status)
-    session.bulk_save_objects(data_operation_execution_statuses)
+        statuses.append(status)
+    session.bulk_save_objects(statuses)
     session.commit()
-    data_operation_execution_process_statuses = []
-    for data_operation_execution_process_status_json in data_operation_execution_process_status_list:
-        data_operation_execution_process_status = DataOperationExecutionProcessStatus(
-            Name=data_operation_execution_process_status_json["Name"],
-            Description=data_operation_execution_process_status_json["Description"]
-            )
-        data_operation_execution_process_statuses.append(data_operation_execution_process_status)
-    session.bulk_save_objects(data_operation_execution_process_statuses)
+
+def insert_event_datas():
+    from models.enums.events import EVENT_EXECUTION_INITIALIZED,EVENT_EXECUTION_FINISHED, EVENT_EXECUTION_STARTED
+    from models.dao.common.OperationEvent import OperationEvent
+    bind = op.get_bind()
+    from sqlalchemy import orm
+    session = orm.Session(bind=bind)
+    events_list = [
+        {
+            "Code": EVENT_EXECUTION_INITIALIZED,
+            "Name": "EVENT_EXECUTION_INITIALIZED",
+            "Description": "Execution initialized",
+            "Class": "DataOperationJobExecution"
+        },
+        {
+            "Code": EVENT_EXECUTION_STARTED,
+            "Name": "EVENT_EXECUTION_STARTED",
+            "Description": "Execution was started",
+            "Class": "DataOperationJobExecution"
+        },
+        {
+            "Code": EVENT_EXECUTION_FINISHED,
+            "Name": "EVENT_EXECUTION_FINISHED",
+            "Description": "Execution was started",
+            "Class": "DataOperationJobExecution"
+        }
+    ]
+    events = []
+    for eventJson in events_list:
+        event = OperationEvent(Code=eventJson["Code"], Name=eventJson["Name"], Description=eventJson["Description"],
+                                 Class=eventJson["Class"])
+
+        events.append(event)
+    session.bulk_save_objects(events)
     session.commit()
 
 def upgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.execute('CREATE SCHEMA "Operation"')
+    op.create_table('OperationEvent',
+    sa.Column('Id', sa.Integer(), nullable=False),
+    sa.Column('Code', sa.Integer(), nullable=False),
+    sa.Column('Name', sa.String(length=100), nullable=False),
+    sa.Column('Description', sa.String(length=250), nullable=False),
+    sa.Column('Class', sa.String(length=255), nullable=False),
+    sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
+    sa.Column('CreationDate', sa.DateTime(), nullable=False),
+    sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
+    sa.Column('LastUpdatedDate', sa.DateTime(), nullable=True),
+    sa.Column('IsDeleted', sa.Integer(), nullable=False),
+    sa.Column('Comments', sa.String(length=1000), nullable=True),
+    sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
+    sa.PrimaryKeyConstraint('Id'),
+    sa.UniqueConstraint('Code'),
+    schema='Common'
+    )
+    op.create_table('Status',
+    sa.Column('Id', sa.Integer(), nullable=False),
+    sa.Column('Name', sa.String(length=100), nullable=False),
+    sa.Column('Description', sa.String(length=250), nullable=False),
+    sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
+    sa.Column('CreationDate', sa.DateTime(), nullable=False),
+    sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
+    sa.Column('LastUpdatedDate', sa.DateTime(), nullable=True),
+    sa.Column('IsDeleted', sa.Integer(), nullable=False),
+    sa.Column('Comments', sa.String(length=1000), nullable=True),
+    sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
+    sa.PrimaryKeyConstraint('Id'),
+    schema='Common'
+    )
     op.create_table('DataOperation',
     sa.Column('Id', sa.Integer(), nullable=False),
     sa.Column('Name', sa.String(length=100), nullable=False),
-    sa.Column('Limit', sa.Integer(), nullable=False),
-    sa.Column('ProcessCount', sa.Integer(), nullable=False),
     sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
     sa.Column('CreationDate', sa.DateTime(), nullable=False),
     sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
@@ -110,54 +131,6 @@ def upgrade():
     sa.Column('IsDeleted', sa.Integer(), nullable=False),
     sa.Column('Comments', sa.String(length=1000), nullable=True),
     sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
-    sa.PrimaryKeyConstraint('Id'),
-    schema='Operation'
-    )
-    op.create_table('DataOperationExecutionProcessStatus',
-    sa.Column('Id', sa.Integer(), nullable=False),
-    sa.Column('Name', sa.String(length=100), nullable=False),
-    sa.Column('Description', sa.String(length=250), nullable=False),
-    sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
-    sa.Column('CreationDate', sa.DateTime(), nullable=False),
-    sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
-    sa.Column('LastUpdatedDate', sa.DateTime(), nullable=True),
-    sa.Column('IsDeleted', sa.Integer(), nullable=False),
-    sa.Column('Comments', sa.String(length=1000), nullable=True),
-    sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
-    sa.PrimaryKeyConstraint('Id'),
-    schema='Operation'
-    )
-    op.create_table('DataOperationExecutionStatus',
-    sa.Column('Id', sa.Integer(), nullable=False),
-    sa.Column('Name', sa.String(length=100), nullable=False),
-    sa.Column('Description', sa.String(length=250), nullable=False),
-    sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
-    sa.Column('CreationDate', sa.DateTime(), nullable=False),
-    sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
-    sa.Column('LastUpdatedDate', sa.DateTime(), nullable=True),
-    sa.Column('IsDeleted', sa.Integer(), nullable=False),
-    sa.Column('Comments', sa.String(length=1000), nullable=True),
-    sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
-    sa.PrimaryKeyConstraint('Id'),
-    schema='Operation'
-    )
-    op.create_table('DataOperationExecution',
-    sa.Column('Id', sa.Integer(), nullable=False),
-    sa.Column('DataOperationId', sa.Integer(), nullable=True),
-    sa.Column('ApSchedulerJobId', sa.Integer(), nullable=True),
-    sa.Column('StatusId', sa.Integer(), nullable=True),
-    sa.Column('StartDate', sa.DateTime(), nullable=False),
-    sa.Column('EndDate', sa.DateTime(), nullable=True),
-    sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
-    sa.Column('CreationDate', sa.DateTime(), nullable=False),
-    sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
-    sa.Column('LastUpdatedDate', sa.DateTime(), nullable=True),
-    sa.Column('IsDeleted', sa.Integer(), nullable=False),
-    sa.Column('Comments', sa.String(length=1000), nullable=True),
-    sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
-    sa.ForeignKeyConstraint(['ApSchedulerJobId'], ['Aps.ApSchedulerJob.Id'], ),
-    sa.ForeignKeyConstraint(['DataOperationId'], ['Operation.DataOperation.Id'], ),
-    sa.ForeignKeyConstraint(['StatusId'], ['Operation.DataOperationExecutionStatus.Id'], ),
     sa.PrimaryKeyConstraint('Id'),
     schema='Operation'
     )
@@ -166,7 +139,8 @@ def upgrade():
     sa.Column('DataOperationId', sa.Integer(), nullable=True),
     sa.Column('PythonDataIntegrationId', sa.Integer(), nullable=True),
     sa.Column('Order', sa.Integer(), nullable=False),
-    sa.Column('SourceCount', sa.Integer(), nullable=True),
+    sa.Column('Limit', sa.Integer(), nullable=False),
+    sa.Column('ProcessCount', sa.Integer(), nullable=False),
     sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
     sa.Column('CreationDate', sa.DateTime(), nullable=False),
     sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
@@ -179,7 +153,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('Id'),
     schema='Operation'
     )
-    op.create_table('DataOperationSchedule',
+    op.create_table('DataOperationJob',
     sa.Column('Id', sa.Integer(), nullable=False),
     sa.Column('DataOperationId', sa.Integer(), nullable=True),
     sa.Column('ApSchedulerJobId', sa.Integer(), nullable=True),
@@ -198,14 +172,12 @@ def upgrade():
     sa.PrimaryKeyConstraint('Id'),
     schema='Operation'
     )
-    op.create_table('DataOperationExecutionProcess',
+    op.create_table('DataOperationJobExecution',
     sa.Column('Id', sa.Integer(), nullable=False),
-    sa.Column('DataOperationExecutionId', sa.Integer(), nullable=True),
+    sa.Column('DataOperationJobId', sa.Integer(), nullable=True),
     sa.Column('StatusId', sa.Integer(), nullable=True),
-    sa.Column('ProcessId', sa.Integer(), nullable=True),
-    sa.Column('SubLimit', sa.Integer(), nullable=False),
-    sa.Column('TopLimit', sa.Integer(), nullable=False),
-    sa.Column('ElapsedTime', sa.Float(precision=2), nullable=True),
+    sa.Column('StartDate', sa.DateTime(), nullable=False),
+    sa.Column('EndDate', sa.DateTime(), nullable=True),
     sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
     sa.Column('CreationDate', sa.DateTime(), nullable=False),
     sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
@@ -213,23 +185,41 @@ def upgrade():
     sa.Column('IsDeleted', sa.Integer(), nullable=False),
     sa.Column('Comments', sa.String(length=1000), nullable=True),
     sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
-    sa.ForeignKeyConstraint(['DataOperationExecutionId'], ['Operation.DataOperationExecution.Id'], ),
-    sa.ForeignKeyConstraint(['StatusId'], ['Operation.DataOperationExecutionProcessStatus.Id'], ),
+    sa.ForeignKeyConstraint(['DataOperationJobId'], ['Operation.DataOperationJob.Id'], ),
+    sa.ForeignKeyConstraint(['StatusId'], ['Common.Status.Id'], ),
     sa.PrimaryKeyConstraint('Id'),
     schema='Operation'
     )
-    insert_connection_types()
+    op.create_table('DataOperationJobExecutionEvent',
+    sa.Column('Id', sa.Integer(), nullable=False),
+    sa.Column('DataOperationJobExecutionId', sa.Integer(), nullable=True),
+    sa.Column('EventId', sa.Integer(), nullable=True),
+    sa.Column('EventDate', sa.DateTime(), nullable=False),
+    sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
+    sa.Column('CreationDate', sa.DateTime(), nullable=False),
+    sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
+    sa.Column('LastUpdatedDate', sa.DateTime(), nullable=True),
+    sa.Column('IsDeleted', sa.Integer(), nullable=False),
+    sa.Column('Comments', sa.String(length=1000), nullable=True),
+    sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
+    sa.ForeignKeyConstraint(['DataOperationJobExecutionId'], ['Operation.DataOperationJobExecution.Id'], ),
+    sa.ForeignKeyConstraint(['EventId'], ['Common.OperationEvent.Id'], ),
+    sa.PrimaryKeyConstraint('Id'),
+    schema='Operation'
+    )
+    insert_statuses()
+    insert_event_datas()
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('DataOperationExecutionProcess', schema='Operation')
-    op.drop_table('DataOperationSchedule', schema='Operation')
+    op.drop_table('DataOperationJobExecutionEvent', schema='Operation')
+    op.drop_table('DataOperationJobExecution', schema='Operation')
+    op.drop_table('DataOperationJob', schema='Operation')
     op.drop_table('DataOperationIntegration', schema='Operation')
-    op.drop_table('DataOperationExecution', schema='Operation')
-    op.drop_table('DataOperationExecutionStatus', schema='Operation')
-    op.drop_table('DataOperationExecutionProcessStatus', schema='Operation')
     op.drop_table('DataOperation', schema='Operation')
+    op.drop_table('Status', schema='Common')
+    op.drop_table('OperationEvent', schema='Common')
     # ### end Alembic commands ###
     op.execute('DROP SCHEMA "Operation"')

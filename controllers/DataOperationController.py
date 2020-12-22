@@ -91,10 +91,10 @@ class ScheduleJobResource(ResourceBase):
         Start operations
         """
         data = IocManager.api.payload
-        code = data.get('Code')  #
+        operation_name = data.get('OperationName')  #
         run_date = data.get('RunDate')  #
-        start_operation_result = self.job_operation_service.add_pdi_job_with_date(code=code, run_date=run_date)
-        result = DataOperationModels.get_pdi_job_model(start_operation_result)
+        start_operation_result = self.job_operation_service.add_pdi_job_with_date(operation_name=operation_name, run_date=run_date)
+        result = DataOperationModels.get_data_operation_job_model(start_operation_result)
         return CommonModels.get_response(result=result)
 
 
@@ -114,14 +114,14 @@ class ScheduleJobWithCronResource(ResourceBase):
         Start operations
         """
         data = IocManager.api.payload
-        code = data.get('Code')  #
+        operation_name = data.get('OperationName')  #
         cron = data.get('Cron')  #
         start_date = data.get('StartDate')  #
         end_date = data.get('EndDate')  #
-        start_operation_result = self.job_operation_service.add_pdi_job_with_cron(code=code, cron=cron,
+        start_operation_result = self.job_operation_service.add_pdi_job_with_cron(operation_name=operation_name, cron=cron,
                                                                                   start_date=start_date,
                                                                                   end_date=end_date)
-        result = DataOperationModels.get_pdi_job_model(start_operation_result)
+        result = DataOperationModels.get_data_operation_job_model(start_operation_result)
         return CommonModels.get_response(result=result)
 
     @DataOperationModels.ns.expect(DataOperationModels.start_operation_with_cron_model,
@@ -139,7 +139,7 @@ class ScheduleJobWithCronResource(ResourceBase):
         start_operation_result = self.job_operation_service.modify_job(code=code, cron=cron, start_date=start_date,
                                                                        end_date=end_date)
         if isinstance(start_operation_result, PythonDataIntegrationJob):
-            result = DataOperationModels.get_pdi_job_model(start_operation_result)
+            result = DataOperationModels.get_data_operation_job_model(start_operation_result)
             return CommonModels.get_response(result=result)
         else:
             message = start_operation_result
@@ -170,7 +170,7 @@ class GetJobDetailsResource(ResourceBase):
 
         if python_data_integration is None:
             return "Code Not Found"
-        result = DataOperationModels.get_pdi_job_models(python_data_integration.Jobs)
+        result = DataOperationModels.get_data_operation_job_models(python_data_integration.Jobs)
         return CommonModels.get_response(result)
 
 

@@ -14,11 +14,15 @@ class Repository(Generic[T], IScoped):
         self.database_session_manager: DatabaseSessionManager = database_session_manager
         self.type = self.__orig_class__.__args__[0]
 
+    @property
+    def table(self):
+        return self.database_session_manager.session.query(self.type)
+
     def insert(self, entity: T):
         self.database_session_manager.session.add(entity)
 
     def first(self, **kwargs) -> T:
-        query: Query = self.database_session_manager.session.query(self.type).filter_by(**kwargs)
+        query: Query = self.table.filter_by(**kwargs)
         return query.first()
 
     def filter_by(self, **kwargs) -> List[T]:

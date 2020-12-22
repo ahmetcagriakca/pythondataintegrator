@@ -73,3 +73,14 @@ class TestDataOperation(TestCase):
         end = time()
         print(f"EndTime :{end}")
         print(f"TotalTime :{end - start}")
+
+    def test_start_operation(self):
+        start = time()
+        print(f"StartTime :{start}")
+        from domain.pdi.services.DataOperationService import DataOperationService
+        data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
+        result = data_operation_service.start_operation('LOCAL_LOG', 0)
+        print(result)
+        end = time()
+        print(f"EndTime :{end}")
+        print(f"TotalTime :{end - start}")

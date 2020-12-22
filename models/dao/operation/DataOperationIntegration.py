@@ -11,7 +11,8 @@ class DataOperationIntegration(Entity, IocManager.Base):
     DataOperationId = Column(Integer, ForeignKey('Operation.DataOperation.Id'))
     PythonDataIntegrationId = Column(Integer, ForeignKey('Integration.PythonDataIntegration.Id'))
     Order = Column(Integer, index=False, unique=False, nullable=False)
-    SourceCount = Column(Integer, index=False, unique=False, nullable=True)
+    Limit = Column(Integer, index=False, unique=False, nullable=False)
+    ProcessCount = Column(Integer, index=False, unique=False, nullable=False)
     DataOperation = relationship("DataOperation", back_populates="Integrations")
     PythonDataIntegration = relationship("PythonDataIntegration", back_populates="DataOperationIntegrations")
 
@@ -19,7 +20,8 @@ class DataOperationIntegration(Entity, IocManager.Base):
                  DataOperationId: int = None,
                  PythonDataIntegrationId: int = None,
                  Order: int = None,
-                 SourceCount: int = None,
+                 Limit: int = None,
+                 ProcessCount: int = None,
                  DataOperation = None,
                  PythonDataIntegration = None,
                  *args, **kwargs):
@@ -27,6 +29,7 @@ class DataOperationIntegration(Entity, IocManager.Base):
         self.DataOperationId: int = DataOperationId
         self.PythonDataIntegrationId: int = PythonDataIntegrationId
         self.Order: int = Order
-        self.SourceCount: int = SourceCount
+        self.Limit: int = Limit
+        self.ProcessCount: int = ProcessCount
         self.DataOperation = DataOperation
         self.PythonDataIntegration = PythonDataIntegration

@@ -16,6 +16,7 @@ class ApSchedulerJob(Entity, IocManager.Base):
     FuncRef = Column(String(500), nullable=False)
     JobEvents: List[ApSchedulerJobEvent] = relationship("ApSchedulerJobEvent", back_populates="ApSchedulerJob")
     DataOperationJobs: List[DataOperationJob] = relationship("DataOperationJob", back_populates="ApSchedulerJob")
+
     def __init__(self,
                  JobId: TEXT = None,
                  NextRunTime: float = None,

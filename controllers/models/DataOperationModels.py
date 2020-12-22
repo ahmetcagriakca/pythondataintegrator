@@ -11,17 +11,21 @@ from controllers.models.PythonDataIntegrationModels import PythonDataIntegration
 from infrastructor.IocManager import IocManager
 from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
 from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
-from models.dao.operation import DataOperation
+from models.dao.operation import DataOperation, DataOperationJob
 
 
 class DataOperationIntegrationModel(EntityModel):
 
     def __init__(self,
                  Order: int = None,
+                 Limit: int = None,
+                 ProcessCount: int = None,
                  Integration=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Order: int = Order
+        self.Limit: int = Limit
+        self.ProcessCount: int = ProcessCount
         self.Integration = Integration
 
 
@@ -29,24 +33,20 @@ class DataOperationModel(EntityModel):
     def __init__(self,
                  Id: int = None,
                  Name: str = None,
-                 Limit: int = None,
-                 ProcessCount: int = None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Id: int = Id
         self.Name: str = Name
-        self.Limit: int = Limit
-        self.ProcessCount: int = ProcessCount
 
 
-class PythonDataIntegrationJobModel(EntityModel):
+class DataOperationJobModel(EntityModel):
     def __init__(self,
                  Id: int = None,
                  Code: str = None,
                  StartDate: datetime = None,
                  EndDate: datetime = None,
                  Cron: str = None,
-                 PythonDataIntegrationId: int = None,
+                 DataOperationId: int = None,
                  ApSchedulerJobId: int = None,
                  PythonDataIntegration=None,
                  ApSchedulerJob=None,
@@ -58,7 +58,7 @@ class PythonDataIntegrationJobModel(EntityModel):
         self.StartDate: datetime = StartDate
         self.EndDate: datetime = EndDate
         self.Cron: int = Cron
-        self.PythonDataIntegrationId: int = PythonDataIntegrationId
+        self.DataOperationId: int = DataOperationId
         self.ApSchedulerJobId: int = ApSchedulerJobId
         self.PythonDataIntegration = PythonDataIntegration
         self.ApSchedulerJob = ApSchedulerJob
@@ -98,36 +98,34 @@ class DataOperationModels:
     operation_integration = IocManager.api.model('test', {
         'Code': fields.String(description='Integration code', required=True),
         'Order': fields.Integer(description='Integration order', required=True, example=1),
+        'Limit': fields.Integer(description='Operation code value', required=False, example=10000),
+        'ProcessCount': fields.Integer(description='Operation code value', required=True, example=1)
     })
 
     create_data_operation_model = IocManager.api.model('CreateDataOperation', {
         'Name': fields.String(description='Data Operation Name', required=True),
         'Integrations': fields.List(fields.Nested(operation_integration), description='Integration code list',
                                     required=True),
-        'Limit': fields.Integer(description='Operation code value', required=False, example=10000),
-        'ProcessCount': fields.Integer(description='Operation code value', required=True, example=1)
     })
 
     update_data_operation_model = IocManager.api.model('UpdateDataOperation', {
         'Name': fields.String(description='Data Operation Name', required=True),
         'Integrations': fields.List(fields.Nested(operation_integration), description='Integration code list',
                                     required=True),
-        'Limit': fields.Integer(description='Paging Limit Information', required=False, example=10000),
-        'ProcessCount': fields.Integer(description='Configure your parallel process', required=False, example=1),
     })
 
     delete_data_operation_model = IocManager.api.model('DeleteDataOperationModel', {
         'Id': fields.Integer(description='Connection Database Id', required=True),
     })
 
-    start_operation_model = IocManager.api.model('StartOperation', {
-        'Code': fields.String(description='Operation code value', required=True),
+    start_operation_model = IocManager.api.model('Schedule', {
+        'OperationName': fields.String(description='Operation name', required=True),
         'RunDate': fields.DateTime(
             description="Job run date.", required=True,
             example=(datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'))
     })
-    start_operation_with_cron_model = IocManager.api.model('StartOperationWithCron', {
-        'Code': fields.String(description='Operation code value', required=True),
+    start_operation_with_cron_model = IocManager.api.model('ScheduleDataOperation', {
+        'OperationName': fields.String(description='Operation name', required=True),
         'Cron': fields.String(description="Job cron value. ", required=True, example='*/1 * * * *'),
         'StartDate': fields.DateTime(
             description="Job start date. The start date for the job can be entered if necessary.", required=False,
@@ -142,8 +140,6 @@ class DataOperationModels:
         entity_model = DataOperationModel(
             Id=data_operation.Id,
             Name=data_operation.Name,
-            Limit=data_operation.Limit,
-            ProcessCount=data_operation.ProcessCount,
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
         integrations = []
@@ -151,10 +147,13 @@ class DataOperationModels:
             entity_model = DataOperationIntegrationModel(
                 Id=data_operation_integration.Id,
                 Order=data_operation_integration.Order,
+                Limit=data_operation_integration.Limit,
+                ProcessCount=data_operation_integration.ProcessCount,
             )
-            data_operation_integration_result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+            data_operation_integration_result_model = json.loads(
+                json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
             integration = PythonDataIntegrationModels.get_pdi_model(data_operation_integration.PythonDataIntegration)
-            data_operation_integration_result_model['Integration']=integration
+            data_operation_integration_result_model['Integration'] = integration
             integrations.append(data_operation_integration_result_model)
         result_model['Integrations'] = integrations
         return result_model
@@ -168,29 +167,29 @@ class DataOperationModels:
         return entities
 
     @staticmethod
-    def get_pdi_job_model(python_data_integration_job: PythonDataIntegrationJob) -> PythonDataIntegrationJobModel:
-        entity_model = PythonDataIntegrationJobModel(
-            Id=python_data_integration_job.Id,
-            Cron=python_data_integration_job.Cron,
-            StartDate=python_data_integration_job.StartDate,
-            EndDate=python_data_integration_job.EndDate,
-            PythonDataIntegrationId=python_data_integration_job.PythonDataIntegrationId,
-            ApSchedulerJobId=python_data_integration_job.ApSchedulerJobId,
-            IsDeleted=python_data_integration_job.IsDeleted,
+    def get_data_operation_job_model(data_operation_job: DataOperationJob) -> DataOperationJobModel:
+        entity_model = DataOperationJobModel(
+            Id=data_operation_job.Id,
+            Cron=data_operation_job.Cron,
+            StartDate=data_operation_job.StartDate,
+            EndDate=data_operation_job.EndDate,
+            DataOperationId=data_operation_job.DataOperationId,
+            ApSchedulerJobId=data_operation_job.ApSchedulerJobId,
+            IsDeleted=data_operation_job.IsDeleted,
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['PythonDataIntegration'] = PythonDataIntegrationModels.get_pdi_model(
-            python_data_integration_job.PythonDataIntegration),
+        result_model['DataOperation'] = DataOperationModels.get_data_operation_result_model(
+            data_operation_job.DataOperation),
         result_model['ApSchedulerJob'] = JobSchedulerModels.get_ap_scheduler_job_model(
-            python_data_integration_job.ApSchedulerJob)
+            data_operation_job.ApSchedulerJob)
         return result_model
 
     @staticmethod
-    def get_pdi_job_models(python_data_integration_jobs: List[PythonDataIntegrationJob]) -> List[
-        PythonDataIntegrationJob]:
+    def get_data_operation_job_models(data_operation_jobs: List[DataOperationJob]) -> List[
+        DataOperationJobModel]:
         entities = []
-        for python_data_integration_job in python_data_integration_jobs:
-            entity = DataOperationModels.get_pdi_job_model(python_data_integration_job)
+        for data_operation_job in data_operation_jobs:
+            entity = DataOperationModels.get_data_operation_job_model(data_operation_jobs)
             entities.append(entity)
         return entities
 

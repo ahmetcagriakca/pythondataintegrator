@@ -1,7 +1,6 @@
 from models.dao.operation.DataOperation import DataOperation
 from models.dao.operation.DataOperationIntegration import DataOperationIntegration
-from models.dao.operation.DataOperationExecution import DataOperationExecution
-from models.dao.operation.DataOperationExecutionProcess import DataOperationExecutionProcess
-from models.dao.operation.DataOperationExecutionStatus import DataOperationExecutionStatus
-from models.dao.operation.DataOperationExecutionProcessStatus import DataOperationExecutionProcessStatus
+from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
+from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
+from models.dao.operation.DataOperationJob import DataOperationJob
 
