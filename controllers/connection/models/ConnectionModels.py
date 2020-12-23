@@ -3,7 +3,7 @@ from typing import List
 
 from flask_restplus import fields
 
-from controllers.models.CommonModels import EntityModel, CommonModels
+from controllers.common.models.CommonModels import EntityModel, CommonModels
 from infrastructor.IocManager import IocManager
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase

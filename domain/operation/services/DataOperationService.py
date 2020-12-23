@@ -3,9 +3,8 @@ from datetime import datetime
 from time import time
 from typing import List
 from injector import inject
-from sqlalchemy import not_
 
-from domain.pdi.services.ProcessService import ProcessService
+from domain.process.services.ProcessService import ProcessService
 from infrastructor.IocManager import IocManager
 from infrastructor.data.ConnectionProvider import ConnectionProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager

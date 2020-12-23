@@ -12,7 +12,7 @@ from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegra
 from models.dao.integration.PyhtonDataIntegrationExecutionJob import PythonDataIntegrationExecutionJob
 
 
-class ConfigurationOperationService(IScoped):
+class DataIntegrationService(IScoped):
     @inject
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,

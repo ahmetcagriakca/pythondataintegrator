@@ -9,7 +9,6 @@ from infrastructor.IocManager import IocManager
 
 class TestSchedulerModels:
     ns = IocManager.api.namespace('TestScheduler', description='Scheduler test endpoints', path='/api/TestScheduler')
-
     cron_sum_model = IocManager.api.model('CronSumModel', {
         'Cron': fields.String(description="Job cron value. ", required=True, example='*/1 * * * *'),
         'StartDate': fields.DateTime(

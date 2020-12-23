@@ -3,8 +3,8 @@ from typing import List
 
 from flask_restplus import fields
 
-from controllers.models.CommonModels import EntityModel, CommonModels
-from controllers.models.ConnectionModels import ConnectionModels
+from controllers.common.models.CommonModels import EntityModel, CommonModels
+from controllers.connection.models.ConnectionModels import ConnectionModels
 from infrastructor.IocManager import IocManager
 from models.dao.integration.PythonDataIntegration import PythonDataIntegration
 
@@ -64,11 +64,9 @@ class PythonDataIntegrationColumnModel:
         self.TargetColumnName = TargetColumnName
 
 
-
-class PythonDataIntegrationModels:
-
-    ns = IocManager.api.namespace('PythonDataIntegration', description='Python Data Integration endpoints',
-                                  path='/api/PythonDataIntegration')
+class DataIntegrationModels:
+    ns = IocManager.api.namespace('DataIntegration', description='Python Data Integration endpoints',
+                                  path='/api/DataIntegration')
     create_integration_data_model = IocManager.api.model('CreateIntegrationDataModel', {
         'Code': fields.String(description='Operation code value', required=True),
         'SourceConnectionId': fields.Integer(description='SourceConnectionId'),
@@ -158,7 +156,6 @@ class PythonDataIntegrationModels:
 
         entities = []
         for python_data_integration in python_data_integrations:
-            entity = PythonDataIntegrationModels.get_pdi_model(python_data_integration)
+            entity = DataIntegrationModels.get_pdi_model(python_data_integration)
             entities.append(entity)
         return entities
-

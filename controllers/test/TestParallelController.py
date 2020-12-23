@@ -2,16 +2,16 @@ from datetime import datetime
 
 from injector import inject
 
-from controllers.models.CommonModels import CommonModels
-from controllers.models.JobSchedulerModels import JobSchedulerModels
-from controllers.models.TestParallelModels import TestParallelModels
-from domain.pdi.services.JobOperationService import JobOperationService
-from domain.pdi.services.TestParallelService import TestParallelService
+from controllers.common.models.CommonModels import CommonModels
+from controllers.job.models.JobSchedulerModels import JobSchedulerModels
+from controllers.test.models.TestParallelModels import TestParallelModels
+from domain.job.services.JobOperationService import JobOperationService
+from domain.process.services.TestParallelService import TestParallelService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 
 
-@TestParallelModels.ns.route('/StartParallel/<int:value>')
+@TestParallelModels.ns.route('/StartParallel/<int:value>', doc=False)
 class TestParallelResource(ResourceBase):
     @inject
     def __init__(self, test_parallel_service: TestParallelService,
@@ -25,7 +25,7 @@ class TestParallelResource(ResourceBase):
         return CommonModels.get_response(message=result)
 
 
-@TestParallelModels.ns.route('/StartParallelJob/<int:value>/<int:count>')
+@TestParallelModels.ns.route('/StartParallelJob/<int:value>/<int:count>', doc=False)
 class StartParallelJob(ResourceBase):
     @inject
     def __init__(self, job_operation_service: JobOperationService, *args, **kwargs):

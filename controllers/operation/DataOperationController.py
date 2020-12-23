@@ -1,9 +1,9 @@
 import json
 from injector import inject
-from controllers.models.CommonModels import CommonModels
-from controllers.models.DataOperationModels import DataOperationModels
-from domain.pdi.services.DataOperationService import DataOperationService
-from domain.pdi.services.JobOperationService import JobOperationService
+from controllers.common.models.CommonModels import CommonModels
+from controllers.operation.models.DataOperationModels import DataOperationModels
+from domain.operation.services.DataOperationService import DataOperationService
+from domain.job.services.JobOperationService import JobOperationService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager

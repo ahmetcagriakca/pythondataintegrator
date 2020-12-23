@@ -3,13 +3,12 @@ from datetime import datetime, timedelta
 from typing import List
 
 from flask_restplus import fields
-from flask_restplus.fields import Raw, MarshallingError
+from flask_restplus.fields import Raw
 
-from controllers.models.CommonModels import EntityModel, CommonModels
-from controllers.models.JobSchedulerModels import JobSchedulerModels
-from controllers.models.PythonDataIntegrationModels import PythonDataIntegrationModels
+from controllers.common.models.CommonModels import EntityModel, CommonModels
+from controllers.job.models.JobSchedulerModels import JobSchedulerModels
+from controllers.integration.models.DataIntegrationModels import DataIntegrationModels
 from infrastructor.IocManager import IocManager
-from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
 from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
 from models.dao.operation import DataOperation, DataOperationJob
 
@@ -152,7 +151,7 @@ class DataOperationModels:
             )
             data_operation_integration_result_model = json.loads(
                 json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-            integration = PythonDataIntegrationModels.get_pdi_model(data_operation_integration.PythonDataIntegration)
+            integration = DataIntegrationModels.get_pdi_model(data_operation_integration.PythonDataIntegration)
             data_operation_integration_result_model['Integration'] = integration
             integrations.append(data_operation_integration_result_model)
         result_model['Integrations'] = integrations

@@ -5,7 +5,7 @@ from typing import List
 from apscheduler.triggers.cron import CronTrigger
 from injector import inject
 
-from domain.pdi.services.DataOperationService import DataOperationService
+from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
@@ -14,8 +14,6 @@ from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
-from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
-from models.dao.integration.PythonDataIntegration import PythonDataIntegration
 from models.dao.operation import DataOperation
 from models.dao.operation.DataOperationJob import DataOperationJob
 

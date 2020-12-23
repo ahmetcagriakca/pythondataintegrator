@@ -80,7 +80,7 @@ class TestMultiProcess(TestCase):
 
         start = time()
         print(f"StartTime :{start}")
-        from domain.pdi.services.TestParallelService import TestParallelService, TaskValue
+        from domain.process.services.TestParallelService import TestParallelService
         test_parallel_service: TestParallelService = IocManager.injector.get(TestParallelService)
         result = test_parallel_service.test_performance_parallel(1000)
         print(result)
@@ -90,7 +90,7 @@ class TestMultiProcess(TestCase):
 
     def test_parallel(self):
 
-        from domain.pdi.services.TestParallelService import TaskValue
+        from domain.process.services.TestParallelService import TaskValue
         start = time()
         print(f"StartTime :{start}")
         start_datetime = datetime.now()
@@ -115,7 +115,7 @@ class TestMultiProcess(TestCase):
 
     def test_with_not_parallel(self):
 
-        from domain.pdi.services.TestParallelService import TaskValue
+        from domain.process.services.TestParallelService import TaskValue
         start = time()
         print(f"StartTime :{start}")
         start_datetime = datetime.now()

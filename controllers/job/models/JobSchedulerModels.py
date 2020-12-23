@@ -3,7 +3,7 @@ from typing import List
 
 from flask_restplus import fields
 
-from controllers.models.CommonModels import EntityModel, CommonModels
+from controllers.common.models.CommonModels import EntityModel, CommonModels
 from infrastructor.IocManager import IocManager
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.aps.ApSchedulerJobEvent import ApSchedulerJobEvent

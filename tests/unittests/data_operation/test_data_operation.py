@@ -55,9 +55,9 @@ class TestDataOperation(TestCase):
     def test_parallel_data_operation(self):
         start = time()
         print(f"StartTime :{start}")
-        from domain.pdi.services.DataOperationService import DataOperationService
+        from domain.operation.services.DataOperationService import DataOperationService
         data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
-        result = data_operation_service.start_operation('CI_TRANSFER_TEST', 0)
+        result = data_operation_service.start_operation('TEST_OPERATION', 0)
         print(result)
         end = time()
         print(f"EndTime :{end}")
@@ -66,7 +66,7 @@ class TestDataOperation(TestCase):
     def test_data_operation(self):
         start = time()
         print(f"StartTime :{start}")
-        from domain.pdi.services.DataOperationService import DataOperationService
+        from domain.operation.services.DataOperationService import DataOperationService
         data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
         result = data_operation_service.start_operation('LOCAL_LOG', 0)
         print(result)
@@ -77,7 +77,7 @@ class TestDataOperation(TestCase):
     def test_start_operation(self):
         start = time()
         print(f"StartTime :{start}")
-        from domain.pdi.services.DataOperationService import DataOperationService
+        from domain.operation.services.DataOperationService import DataOperationService
         data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
         result = data_operation_service.start_operation('LOCAL_LOG', 0)
         print(result)

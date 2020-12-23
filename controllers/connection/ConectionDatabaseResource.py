@@ -1,76 +1,22 @@
 import json
 
 from injector import inject
-from controllers.models.CommonModels import CommonModels
-from controllers.models.ConnectionModels import ConnectionModels
-from domain.pdi.services.ConnectionService import ConnectionService
+from controllers.common.models.CommonModels import CommonModels
+from controllers.connection.models.ConnectionModels import ConnectionModels
+from domain.connection.services.ConnectionService import ConnectionService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 from models.viewmodels.connection.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel
 from models.viewmodels.connection.UpdateConnectionDatabaseModel import UpdateConnectionDatabaseModel
 
 
-@ConnectionModels.ns.route("/GetConnectionTypes")
-class GetConnectionTypesResource(ResourceBase):
+@ConnectionModels.ns.route("/ConnectionDatabase")
+class ConnectionDatabaseResource(ResourceBase):
     @inject
     def __init__(self, connection_service: ConnectionService,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.connection_service = connection_service
-
-    @ConnectionModels.ns.marshal_with(CommonModels.SuccessModel)
-    def get(self):
-        """
-        Get Connection Types
-        """
-        connection_types = self.connection_service.get_connection_types()
-        result = ConnectionModels.get_connection_type_models(connection_types)
-        return CommonModels.get_response(result=result)
-
-
-@ConnectionModels.ns.route("/GetConnectorTypes")
-class GetConnectorTypesResource(ResourceBase):
-    @inject
-    def __init__(self, connection_service: ConnectionService,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.connection_service = connection_service
-
-    @ConnectionModels.ns.marshal_with(CommonModels.SuccessModel)
-    def get(self):
-        """
-        Get Connector Types
-        """
-        connector_types = self.connection_service.get_connector_types()
-        result = ConnectionModels.get_connector_type_models(connector_types)
-        return CommonModels.get_response(result=result)
-
-@ConnectionModels.ns.route("/Conection")
-class GetConnectionResource(ResourceBase):
-    @inject
-    def __init__(self, connection_service: ConnectionService,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.connection_service = connection_service
-
-
-    @ConnectionModels.ns.marshal_with(CommonModels.SuccessModel)
-    def get(self):
-        """
-        Get All Connections
-        """
-        entities = self.connection_service.get_connections()
-        result = ConnectionModels.get_connection_result_models(entities)
-        return CommonModels.get_response(result=result)
-
-@ConnectionModels.ns.route("/ConectionDatabase")
-class GetConectionDatabaseResource(ResourceBase):
-    @inject
-    def __init__(self, connection_service: ConnectionService,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.connection_service = connection_service
-
 
     @ConnectionModels.ns.expect(ConnectionModels.create_connection_database_model, validate=True)
     @ConnectionModels.ns.marshal_with(CommonModels.SuccessModel)
