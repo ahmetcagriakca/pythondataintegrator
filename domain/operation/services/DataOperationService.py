@@ -202,13 +202,11 @@ class DataOperationService(IScoped):
                 new_value = tasks.get()
                 if new_value.IsFinished:
                     sql_logger.info(f"{process_name} process finished")
-                    print('[%s] evaluation routine quits' % process_name)
                     # Indicate finished
                     results.put(new_value)
                     break
                 else:
                     start = time()
-                    print(f"StartTime :{start}")
                     sql_logger.info(
                         f"{process_name} process got a new task. limits:{new_value.Data.sub_limit}-{new_value.Data.top_limit} ")
                     executable_script = PdiUtils.prepare_executable_script(
@@ -278,10 +276,13 @@ class DataOperationService(IScoped):
         return data_operation_job_execution
 
     def update_data_operation_job_execution_status(self, data_operation_job_execution_id: int = None,
-                                                   status_id: int = None):
+                                                   status_id: int = None,is_finished:bool=False):
         data_operation_job_execution = self.data_operation_job_execution_repository.first(
             Id=data_operation_job_execution_id)
         status = self.status_repository.first(Id=status_id)
+        if is_finished:
+            data_operation_job_execution.EndDate=datetime.now()
+
         data_operation_job_execution.Status = status
         self.database_session_manager.commit()
         return data_operation_job_execution
@@ -326,7 +327,7 @@ class DataOperationService(IScoped):
                 status_id=2)
             self.create_data_operation_job_execution_event(data_operation_execution_id=data_operation_job_execution.Id,
                                                            event_code=EVENT_EXECUTION_STARTED)
-            data_operation_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0).order_by(
+            data_operation_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,DataOperationId=data_operation.Id).order_by(
                 "Order")
             for data_operation_integration in data_operation_integrations:
                 integration: PythonDataIntegration = data_operation_integration.PythonDataIntegration
@@ -365,8 +366,8 @@ class DataOperationService(IScoped):
                     target_connection_manager.delete(
                         PdiUtils.truncate_table(target_connection.Schema, target_connection.TableName,
                                                 target_connection.Connection.Database.ConnectorType.Name))
-                limit = integration.Limit
-                process_count = integration.ProcessCount
+                limit = data_operation_integration.Limit
+                process_count = data_operation_integration.ProcessCount
                 if process_count > 1:
                     # Integration Start
                     self.sql_logger.info(
@@ -429,14 +430,14 @@ class DataOperationService(IScoped):
             # execution started
             self.update_data_operation_job_execution_status(
                 data_operation_job_execution_id=data_operation_job_execution.Id,
-                status_id=3)
+                status_id=3,is_finished=True)
             self.create_data_operation_job_execution_event(data_operation_execution_id=data_operation_job_execution.Id,
                                                            event_code=EVENT_EXECUTION_FINISHED)
             self.sql_logger.info('Data Integration is completed', job_id=job_id)
         except Exception as ex:
             self.update_data_operation_job_execution_status(
                 data_operation_job_execution_id=data_operation_job_execution.Id,
-                status_id=4)
+                status_id=4,is_finished=True)
             self.create_data_operation_job_execution_event(data_operation_execution_id=data_operation_job_execution.Id,
                                                            event_code=EVENT_EXECUTION_FINISHED)
             raise ex

@@ -1,3 +1,5 @@
+from typing import List
+
 from injector import inject
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
@@ -35,6 +37,13 @@ class DataIntegrationService(IScoped):
         self.sql_logger = sql_logger
 
     #######################################################################################
+
+    def get_data_integrations(self) -> List[PythonDataIntegration]:
+        """
+        Data integration data preparing
+        """
+        integration_datas = self.python_data_integration_repository.filter_by(IsDeleted=0)
+        return integration_datas.all()
 
     def create_integration_data(self, data: CreateIntegrationDataModel):
         self.sql_logger.info('PDI Insertion for:' + data.Code)
