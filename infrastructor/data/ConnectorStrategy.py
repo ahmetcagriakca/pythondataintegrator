@@ -10,3 +10,6 @@ class ConnectorStrategy(IScoped):
     @abstractmethod
     def disconnect(self):
         pass
+
+    def execute_many(self,query,data):
+        pass
