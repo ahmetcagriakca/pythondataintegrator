@@ -28,18 +28,18 @@ class PdiUtils:
 
     @staticmethod
     def mssql_executable_script(schema, table, sub_limit, top_limit, selected_rows, first_row):
-        return f"WITH TEMP_INTEGRATION AS(SELECT {selected_rows},RowNum = ROW_NUMBER() OVER ( order by {first_row} ) FROM {schema}.{table}) SELECT * FROM TEMP_INTEGRATION WHERE RowNum >= {sub_limit} AND RowNum < {top_limit}"
+        return f"WITH TEMP_INTEGRATION AS(SELECT {selected_rows}, row_number = ROW_NUMBER() OVER ( order by {first_row} ) FROM {schema}.{table}) SELECT * FROM TEMP_INTEGRATION WHERE row_number >= {sub_limit} AND row_number < {top_limit}"
 
     @staticmethod
     def oracle_executable_script(schema, table, sub_limit, top_limit, selected_rows, first_row):
-        return f"SELECT * FROM (SELECT {selected_rows}, rownum r from {schema}.{table} M) WHERE r >= {sub_limit} and r < {top_limit}"
+        return f"WITH TEMP_INTEGRATION AS(SELECT {selected_rows},ROW_NUMBER() OVER ( order by {first_row} ) row_number FROM {schema}.{table}) SELECT * FROM TEMP_INTEGRATION WHERE row_number >= {sub_limit} and row_number < {top_limit}"
 
     @staticmethod
     def postgresql_executable_script(schema, table, sub_limit, top_limit, selected_rows, first_row):
         schema = '"' + schema + '"'
         table = '"' + table + '"'
         first_row = '"' + first_row + '"'
-        return f"WITH TEMP_INTEGRATION AS(SELECT {selected_rows},ROW_NUMBER() OVER ( order by {first_row} ) FROM {schema}.{table}) SELECT * FROM TEMP_INTEGRATION WHERE ROW_NUMBER >= {sub_limit} AND ROW_NUMBER < {top_limit}"
+        return f"WITH TEMP_INTEGRATION AS(SELECT {selected_rows},ROW_NUMBER() OVER ( order by {first_row} ) row_number FROM {schema}.{table}) SELECT * FROM TEMP_INTEGRATION WHERE row_number >= {sub_limit} AND row_number < {top_limit}"
 
     #################################################################
     @staticmethod

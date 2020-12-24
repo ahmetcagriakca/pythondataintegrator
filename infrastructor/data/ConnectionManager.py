@@ -56,9 +56,7 @@ class ConnectionManager(IScoped):
         return self._insert_to_db_with_retry(executable_script, data, self.default_retry)
 
     def _insert_many_start(self, executable_script, data):
-        cur = self.connector.connection.cursor()
-        cur.executemany(executable_script, data)
-        self.connector.connection.commit()
+        self.connector.execute_many(executable_script,data)
 
     def _insert_to_db_with_retry(self, executable_script, data, retry):
         try:
