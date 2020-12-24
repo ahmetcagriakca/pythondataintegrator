@@ -3,7 +3,6 @@ from datetime import datetime
 from time import time
 from typing import List
 from injector import inject
-
 from domain.process.services.ProcessService import ProcessService
 from infrastructor.IocManager import IocManager
 from infrastructor.data.ConnectionProvider import ConnectionProvider
@@ -19,11 +18,64 @@ from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.common import OperationEvent
 from models.dao.common.Status import Status
 from models.dao.integration.PythonDataIntegration import PythonDataIntegration
-from models.dao.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, DataOperationJob
+from models.dao.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
+    DataOperationJob
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
+from models.dto.LimitModifier import LimitModifier
 from models.enums.events import EVENT_EXECUTION_STARTED, EVENT_EXECUTION_FINISHED, EVENT_EXECUTION_INITIALIZED
 from models.viewmodels.operation import CreateDataOperationModel
 from models.viewmodels.operation.UpdateDataOperationModel import UpdateDataOperationModel
+
+
+class ExecuteOperationDto:
+    def __init__(self,
+                 source_connection=None,
+                 target_connection=None,
+                 source_connection_manager=None,
+                 target_connection_manager=None,
+                 limit_modifier=None,
+                 first_row=None,
+                 selected_rows=None,
+                 related_columns=None,
+                 final_executable=None
+                 ):
+        self.source_connection = source_connection
+        self.target_connection = target_connection
+        self.source_connection_manager = source_connection_manager
+        self.target_connection_manager = target_connection_manager
+        self.limit_modifier = limit_modifier
+        self.first_row = first_row
+        self.selected_rows = selected_rows
+        self.related_columns = related_columns
+        self.final_executable = final_executable
+
+
+class ExecuteOperationFactory:
+    def __init__(self, connection_provider: ConnectionProvider):
+        self.connection_provider = connection_provider
+
+    def GetExecuteOperationDto(self,
+                               source_connection,
+                               target_connection,
+                               integration_data_columns):
+        source_connection_manager = self.connection_provider.get_connection(source_connection)
+        target_connection_manager = self.connection_provider.get_connection(target_connection)
+        column_rows, final_executable, related_columns = PdiUtils.get_row_column_and_values(
+            target_connection.Connection.Database.ConnectorType.Name, target_connection.Schema,
+            target_connection.TableName, integration_data_columns)
+        first_row, selected_rows = PdiUtils.get_first_row_and_selected_rows(column_rows)
+
+        execute_operation_dto = ExecuteOperationDto(
+            source_connection=source_connection,
+            target_connection=target_connection,
+            source_connection_manager=source_connection_manager,
+            target_connection_manager=target_connection_manager,
+            first_row=first_row,
+            selected_rows=selected_rows,
+            related_columns=related_columns,
+            final_executable=final_executable
+        )
+        return execute_operation_dto
 
 
 class DataOperationService(IScoped):
@@ -39,7 +91,8 @@ class DataOperationService(IScoped):
         self.process_service = process_service
         self.pdi_config: PdiConfig = pdi_config
         self.database_session_manager = database_session_manager
-        self.python_data_integration_repository: Repository[PythonDataIntegration] = Repository[PythonDataIntegration](
+        self.python_data_integration_repository: Repository[PythonDataIntegration] = Repository[
+            PythonDataIntegration](
             database_session_manager)
         self.data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
             database_session_manager)
@@ -175,7 +228,7 @@ class DataOperationService(IScoped):
         self.database_session_manager.commit()
 
     @staticmethod
-    def parallel_operation(process_id, process_name, tasks, results):
+    def parallel_operation(process_id, sub_process_id, process_name, tasks, results):
         try:
             print('[%s] evaluation routine starts' % process_name)
 
@@ -184,60 +237,70 @@ class DataOperationService(IScoped):
             IocManager.configure_startup(root_directory)
             sql_logger = IocManager.injector.get(SqlLogger)
             database_session_manager = IocManager.injector.get(DatabaseSessionManager)
-            python_data_integration_repository: Repository[PythonDataIntegration] = Repository[PythonDataIntegration](
+            python_data_integration_repository: Repository[PythonDataIntegration] = Repository[
+                PythonDataIntegration](
                 database_session_manager)
             connection_provider = IocManager.injector.get(ConnectionProvider)
             integration_data = python_data_integration_repository.first(Id=process_id, IsDeleted=0)
-
             source_connection = [x for x in integration_data.Connections if x.SourceOrTarget == 0][0]
             target_connection = [x for x in integration_data.Connections if x.SourceOrTarget == 1][0]
-            source_connection_manager = connection_provider.get_connection(source_connection)
-            target_connection_manager = connection_provider.get_connection(target_connection)
-            column_rows, final_executable, related_columns = PdiUtils.get_row_column_and_values(
-                target_connection.Connection.Database.ConnectorType.Name, target_connection.Schema,
-                target_connection.TableName, integration_data.Columns)
-            first_row, selected_rows = PdiUtils.get_first_row_and_selected_rows(column_rows)
+            execute_operation_dto = ExecuteOperationFactory(
+                connection_provider=connection_provider).GetExecuteOperationDto(
+                source_connection=source_connection,
+                target_connection=target_connection,
+                integration_data_columns=integration_data.Columns)
+
             while True:
                 # waiting for new task
-                new_value = tasks.get()
-                if new_value.IsFinished:
+                new_task: TaskData = tasks.get()
+                new_task.SubProcessId = sub_process_id
+                if new_task.IsFinished:
                     sql_logger.info(f"{process_name} process finished")
                     # Indicate finished
-                    results.put(new_value)
+                    results.put(new_task)
                     break
                 else:
                     start = time()
                     sql_logger.info(
-                        f"{process_name} process got a new task. limits:{new_value.Data.sub_limit}-{new_value.Data.top_limit} ")
-                    executable_script = PdiUtils.prepare_executable_script(
-                        source_connector_type=source_connection.Connection.Database.ConnectorType.Name,
-                        source_schema=source_connection.Schema,
-                        source_table_name=source_connection.TableName,
-                        sub_limit=new_value.Data.sub_limit,
-                        top_limit=new_value.Data.top_limit,
-                        first_row=first_row,
-                        selected_rows=selected_rows
-                    )
-                    DataOperationService.run_operation(
-                        source_connection_manager=source_connection_manager,
-                        target_connection_manager=target_connection_manager,
-                        executable_script=executable_script,
-                        related_columns=related_columns,
-                        final_executable=final_executable)
+                        f"{process_name}-{sub_process_id} process got a new task.Id:{new_task.Data.Id} limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit} ")
+                    if process_name == "P1":
+                        return
+                    if process_name == "P3":
+                        return
+                    execute_operation_dto.limit_modifier = new_task.Data
+                    DataOperationService.execute_operation(execute_operation_dto=execute_operation_dto)
+                    # executable_script = PdiUtils.prepare_executable_script(
+                    #     source_connector_type=source_connection.Connection.Database.ConnectorType.Name,
+                    #     source_schema=source_connection.Schema,
+                    #     source_table_name=source_connection.TableName,
+                    #     sub_limit=new_task.Data.SubLimit,
+                    #     top_limit=new_task.Data.TopLimit,
+                    #     first_row=first_row,
+                    #     selected_rows=selected_rows
+                    # )
+                    # DataOperationService.run_operation(
+                    #     source_connection_manager=source_connection_manager,
+                    #     target_connection_manager=target_connection_manager,
+                    #     executable_script=executable_script,
+                    #     related_columns=related_columns,
+                    #     final_executable=final_executable)
                     end = time()
                     sql_logger.info(
-                        f"{process_name} process finished task. limits:{new_value.Data.sub_limit}-{new_value.Data.top_limit}. time:{end - start}")
-                    results.put(new_value)
+                        f"{process_name} process finished task. limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit}. time:{end - start}")
+                    new_task.IsProcessed = True
+                    results.put(new_task)
+
         except Exception as ex:
             sql_logger.error(
-                f"{process_name} process finished task. limits:{new_value.Data.sub_limit}-{new_value.Data.top_limit}. time:{end - start}- error:{ex}")
-            data = TaskData(IsFinished=True)
+                f"{process_name} process finished task. limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit}. time:{end - start}- error:{ex}")
+
+            data = TaskData(SubProcessId=sub_process_id, IsFinished=True)
             results.put(data)
 
     @staticmethod
     def parallel_operation_result(result: TaskData):
         if not result.IsFinished:
-            print(f'Operation executed for limits: {result.Data.sub_limit}-{result.Data.top_limit} ')
+            print(f'Operation executed for limits: {result.Data.SubLimit}-{result.Data.TopLimit} ')
 
     @staticmethod
     def run_operation(source_connection_manager, target_connection_manager, executable_script,
@@ -276,12 +339,12 @@ class DataOperationService(IScoped):
         return data_operation_job_execution
 
     def update_data_operation_job_execution_status(self, data_operation_job_execution_id: int = None,
-                                                   status_id: int = None,is_finished:bool=False):
+                                                   status_id: int = None, is_finished: bool = False):
         data_operation_job_execution = self.data_operation_job_execution_repository.first(
             Id=data_operation_job_execution_id)
         status = self.status_repository.first(Id=status_id)
         if is_finished:
-            data_operation_job_execution.EndDate=datetime.now()
+            data_operation_job_execution.EndDate = datetime.now()
 
         data_operation_job_execution.Status = status
         self.database_session_manager.commit()
@@ -299,6 +362,38 @@ class DataOperationService(IScoped):
         self.data_operation_job_execution_event_repository.insert(data_operation_job_execution_event)
         self.database_session_manager.commit()
         return data_operation_job_execution_event
+
+    @staticmethod
+    def execute_limit_modifiers(sql_logger, limit_modifiers, execute_operation_dto):
+
+        for limit_modifier in limit_modifiers:
+            start = time()
+            print(f"StartTime :{start}")
+            sql_logger.info(
+                f"Process got a new task. limits:{limit_modifier.SubLimit}-{limit_modifier.TopLimit} ")
+            execute_operation_dto.limit_modifier = limit_modifier
+            DataOperationService.execute_operation(execute_operation_dto=execute_operation_dto)
+            end = time()
+            sql_logger.info(
+                f"Process finished task. limits:{limit_modifier.SubLimit}-{limit_modifier.TopLimit}. time:{end - start}")
+
+    @staticmethod
+    def execute_operation(execute_operation_dto: ExecuteOperationDto):
+        executable_script = PdiUtils.prepare_executable_script(
+            source_connector_type=execute_operation_dto.source_connection.Connection.Database.ConnectorType.Name,
+            source_schema=execute_operation_dto.source_connection.Schema,
+            source_table_name=execute_operation_dto.source_connection.TableName,
+            sub_limit=execute_operation_dto.limit_modifier.SubLimit,
+            top_limit=execute_operation_dto.limit_modifier.TopLimit,
+            first_row=execute_operation_dto.first_row,
+            selected_rows=execute_operation_dto.selected_rows
+        )
+        DataOperationService.run_operation(
+            source_connection_manager=execute_operation_dto.source_connection_manager,
+            target_connection_manager=execute_operation_dto.target_connection_manager,
+            executable_script=executable_script,
+            related_columns=execute_operation_dto.related_columns,
+            final_executable=execute_operation_dto.final_executable)
 
     def start_operation(self, data_operation_id: str = None, job_id=None):  # parallel_
         """
@@ -325,9 +420,11 @@ class DataOperationService(IScoped):
             self.update_data_operation_job_execution_status(
                 data_operation_job_execution_id=data_operation_job_execution.Id,
                 status_id=2)
-            self.create_data_operation_job_execution_event(data_operation_execution_id=data_operation_job_execution.Id,
-                                                           event_code=EVENT_EXECUTION_STARTED)
-            data_operation_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,DataOperationId=data_operation.Id).order_by(
+            self.create_data_operation_job_execution_event(
+                data_operation_execution_id=data_operation_job_execution.Id,
+                event_code=EVENT_EXECUTION_STARTED)
+            data_operation_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
+                                                                                               DataOperationId=data_operation.Id).order_by(
                 "Order")
             for data_operation_integration in data_operation_integrations:
                 integration: PythonDataIntegration = data_operation_integration.PythonDataIntegration
@@ -374,41 +471,39 @@ class DataOperationService(IScoped):
                         f"{integration.Code} - operation will execute parallel. {process_count}-{limit}",
                         job_id=job_id)
                     limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
-                    self.process_service.start_parallel_process(process_id=integration.Id, datas=limit_modifiers,
-                                                                process_count=process_count,
-                                                                process_method=DataOperationService.parallel_operation,
-                                                                result_method=DataOperationService.parallel_operation_result)
-                else:
-                    self.sql_logger.info(f"{integration.Code} - operation will execute serial. {limit}", job_id=job_id)
-                    column_rows, final_executable, related_columns = PdiUtils.get_row_column_and_values(
-                        target_connection.Connection.Database.ConnectorType.Name, target_connection.Schema,
-                        target_connection.TableName, integration.Columns)
-                    first_row, selected_rows = PdiUtils.get_first_row_and_selected_rows(column_rows)
+                    unprocessed_task_list = self.process_service.start_parallel_process(process_id=integration.Id,
+                                                                                        datas=limit_modifiers,
+                                                                                        process_count=process_count,
+                                                                                        process_method=DataOperationService.parallel_operation,
+                                                                                        result_method=DataOperationService.parallel_operation_result)
+                    print("parallel finished")
+                    if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
+                        self.sql_logger.info(f"Unprocessed tasks founded",
+                                             job_id=job_id)
+                        execute_operation_dto = ExecuteOperationFactory(
+                            connection_provider=self.connection_provider).GetExecuteOperationDto(
+                            source_connection=source_connection,
+                            target_connection=target_connection,
+                            integration_data_columns=integration.Columns)
+                        limit_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]
 
+                        DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
+                                                                     limit_modifiers=limit_modifiers,
+                                                                     execute_operation_dto=execute_operation_dto)
+
+                else:
+                    self.sql_logger.info(f"{integration.Code} - operation will execute serial. {limit}",
+                                         job_id=job_id)
+
+                    execute_operation_dto = ExecuteOperationFactory(
+                        connection_provider=self.connection_provider).GetExecuteOperationDto(
+                        source_connection=source_connection,
+                        target_connection=target_connection,
+                        integration_data_columns=integration.Columns)
                     limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
-                    for limit_modifier in limit_modifiers:
-                        start = time()
-                        print(f"StartTime :{start}")
-                        self.sql_logger.info(
-                            f"Process got a new task. limits:{limit_modifier.sub_limit}-{limit_modifier.top_limit} ")
-                        executable_script = PdiUtils.prepare_executable_script(
-                            source_connector_type=source_connection.Connection.Database.ConnectorType.Name,
-                            source_schema=source_connection.Schema,
-                            source_table_name=source_connection.TableName,
-                            sub_limit=limit_modifier.sub_limit,
-                            top_limit=limit_modifier.top_limit,
-                            first_row=first_row,
-                            selected_rows=selected_rows
-                        )
-                        DataOperationService.run_operation(
-                            source_connection_manager=source_connection_manager,
-                            target_connection_manager=target_connection_manager,
-                            executable_script=executable_script,
-                            related_columns=related_columns,
-                            final_executable=final_executable)
-                        end = time()
-                        self.sql_logger.info(
-                            f"Process finished task. limits:{limit_modifier.sub_limit}-{limit_modifier.top_limit}. time:{end - start}")
+                    DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
+                                                                 limit_modifiers=limit_modifiers,
+                                                                 execute_operation_dto=execute_operation_dto)
 
                 # Post exec job
                 post_execution = [x for x in integration.ExecutionJobs if x.IsPost == 1]
@@ -430,14 +525,16 @@ class DataOperationService(IScoped):
             # execution started
             self.update_data_operation_job_execution_status(
                 data_operation_job_execution_id=data_operation_job_execution.Id,
-                status_id=3,is_finished=True)
-            self.create_data_operation_job_execution_event(data_operation_execution_id=data_operation_job_execution.Id,
-                                                           event_code=EVENT_EXECUTION_FINISHED)
+                status_id=3, is_finished=True)
+            self.create_data_operation_job_execution_event(
+                data_operation_execution_id=data_operation_job_execution.Id,
+                event_code=EVENT_EXECUTION_FINISHED)
             self.sql_logger.info('Data Integration is completed', job_id=job_id)
         except Exception as ex:
             self.update_data_operation_job_execution_status(
                 data_operation_job_execution_id=data_operation_job_execution.Id,
-                status_id=4,is_finished=True)
-            self.create_data_operation_job_execution_event(data_operation_execution_id=data_operation_job_execution.Id,
-                                                           event_code=EVENT_EXECUTION_FINISHED)
+                status_id=4, is_finished=True)
+            self.create_data_operation_job_execution_event(
+                data_operation_execution_id=data_operation_job_execution.Id,
+                event_code=EVENT_EXECUTION_FINISHED)
             raise ex

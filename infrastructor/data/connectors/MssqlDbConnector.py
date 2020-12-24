@@ -30,12 +30,11 @@ class MssqlDbConnector(ConnectorStrategy):
             pass
 
     def execute_many(self,query,data):
-        cursor = self.connection.cursor()
-        cursor.fast_executemany = True
+        self.cursor.fast_executemany = True
         try:
-            cursor.executemany(query, data)
+            self.cursor.executemany(query, data)
             self.connection.commit()
         except Exception as error:
             self.connection.rollback()
-            cursor.close()
+            self.cursor.close()
             raise error

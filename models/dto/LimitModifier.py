@@ -1,8 +1,12 @@
+from infrastructor.multi_processing.ParallelMultiProcessing import ProcessBaseData
 
-class LimitModifier:
+
+class LimitModifier(ProcessBaseData):
     def __init__(self,
-                 top_limit: int = None,
-                 sub_limit: int = None,
+                 Id: int = None,
+                 TopLimit: int = None,
+                 SubLimit: int = None,
                  ):
-        self.sub_limit = sub_limit
-        self.top_limit = top_limit
+        super().__init__(Id)
+        self.SubLimit = SubLimit
+        self.TopLimit = TopLimit
