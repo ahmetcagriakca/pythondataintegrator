@@ -9,7 +9,7 @@ from infrastructor.api.ResourceBase import ResourceBase
 from models.viewmodels.integration.CreateIntegrationDataModel import CreateIntegrationDataModel
 
 
-@DataIntegrationModels.ns.route("/DataIntegration")
+@DataIntegrationModels.ns.route("")
 class DataIntegrationResource(ResourceBase):
     @inject
     def __init__(self,
@@ -23,7 +23,7 @@ class DataIntegrationResource(ResourceBase):
         """
         All integration data
         """
-        python_data_integrations = self.python_data_integration_repository.filter_by(IsDeleted=0)
+        python_data_integrations = self.data_integration_service.get_data_integrations()
         result = DataIntegrationModels.get_pdi_models(python_data_integrations)
         return CommonModels.get_response(result)
 

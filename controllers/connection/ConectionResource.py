@@ -5,7 +5,7 @@ from domain.connection.services.ConnectionService import ConnectionService
 from infrastructor.api.ResourceBase import ResourceBase
 
 
-@ConnectionModels.ns.route("/Connection")
+@ConnectionModels.ns.route("")
 class ConnectionResource(ResourceBase):
     @inject
     def __init__(self, connection_service: ConnectionService,
