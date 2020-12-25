@@ -181,7 +181,7 @@ class DataOperationService(IScoped):
             if pdi is None:
                 raise OperationalException(f"{integration.Code} integration can not be found")
 
-            data_operation_integration = self.data_operation_integration_repository.first(
+            data_operation_integration = self.data_operation_integration_repository.first(DataOperationId=data_operation.Id,
                 PythonDataIntegrationId=pdi.Id)
             if data_operation_integration is None:
                 new_data_operation_integration = DataOperationIntegration(Order=integration.Order,
@@ -263,27 +263,8 @@ class DataOperationService(IScoped):
                     start = time()
                     sql_logger.info(
                         f"{process_name}-{sub_process_id} process got a new task.Id:{new_task.Data.Id} limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit} ")
-                    if process_name == "P1":
-                        return
-                    if process_name == "P3":
-                        return
                     execute_operation_dto.limit_modifier = new_task.Data
                     DataOperationService.execute_operation(execute_operation_dto=execute_operation_dto)
-                    # executable_script = PdiUtils.prepare_executable_script(
-                    #     source_connector_type=source_connection.Connection.Database.ConnectorType.Name,
-                    #     source_schema=source_connection.Schema,
-                    #     source_table_name=source_connection.TableName,
-                    #     sub_limit=new_task.Data.SubLimit,
-                    #     top_limit=new_task.Data.TopLimit,
-                    #     first_row=first_row,
-                    #     selected_rows=selected_rows
-                    # )
-                    # DataOperationService.run_operation(
-                    #     source_connection_manager=source_connection_manager,
-                    #     target_connection_manager=target_connection_manager,
-                    #     executable_script=executable_script,
-                    #     related_columns=related_columns,
-                    #     final_executable=final_executable)
                     end = time()
                     sql_logger.info(
                         f"{process_name} process finished task. limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit}. time:{end - start}")
@@ -425,7 +406,7 @@ class DataOperationService(IScoped):
                 event_code=EVENT_EXECUTION_STARTED)
             data_operation_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
                                                                                                DataOperationId=data_operation.Id).order_by(
-                "Order")
+                "Order").all()
             for data_operation_integration in data_operation_integrations:
                 integration: PythonDataIntegration = data_operation_integration.PythonDataIntegration
                 integration_code = integration.Code
