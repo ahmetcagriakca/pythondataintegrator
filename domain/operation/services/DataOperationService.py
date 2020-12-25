@@ -13,7 +13,6 @@ from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.multi_processing.ParallelMultiProcessing import TaskData
 from infrastructor.utils.PdiUtils import PdiUtils
-from models.configs.PdiConfig import PdiConfig
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.common import OperationEvent
 from models.dao.common.Status import Status
@@ -85,11 +84,9 @@ class DataOperationService(IScoped):
                  database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
                  connection_provider: ConnectionProvider,
-                 pdi_config: PdiConfig,
                  process_service: ProcessService
                  ):
         self.process_service = process_service
-        self.pdi_config: PdiConfig = pdi_config
         self.database_session_manager = database_session_manager
         self.python_data_integration_repository: Repository[PythonDataIntegration] = Repository[
             PythonDataIntegration](

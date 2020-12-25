@@ -4,7 +4,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from infrastructor.utils.ConfigManager import ConfigManager
 from models.configs.ApiConfig import ApiConfig
 from models.configs.DatabaseConfig import DatabaseConfig
-from models.configs.PdiConfig import PdiConfig
 
 def start():
     from infrastructor.IocManager import IocManager
