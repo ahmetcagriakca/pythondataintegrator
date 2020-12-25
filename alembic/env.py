@@ -43,7 +43,6 @@ from models.dao.integration.PythonDataIntegration import PythonDataIntegration
 from models.dao.integration.PythonDataIntegrationConnection import PythonDataIntegrationConnection
 from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegrationColumn
 from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
-from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
 from models.dao.common.OperationEvent import OperationEvent
 from models.dao.common.Status import Status
 from models.dao.operation.DataOperation import DataOperation

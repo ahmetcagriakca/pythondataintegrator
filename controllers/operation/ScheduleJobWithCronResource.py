@@ -1,3 +1,4 @@
+from models.dao.operation import DataOperationJob
 from injector import inject
 from controllers.common.models.CommonModels import CommonModels
 from controllers.operation.models.DataOperationModels import DataOperationModels
@@ -5,7 +6,6 @@ from domain.operation.services.DataOperationService import DataOperationService
 from domain.job.services.JobOperationService import JobOperationService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
-from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
 
 
 @DataOperationModels.ns.route("/ScheduleJobWithCron")
@@ -48,7 +48,7 @@ class ScheduleJobWithCronResource(ResourceBase):
         end_date = data.get('EndDate')  #
         start_operation_result = self.job_operation_service.modify_job(code=code, cron=cron, start_date=start_date,
                                                                        end_date=end_date)
-        if isinstance(start_operation_result, PythonDataIntegrationJob):
+        if isinstance(start_operation_result, DataOperationJob):
             result = DataOperationModels.get_data_operation_job_model(start_operation_result)
             return CommonModels.get_response(result=result)
         else:
