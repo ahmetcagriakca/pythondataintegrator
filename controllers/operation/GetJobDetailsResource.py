@@ -5,7 +5,6 @@ from infrastructor.api.ResourceBase import ResourceBase
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from models.dao.integration.PythonDataIntegration import PythonDataIntegration
-from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
 
 
 @DataOperationModels.ns.route('/GetJobDetails/<string:code>')
@@ -16,10 +15,6 @@ class GetJobDetailsResource(ResourceBase):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.database_session_manager = database_session_manager
-        self.python_data_integration_log_repository: Repository[PythonDataIntegrationLog] = Repository[
-            PythonDataIntegrationLog](
-            database_session_manager)
-
         self.python_data_integration_repository: Repository[PythonDataIntegration] = Repository[PythonDataIntegration](
             database_session_manager)
 
