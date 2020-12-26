@@ -78,8 +78,8 @@ class ConnectionModels:
 
     create_connection_database_model = IocManager.api.model('CreateConnectionDatabaseModel', {
         'Name': fields.String(description='Operation code value', required=True),
-        'ConnectionTypeId': fields.Integer(description='ConnectionTypeId'),
-        'ConnectorTypeId': fields.Integer(description='ConnectorTypeId'),
+        'ConnectionTypeName': fields.Integer(description='ConnectionTypeName'),
+        'ConnectorTypeName': fields.Integer(description='ConnectorTypeName'),
         'Host': fields.String(description='Host'),
         'Port': fields.Integer(description='Port'),
         'Sid': fields.String(description='Sid'),
@@ -88,9 +88,8 @@ class ConnectionModels:
         'Password': fields.String(description='Password'),
     })
     update_connection_database_model = IocManager.api.model('UpdateConnectionDatabaseModel', {
-        'Id': fields.Integer(description='Operation code value', required=True),
-        'Name': fields.String(description='Operation code value'),
-        'ConnectorTypeId': fields.Integer(description='ConnectorTypeId'),
+        'Name': fields.String(description='Connection Name'),
+        'ConnectorTypeName': fields.Integer(description='ConnectorTypeName'),
         'Host': fields.String(description='Host'),
         'Port': fields.Integer(description='Port'),
         'Sid': fields.String(description='Sid'),

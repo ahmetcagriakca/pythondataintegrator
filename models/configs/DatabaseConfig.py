@@ -12,7 +12,6 @@ class DatabaseConfig(BaseConfig):
                  database: str = None,
                  username: str = None,
                  password: str = None,
-                 schema: str = None,
                  ):
         self.connection_string = connection_string
         self.type = type

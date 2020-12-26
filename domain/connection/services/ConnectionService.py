@@ -75,16 +75,19 @@ class ConnectionService(IScoped):
         """
         Create Database connection
         """
-        connection_type = self.connection_type_repository.first(Id=connection_database_model.ConnectionTypeId)
-        if connection_type is None:
-            raise OperationalException("Connection Type Not Found")
         if self.check_connection_name(connection_database_model.Name):
             raise OperationalException("Connection name already defined")
-        connection = Connection(Name=connection_database_model.Name,
-                                ConnectionType=connection_type)
-        connector_type = self.connector_type_repository.first(Id=connection_database_model.ConnectorTypeId)
+
+        connection_type = self.connection_type_repository.first(Name=connection_database_model.ConnectionTypeName)
+        if connection_type is None:
+            raise OperationalException("Connection Type Not Found")
+
+        connector_type = self.connector_type_repository.first(Name=connection_database_model.ConnectorTypeName)
         if connector_type is None:
             raise OperationalException("Connector Type Not Found")
+
+        connection = Connection(Name=connection_database_model.Name,
+                                ConnectionType=connection_type)
         connection_database = ConnectionDatabase(Connection=connection,
                                                  ConnectorType=connector_type,
                                                  Host=connection_database_model.Host,
@@ -107,11 +110,9 @@ class ConnectionService(IScoped):
         Update Database connection
         """
 
-        if self.check_connection_name(connection_database_model.Name):
-            raise OperationalException("Connection name already defined")
-        connection_database = self.connection_database_repository.first(Id=connection_database_model.Id)
-        connection = connection_database.Connection
-        connection.Name = connection_database_model.Name
+        if not self.check_connection_name(connection_database_model.Name):
+            raise OperationalException("Connection name not found")
+        connection_database = self.connection_database_repository.first(Name=connection_database_model.Name)
 
         connector_type = self.connector_type_repository.first(Id=connection_database_model.ConnectorTypeId)
         if connector_type is None:

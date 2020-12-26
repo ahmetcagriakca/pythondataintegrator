@@ -32,21 +32,21 @@ class ExecuteOperationDto:
                  target_connection=None,
                  source_connection_manager=None,
                  target_connection_manager=None,
-                 limit_modifier=None,
-                 first_row=None,
-                 selected_rows=None,
+                 source_query=None,
+                 target_query=None,
                  related_columns=None,
-                 final_executable=None
+                 first_row=None,
+                 limit_modifier=None,
                  ):
         self.source_connection = source_connection
         self.target_connection = target_connection
         self.source_connection_manager = source_connection_manager
         self.target_connection_manager = target_connection_manager
-        self.limit_modifier = limit_modifier
-        self.first_row = first_row
-        self.selected_rows = selected_rows
+        self.source_query = source_query
+        self.target_query = target_query
         self.related_columns = related_columns
-        self.final_executable = final_executable
+        self.first_row = first_row
+        self.limit_modifier = limit_modifier
 
 
 class ExecuteOperationFactory:
@@ -57,22 +57,26 @@ class ExecuteOperationFactory:
                                source_connection,
                                target_connection,
                                integration_data_columns):
+        column_rows, related_columns, final_executable = PdiUtils.get_row_column_and_values(
+            target_connection.Schema, target_connection.TableName, integration_data_columns)
         source_connection_manager = self.connection_provider.get_connection(source_connection)
         target_connection_manager = self.connection_provider.get_connection(target_connection)
-        column_rows, final_executable, related_columns = PdiUtils.get_row_column_and_values(
-            target_connection.Connection.Database.ConnectorType.Name, target_connection.Schema,
-            target_connection.TableName, integration_data_columns)
-        first_row, selected_rows = PdiUtils.get_first_row_and_selected_rows(column_rows)
 
+        target_query = PdiUtils.prepare_target_query(
+            column_rows=column_rows, query=target_connection.Query,
+            target_connector_name=target_connection.Connection.Database.ConnectorType.Name)
+
+        eliminated_column_rows = [column_row for column_row in column_rows if column_row[1] is not None]
+        first_row=eliminated_column_rows[0][1]
         execute_operation_dto = ExecuteOperationDto(
             source_connection=source_connection,
             target_connection=target_connection,
             source_connection_manager=source_connection_manager,
             target_connection_manager=target_connection_manager,
-            first_row=first_row,
-            selected_rows=selected_rows,
+            source_query=source_connection.Query,
+            target_query=target_query,
             related_columns=related_columns,
-            final_executable=final_executable
+            first_row=first_row
         )
         return execute_operation_dto
 
@@ -178,7 +182,8 @@ class DataOperationService(IScoped):
             if pdi is None:
                 raise OperationalException(f"{integration.Code} integration can not be found")
 
-            data_operation_integration = self.data_operation_integration_repository.first(DataOperationId=data_operation.Id,
+            data_operation_integration = self.data_operation_integration_repository.first(
+                DataOperationId=data_operation.Id,
                 DataIntegrationId=pdi.Id)
             if data_operation_integration is None:
                 new_data_operation_integration = DataOperationIntegration(Order=integration.Order,
@@ -359,19 +364,17 @@ class DataOperationService(IScoped):
     def execute_operation(execute_operation_dto: ExecuteOperationDto):
         executable_script = PdiUtils.prepare_executable_script(
             source_connector_type=execute_operation_dto.source_connection.Connection.Database.ConnectorType.Name,
-            source_schema=execute_operation_dto.source_connection.Schema,
-            source_table_name=execute_operation_dto.source_connection.TableName,
+            query=execute_operation_dto.source_query,
             sub_limit=execute_operation_dto.limit_modifier.SubLimit,
             top_limit=execute_operation_dto.limit_modifier.TopLimit,
-            first_row=execute_operation_dto.first_row,
-            selected_rows=execute_operation_dto.selected_rows
+            first_row = execute_operation_dto.first_row
         )
         DataOperationService.run_operation(
             source_connection_manager=execute_operation_dto.source_connection_manager,
             target_connection_manager=execute_operation_dto.target_connection_manager,
             executable_script=executable_script,
             related_columns=execute_operation_dto.related_columns,
-            final_executable=execute_operation_dto.final_executable)
+            final_executable=execute_operation_dto.target_query)
 
     def start_operation(self, data_operation_id: str = None, job_id=None):  # parallel_
         """
