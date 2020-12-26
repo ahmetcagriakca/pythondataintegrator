@@ -1,6 +1,5 @@
 class UpdateConnectionDatabaseModel:
     def __init__(self,
-                 Id: int = None,
                  Name: str = None,
                  ConnectorTypeId: int = None,
                  Host: str = None,
@@ -10,7 +9,6 @@ class UpdateConnectionDatabaseModel:
                  User: str = None,
                  Password: str = None,
                  ):
-        self.Id: int = Id
         self.Name: str = Name
         self.ConnectorTypeId: str = ConnectorTypeId
         self.Host: str = Host

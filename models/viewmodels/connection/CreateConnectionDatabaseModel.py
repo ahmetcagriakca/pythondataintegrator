@@ -1,8 +1,8 @@
 class CreateConnectionDatabaseModel:
     def __init__(self,
                  Name: str = None,
-                 ConnectionTypeId: int = None,
-                 ConnectorTypeId: int = None,
+                 ConnectionTypeName: int = None,
+                 ConnectorTypeName: int = None,
                  Host: str = None,
                  Port: int = None,
                  Sid: str = None,
@@ -11,8 +11,8 @@ class CreateConnectionDatabaseModel:
                  Password: str = None,
                  ):
         self.Name: str = Name
-        self.ConnectionTypeId: str = ConnectionTypeId
-        self.ConnectorTypeId: str = ConnectorTypeId
+        self.ConnectionTypeName: str = ConnectionTypeName
+        self.ConnectorTypeName: str = ConnectorTypeName
         self.Host: str = Host
         self.Port: int = Port
         self.Sid: str = Sid

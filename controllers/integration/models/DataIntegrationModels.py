@@ -37,6 +37,7 @@ class DataIntegrationConnectionModel:
                  SourceOrTarget: int = None,
                  Schema: str = None,
                  TableName: str = None,
+                 Query: str = None,
                  DataIntegration=None,
                  Connection=None,
                  *args, **kwargs):
@@ -45,6 +46,7 @@ class DataIntegrationConnectionModel:
         self.SourceOrTarget: int = SourceOrTarget
         self.Schema: str = Schema
         self.TableName: str = TableName
+        self.Query: str = Query
         self.DataIntegration = DataIntegration
         self.Connection = Connection
 
@@ -67,14 +69,16 @@ class DataIntegrationColumnModel:
 class DataIntegrationModels:
     ns = IocManager.api.namespace('DataIntegration', description='Data Integration endpoints',
                                   path='/api/DataIntegration')
-    create_integration_data_model = IocManager.api.model('CreateIntegrationDataModel', {
+    create_data_integration_model = IocManager.api.model('CreateDataIntegrationModel', {
         'Code': fields.String(description='Operation code value', required=True),
-        'SourceConnectionId': fields.Integer(description='SourceConnectionId'),
+        'SourceConnectionName': fields.String(description='SourceConnectionName'),
         'SourceSchema': fields.String(description='SourceSchema'),
         'SourceTableName': fields.String(description='SourceTableName'),
-        'TargetConnectionId': fields.Integer(description='TargetConnectionId'),
+        'SourceQuery': fields.String(description='SourceQuery'),
+        'TargetConnectionName': fields.String(description='TargetConnectionName'),
         'TargetSchema': fields.String(description='TargetSchema'),
         'TargetTableName': fields.String(description='TargetTableName'),
+        'TargetQuery': fields.String(description='TargetQuery'),
         'IsTargetTruncate': fields.Boolean(description='IsTargetTruncate'),
         'IsDelta': fields.Boolean(description='IsDelta'),
         'Comments': fields.String(description='Comments'),
@@ -84,14 +88,16 @@ class DataIntegrationModels:
         'PostExecutions': fields.String(description='PostExecutions'),
     })
 
-    update_integration_data_model = IocManager.api.model('UpdateIntegrationDataModel', {
+    update_data_integration_model = IocManager.api.model('UpdateIntegrationDataModel', {
         'Code': fields.String(description='Operation code value', required=True),
-        'SourceConnectionId': fields.Integer(description='SourceConnectionId'),
+        'SourceConnectionName': fields.String(description='SourceConnectionName'),
         'SourceSchema': fields.String(description='SourceSchema'),
         'SourceTableName': fields.String(description='SourceTableName'),
-        'TargetConnectionId': fields.Integer(description='TargetConnectionId'),
+        'SourceQuery': fields.String(description='SourceQuery'),
+        'TargetConnectionName': fields.String(description='TargetConnectionName'),
         'TargetSchema': fields.String(description='TargetSchema'),
         'TargetTableName': fields.String(description='TargetTableName'),
+        'TargetQuery': fields.String(description='TargetQuery'),
         'IsTargetTruncate': fields.Boolean(description='IsTargetTruncate'),
         'IsDelta': fields.Boolean(description='IsDelta'),
         'Comments': fields.String(description='Comments'),
@@ -101,18 +107,20 @@ class DataIntegrationModels:
         'PostExecutions': fields.String(description='PostExecutions'),
     })
 
-    delete_integration_data_model = IocManager.api.model('DeleteIntegrationDataModel', {
+    delete_data_integration_model = IocManager.api.model('DeleteIntegrationDataModel', {
         'Code': fields.String(description='Operation code value', required=True),
     })
 
     @staticmethod
-    def get_pdi_model(data_integration: DataIntegration) -> DataIntegrationModel:
+    def get_data_integration_model(data_integration: DataIntegration) -> DataIntegrationModel:
         source_connection = data_integration.Connections[0]
         entity_source = DataIntegrationConnectionModel(
             Id=source_connection.Id,
             SourceOrTarget=source_connection.SourceOrTarget,
             Schema=source_connection.Schema,
-            TableName=source_connection.TableName)
+            TableName=source_connection.TableName,
+            Query=source_connection.Query,
+        )
         source = json.loads(json.dumps(entity_source.__dict__, default=CommonModels.date_converter))
         source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
 
@@ -121,7 +129,9 @@ class DataIntegrationModels:
             Id=target_connection.Id,
             SourceOrTarget=target_connection.SourceOrTarget,
             Schema=target_connection.Schema,
-            TableName=target_connection.TableName)
+            TableName=target_connection.TableName,
+            Query=source_connection.Query,
+        )
         target = json.loads(json.dumps(entity_target.__dict__, default=CommonModels.date_converter))
         target['Connection'] = ConnectionModels.get_connection_result_model(target_connection.Connection)
         columns = []
@@ -152,10 +162,10 @@ class DataIntegrationModels:
         return result_model
 
     @staticmethod
-    def get_pdi_models(data_integrations: List[DataIntegration]) -> List[DataIntegrationModel]:
+    def get_data_integration_models(data_integrations: List[DataIntegration]) -> List[DataIntegrationModel]:
 
         entities = []
         for data_integration in data_integrations:
-            entity = DataIntegrationModels.get_pdi_model(data_integration)
+            entity = DataIntegrationModels.get_data_integration_model(data_integration)
             entities.append(entity)
         return entities

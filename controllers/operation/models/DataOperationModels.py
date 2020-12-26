@@ -151,7 +151,7 @@ class DataOperationModels:
             )
             data_operation_integration_result_model = json.loads(
                 json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-            integration = DataIntegrationModels.get_pdi_model(data_operation_integration.DataIntegration)
+            integration = DataIntegrationModels.get_data_integration_model(data_operation_integration.DataIntegration)
             data_operation_integration_result_model['Integration'] = integration
             integrations.append(data_operation_integration_result_model)
         result_model['Integrations'] = integrations

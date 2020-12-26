@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
@@ -12,6 +12,7 @@ class DataIntegrationConnection(Entity, IocManager.Base):
     SourceOrTarget = Column(Integer, index=False, unique=False, nullable=False)
     Schema = Column(String(100), index=False, unique=False, nullable=True)
     TableName = Column(String(100), index=False, unique=False, nullable=True)
+    Query = Column(Text, index=False, unique=False, nullable=True)
     Connection = relationship("Connection", back_populates="DataIntegrationConnections")
     DataIntegration = relationship("DataIntegration", back_populates="Connections")
 
@@ -21,6 +22,7 @@ class DataIntegrationConnection(Entity, IocManager.Base):
                  ConnectionId: int = None,
                  Schema: str = None,
                  TableName: str = None,
+                 Query: str = None,
                  DataIntegration=None,
                  Connection=None,
                  *args, **kwargs):
@@ -30,5 +32,6 @@ class DataIntegrationConnection(Entity, IocManager.Base):
         self.ConnectionId: str = ConnectionId
         self.Schema: str = Schema
         self.TableName: str = TableName
+        self.Query: str = Query
         self.DataIntegration = DataIntegration
         self.Connection = Connection

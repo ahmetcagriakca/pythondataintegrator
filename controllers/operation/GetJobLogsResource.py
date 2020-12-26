@@ -16,8 +16,7 @@ class GetJobLogsResource(ResourceBase):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.database_session_manager = database_session_manager
-        self.log_repository: Repository[Log] = Repository[
-            Log](
+        self.log_repository: Repository[Log] = Repository[Log](
             database_session_manager)
 
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](

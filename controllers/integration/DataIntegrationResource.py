@@ -6,7 +6,7 @@ from controllers.integration.models.DataIntegrationModels import DataIntegration
 from domain.integration.services.DataIntegrationService import DataIntegrationService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
-from models.viewmodels.integration.CreateIntegrationDataModel import CreateIntegrationDataModel
+from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 
 
 @DataIntegrationModels.ns.route("")
@@ -24,22 +24,22 @@ class DataIntegrationResource(ResourceBase):
         All integration data
         """
         data_integrations = self.data_integration_service.get_data_integrations()
-        result = DataIntegrationModels.get_pdi_models(data_integrations)
+        result = DataIntegrationModels.get_data_integration_models(data_integrations)
         return CommonModels.get_response(result)
 
-    @DataIntegrationModels.ns.expect(DataIntegrationModels.create_integration_data_model, validate=True)
+    @DataIntegrationModels.ns.expect(DataIntegrationModels.create_data_integration_model, validate=True)
     @DataIntegrationModels.ns.marshal_with(CommonModels.SuccessModel)
     def post(self):
         """
         Create Integration Data
         """
-        data: CreateIntegrationDataModel = json.loads(json.dumps(IocManager.api.payload),
-                                                      object_hook=lambda d: CreateIntegrationDataModel(**d))
-        creation_result = self.data_integration_service.create_integration_data(data)
-        result = DataIntegrationModels.get_pdi_model(creation_result)
+        data: CreateDataIntegrationModel = json.loads(json.dumps(IocManager.api.payload),
+                                                      object_hook=lambda d: CreateDataIntegrationModel(**d))
+        data_integrations = self.data_integration_service.create_data_integration(data)
+        result = DataIntegrationModels.get_data_integration_model(data_integrations)
         return CommonModels.get_response(result=result)
 
-    @DataIntegrationModels.ns.expect(DataIntegrationModels.delete_integration_data_model, validate=True)
+    @DataIntegrationModels.ns.expect(DataIntegrationModels.delete_data_integration_model, validate=True)
     @DataIntegrationModels.ns.marshal_with(CommonModels.SuccessModel)
     def delete(self):
         """
