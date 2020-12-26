@@ -6,10 +6,10 @@ from flask_restplus import fields
 from controllers.common.models.CommonModels import EntityModel, CommonModels
 from controllers.connection.models.ConnectionModels import ConnectionModels
 from infrastructor.IocManager import IocManager
-from models.dao.integration.PythonDataIntegration import PythonDataIntegration
+from models.dao.integration.DataIntegration import DataIntegration
 
 
-class PythonDataIntegrationModel(EntityModel):
+class DataIntegrationModel(EntityModel):
 
     def __init__(self,
                  Id=None,
@@ -30,14 +30,14 @@ class PythonDataIntegrationModel(EntityModel):
         self.IsDeleted = IsDeleted
 
 
-class PythonDataIntegrationConnectionModel:
+class DataIntegrationConnectionModel:
 
     def __init__(self,
                  Id: int = None,
                  SourceOrTarget: int = None,
                  Schema: str = None,
                  TableName: str = None,
-                 PythonDataIntegration=None,
+                 DataIntegration=None,
                  Connection=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -45,11 +45,11 @@ class PythonDataIntegrationConnectionModel:
         self.SourceOrTarget: int = SourceOrTarget
         self.Schema: str = Schema
         self.TableName: str = TableName
-        self.PythonDataIntegration = PythonDataIntegration
+        self.DataIntegration = DataIntegration
         self.Connection = Connection
 
 
-class PythonDataIntegrationColumnModel:
+class DataIntegrationColumnModel:
 
     def __init__(self,
                  Id=None,
@@ -65,7 +65,7 @@ class PythonDataIntegrationColumnModel:
 
 
 class DataIntegrationModels:
-    ns = IocManager.api.namespace('DataIntegration', description='Python Data Integration endpoints',
+    ns = IocManager.api.namespace('DataIntegration', description='Data Integration endpoints',
                                   path='/api/DataIntegration')
     create_integration_data_model = IocManager.api.model('CreateIntegrationDataModel', {
         'Code': fields.String(description='Operation code value', required=True),
@@ -106,9 +106,9 @@ class DataIntegrationModels:
     })
 
     @staticmethod
-    def get_pdi_model(python_data_integration: PythonDataIntegration) -> PythonDataIntegrationModel:
-        source_connection = python_data_integration.Connections[0]
-        entity_source = PythonDataIntegrationConnectionModel(
+    def get_pdi_model(data_integration: DataIntegration) -> DataIntegrationModel:
+        source_connection = data_integration.Connections[0]
+        entity_source = DataIntegrationConnectionModel(
             Id=source_connection.Id,
             SourceOrTarget=source_connection.SourceOrTarget,
             Schema=source_connection.Schema,
@@ -116,8 +116,8 @@ class DataIntegrationModels:
         source = json.loads(json.dumps(entity_source.__dict__, default=CommonModels.date_converter))
         source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
 
-        target_connection = python_data_integration.Connections[1]
-        entity_target = PythonDataIntegrationConnectionModel(
+        target_connection = data_integration.Connections[1]
+        entity_target = DataIntegrationConnectionModel(
             Id=target_connection.Id,
             SourceOrTarget=target_connection.SourceOrTarget,
             Schema=target_connection.Schema,
@@ -125,8 +125,8 @@ class DataIntegrationModels:
         target = json.loads(json.dumps(entity_target.__dict__, default=CommonModels.date_converter))
         target['Connection'] = ConnectionModels.get_connection_result_model(target_connection.Connection)
         columns = []
-        for col in python_data_integration.Columns:
-            entity_column = PythonDataIntegrationColumnModel(
+        for col in data_integration.Columns:
+            entity_column = DataIntegrationColumnModel(
                 Id=col.Id,
                 ResourceType=col.ResourceType,
                 SourceColumnName=col.SourceColumnName,
@@ -134,14 +134,14 @@ class DataIntegrationModels:
             )
             column = json.loads(json.dumps(entity_column.__dict__, default=CommonModels.date_converter))
             columns.append(column)
-        entity_model = PythonDataIntegrationModel(
-            Id=python_data_integration.Id,
-            Code=python_data_integration.Code,
-            IsTargetTruncate=python_data_integration.IsTargetTruncate,
-            IsDelta=python_data_integration.IsDelta,
-            CreationDate=python_data_integration.CreationDate,
-            Comments=python_data_integration.Comments,
-            IsDeleted=python_data_integration.IsDeleted
+        entity_model = DataIntegrationModel(
+            Id=data_integration.Id,
+            Code=data_integration.Code,
+            IsTargetTruncate=data_integration.IsTargetTruncate,
+            IsDelta=data_integration.IsDelta,
+            CreationDate=data_integration.CreationDate,
+            Comments=data_integration.Comments,
+            IsDeleted=data_integration.IsDeleted
         )
 
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
@@ -152,10 +152,10 @@ class DataIntegrationModels:
         return result_model
 
     @staticmethod
-    def get_pdi_models(python_data_integrations: List[PythonDataIntegration]) -> List[PythonDataIntegrationModel]:
+    def get_pdi_models(data_integrations: List[DataIntegration]) -> List[DataIntegrationModel]:
 
         entities = []
-        for python_data_integration in python_data_integrations:
-            entity = DataIntegrationModels.get_pdi_model(python_data_integration)
+        for data_integration in data_integrations:
+            entity = DataIntegrationModels.get_pdi_model(data_integration)
             entities.append(entity)
         return entities

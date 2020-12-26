@@ -5,7 +5,7 @@ from infrastructor.api.ResourceBase import ResourceBase
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
-from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
+from models.dao.common.Log import Log
 
 
 @DataOperationModels.ns.route('/GetJobLogs/<int:job_id>')
@@ -16,8 +16,8 @@ class GetJobLogsResource(ResourceBase):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.database_session_manager = database_session_manager
-        self.python_data_integration_log_repository: Repository[PythonDataIntegrationLog] = Repository[
-            PythonDataIntegrationLog](
+        self.log_repository: Repository[Log] = Repository[
+            Log](
             database_session_manager)
 
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
@@ -31,7 +31,7 @@ class GetJobLogsResource(ResourceBase):
         ap_scheduler_job = self.ap_scheduler_job_repository.first(Id=job_id)
         if ap_scheduler_job is None:
             return "Job Not Found"
-        logs = self.python_data_integration_log_repository.filter_by(
+        logs = self.log_repository.filter_by(
             JobId=job_id).all()
         result = DataOperationModels.get_pdi_logs_model(logs)
         return CommonModels.get_response(result)

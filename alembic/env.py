@@ -39,11 +39,10 @@ from models.dao.connection.ConnectorType import ConnectorType
 from models.dao.connection.ConnectionType import ConnectionType
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
-from models.dao.integration.PythonDataIntegration import PythonDataIntegration
-from models.dao.integration.PythonDataIntegrationConnection import PythonDataIntegrationConnection
-from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegrationColumn
-from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
-from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
+from models.dao.integration.DataIntegration import DataIntegration
+from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
+from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
+from models.dao.common.Log import Log
 from models.dao.common.OperationEvent import OperationEvent
 from models.dao.common.Status import Status
 from models.dao.operation.DataOperation import DataOperation
@@ -51,7 +50,6 @@ from models.dao.operation.DataOperationIntegration import DataOperationIntegrati
 from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
 from models.dao.operation.DataOperationJob import DataOperationJob
-
 
 config = context.config
 
