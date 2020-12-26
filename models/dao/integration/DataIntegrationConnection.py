@@ -4,31 +4,31 @@ from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
 
 
-class PythonDataIntegrationConnection(Entity, IocManager.Base):
-    __tablename__ = "PythonDataIntegrationConnection"
+class DataIntegrationConnection(Entity, IocManager.Base):
+    __tablename__ = "DataIntegrationConnection"
     __table_args__ = {"schema": "Integration"}
-    PythonDataIntegrationId = Column(Integer, ForeignKey('Integration.PythonDataIntegration.Id'))
+    DataIntegrationId = Column(Integer, ForeignKey('Integration.DataIntegration.Id'))
     ConnectionId = Column(Integer, ForeignKey('Connection.Connection.Id'))
     SourceOrTarget = Column(Integer, index=False, unique=False, nullable=False)
     Schema = Column(String(100), index=False, unique=False, nullable=True)
     TableName = Column(String(100), index=False, unique=False, nullable=True)
-    Connection = relationship("Connection", back_populates="PythonDataIntegrationConnections")
-    PythonDataIntegration = relationship("PythonDataIntegration", back_populates="Connections")
+    Connection = relationship("Connection", back_populates="DataIntegrationConnections")
+    DataIntegration = relationship("DataIntegration", back_populates="Connections")
 
     def __init__(self,
                  SourceOrTarget: int = None,
-                 PythonDataIntegrationId: int = None,
+                 DataIntegrationId: int = None,
                  ConnectionId: int = None,
                  Schema: str = None,
                  TableName: str = None,
-                 PythonDataIntegration=None,
+                 DataIntegration=None,
                  Connection=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.SourceOrTarget: int = SourceOrTarget
-        self.PythonDataIntegrationId: str = PythonDataIntegrationId
+        self.DataIntegrationId: str = DataIntegrationId
         self.ConnectionId: str = ConnectionId
         self.Schema: str = Schema
         self.TableName: str = TableName
-        self.PythonDataIntegration = PythonDataIntegration
+        self.DataIntegration = DataIntegration
         self.Connection = Connection

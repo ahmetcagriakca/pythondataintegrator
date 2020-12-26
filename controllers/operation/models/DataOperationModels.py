@@ -9,7 +9,7 @@ from controllers.common.models.CommonModels import EntityModel, CommonModels
 from controllers.job.models.JobSchedulerModels import JobSchedulerModels
 from controllers.integration.models.DataIntegrationModels import DataIntegrationModels
 from infrastructor.IocManager import IocManager
-from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
+from models.dao.common.Log import Log
 from models.dao.operation import DataOperation, DataOperationJob
 
 
@@ -47,7 +47,7 @@ class DataOperationJobModel(EntityModel):
                  Cron: str = None,
                  DataOperationId: int = None,
                  ApSchedulerJobId: int = None,
-                 PythonDataIntegration=None,
+                 DataIntegration=None,
                  ApSchedulerJob=None,
                  IsDeleted=None,
                  *args, **kwargs):
@@ -59,12 +59,12 @@ class DataOperationJobModel(EntityModel):
         self.Cron: int = Cron
         self.DataOperationId: int = DataOperationId
         self.ApSchedulerJobId: int = ApSchedulerJobId
-        self.PythonDataIntegration = PythonDataIntegration
+        self.DataIntegration = DataIntegration
         self.ApSchedulerJob = ApSchedulerJob
         self.IsDeleted = IsDeleted
 
 
-class PythonDataIntegrationLogModel():
+class DataIntegrationLogModel():
 
     def __init__(self,
                  Id: int = None,
@@ -151,7 +151,7 @@ class DataOperationModels:
             )
             data_operation_integration_result_model = json.loads(
                 json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-            integration = DataIntegrationModels.get_pdi_model(data_operation_integration.PythonDataIntegration)
+            integration = DataIntegrationModels.get_pdi_model(data_operation_integration.DataIntegration)
             data_operation_integration_result_model['Integration'] = integration
             integrations.append(data_operation_integration_result_model)
         result_model['Integrations'] = integrations
@@ -193,17 +193,17 @@ class DataOperationModels:
         return entities
 
     @staticmethod
-    def get_pdi_logs_model(python_data_integration_logs: List[PythonDataIntegrationLog]) -> List[
-        PythonDataIntegrationLogModel]:
+    def get_pdi_logs_model(logs: List[Log]) -> List[
+        DataIntegrationLogModel]:
 
         entities = []
-        for python_data_integration_log in python_data_integration_logs:
-            result = PythonDataIntegrationLogModel(
-                Id=python_data_integration_log.Id,
-                JobId=python_data_integration_log.JobId,
-                Type='Info' if python_data_integration_log.TypeId == 2 else 'Error',
-                Content=python_data_integration_log.Content,
-                LogDatetime=python_data_integration_log.LogDatetime,
+        for log in logs:
+            result = DataIntegrationLogModel(
+                Id=log.Id,
+                JobId=log.JobId,
+                Type='Info' if log.TypeId == 2 else 'Error',
+                Content=log.Content,
+                LogDatetime=log.LogDatetime,
             )
             entity = json.loads(json.dumps(result.__dict__, default=CommonModels.date_converter))
             entities.append(entity)

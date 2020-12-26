@@ -5,7 +5,7 @@ from infrastructor.data.ConnectionPolicy import ConnectionPolicy
 from infrastructor.dependency.scopes import ISingleton
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.configs.DatabaseConfig import DatabaseConfig
-from models.dao.integration.PythonDataIntegrationConnection import PythonDataIntegrationConnection
+from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 
 
 class ConnectionProvider(ISingleton):
@@ -19,7 +19,7 @@ class ConnectionProvider(ISingleton):
         self.sql_logger = sql_logger
         self.crypto_service: CryptoService = crypto_service
 
-    def get_connection(self, connection: PythonDataIntegrationConnection) -> ConnectionManager:
+    def get_connection(self, connection: DataIntegrationConnection) -> ConnectionManager:
         """
          Database getting from integration_data
         """

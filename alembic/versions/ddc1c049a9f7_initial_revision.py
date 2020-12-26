@@ -249,7 +249,7 @@ def upgrade():
                     sa.UniqueConstraint('Name'),
                     schema='Connection'
                     )
-    op.create_table('PythonDataIntegration',
+    op.create_table('DataIntegration',
                     sa.Column('Id', sa.Integer(), nullable=False),
                     sa.Column('Code', sa.String(length=100), nullable=False),
                     sa.Column('IsTargetTruncate', sa.Boolean(), nullable=True),
@@ -264,9 +264,9 @@ def upgrade():
                     sa.PrimaryKeyConstraint('Id'),
                     schema='Integration'
                     )
-    op.create_index(op.f('ix_Integration_PythonDataIntegration_Code'), 'PythonDataIntegration', ['Code'], unique=True,
+    op.create_index(op.f('ix_Integration_DataIntegration_Code'), 'DataIntegration', ['Code'], unique=True,
                     schema='Integration')
-    op.create_table('PythonDataIntegrationLog',
+    op.create_table('DataIntegrationLog',
                     sa.Column('Id', sa.Integer(), nullable=False),
                     sa.Column('TypeId', sa.Integer(), nullable=False),
                     sa.Column('Content', sa.String(length=4000), nullable=True),
@@ -282,9 +282,9 @@ def upgrade():
                     sa.PrimaryKeyConstraint('Id'),
                     schema='Integration'
                     )
-    op.create_index(op.f('ix_Integration_PythonDataIntegrationLog_JobId'), 'PythonDataIntegrationLog', ['JobId'],
+    op.create_index(op.f('ix_Integration_DataIntegrationLog_JobId'), 'DataIntegrationLog', ['JobId'],
                     unique=False, schema='Integration')
-    op.create_index(op.f('ix_Integration_PythonDataIntegrationLog_TypeId'), 'PythonDataIntegrationLog', ['TypeId'],
+    op.create_index(op.f('ix_Integration_DataIntegrationLog_TypeId'), 'DataIntegrationLog', ['TypeId'],
                     unique=False, schema='Integration')
     op.create_table('ApSchedulerJobEvent',
                     sa.Column('Id', sa.Integer(), nullable=False),
@@ -334,9 +334,9 @@ def upgrade():
                     sa.UniqueConstraint('Name'),
                     schema='Connection'
                     )
-    op.create_table('PythonDataIntegrationColumn',
+    op.create_table('DataIntegrationColumn',
                     sa.Column('Id', sa.Integer(), nullable=False),
-                    sa.Column('PythonDataIntegrationId', sa.Integer(), nullable=True),
+                    sa.Column('DataIntegrationId', sa.Integer(), nullable=True),
                     sa.Column('ResourceType', sa.String(length=100), nullable=True),
                     sa.Column('SourceColumnName', sa.String(length=100), nullable=True),
                     sa.Column('TargetColumnName', sa.String(length=100), nullable=True),
@@ -347,13 +347,13 @@ def upgrade():
                     sa.Column('IsDeleted', sa.Integer(), nullable=False),
                     sa.Column('Comments', sa.String(length=1000), nullable=True),
                     sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
-                    sa.ForeignKeyConstraint(['PythonDataIntegrationId'], ['Integration.PythonDataIntegration.Id'], ),
+                    sa.ForeignKeyConstraint(['DataIntegrationId'], ['Integration.DataIntegration.Id'], ),
                     sa.PrimaryKeyConstraint('Id'),
                     schema='Integration'
                     )
-    op.create_table('PythonDataIntegrationExecutionJob',
+    op.create_table('DataIntegrationExecutionJob',
                     sa.Column('Id', sa.Integer(), nullable=False),
-                    sa.Column('PythonDataIntegrationId', sa.Integer(), nullable=True),
+                    sa.Column('DataIntegrationId', sa.Integer(), nullable=True),
                     sa.Column('ExecutionProcedure', sa.String(length=1000), nullable=True),
                     sa.Column('IsPre', sa.Boolean(), nullable=True),
                     sa.Column('IsPost', sa.Boolean(), nullable=True),
@@ -364,7 +364,7 @@ def upgrade():
                     sa.Column('IsDeleted', sa.Integer(), nullable=False),
                     sa.Column('Comments', sa.String(length=1000), nullable=True),
                     sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
-                    sa.ForeignKeyConstraint(['PythonDataIntegrationId'], ['Integration.PythonDataIntegration.Id'], ),
+                    sa.ForeignKeyConstraint(['DataIntegrationId'], ['Integration.DataIntegration.Id'], ),
                     sa.PrimaryKeyConstraint('Id'),
                     schema='Integration'
                     )
@@ -390,9 +390,9 @@ def upgrade():
                     sa.PrimaryKeyConstraint('Id'),
                     schema='Connection'
                     )
-    op.create_table('PythonDataIntegrationConnection',
+    op.create_table('DataIntegrationConnection',
                     sa.Column('Id', sa.Integer(), nullable=False),
-                    sa.Column('PythonDataIntegrationId', sa.Integer(), nullable=True),
+                    sa.Column('DataIntegrationId', sa.Integer(), nullable=True),
                     sa.Column('ConnectionId', sa.Integer(), nullable=True),
                     sa.Column('SourceOrTarget', sa.Integer(), nullable=False),
                     sa.Column('Schema', sa.String(length=100), nullable=True),
@@ -405,7 +405,7 @@ def upgrade():
                     sa.Column('Comments', sa.String(length=1000), nullable=True),
                     sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
                     sa.ForeignKeyConstraint(['ConnectionId'], ['Connection.Connection.Id'], ),
-                    sa.ForeignKeyConstraint(['PythonDataIntegrationId'], ['Integration.PythonDataIntegration.Id'], ),
+                    sa.ForeignKeyConstraint(['DataIntegrationId'], ['Integration.DataIntegration.Id'], ),
                     sa.PrimaryKeyConstraint('Id'),
                     schema='Integration'
                     )
@@ -416,22 +416,22 @@ def upgrade():
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('PythonDataIntegrationConnection', schema='Integration')
+    op.drop_table('DataIntegrationConnection', schema='Integration')
     op.drop_table('ConnectionDatabase', schema='Connection')
-    op.drop_table('PythonDataIntegrationExecutionJob', schema='Integration')
-    op.drop_table('PythonDataIntegrationColumn', schema='Integration')
+    op.drop_table('DataIntegrationExecutionJob', schema='Integration')
+    op.drop_table('DataIntegrationColumn', schema='Integration')
     op.drop_table('ConnectorType', schema='Connection')
     op.drop_index(op.f('ix_Connection_Connection_Name'), table_name='Connection', schema='Connection')
     op.drop_table('Connection', schema='Connection')
     op.drop_table('ApSchedulerJobEvent', schema='Aps')
-    op.drop_index(op.f('ix_Integration_PythonDataIntegrationLog_TypeId'), table_name='PythonDataIntegrationLog',
+    op.drop_index(op.f('ix_Integration_DataIntegrationLog_TypeId'), table_name='DataIntegrationLog',
                   schema='Integration')
-    op.drop_index(op.f('ix_Integration_PythonDataIntegrationLog_JobId'), table_name='PythonDataIntegrationLog',
+    op.drop_index(op.f('ix_Integration_DataIntegrationLog_JobId'), table_name='DataIntegrationLog',
                   schema='Integration')
-    op.drop_table('PythonDataIntegrationLog', schema='Integration')
-    op.drop_index(op.f('ix_Integration_PythonDataIntegration_Code'), table_name='PythonDataIntegration',
+    op.drop_table('DataIntegrationLog', schema='Integration')
+    op.drop_index(op.f('ix_Integration_DataIntegration_Code'), table_name='DataIntegration',
                   schema='Integration')
-    op.drop_table('PythonDataIntegration', schema='Integration')
+    op.drop_table('DataIntegration', schema='Integration')
     op.drop_table('ConnectionType', schema='Connection')
     op.drop_index(op.f('ix_Aps_ApSchedulerJobsTable_next_run_time'), table_name='ApSchedulerJobsTable', schema='Aps')
     op.drop_table('ApSchedulerJobsTable', schema='Aps')

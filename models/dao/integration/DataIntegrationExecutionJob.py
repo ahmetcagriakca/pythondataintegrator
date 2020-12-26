@@ -5,23 +5,23 @@ from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
 
 
-class PythonDataIntegrationExecutionJob(Entity, IocManager.Base):
-    __tablename__ = "PythonDataIntegrationExecutionJob"
+class DataIntegrationExecutionJob(Entity, IocManager.Base):
+    __tablename__ = "DataIntegrationExecutionJob"
     __table_args__ = {"schema": "Integration"}
-    PythonDataIntegrationId = Column(Integer, ForeignKey('Integration.PythonDataIntegration.Id'))
+    DataIntegrationId = Column(Integer, ForeignKey('Integration.DataIntegration.Id'))
     ExecutionProcedure = Column(String(1000), index=False, unique=False, nullable=True)
     IsPre = Column(Boolean, index=False, unique=False, nullable=True)
     IsPost = Column(Boolean, index=False, unique=False, nullable=True)
-    PythonDataIntegration = relationship("PythonDataIntegration", back_populates="ExecutionJobs")
+    DataIntegration = relationship("DataIntegration", back_populates="ExecutionJobs")
 
     def __init__(self,
                  ExecutionProcedure: str = None,
                  IsPre: bool = None,
                  IsPost: bool = None,
-                 PythonDataIntegration=None,
+                 DataIntegration=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ExecutionProcedure: str = ExecutionProcedure
         self.IsPre: str = IsPre
         self.IsPost: str = IsPost
-        self.PythonDataIntegration = PythonDataIntegration
+        self.DataIntegration = DataIntegration

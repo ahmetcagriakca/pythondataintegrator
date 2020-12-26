@@ -7,11 +7,11 @@ from infrastructor.dependency.scopes import IScoped
 from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.connection.Connection import Connection
-from models.dao.integration.PythonDataIntegrationConnection import PythonDataIntegrationConnection
+from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.viewmodels.integration.CreateIntegrationDataModel import CreateIntegrationDataModel
-from models.dao.integration.PythonDataIntegration import PythonDataIntegration
-from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegrationColumn
-from models.dao.integration.PyhtonDataIntegrationExecutionJob import PythonDataIntegrationExecutionJob
+from models.dao.integration.DataIntegration import DataIntegration
+from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
+from models.dao.integration.DataIntegrationExecutionJob import DataIntegrationExecutionJob
 
 
 class DataIntegrationService(IScoped):
@@ -21,65 +21,65 @@ class DataIntegrationService(IScoped):
                  sql_logger: SqlLogger,
                  ):
         self.database_session_manager = database_session_manager
-        self.python_data_integration_repository: Repository[PythonDataIntegration] = Repository[PythonDataIntegration](
+        self.data_integration_repository: Repository[DataIntegration] = Repository[DataIntegration](
             database_session_manager)
-        self.python_data_integration_column_repository: Repository[PythonDataIntegrationColumn] = Repository[
-            PythonDataIntegrationColumn](
+        self.data_integration_column_repository: Repository[DataIntegrationColumn] = Repository[
+            DataIntegrationColumn](
             database_session_manager)
-        self.python_data_integration_connection_repository: Repository[PythonDataIntegrationConnection] = Repository[
-            PythonDataIntegrationConnection](
+        self.data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[
+            DataIntegrationConnection](
             database_session_manager)
-        self.pyhton_data_integration_execution_job_repository: Repository[PythonDataIntegrationExecutionJob] = \
+        self.pyhton_data_integration_execution_job_repository: Repository[DataIntegrationExecutionJob] = \
             Repository[
-                PythonDataIntegrationExecutionJob](
+                DataIntegrationExecutionJob](
                 database_session_manager)
         self.connection_repository: Repository[Connection] = Repository[Connection](database_session_manager)
         self.sql_logger = sql_logger
 
     #######################################################################################
 
-    def get_data_integrations(self) -> List[PythonDataIntegration]:
+    def get_data_integrations(self) -> List[DataIntegration]:
         """
         Data integration data preparing
         """
-        integration_datas = self.python_data_integration_repository.filter_by(IsDeleted=0)
+        integration_datas = self.data_integration_repository.filter_by(IsDeleted=0)
         return integration_datas.all()
 
     def create_integration_data(self, data: CreateIntegrationDataModel):
         self.sql_logger.info('PDI Insertion for:' + data.Code)
 
         if data.Code is not None and data.Code != "":
-            pdi = self.python_data_integration_repository.first(IsDeleted=0, Code=data.Code)
+            pdi = self.data_integration_repository.first(IsDeleted=0, Code=data.Code)
             if pdi is not None:
                 raise OperationalException("Code already exists")
         else:
             raise OperationalException("Code required")
         inserted_pdi = self.insert_configuration(data)
         self.sql_logger.info(f'PDI Insertion for {data.Code} is Completed')
-        pdi = self.python_data_integration_repository.get_by_id(inserted_pdi.Id)
+        pdi = self.data_integration_repository.get_by_id(inserted_pdi.Id)
         return pdi
 
-    def insert_configuration(self, data: CreateIntegrationDataModel) -> PythonDataIntegration:
+    def insert_configuration(self, data: CreateIntegrationDataModel) -> DataIntegration:
 
-        python_data_integration = PythonDataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
+        data_integration = DataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
                                                         IsDelta=data.IsDelta)
-        self.python_data_integration_repository.insert(python_data_integration)
+        self.data_integration_repository.insert(data_integration)
 
         source = self.connection_repository.first(Id=data.SourceConnectionId)
         if source is None:
             raise OperationalException("Source Connection not found")
-        source_connection = PythonDataIntegrationConnection(
+        source_connection = DataIntegrationConnection(
             SourceOrTarget=0, ConnectionId=data.SourceConnectionId, Schema=data.SourceSchema,
-            TableName=data.SourceTableName, PythonDataIntegration=python_data_integration, Connection=source)
-        self.python_data_integration_connection_repository.insert(source_connection)
+            TableName=data.SourceTableName, DataIntegration=data_integration, Connection=source)
+        self.data_integration_connection_repository.insert(source_connection)
 
         target = self.connection_repository.first(Id=data.TargetConnectionId)
         if target is None:
             raise OperationalException("Target Connection not found")
-        target_connection = PythonDataIntegrationConnection(
+        target_connection = DataIntegrationConnection(
             SourceOrTarget=1, ConnectionId=data.TargetConnectionId, Schema=data.TargetSchema,
-            TableName=data.TargetTableName, PythonDataIntegration=python_data_integration, Connection=target)
-        self.python_data_integration_connection_repository.insert(target_connection)
+            TableName=data.TargetTableName, DataIntegration=data_integration, Connection=target)
+        self.data_integration_connection_repository.insert(target_connection)
 
         source_columns_list = data.SourceColumns.split(",")
         target_columns_list = data.TargetColumns.split(",")
@@ -87,46 +87,46 @@ class DataIntegrationService(IScoped):
             raise OperationalException("Source and Target Column List must be equal")
         for relatedColumn in source_columns_list:
             target_column_name = target_columns_list[source_columns_list.index(relatedColumn)]
-            python_data_integration_column = PythonDataIntegrationColumn(SourceColumnName=relatedColumn,
+            data_integration_column = DataIntegrationColumn(SourceColumnName=relatedColumn,
                                                                          TargetColumnName=target_column_name,
-                                                                         PythonDataIntegration=python_data_integration)
-            self.python_data_integration_column_repository.insert(python_data_integration_column)
+                                                                         DataIntegration=data_integration)
+            self.data_integration_column_repository.insert(data_integration_column)
 
         if data.PreExecutions is not None and data.PreExecutions != "":
-            self.insert_execution_job(data.PreExecutions, 1, 0, python_data_integration)
+            self.insert_execution_job(data.PreExecutions, 1, 0, data_integration)
         if data.PostExecutions is not None and data.PostExecutions != "":
-            self.insert_execution_job(data.PostExecutions, 0, 1, python_data_integration)
+            self.insert_execution_job(data.PostExecutions, 0, 1, data_integration)
 
         self.database_session_manager.commit()
-        return python_data_integration
+        return data_integration
 
-    def insert_execution_job(self, ExecutionList, IsPre, IsPost, PythonDataIntegration):
+    def insert_execution_job(self, ExecutionList, IsPre, IsPost, DataIntegration):
         pre_execution_list = ExecutionList.split(",")
         for preExecution in pre_execution_list:
-            python_data_integration_execution_job = PythonDataIntegrationExecutionJob(ExecutionProcedure=preExecution,
+            data_integration_execution_job = DataIntegrationExecutionJob(ExecutionProcedure=preExecution,
                                                                                       IsPre=IsPre,
                                                                                       IsPost=IsPost,
-                                                                                      PythonDataIntegration=PythonDataIntegration)
-            self.pyhton_data_integration_execution_job_repository.insert(python_data_integration_execution_job)
+                                                                                      DataIntegration=DataIntegration)
+            self.pyhton_data_integration_execution_job_repository.insert(data_integration_execution_job)
 
     # def update_integration_data(self, data: CreateIntegrationDataModel):
     #     self.sql_logger.info('PDI Insertion for:' + data.Code)
     #
     #     if data.Code is not None and data.Code != "":
-    #         python_data_integration = self.python_data_integration_repository.first(IsDeleted=0, Code=data.Code)
-    #         if python_data_integration is None:
+    #         data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code)
+    #         if data_integration is None:
     #             raise OperationalException("Code not exists")
     #     else:
     #         raise OperationalException("Code required")
-    #     python_data_integration.IsTargetTruncate = data.IsTargetTruncate
-    #     python_data_integration.IsDelta = data.IsDelta
+    #     data_integration.IsTargetTruncate = data.IsTargetTruncate
+    #     data_integration.IsDelta = data.IsDelta
     #
-    #     source_connection = python_data_integration.Connections[0]
+    #     source_connection = data_integration.Connections[0]
     #     source_connection.ConnectionId = data.SourceConnectionId
     #     source_connection.Schema = data.SourceSchema
     #     source_connection.TableName = data.SourceTableName
     #
-    #     target_connection = python_data_integration.Connections[1]
+    #     target_connection = data_integration.Connections[1]
     #     target_connection.ConnectionId = data.SourceConnectionId
     #     target_connection.Schema = data.SourceSchema
     #     target_connection.TableName = data.SourceTableName
@@ -138,24 +138,24 @@ class DataIntegrationService(IScoped):
     #         raise OperationalException("Source and Target Column List must be equal")
     #     for relatedColumn in source_columns_list:
     #         target_column_name = target_columns_list[source_columns_list.index(relatedColumn)]
-    #         python_data_integration_column = PythonDataIntegrationColumn(SourceColumnName=relatedColumn,
+    #         data_integration_column = DataIntegrationColumn(SourceColumnName=relatedColumn,
     #                                                                      TargetColumnName=target_column_name,
-    #                                                                      PythonDataIntegration=python_data_integration)
-    #         self.python_data_integration_column_repository.insert(python_data_integration_column)
+    #                                                                      DataIntegration=data_integration)
+    #         self.data_integration_column_repository.insert(data_integration_column)
     #
     #     if data.PreExecutions is not None and data.PreExecutions != "":
-    #         self.insert_execution_job(data.PreExecutions, 1, 0, python_data_integration)
+    #         self.insert_execution_job(data.PreExecutions, 1, 0, data_integration)
     #     if data.PostExecutions is not None and data.PostExecutions != "":
-    #         self.insert_execution_job(data.PostExecutions, 0, 1, python_data_integration)
+    #         self.insert_execution_job(data.PostExecutions, 0, 1, data_integration)
     #
     #     self.database_session_manager.commit()
-    #     return python_data_integration
+    #     return data_integration
 
     def delete_integration_data(self, code):
         self.sql_logger.info('PDI deletion for:' + code)
 
         if code is not None and code != "":
-            pdi = self.python_data_integration_repository.first(IsDeleted=0, Code=code)
+            pdi = self.data_integration_repository.first(IsDeleted=0, Code=code)
             if pdi is None:
                 raise OperationalException("Code not found")
         else:

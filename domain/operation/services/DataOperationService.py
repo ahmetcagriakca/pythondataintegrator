@@ -16,7 +16,7 @@ from infrastructor.utils.PdiUtils import PdiUtils
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.common import OperationEvent
 from models.dao.common.Status import Status
-from models.dao.integration.PythonDataIntegration import PythonDataIntegration
+from models.dao.integration.DataIntegration import DataIntegration
 from models.dao.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
     DataOperationJob
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
@@ -88,8 +88,8 @@ class DataOperationService(IScoped):
                  ):
         self.process_service = process_service
         self.database_session_manager = database_session_manager
-        self.python_data_integration_repository: Repository[PythonDataIntegration] = Repository[
-            PythonDataIntegration](
+        self.data_integration_repository: Repository[DataIntegration] = Repository[
+            DataIntegration](
             database_session_manager)
         self.data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
             database_session_manager)
@@ -119,11 +119,11 @@ class DataOperationService(IScoped):
         data_operations = self.data_operation_repository.filter_by(IsDeleted=0).all()
         return data_operations
 
-    def get_integration_datas(self, integration_code=None) -> List[PythonDataIntegration]:
+    def get_integration_datas(self, integration_code=None) -> List[DataIntegration]:
         """
         Data integration data preparing
         """
-        integration_datas = self.python_data_integration_repository.filter_by(IsDeleted=0)
+        integration_datas = self.data_integration_repository.filter_by(IsDeleted=0)
         if integration_code is not None:
             integration_datas = integration_datas.filter_by(Code=integration_code)
         return integration_datas.all()
@@ -149,13 +149,13 @@ class DataOperationService(IScoped):
 
         self.data_operation_repository.insert(data_operation)
         for integration in data_operation_model.Integrations:
-            pdi = self.python_data_integration_repository.first(IsDeleted=0, Code=integration.Code)
+            pdi = self.data_integration_repository.first(IsDeleted=0, Code=integration.Code)
             if pdi is None:
                 raise OperationalException(f"{integration.Code} integration can not be found")
 
             data_operation_integration = DataOperationIntegration(Order=integration.Order, Limit=integration.Limit,
                                                                   ProcessCount=integration.ProcessCount,
-                                                                  PythonDataIntegration=pdi,
+                                                                  DataIntegration=pdi,
                                                                   DataOperation=data_operation)
             self.data_operation_integration_repository.insert(data_operation_integration)
 
@@ -174,17 +174,17 @@ class DataOperationService(IScoped):
         data_operation = self.data_operation_repository.first(Name=data_operation_model.Name)
         # insert or update integration
         for integration in data_operation_model.Integrations:
-            pdi = self.python_data_integration_repository.first(IsDeleted=0, Code=integration.Code)
+            pdi = self.data_integration_repository.first(IsDeleted=0, Code=integration.Code)
             if pdi is None:
                 raise OperationalException(f"{integration.Code} integration can not be found")
 
             data_operation_integration = self.data_operation_integration_repository.first(DataOperationId=data_operation.Id,
-                PythonDataIntegrationId=pdi.Id)
+                DataIntegrationId=pdi.Id)
             if data_operation_integration is None:
                 new_data_operation_integration = DataOperationIntegration(Order=integration.Order,
                                                                           Limit=integration.Limit,
                                                                           ProcessCount=integration.ProcessCount,
-                                                                          PythonDataIntegration=pdi,
+                                                                          DataIntegration=pdi,
                                                                           DataOperation=data_operation)
                 self.data_operation_integration_repository.insert(new_data_operation_integration)
             else:
@@ -198,7 +198,7 @@ class DataOperationService(IScoped):
         for existing_integration in check_existing_integrations:
             founded = False
             for integration in data_operation_model.Integrations:
-                if existing_integration.PythonDataIntegration.Code == integration.Code:
+                if existing_integration.DataIntegration.Code == integration.Code:
                     founded = True
             if not founded:
                 self.data_operation_integration_repository.delete_by_id(existing_integration.Id)
@@ -234,11 +234,11 @@ class DataOperationService(IScoped):
             IocManager.configure_startup(root_directory)
             sql_logger = IocManager.injector.get(SqlLogger)
             database_session_manager = IocManager.injector.get(DatabaseSessionManager)
-            python_data_integration_repository: Repository[PythonDataIntegration] = Repository[
-                PythonDataIntegration](
+            data_integration_repository: Repository[DataIntegration] = Repository[
+                DataIntegration](
                 database_session_manager)
             connection_provider = IocManager.injector.get(ConnectionProvider)
-            integration_data = python_data_integration_repository.first(Id=process_id, IsDeleted=0)
+            integration_data = data_integration_repository.first(Id=process_id, IsDeleted=0)
             source_connection = [x for x in integration_data.Connections if x.SourceOrTarget == 0][0]
             target_connection = [x for x in integration_data.Connections if x.SourceOrTarget == 1][0]
             execute_operation_dto = ExecuteOperationFactory(
@@ -405,7 +405,7 @@ class DataOperationService(IScoped):
                                                                                                DataOperationId=data_operation.Id).order_by(
                 "Order").all()
             for data_operation_integration in data_operation_integrations:
-                integration: PythonDataIntegration = data_operation_integration.PythonDataIntegration
+                integration: DataIntegration = data_operation_integration.DataIntegration
                 integration_code = integration.Code
                 # Source and target database managers instantiate
                 source_connection = [x for x in integration.Connections if x.SourceOrTarget == 0][0]

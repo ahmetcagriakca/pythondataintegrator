@@ -1,6 +1,6 @@
 from typing import List
 
-from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegrationColumn
+from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
 from models.dto.LimitModifier import LimitModifier
 
 
@@ -131,25 +131,25 @@ class PdiUtils:
 
     @staticmethod
     def get_row_column_and_values(target_connector_type: str, target_schema: str, target_table_name: str,
-                                  python_data_integration_columns: List[PythonDataIntegrationColumn]):
+                                  data_integration_columns: List[DataIntegrationColumn]):
         related_columns = []
         column_rows = []
         insert_row_columns = ""
         insert_row_values = ""
-        for column in python_data_integration_columns:
+        for column in data_integration_columns:
             if column.SourceColumnName is not None:
                 rel_column = (column.ResourceType, column.SourceColumnName)
                 related_columns.append(rel_column)
                 row = (column.ResourceType, column.SourceColumnName, column.TargetColumnName)
                 column_rows.append(row)
-                insert_row_columns += f'{"" if column == python_data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
+                insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
                 if target_connector_type == 'ORACLE':
-                    indexer = f':{python_data_integration_columns.index(column)}'
+                    indexer = f':{data_integration_columns.index(column)}'
                 elif target_connector_type == 'MSSQL':
                     indexer = '?'
                 elif target_connector_type == 'POSTGRESQL':
                     indexer = '%s'
-                insert_row_values += f'{"" if column == python_data_integration_columns[0] else ", "}{indexer}'
+                insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}{indexer}'
         final_executable = PdiUtils.insert_into_table(target_schema, target_table_name, insert_row_columns,
                                                       insert_row_values, target_connector_type)
         return column_rows, final_executable, related_columns

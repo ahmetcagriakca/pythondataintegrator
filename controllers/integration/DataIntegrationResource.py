@@ -23,8 +23,8 @@ class DataIntegrationResource(ResourceBase):
         """
         All integration data
         """
-        python_data_integrations = self.data_integration_service.get_data_integrations()
-        result = DataIntegrationModels.get_pdi_models(python_data_integrations)
+        data_integrations = self.data_integration_service.get_data_integrations()
+        result = DataIntegrationModels.get_pdi_models(data_integrations)
         return CommonModels.get_response(result)
 
     @DataIntegrationModels.ns.expect(DataIntegrationModels.create_integration_data_model, validate=True)
