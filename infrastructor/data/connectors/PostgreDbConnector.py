@@ -29,17 +29,10 @@ class PostgreDbConnector(ConnectorStrategy):
             pass
 
     def execute_many(self, query, data):
-        # Create a list of tupples from the dataframe values
-        # tuples = [tuple(x) for x in df.to_numpy()]
-        # # Comma-separated dataframe columns
-        # cols = ','.join(list(df.columns))
-        # # SQL quert to execute
-        # query = "INSERT INTO %s(%s) VALUES(%%s,%%s,%%s)" % (table, cols)
-        cursor = self.connection.cursor()
         try:
-            extras.execute_batch(cursor, query, data, 10000)
+            extras.execute_batch(self.cursor, query, data, 10000)
             self.connection.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             self.connection.rollback()
-            cursor.close()
+            self.cursor.close()
             raise error

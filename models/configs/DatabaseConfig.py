@@ -22,7 +22,6 @@ class DatabaseConfig(BaseConfig):
         self.database: str = database
         self.username: str = username
         self.password: str = password
-        self.schema: str = schema
 
     def is_valid(self):
         pass

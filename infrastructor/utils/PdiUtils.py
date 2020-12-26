@@ -54,13 +54,15 @@ class PdiUtils:
 
     @staticmethod
     def get_limit_modifiers(data_count, limit):
-        top_limit = limit+1
+        top_limit = limit + 1
         sub_limit = 1
         limit_modifiers = []
+        id = 0
         while True:
             if top_limit != limit and top_limit - data_count > limit:
                 break
-            limit_modifier = LimitModifier(top_limit=top_limit, sub_limit=sub_limit)
+            id = id + 1
+            limit_modifier = LimitModifier(Id=id, TopLimit=top_limit, SubLimit=sub_limit)
             limit_modifiers.append(limit_modifier)
             top_limit += limit
             sub_limit += limit

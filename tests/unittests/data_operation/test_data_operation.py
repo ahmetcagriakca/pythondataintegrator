@@ -45,12 +45,12 @@ class TestDataOperation(TestCase):
         while True:
             if top_limit != limit and top_limit - data_count > limit:
                 break
-            limit_modifier = LimitModifier(top_limit=top_limit, sub_limit=sub_limit)
+            limit_modifier = LimitModifier(TopLimit=top_limit, SubLimit=sub_limit)
             limit_modifiers.append(limit_modifier)
             top_limit += limit
             sub_limit += limit
         for li in limit_modifiers:
-            print(f"{li.sub_limit} - {li.top_limit}")
+            print(f"{li.TopLimit} - {li.TopLimit}")
 
     def test_parallel_data_operation(self):
         start = time()
