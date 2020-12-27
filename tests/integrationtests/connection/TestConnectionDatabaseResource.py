@@ -92,8 +92,7 @@ class TestConnectionDatabaseResuource(TestCase):
         except Exception as ex:
             assert True == False
         finally:
-
-            # remove new record
+            # clean integration test operations
             database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
 
             connection_database_repository: Repository[ConnectionDatabase] = Repository[ConnectionDatabase](

@@ -54,18 +54,22 @@ class TestConnectionResuource(TestCase):
         return response_data
 
     def test_get_connection(self):
-        id=1
+        id = 1
         test_data = {"Id": id}
-        response_data= self.delete_connection(test_data)
-        assert response_data["Message"] == "Connection Removed Successfully"
-        database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
-
-        connection_database_repository: Repository[ConnectionDatabase] = Repository[ConnectionDatabase](
-            database_session_manager)
-        connection_repository: Repository[Connection] = Repository[Connection](
-            database_session_manager)
-        connection = connection_repository.first(Id=id)
-        connection_database = connection_database_repository.first(Connection=connection)
-        connection.IsDeleted=0
-        connection_database.IsDeleted=0
-        database_session_manager.commit()
+        try:
+            response_data = self.delete_connection(test_data)
+            assert response_data["Message"] == "Connection Removed Successfully"
+        except Exception as ex:
+            assert True == False
+        finally:
+            # clean integration test operations
+            database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
+            connection_database_repository: Repository[ConnectionDatabase] = Repository[ConnectionDatabase](
+                database_session_manager)
+            connection_repository: Repository[Connection] = Repository[Connection](
+                database_session_manager)
+            connection = connection_repository.first(Id=id)
+            connection_database = connection_database_repository.first(Connection=connection)
+            connection.IsDeleted = 0
+            connection_database.IsDeleted = 0
+            database_session_manager.commit()
