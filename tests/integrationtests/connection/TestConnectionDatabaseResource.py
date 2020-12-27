@@ -9,7 +9,7 @@ from infrastructor.data.Repository import Repository
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from tests.integrationtests.common.TestManager import TestManager
-from tests.integrationtests.connection.testdata.connection_test_data import ConnectionTestData
+from tests.integrationtests.connection.testdata.ConnectionTestData import ConnectionTestData
 
 
 class TestConnectionDatabaseResuource(TestCase):
@@ -18,12 +18,10 @@ class TestConnectionDatabaseResuource(TestCase):
         self.test_manager = TestManager()
 
     def insert_connection(self, request):
-        # insert connection
         response_data = self.test_manager.api_client.post('/api/Connection/ConnectionDatabase', request)
         return response_data
 
     def update_connection(self, request):
-        # update connection
         response_data = self.test_manager.api_client.put('/api/Connection/ConnectionDatabase', request)
         return response_data
 

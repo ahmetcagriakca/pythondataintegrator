@@ -16,7 +16,7 @@ from models.dao.integration.DataIntegrationExecutionJob import DataIntegrationEx
 from models.viewmodels.integration.UpdateDataIntegrationModel import UpdateDataIntegrationModel
 
 
-class DataIntegrationService(IScoped):
+class DataIntegrationConnectionService(IScoped):
     @inject
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
@@ -39,15 +39,8 @@ class DataIntegrationService(IScoped):
         self.sql_logger = sql_logger
 
     #######################################################################################
-
-    def get_data_integrations(self) -> List[DataIntegration]:
-        """
-        Data integration data preparing
-        """
-        integration_datas = self.data_integration_repository.filter_by(IsDeleted=0)
-        return integration_datas.all()
-
     def create_data_integration(self, data: CreateDataIntegrationModel):
+        self.sql_logger.info('PDI Insertion for:' + data.Code)
         if data.Code is not None and data.Code != "":
             data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code)
             if data_integration is not None:
@@ -55,27 +48,12 @@ class DataIntegrationService(IScoped):
         else:
             raise OperationalException("Code required")
         data_integration = self.insert_data_integration(data)
+        self.sql_logger.info(f'PDI Insertion for {data.Code} is Completed')
         data_integration_result = self.data_integration_repository.first(IsDeleted=0, Id=data_integration.Id)
         return data_integration_result
 
-    def insert_data_integration(self, data: CreateDataIntegrationModel) -> DataIntegration:
+    def insert_data_integration(self, data: CreateDataIntegrationModel,data_integration:DataIntegration) -> DataIntegration:
 
-        data_integration = DataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
-                                           IsDelta=data.IsDelta)
-        self.data_integration_repository.insert(data_integration)
-
-        source_columns_list = data.SourceColumns.split(",")
-        target_columns_list = data.TargetColumns.split(",")
-        if len(source_columns_list) != len(target_columns_list):
-            raise OperationalException("Source and Target Column List must be equal")
-        data_integration_columns = []
-        for relatedColumn in source_columns_list:
-            target_column_name = target_columns_list[source_columns_list.index(relatedColumn)]
-            data_integration_column = DataIntegrationColumn(SourceColumnName=relatedColumn,
-                                                            TargetColumnName=target_column_name,
-                                                            DataIntegration=data_integration)
-            data_integration_columns.append(data_integration_column)
-            self.data_integration_column_repository.insert(data_integration_column)
         if data.SourceConnectionName is not None and data.SourceConnectionName != '':
             source = self.connection_repository.first(Name=data.SourceConnectionName)
             if source is None:
@@ -94,22 +72,15 @@ class DataIntegrationService(IScoped):
                 DataIntegration=data_integration, Connection=target)
             self.data_integration_connection_repository.insert(target_connection)
 
-            column_rows, related_columns, target_execute_query = PdiUtils.get_row_column_and_values(
-                schema=target_connection.Schema, table_name=target_connection.TableName,
-                data_integration_columns=data_integration_columns)
+            # column_rows, related_columns, target_execute_query = PdiUtils.get_row_column_and_values(
+            #     schema=target_connection.Schema, table_name=target_connection.TableName,
+            #     data_integration_columns=data_integration_columns)
             selected_rows = PdiUtils.get_selected_rows(column_rows)
             if source_connection.Query is None or source_connection.Query == '':
                 query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
                 source_connection.Query = query
             if target_connection.Query is None or target_connection.Query == '':
                 target_connection.Query = target_execute_query
-
-        if data.PreExecutions is not None and data.PreExecutions != "":
-            self.insert_execution_job(data.PreExecutions, 1, 0, data_integration)
-        if data.PostExecutions is not None and data.PostExecutions != "":
-            self.insert_execution_job(data.PostExecutions, 0, 1, data_integration)
-
-        self.database_session_manager.commit()
         return data_integration
 
     def insert_execution_job(self, ExecutionList, IsPre, IsPost, DataIntegration):
@@ -121,42 +92,6 @@ class DataIntegrationService(IScoped):
                                                                          DataIntegration=DataIntegration)
             self.data_integration_execution_job_repository.insert(data_integration_execution_job)
 
-    def update_execution_job(self, ExecutionList, IsPre, IsPost, DataIntegration):
-        execution_list = ExecutionList.split(",")
-        for preExecution in execution_list:
-            data_integration_execution_job = self.data_integration_execution_job_repository.first(
-                IsDeleted=0,
-                IsPre=IsPre,
-                IsPost=IsPost,
-                ExecutionProcedure=preExecution,
-                DataIntegration=DataIntegration)
-            if data_integration_execution_job is None:
-                data_integration_execution_job = DataIntegrationExecutionJob(ExecutionProcedure=preExecution,
-                                                                             IsPre=IsPre,
-                                                                             IsPost=IsPost,
-                                                                             DataIntegration=DataIntegration)
-                self.data_integration_execution_job_repository.insert(data_integration_execution_job)
-
-        data_integration_execution_jobs = self.data_integration_execution_job_repository.filter_by(
-            IsDeleted=0,
-            DataIntegration=DataIntegration,
-            IsPre=IsPre,
-            IsPost=IsPost)
-        for data_integration_execution_job in data_integration_execution_jobs:
-            check_execution = [execution for execution in execution_list if
-                               execution == data_integration_execution_job.ExecutionProcedure][0]
-            if check_execution is not None:
-                self.data_integration_execution_job_repository.delete(data_integration_execution_job)
-
-    def delete_execution_job(self, IsPre, IsPost, DataIntegration):
-        data_integration_execution_jobs = self.data_integration_execution_job_repository.filter_by(
-            IsDeleted=0,
-            DataIntegration=DataIntegration,
-            IsPre=IsPre,
-            IsPost=IsPost)
-        for data_integration_execution_job in data_integration_execution_jobs:
-            self.data_integration_execution_job_repository.delete(data_integration_execution_job)
-
     def update_data_integration(self, data: UpdateDataIntegrationModel):
         if data.Code is not None and data.Code != "":
             data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code)
@@ -166,6 +101,16 @@ class DataIntegrationService(IScoped):
             raise OperationalException("Code required")
         data_integration.IsTargetTruncate = data.IsTargetTruncate
         data_integration.IsDelta = data.IsDelta
+
+        source_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 0][0]
+        source_connection.ConnectionId = data.SourceConnectionName
+        source_connection.Schema = data.SourceSchema
+        source_connection.TableName = data.SourceTableName
+
+        target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
+        target_connection.ConnectionId = data.TargetConnectionName
+        target_connection.Schema = data.TargetSchema
+        target_connection.TableName = data.TargetTableName
 
         source_columns_list = data.SourceColumns.split(",")
         target_columns_list = data.TargetColumns.split(",")
@@ -194,44 +139,10 @@ class DataIntegrationService(IScoped):
             if not column_founded:
                 self.database_session_manager.session.delete(data_integration_column)
 
-        if data.SourceConnectionName is not None and data.SourceConnectionName != '':
-            source_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 0][0]
-            source = self.connection_repository.first(Name=data.SourceConnectionName)
-            if source is None:
-                raise OperationalException("Source Connection not found")
-            source_connection.Connection = source
-            source_connection.Schema = data.SourceSchema
-            source_connection.Query = data.SourceQuery
-
-        if data.TargetConnectionName is not None and data.TargetConnectionName != '':
-            target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
-            target = self.connection_repository.first(Name=data.TargetConnectionName)
-            if target is None:
-                raise OperationalException("Target Connection not found")
-            target_connection.Connection = target
-            target_connection.Schema = data.TargetSchema
-            target_connection.TableName = data.TargetTableName
-            target_connection.Query = data.TargetQuery
-            data_integration_columns = self.data_integration_column_repository.filter_by(
-                DataIntegration=data_integration)
-            column_rows, related_columns, target_execute_query = PdiUtils.get_row_column_and_values(
-                schema=target_connection.Schema, table_name=target_connection.TableName,
-                data_integration_columns=data_integration_columns)
-            selected_rows = PdiUtils.get_selected_rows(column_rows)
-            if source_connection.Query is None or source_connection.Query == '':
-                query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
-                source_connection.Query = query
-            if target_connection.Query is None or target_connection.Query == '':
-                target_connection.Query = target_execute_query
-
         if data.PreExecutions is not None and data.PreExecutions != "":
-            self.update_execution_job(data.PreExecutions, True, False, data_integration)
-        else:
-            self.delete_execution_job(True, False, data_integration)
+            self.insert_execution_job(data.PreExecutions, 1, 0, data_integration)
         if data.PostExecutions is not None and data.PostExecutions != "":
-            self.update_execution_job(data.PostExecutions, False, True, data_integration)
-        else:
-            self.delete_execution_job(False, True, data_integration)
+            self.insert_execution_job(data.PostExecutions, 0, 1, data_integration)
 
         self.database_session_manager.commit()
         return data_integration

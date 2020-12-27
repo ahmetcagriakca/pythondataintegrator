@@ -113,7 +113,7 @@ class DataIntegrationModels:
 
     @staticmethod
     def get_data_integration_model(data_integration: DataIntegration) -> DataIntegrationModel:
-        source_connection = data_integration.Connections[0]
+        source_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 0][0]
         entity_source = DataIntegrationConnectionModel(
             Id=source_connection.Id,
             SourceOrTarget=source_connection.SourceOrTarget,
@@ -124,13 +124,13 @@ class DataIntegrationModels:
         source = json.loads(json.dumps(entity_source.__dict__, default=CommonModels.date_converter))
         source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
 
-        target_connection = data_integration.Connections[1]
+        target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
         entity_target = DataIntegrationConnectionModel(
             Id=target_connection.Id,
             SourceOrTarget=target_connection.SourceOrTarget,
             Schema=target_connection.Schema,
             TableName=target_connection.TableName,
-            Query=source_connection.Query,
+            Query=target_connection.Query,
         )
         target = json.loads(json.dumps(entity_target.__dict__, default=CommonModels.date_converter))
         target['Connection'] = ConnectionModels.get_connection_result_model(target_connection.Connection)
