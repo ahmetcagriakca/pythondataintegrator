@@ -7,53 +7,23 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
+from tests.integrationtests.common.TestManager import TestManager
 
 
 class TestConnectionResuource(TestCase):
     def __init__(self, methodName='TestConnectionResuource'):
         super(TestConnectionResuource, self).__init__(methodName)
-
-        from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
-        from infrastructor.scheduler.JobScheduler import JobScheduler
-        os.environ["PYTHON_ENVIRONMENT"] = 'test'
-        root_directory = os.path.abspath(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir))
-        IocManager.configure_startup(root_directory=root_directory,
-                                     app_wrapper=FlaskAppWrapper,
-                                     job_scheduler=JobScheduler)
-        self.client = IocManager.app.test_client()
-
-    def print_error_detail(self, data):
-        print(data['message'] if 'message' in data else '')
-        print(data['traceback'] if 'traceback' in data else '')
-        print(data['message'] if 'message' in data else '')
+        self.test_manager = TestManager()
 
     def test_get_connection(self):
-        response = self.client.get(
-            '/api/Connection',
-            content_type='application/json',
-        )
-
-        response_data = json.loads(response.get_data(as_text=True))
-        print(response_data)
-        assert response.status_code == 200
-        self.print_error_detail(response_data)
+        response_data = self.test_manager.api_client.get('/api/Connection')
         assert response_data['IsSuccess'] == True
 
     def delete_connection(self, request):
-        data = json.dumps(request)
-        response = self.client.delete(
-            '/api/Connection',
-            data=data,
-            content_type='application/json',
-        )
-        response_data = json.loads(response.get_data(as_text=True))
-        print(response_data)
-        assert response.status_code == 200
-        self.print_error_detail(response_data)
+        response_data = self.test_manager.api_client.delete('/api/Connection', request)
         return response_data
 
-    def test_get_connection(self):
+    def test_delete_connection(self):
         id = 1
         test_data = {"Id": id}
         try:
@@ -63,7 +33,8 @@ class TestConnectionResuource(TestCase):
             assert True == False
         finally:
             # clean integration test operations
-            database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
+            database_session_manager: DatabaseSessionManager = self.test_manager.ioc_manager.injector.get(
+                DatabaseSessionManager)
             connection_database_repository: Repository[ConnectionDatabase] = Repository[ConnectionDatabase](
                 database_session_manager)
             connection_repository: Repository[Connection] = Repository[Connection](
