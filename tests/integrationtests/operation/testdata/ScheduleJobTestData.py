@@ -1,41 +1,18 @@
-class DataOperationTestData:
-    test_insert_input = {
-        "Name": "TEST_DATA_OPERATION",
-        "Integrations": [
-            {
-                "Code": "TEST_DATA_OPERATION_INTEGRATION",
-                "Order": 1,
-                "Limit": 10000,
-                "ProcessCount": 1
-            }
-        ]
-    }
+class ScheduleJobTestData:
 
-    test_update_input = {
-        "Name": "TEST_DATA_OPERATION",
-        "Integrations": [
-            {
-                "Code": "TEST_DATA_OPERATION_INTEGRATION",
-                "Order": 1,
-                "Limit": 100000,
-                "ProcessCount": 2
-            }
-        ]
-    }
-
-    test_integration_connection = {
+    test_job_connection = {
         "Name": "TestIntegrationConnection",
         "ConnectionTypeName": "Database",
         "ConnectorTypeName": "POSTGRESQL",
         "Host": "localhost",
         "Port": 5432,
         "Sid": "",
-        "DatabaseName": "test_pdi",
+        "DatabaseName": "test_pdi_integration",
         "User": "postgres",
         "Password": "123456"
     }
 
-    test_data_operation_integration_input = {
+    test_job_integration = {
         "Code": "TEST_DATA_OPERATION_INTEGRATION",
         "SourceConnectionName": "TestIntegrationConnection",
         "SourceSchema": "test",
@@ -43,7 +20,7 @@ class DataOperationTestData:
         "SourceQuery": "",
         "TargetConnectionName": "TestIntegrationConnection",
         "TargetSchema": "test",
-        "TargetTableName": "test_integration_source",
+        "TargetTableName": "test_integration_target",
         "TargetQuery": "",
         "IsTargetTruncate": True,
         "IsDelta": True,
@@ -52,4 +29,17 @@ class DataOperationTestData:
         "TargetColumns": "Id,Name",
         "PreExecutions": "",
         "PostExecutions": ""
+    }
+
+
+    test_job_data_operation = {
+        "Name": "TEST_JOB_DATA_OPERATION",
+        "Integrations": [
+            {
+                "Code": "TEST_DATA_OPERATION_INTEGRATION",
+                "Order": 1,
+                "Limit": 100,
+                "ProcessCount": 1
+            }
+        ]
     }

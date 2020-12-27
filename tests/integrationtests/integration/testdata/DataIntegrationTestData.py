@@ -37,6 +37,18 @@ class DataIntegrationTestData:
         "PostExecutions": ""
     }
 
+    test_integration_connection = {
+        "Name": "TestIntegrationConnection",
+        "ConnectionTypeName": "Database",
+        "ConnectorTypeName": "POSTGRESQL",
+        "Host": "localhost",
+        "Port": 5432,
+        "Sid": "",
+        "DatabaseName": "test_pdi",
+        "User": "postgres",
+        "Password": "123456"
+    }
+
     test_data_operation_integration_input = {
         "Code": "TEST_DATA_OPERATION_INTEGRATION",
         "SourceConnectionName": "TestIntegrationConnection",

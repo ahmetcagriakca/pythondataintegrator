@@ -127,7 +127,7 @@ class ConnectionModels:
             Name=connector_type.Name,
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectionType'] = connection_type,
+        result_model['ConnectionType'] = connection_type
 
         return result_model
 
@@ -148,7 +148,7 @@ class ConnectionModels:
             Name=connection.Name,
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectionType'] = connection_type,
+        result_model['ConnectionType'] = connection_type
         return result_model
 
     @staticmethod
@@ -170,8 +170,8 @@ class ConnectionModels:
         connector_type = ConnectionModels.get_connector_type_model(connection_database.ConnectorType)
         entity_model = ConnectionModels.get_connection_database_entity_model(connection_database)
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectorType'] = connector_type,
-        result_model['Connection'] = connection,
+        result_model['ConnectorType'] = connector_type
+        result_model['Connection'] = connection
         return result_model
 
     @staticmethod
@@ -188,7 +188,7 @@ class ConnectionModels:
         connector_type = ConnectionModels.get_connector_type_model(connection_database.ConnectorType)
         entity_model = ConnectionModels.get_connection_database_entity_model(connection_database)
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectorType'] = connector_type,
+        result_model['ConnectorType'] = connector_type
         return result_model
 
     @staticmethod
@@ -199,9 +199,9 @@ class ConnectionModels:
             Name=connection.Name,
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectionType'] = connection_type,
+        result_model['ConnectionType'] = connection_type
         connection_database = ConnectionModels.get_connection_database_result_model(connection.Database)
-        result_model['Database'] = connection_database,
+        result_model['Database'] = connection_database
         return result_model
 
     @staticmethod

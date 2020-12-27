@@ -67,7 +67,7 @@ class ExecuteOperationFactory:
             target_connector_name=target_connection.Connection.Database.ConnectorType.Name)
 
         eliminated_column_rows = [column_row for column_row in column_rows if column_row[1] is not None]
-        first_row=eliminated_column_rows[0][1]
+        first_row = eliminated_column_rows[0][1]
         execute_operation_dto = ExecuteOperationDto(
             source_connection=source_connection,
             target_connection=target_connection,
@@ -153,13 +153,13 @@ class DataOperationService(IScoped):
 
         self.data_operation_repository.insert(data_operation)
         for integration in data_operation_model.Integrations:
-            pdi = self.data_integration_repository.first(IsDeleted=0, Code=integration.Code)
-            if pdi is None:
+            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=integration.Code)
+            if data_integration is None:
                 raise OperationalException(f"{integration.Code} integration can not be found")
 
             data_operation_integration = DataOperationIntegration(Order=integration.Order, Limit=integration.Limit,
                                                                   ProcessCount=integration.ProcessCount,
-                                                                  DataIntegration=pdi,
+                                                                  DataIntegration=data_integration,
                                                                   DataOperation=data_operation)
             self.data_operation_integration_repository.insert(data_operation_integration)
 
@@ -178,18 +178,18 @@ class DataOperationService(IScoped):
         data_operation = self.data_operation_repository.first(Name=data_operation_model.Name)
         # insert or update integration
         for integration in data_operation_model.Integrations:
-            pdi = self.data_integration_repository.first(IsDeleted=0, Code=integration.Code)
-            if pdi is None:
+            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=integration.Code)
+            if data_integration is None:
                 raise OperationalException(f"{integration.Code} integration can not be found")
 
             data_operation_integration = self.data_operation_integration_repository.first(
                 DataOperationId=data_operation.Id,
-                DataIntegrationId=pdi.Id)
+                DataIntegrationId=data_integration.Id)
             if data_operation_integration is None:
                 new_data_operation_integration = DataOperationIntegration(Order=integration.Order,
                                                                           Limit=integration.Limit,
                                                                           ProcessCount=integration.ProcessCount,
-                                                                          DataIntegration=pdi,
+                                                                          DataIntegration=data_integration,
                                                                           DataOperation=data_operation)
                 self.data_operation_integration_repository.insert(new_data_operation_integration)
             else:
@@ -351,7 +351,6 @@ class DataOperationService(IScoped):
 
         for limit_modifier in limit_modifiers:
             start = time()
-            print(f"StartTime :{start}")
             sql_logger.info(
                 f"Process got a new task. limits:{limit_modifier.SubLimit}-{limit_modifier.TopLimit} ")
             execute_operation_dto.limit_modifier = limit_modifier
@@ -367,7 +366,7 @@ class DataOperationService(IScoped):
             query=execute_operation_dto.source_query,
             sub_limit=execute_operation_dto.limit_modifier.SubLimit,
             top_limit=execute_operation_dto.limit_modifier.TopLimit,
-            first_row = execute_operation_dto.first_row
+            first_row=execute_operation_dto.first_row
         )
         DataOperationService.run_operation(
             source_connection_manager=execute_operation_dto.source_connection_manager,

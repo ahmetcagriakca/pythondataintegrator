@@ -61,3 +61,8 @@ class TestServiceEndpoints:
     def delete_data_operation(self, request):
         response_data = self.api_client.delete('/api/DataOperation', request)
         return response_data
+
+
+    def run_schedule_job_operation(self, request):
+        response_data = self.api_client.post('/api/DataOperation/ScheduleJob', request)
+        return response_data
