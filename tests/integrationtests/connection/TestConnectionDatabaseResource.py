@@ -30,7 +30,7 @@ class TestConnectionDatabaseResuource(TestCase):
         print(data['traceback'] if 'traceback' in data else '')
         print(data['message'] if 'message' in data else '')
 
-    def insert_connection(self, request, expected):
+    def insert_connection(self, request):
         # insert connection
         data = json.dumps(request)
         response = self.client.post(
@@ -42,9 +42,9 @@ class TestConnectionDatabaseResuource(TestCase):
         print(response_data)
         assert response.status_code == 200
         self.print_error_detail(response_data)
-        assert response_data['IsSuccess'] == expected
+        return response_data
 
-    def update_connection(self, request, expected):
+    def update_connection(self, request):
         data = json.dumps(request)
         response = self.client.put(
             '/api/Connection/ConnectionDatabase',
@@ -55,12 +55,12 @@ class TestConnectionDatabaseResuource(TestCase):
         print(response_data)
         assert response.status_code == 200
         self.print_error_detail(response_data)
-        assert response_data['IsSuccess'] == expected
+        return response_data
 
     def test_database_connection(self):
         name = 'NewDatabaseConnection'
         test_insert_input = {
-            "Name": "NewDatabaseConnection",
+            "Name": name,
             "ConnectionTypeName": "Database",
             "ConnectorTypeName": "POSTGRESQL",
             "Host": "string",
@@ -71,7 +71,7 @@ class TestConnectionDatabaseResuource(TestCase):
             "Password": "string"
         }
         test_update_input = {
-            "Name": "NewDatabaseConnection",
+            "Name": name,
             "ConnectorTypeName": "MSSQL",
             "Host": "Test",
             "Port": 1550,
@@ -81,9 +81,14 @@ class TestConnectionDatabaseResuource(TestCase):
             "Password": "test"
         }
         expected = True
+        expected_name = name
         try:
-            self.insert_connection(test_insert_input, expected)
-            self.update_connection(test_update_input, expected)
+            response_data = self.insert_connection(test_insert_input)
+            assert response_data['IsSuccess'] == expected
+            assert response_data['Result']['Name'] == expected_name
+            response_data = self.update_connection(test_update_input)
+            assert response_data['IsSuccess'] == expected
+            assert response_data['Result']['Database'][0]['ConnectorType'][0]['Name'] == "MSSQL"
         except Exception as ex:
             assert True == False
         finally:

@@ -40,7 +40,7 @@ class TestConnectionResuource(TestCase):
         self.print_error_detail(response_data)
         assert response_data['IsSuccess'] == True
 
-    def delete_connection(self, request, expected):
+    def delete_connection(self, request):
         data = json.dumps(request)
         response = self.client.delete(
             '/api/Connection',
@@ -51,12 +51,13 @@ class TestConnectionResuource(TestCase):
         print(response_data)
         assert response.status_code == 200
         self.print_error_detail(response_data)
-        assert response_data['IsSuccess'] == expected
+        return response_data
 
     def test_get_connection(self):
         id=1
         test_data = {"Id": id}
-        self.delete_connection(test_data, True)
+        response_data= self.delete_connection(test_data)
+        assert response_data["Message"] == "Connection Removed Successfully"
         database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
 
         connection_database_repository: Repository[ConnectionDatabase] = Repository[ConnectionDatabase](
