@@ -112,9 +112,10 @@ class ConnectionService(IScoped):
 
         if not self.check_connection_name(connection_database_model.Name):
             raise OperationalException("Connection name not found")
-        connection_database = self.connection_database_repository.first(Name=connection_database_model.Name)
+        connection = self.connection_repository.first(Name=connection_database_model.Name)
+        connection_database = self.connection_database_repository.first(ConnectionId=connection.Id)
 
-        connector_type = self.connector_type_repository.first(Id=connection_database_model.ConnectorTypeId)
+        connector_type = self.connector_type_repository.first(Name=connection_database_model.ConnectorTypeName)
         if connector_type is None:
             raise OperationalException("Connector Type Not Found")
         connection_database.ConnectorType = connector_type
@@ -130,16 +131,16 @@ class ConnectionService(IScoped):
         connection = self.connection_repository.first(Id=connection_database.Connection.Id)
         return connection
 
-    def delete_connection_database(self, id: int):
+    def delete_connection(self, id: int):
         """
         Delete Database connection
         """
-        connection_database = self.connection_database_repository.first(Id=id, IsDeleted=0)
-        if connection_database is None:
-            raise OperationalException("Database Connection Not Found")
+        connection = self.connection_repository.first(Id=id, IsDeleted=0)
+        if connection is None:
+            raise OperationalException("Connection Not Found")
 
-        self.connection_repository.delete_by_id(connection_database.ConnectionId)
-        self.connection_database_repository.delete_by_id(connection_database.Id)
-        message = f'{connection_database.Connection.Name} connection deleted'
+        self.connection_repository.delete_by_id(connection.Id)
+        self.connection_database_repository.delete_by_id(connection.Database.Id)
+        message = f'{connection.Name} connection deleted'
         self.sql_logger.info(message)
         self.database_session_manager.commit()

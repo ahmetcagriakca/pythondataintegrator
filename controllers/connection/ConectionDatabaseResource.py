@@ -42,14 +42,3 @@ class ConnectionDatabaseResource(ResourceBase):
         creation_result = self.connection_service.update_connection_database(data)
         result = ConnectionModels.get_connection_result_model(creation_result)
         return CommonModels.get_response(result=result)
-
-    @ConnectionModels.ns.expect(ConnectionModels.delete_connection_database_model, validate=True)
-    @ConnectionModels.ns.marshal_with(CommonModels.SuccessModel)
-    def delete(self):
-        """
-        Delete Existing Database Connection
-        """
-        data = IocManager.api.payload
-        id = data.get('Id')  #
-        deletion_result = self.connection_service.delete_connection_database(id)
-        return CommonModels.get_response(message="Connection Removed Successfully")
