@@ -20,3 +20,15 @@ class ConnectionTestData:
         "User": "test",
         "Password": "test"
     }
+
+    test_integration_connection = {
+        "Name": "TestIntegrationConnection",
+        "ConnectionTypeName": "Database",
+        "ConnectorTypeName": "POSTGRESQL",
+        "Host": "localhost",
+        "Port": 5432,
+        "Sid": "",
+        "DatabaseName": "test_pdi",
+        "User": "postgres",
+        "Password": "123456"
+    }
