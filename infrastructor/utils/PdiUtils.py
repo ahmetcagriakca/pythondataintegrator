@@ -73,7 +73,7 @@ class PdiUtils:
                                                                  first_row=first_row)
         elif source_connector_type == 'POSTGRESQL':
             executable_script = PdiUtils.postgresql_executable_script(query=query, sub_limit=sub_limit,
-                                                                      top_limit=top_limit, first_row=first_row)
+                                                                      top_limit=top_limit, first_row=f'"{first_row}"')
         return executable_script
 
     #######################################################################################

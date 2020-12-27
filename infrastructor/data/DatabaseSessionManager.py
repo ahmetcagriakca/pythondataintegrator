@@ -14,8 +14,7 @@ class DatabaseSessionManager(IScoped):
     @inject
     def __init__(self,
                  database_config: DatabaseConfig,
-                 api_config: ApiConfig,
-                 console_logger: ConsoleLogger):
+                 api_config: ApiConfig):
         self.api_config = api_config
         self.engine = None
         connection_string = Utils.get_connection_string(database_config=database_config)

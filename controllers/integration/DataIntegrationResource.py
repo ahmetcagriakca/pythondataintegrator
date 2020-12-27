@@ -7,6 +7,7 @@ from domain.integration.services.DataIntegrationService import DataIntegrationSe
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
+from models.viewmodels.integration.UpdateDataIntegrationModel import UpdateDataIntegrationModel
 
 
 @DataIntegrationModels.ns.route("")
@@ -35,8 +36,20 @@ class DataIntegrationResource(ResourceBase):
         """
         data: CreateDataIntegrationModel = json.loads(json.dumps(IocManager.api.payload),
                                                       object_hook=lambda d: CreateDataIntegrationModel(**d))
-        data_integrations = self.data_integration_service.create_data_integration(data)
-        result = DataIntegrationModels.get_data_integration_model(data_integrations)
+        data_integration = self.data_integration_service.create_data_integration(data)
+        result = DataIntegrationModels.get_data_integration_model(data_integration)
+        return CommonModels.get_response(result=result)
+
+    @DataIntegrationModels.ns.expect(DataIntegrationModels.update_data_integration_model, validate=True)
+    @DataIntegrationModels.ns.marshal_with(CommonModels.SuccessModel)
+    def put(self):
+        """
+        Create Integration Data
+        """
+        data: CreateDataIntegrationModel = json.loads(json.dumps(IocManager.api.payload),
+                                                      object_hook=lambda d: UpdateDataIntegrationModel(**d))
+        data_integration = self.data_integration_service.update_data_integration(data)
+        result = DataIntegrationModels.get_data_integration_model(data_integration)
         return CommonModels.get_response(result=result)
 
     @DataIntegrationModels.ns.expect(DataIntegrationModels.delete_data_integration_model, validate=True)
@@ -48,5 +61,4 @@ class DataIntegrationResource(ResourceBase):
         data = IocManager.api.payload
         code = data.get('Code')  #
         deletion_result = self.data_integration_service.delete_integration_data(code)
-        return CommonModels.get_response(message=f'PDI deletion for {code} is Completed')
-
+        return CommonModels.get_response(message=f'Data integration deletion for {code} is Completed')

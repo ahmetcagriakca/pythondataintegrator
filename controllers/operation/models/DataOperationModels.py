@@ -178,7 +178,7 @@ class DataOperationModels:
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
         result_model['DataOperation'] = DataOperationModels.get_data_operation_result_model(
-            data_operation_job.DataOperation),
+            data_operation_job.DataOperation)
         result_model['ApSchedulerJob'] = JobSchedulerModels.get_ap_scheduler_job_model(
             data_operation_job.ApSchedulerJob)
         return result_model

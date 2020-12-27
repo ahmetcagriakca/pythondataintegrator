@@ -54,7 +54,6 @@ class TestDataOperation(TestCase):
 
     def test_parallel_data_operation(self):
         start = time()
-        print(f"StartTime :{start}")
         from domain.operation.services.DataOperationService import DataOperationService
         data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
         result = data_operation_service.start_operation('TEST_OPERATION', 0)
@@ -65,7 +64,6 @@ class TestDataOperation(TestCase):
 
     def test_data_operation(self):
         start = time()
-        print(f"StartTime :{start}")
         from domain.operation.services.DataOperationService import DataOperationService
         data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
         result = data_operation_service.start_operation('LOCAL_LOG', 0)
@@ -76,7 +74,6 @@ class TestDataOperation(TestCase):
 
     def test_start_operation(self):
         start = time()
-        print(f"StartTime :{start}")
         from domain.operation.services.DataOperationService import DataOperationService
         data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
         result = data_operation_service.start_operation('LOCAL_LOG', 0)

@@ -49,7 +49,6 @@ class ProcessService(IScoped):
 
     def start_parallel_process(self, process_id, datas, process_count, process_method, result_method):
         start = time()
-        print(f"StartTime :{start}")
         start_datetime = datetime.now()
 
         sql_logger = IocManager.injector.get(SqlLogger)

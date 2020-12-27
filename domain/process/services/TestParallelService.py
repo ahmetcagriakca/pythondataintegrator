@@ -51,7 +51,6 @@ class TestParallelService(IScoped):
     @staticmethod
     def calculate_method(sql_logger, process_name, my_value):
         start = time()
-        print(f"StartTime :{start}")
         start_datetime = datetime.now()
         sql_logger.info(f"{process_name} process worked with {my_value}")
         # Compute result and mimic a long-running task
@@ -118,7 +117,6 @@ class TestParallelService(IScoped):
     def test_parallel(self, data, thread_count):
 
         start = time()
-        print(f"StartTime :{start}")
         start_datetime = datetime.now()
 
         sql_logger = IocManager.injector.get(SqlLogger)
@@ -142,7 +140,6 @@ class TestParallelService(IScoped):
     def test_with_not_parallel(self, data):
 
         start = time()
-        print(f"StartTime :{start}")
         start_datetime = datetime.now()
         sql_logger = IocManager.injector.get(SqlLogger)
         sql_logger.info(f"One Thread Operations Started")
