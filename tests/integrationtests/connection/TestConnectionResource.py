@@ -16,18 +16,15 @@ class TestConnectionResuource(TestCase):
         self.test_manager = TestManager()
 
     def test_get_connection(self):
-        response_data = self.test_manager.api_client.get('/api/Connection')
+        response_data = self.test_manager.service_endpoints.get_connection()
         assert response_data['IsSuccess'] == True
 
-    def delete_connection(self, request):
-        response_data = self.test_manager.api_client.delete('/api/Connection', request)
-        return response_data
 
     def test_delete_connection(self):
         id = 1
         test_data = {"Id": id}
         try:
-            response_data = self.delete_connection(test_data)
+            response_data = self.test_manager.service_endpoints.delete_connection(test_data)
             assert response_data["Message"] == "Connection Removed Successfully"
         except Exception as ex:
             assert True == False

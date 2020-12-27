@@ -17,21 +17,15 @@ class TestConnectionDatabaseResuource(TestCase):
         super(TestConnectionDatabaseResuource, self).__init__(methodName)
         self.test_manager = TestManager()
 
-    def insert_connection(self, request):
-        response_data = self.test_manager.api_client.post('/api/Connection/ConnectionDatabase', request)
-        return response_data
-
-    def update_connection(self, request):
-        response_data = self.test_manager.api_client.put('/api/Connection/ConnectionDatabase', request)
-        return response_data
-
     def test_database_connection(self):
         expected = True
         try:
-            response_data = self.insert_connection(ConnectionTestData.test_insert_input)
+            response_data = self.test_manager.service_endpoints.insert_connection_database(
+                ConnectionTestData.test_insert_input)
             assert response_data['IsSuccess'] == expected
             assert response_data['Result']['Name'] == ConnectionTestData.test_insert_input['Name']
-            response_data = self.update_connection(ConnectionTestData.test_update_input)
+            response_data = self.test_manager.service_endpoints.update_connection_database(
+                ConnectionTestData.test_update_input)
             assert response_data['IsSuccess'] == expected
             assert response_data['Result']['Database'][0]['ConnectorType'][0]['Name'] == \
                    ConnectionTestData.test_update_input["ConnectorTypeName"]
@@ -39,7 +33,8 @@ class TestConnectionDatabaseResuource(TestCase):
             assert True == False
         finally:
             # clean integration test operations
-            database_session_manager: DatabaseSessionManager = self.test_manager.ioc_manager.injector.get(DatabaseSessionManager)
+            database_session_manager: DatabaseSessionManager = self.test_manager.ioc_manager.injector.get(
+                DatabaseSessionManager)
 
             connection_database_repository: Repository[ConnectionDatabase] = Repository[ConnectionDatabase](
                 database_session_manager)

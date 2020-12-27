@@ -1,5 +1,6 @@
 from tests.integrationtests.connection.testdata.ConnectionTestData import ConnectionTestData
 from tests.integrationtests.integration.testdata.DataIntegrationTestData import DataIntegrationTestData
+from tests.integrationtests.operation.testdata.DataOperationTestData import DataOperationTestData
 
 
 

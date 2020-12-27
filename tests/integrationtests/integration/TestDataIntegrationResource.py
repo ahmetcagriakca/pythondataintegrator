@@ -20,31 +20,8 @@ class TestDataIntegrationResuource(TestCase):
         self.test_manager = TestManager()
 
     def test_get_data_integration(self):
-        response_data = self.test_manager.api_client.get('/api/DataIntegration')
+        response_data = self.test_manager.service_endpoints.get_data_integration()
         assert response_data['IsSuccess'] == True
-
-    def insert_data_integration(self, request):
-        response_data = self.test_manager.api_client.post('/api/DataIntegration', request)
-        return response_data
-
-    def update_data_integration(self, request):
-        response_data = self.test_manager.api_client.put('/api/DataIntegration', request)
-        return response_data
-
-    def delete_data_integration(self, request):
-        response_data = self.test_manager.api_client.delete('/api/DataIntegration', request)
-        return response_data
-
-    def create_test_connection(self, test_integration_connection):
-        database_session_manager: DatabaseSessionManager = self.test_manager.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        connection_repository: Repository[Connection] = Repository[Connection](
-            database_session_manager)
-
-        connection = connection_repository.first(Name=test_integration_connection["Name"])
-        if connection is None:
-            response_data = self.test_manager.api_client.post('/api/Connection/ConnectionDatabase',
-                                                              test_integration_connection)
 
     def test_data_integration(self):
 
@@ -53,21 +30,21 @@ class TestDataIntegrationResuource(TestCase):
         expected_insert_target_query = f'INSERT INTO "test"."test_integration_source"("Id", "Name") VALUES (:Id, :Name)'
         expected_update_source_query = f'SELECT "Id", "Name", "Order" FROM "test"."test_integration_source"'
         expected_update_target_query = f'INSERT INTO "test"."test_integration_source"("Id", "Name", "Order") VALUES (:Id, :Name, :Order)'
-        self.create_test_connection(ConnectionTestData.test_integration_connection)
+        self.test_manager.service_scenarios.create_test_connection(ConnectionTestData.test_integration_connection)
         try:
-            response_data = self.insert_data_integration(DataIntegrationTestData.test_insert_input)
+            response_data = self.test_manager.service_endpoints.insert_data_integration(DataIntegrationTestData.test_insert_input)
             assert response_data['IsSuccess'] == expected
             assert response_data['Result']['Code'] == DataIntegrationTestData.test_insert_input['Code']
             assert response_data['Result']['SourceConnection']['Query'] == expected_insert_source_query
             assert response_data['Result']['TargetConnection']['Query'] == expected_insert_target_query
 
-            response_data = self.update_data_integration(DataIntegrationTestData.test_update_input)
+            response_data = self.test_manager.service_endpoints.update_data_integration(DataIntegrationTestData.test_update_input)
             assert response_data['IsSuccess'] == expected
             assert response_data['Result']['Code'] == DataIntegrationTestData.test_insert_input['Code']
             assert response_data['Result']['SourceConnection']['Query'] == expected_update_source_query
             assert response_data['Result']['TargetConnection']['Query'] == expected_update_target_query
             delete_request = {"Code": DataIntegrationTestData.test_insert_input["Code"]}
-            response_data = self.delete_data_integration(delete_request)
+            response_data = self.test_manager.service_endpoints.delete_data_integration(delete_request)
             assert response_data['Message'] == f'Data integration deletion for {delete_request["Code"]} is Completed'
         except Exception as ex:
             assert True == False

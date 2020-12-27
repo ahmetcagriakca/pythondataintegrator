@@ -18,5 +18,5 @@ class TestConnectorTypeResuource(TestCase):
         print(data['message'] if 'message' in data else '')
 
     def test_get_connector_type(self):
-        response_data = self.test_manager.api_client.get('/api/Connection/ConnectorType')
+        response_data = self.test_manager.service_endpoints.get_connector_type()
         assert response_data['IsSuccess'] == True

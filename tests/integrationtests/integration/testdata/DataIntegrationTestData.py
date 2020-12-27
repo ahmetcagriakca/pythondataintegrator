@@ -36,3 +36,22 @@ class DataIntegrationTestData:
         "PreExecutions": "",
         "PostExecutions": ""
     }
+
+    test_data_operation_integration_input = {
+        "Code": "TEST_DATA_OPERATION_INTEGRATION",
+        "SourceConnectionName": "TestIntegrationConnection",
+        "SourceSchema": "test",
+        "SourceTableName": "test_integration_source",
+        "SourceQuery": "",
+        "TargetConnectionName": "TestIntegrationConnection",
+        "TargetSchema": "test",
+        "TargetTableName": "test_integration_source",
+        "TargetQuery": "",
+        "IsTargetTruncate": True,
+        "IsDelta": True,
+        "Comments": "Test integration record",
+        "SourceColumns": "Id,Name",
+        "TargetColumns": "Id,Name",
+        "PreExecutions": "",
+        "PostExecutions": ""
+    }
