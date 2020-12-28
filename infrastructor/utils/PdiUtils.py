@@ -6,18 +6,18 @@ from models.dto.LimitModifier import LimitModifier
 
 class PdiUtils:
     @staticmethod
-    def count_table(schema, table, connector_type):
-        if connector_type == 'POSTGRESQL':
-            schema = '"' + schema + '"'
-            table = '"' + table + '"'
-        return f"SELECT COUNT(*)  FROM {schema}.{table}"
+    def count_table_mssql(query):
+        return f"SELECT COUNT(*)  FROM ({query})  as count_table"
+    @staticmethod
+    def count_table_postgresql(query):
+        return f"SELECT COUNT(*)  FROM ({query})  as count_table"
+    @staticmethod
+    def count_table_oracle(query):
+        return f"SELECT COUNT(*)  FROM ({query}) "
 
     @staticmethod
-    def truncate_table(schema, table, connector_type):
-        if connector_type == 'POSTGRESQL':
-            schema = '"' + schema + '"'
-            table = '"' + table + '"'
-        return f"DELETE FROM {schema}.{table}"
+    def truncate_table(schema, table):
+        return f'DELETE FROM "{schema}"."{table}"'
 
     @staticmethod
     def insert_into_table(schema, table, row_columns, row_values):

@@ -8,19 +8,21 @@ class OracleDbConnector(ConnectorStrategy):
     @inject
     def __init__(self, database_config: DatabaseConfig):
         self.database_config = database_config
-        self._tns = cx_Oracle.makedsn(self.database_config.host, self.database_config.port,
-                                      service_name=self.database_config.database)
+        self._tns = None
+        if self.database_config.sid is not None and self.database_config.sid != '':
+            self._tns = cx_Oracle.makedsn(self.database_config.host, self.database_config.port,
+                                          service_name=self.database_config.sid)
+        else:
+            self._tns = cx_Oracle.makedsn(self.database_config.host, self.database_config.port,
+                                          service_name=self.database_config.service_name)
         self.connection_string = None
         self.connection = None
         self.cursor = None
 
     def connect(self):
-        if self.database_config.connection_string is not None:
-            self.connection = cx_Oracle.connect(self.database_config.connection_string)
-        else:
-            self.connection = cx_Oracle.connect(self.database_config.username, self.database_config.password, self._tns,
-                                                encoding="UTF-8",
-                                                nencoding="UTF-8")
+        self.connection = cx_Oracle.connect(self.database_config.username, self.database_config.password, self._tns,
+                                            encoding="UTF-8",
+                                            nencoding="UTF-8")
 
     def disconnect(self):
         try:

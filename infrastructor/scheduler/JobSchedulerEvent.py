@@ -80,8 +80,9 @@ class JobSchedulerEvent(ISingleton):
         ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
             database_session_manager)
         ap_scheduler_job: List[ApSchedulerJob] = ap_scheduler_job_repository.first(JobId=event.job_id)
-        ap_scheduler_job.IsDeleted = 1
-        database_session_manager.commit()
+        if ap_scheduler_job is not None:
+            ap_scheduler_job.IsDeleted = 1
+            database_session_manager.commit()
 
     @staticmethod
     def add_job_event(event):

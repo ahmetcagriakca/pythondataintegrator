@@ -91,7 +91,9 @@ class ConnectionService(IScoped):
         connection_database = ConnectionDatabase(Connection=connection,
                                                  ConnectorType=connector_type,
                                                  Host=connection_database_model.Host,
-                                                 Port=connection_database_model.Port, Sid=connection_database_model.Sid,
+                                                 Port=connection_database_model.Port, 
+                                                 Sid=connection_database_model.Sid,
+                                                 ServiceName=connection_database_model.ServiceName,
                                                  DatabaseName=connection_database_model.DatabaseName,
                                                  User=self.crypto_service.encrypt_code(
                                                      connection_database_model.User.encode()).decode(),
@@ -122,6 +124,7 @@ class ConnectionService(IScoped):
         connection_database.Host = connection_database_model.Host
         connection_database.Port = connection_database_model.Port
         connection_database.Sid = connection_database_model.Sid
+        connection_database.ServiceName = connection_database_model.ServiceName
         connection_database.DatabaseName = connection_database_model.DatabaseName
         connection_database.User = self.crypto_service.encrypt_code(connection_database_model.User.encode()).decode()
         connection_database.Password = self.crypto_service.encrypt_code(

@@ -29,7 +29,7 @@ class MssqlDbConnector(ConnectorStrategy):
         except Exception:
             pass
 
-    def execute_many(self,query,data):
+    def execute_many(self, query, data):
         self.cursor.fast_executemany = True
         try:
             self.cursor.executemany(query, data)
