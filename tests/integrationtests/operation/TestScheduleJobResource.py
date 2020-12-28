@@ -55,11 +55,12 @@ class TestScheduleJobResource(TestCase):
         expected = True
         IocManager.injector.get(IocManager.job_scheduler).run()
         self.test_manager.service_scenarios.create_test_connection(ScheduleJobTestData.test_job_connection)
-        source_query = '''select "Id","Name"
-                            from test.test_integration_source'''
-        ScheduleJobTestData.test_job_integration["SourceQuery"] = source_query
         data_integration_response = self.test_manager.service_scenarios.create_test_integration(
             ScheduleJobTestData.test_job_integration)
+        data_integration_response = self.test_manager.service_scenarios.create_test_integration(
+            ScheduleJobTestData.test_job_integration_for_update)
+        data_integration_response = self.test_manager.service_scenarios.create_test_integration(
+            ScheduleJobTestData.test_job_integration_for_target_query)
         data_operation_response = self.test_manager.service_scenarios.create_test_operation(
             ScheduleJobTestData.test_job_data_operation)
         try:

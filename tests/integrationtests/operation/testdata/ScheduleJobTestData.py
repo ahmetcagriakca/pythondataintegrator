@@ -17,7 +17,7 @@ class ScheduleJobTestData:
         "SourceConnectionName": "TestIntegrationConnection",
         "SourceSchema": "test",
         "SourceTableName": "test_integration_source",
-        "SourceQuery": "",
+        "SourceQuery": 'select "Id","Name"\nfrom test.test_integration_source',
         "TargetConnectionName": "TestIntegrationConnection",
         "TargetSchema": "test",
         "TargetTableName": "test_integration_target",
@@ -31,6 +31,43 @@ class ScheduleJobTestData:
         "PostExecutions": ""
     }
 
+    test_job_integration_for_update = {
+        "Code": "TEST_DATA_OPERATION_INTEGRATION_FOR_UPDATE",
+        "SourceConnectionName": "TestIntegrationConnection",
+        "SourceSchema": "test",
+        "SourceTableName": "test_integration_source",
+        "SourceQuery": 'select "Name","Id"\nfrom test.test_integration_source',
+        "TargetConnectionName": "TestIntegrationConnection",
+        "TargetSchema": "test",
+        "TargetTableName": "test_integration_target",
+        "TargetQuery": 'update test.test_integration_target set "Name" =:Name\nwhere "Id"=:Id',
+        "IsTargetTruncate": False,
+        "IsDelta": True,
+        "Comments": "Test integration record",
+        "SourceColumns": "Name,Id",
+        "TargetColumns": "Name,Id",
+        "PreExecutions": "",
+        "PostExecutions": ""
+    }
+
+    test_job_integration_for_target_query = {
+        "Code": "TEST_DATA_OPERATION_INTEGRATION_FOR_QUERY",
+        "SourceConnectionName": "",
+        "SourceSchema": "",
+        "SourceTableName": "",
+        "SourceQuery": '',
+        "TargetConnectionName": "TestIntegrationConnection",
+        "TargetSchema": "test",
+        "TargetTableName": "test_integration_target",
+        "TargetQuery": 'update test.test_integration_target set "Name" =\'query run\'where "Id"=1',
+        "IsTargetTruncate": False,
+        "IsDelta": True,
+        "Comments": "Test integration record",
+        "SourceColumns": "Name,Id",
+        "TargetColumns": "Name,Id",
+        "PreExecutions": "",
+        "PostExecutions": ""
+    }
 
     test_job_data_operation = {
         "Name": "TEST_JOB_DATA_OPERATION",
@@ -39,6 +76,18 @@ class ScheduleJobTestData:
                 "Code": "TEST_DATA_OPERATION_INTEGRATION",
                 "Order": 1,
                 "Limit": 100,
+                "ProcessCount": 1
+            },
+            {
+                "Code": "TEST_DATA_OPERATION_INTEGRATION_FOR_UPDATE",
+                "Order": 2,
+                "Limit": 100,
+                "ProcessCount": 1
+            },
+            {
+                "Code": "TEST_DATA_OPERATION_INTEGRATION_FOR_QUERY",
+                "Order": 3,
+                "Limit": 0,
                 "ProcessCount": 1
             }
         ]

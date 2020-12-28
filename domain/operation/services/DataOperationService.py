@@ -17,6 +17,7 @@ from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.common import OperationEvent
 from models.dao.common.Status import Status
 from models.dao.integration.DataIntegration import DataIntegration
+from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.dao.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
     DataOperationJob
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
@@ -112,6 +113,8 @@ class DataOperationService(IScoped):
             DataOperationJobExecutionEvent](
             database_session_manager)
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
+            database_session_manager)
+        self.data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[DataIntegrationConnection](
             database_session_manager)
         self.connection_provider: ConnectionProvider = connection_provider
         self.sql_logger: SqlLogger = sql_logger
@@ -410,11 +413,23 @@ class DataOperationService(IScoped):
                 integration: DataIntegration = data_operation_integration.DataIntegration
                 integration_code = integration.Code
                 # Source and target database managers instantiate
-                source_connection = [x for x in integration.Connections if x.SourceOrTarget == 0][0]
-                target_connection = [x for x in integration.Connections if x.SourceOrTarget == 1][0]
-                source_connection_manager = self.connection_provider.get_connection(source_connection)
-                target_connection_manager = self.connection_provider.get_connection(target_connection)
-
+                source_connection = self.data_integration_connection_repository.first(IsDeleted=0,
+                                                                                      DataIntegration=integration,
+                                                                                      SourceOrTarget=0)
+                target_connection = self.data_integration_connection_repository.first(IsDeleted=0,
+                                                                                      DataIntegration=integration,
+                                                                                      SourceOrTarget=1)
+                # only target query run
+                if source_connection is None:
+                    self.sql_logger.info(
+                        f"{integration.Code} - running query integration is began",
+                        job_id=job_id)
+                    target_connection_manager = self.connection_provider.get_connection(target_connection)
+                    target_connection_manager.run_query(target_connection.Query)
+                    continue
+                else:
+                    target_connection_manager = self.connection_provider.get_connection(target_connection)
+                    source_connection_manager = self.connection_provider.get_connection(source_connection)
                 # Pre exec job
                 pre_execution = [x for x in integration.ExecutionJobs if x.IsPre == 1]
                 if len(pre_execution) > 0:
