@@ -6,6 +6,7 @@ class CreateConnectionDatabaseModel:
                  Host: str = None,
                  Port: int = None,
                  Sid: str = None,
+                 ServiceName: str = None,
                  DatabaseName: str = None,
                  User: str = None,
                  Password: str = None,
@@ -16,6 +17,7 @@ class CreateConnectionDatabaseModel:
         self.Host: str = Host
         self.Port: int = Port
         self.Sid: str = Sid
+        self.ServiceName: str = ServiceName
         self.DatabaseName: str = DatabaseName
         self.User: str = User
         self.Password: str = Password

@@ -44,3 +44,5 @@ RENAME "PythonDataIntegrationId" TO "DataIntegrationId";
     RENAME TO "ix_Common_Log_JobId";
 ALTER INDEX "Common"."ix_Integration_DataIntegrationLog_TypeId"
 RENAME TO "ix_Common_Log_TypeId";
+ALTER TABLE "Connection"."ConnectionDatabase"
+    ADD COLUMN "ServiceName" character varying(100);

@@ -114,7 +114,8 @@ class DataOperationService(IScoped):
             database_session_manager)
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
             database_session_manager)
-        self.data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[DataIntegrationConnection](
+        self.data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[
+            DataIntegrationConnection](
             database_session_manager)
         self.connection_provider: ConnectionProvider = connection_provider
         self.sql_logger: SqlLogger = sql_logger
@@ -447,17 +448,17 @@ class DataOperationService(IScoped):
                 self.sql_logger.info(
                     f"{integration.Code} - {target_connection.Schema}.{target_connection.TableName} integration is began",
                     job_id=job_id)
-
-                data_count = \
-                    source_connection_manager.fetch(
-                        PdiUtils.count_table(source_connection.Schema, source_connection.TableName,
-                                             source_connection.Connection.Database.ConnectorType.Name))[0][0]
-
+                data_count=0
+                if source_connection.Connection.Database.ConnectorType.Name =='MSSQL':
+                    data_count = source_connection_manager.fetch(PdiUtils.count_table_mssql(source_connection.Query))[0][0]
+                elif source_connection.Connection.Database.ConnectorType.Name =='POSTGRESQL':
+                    data_count = source_connection_manager.fetch(PdiUtils.count_table_postgresql(source_connection.Query))[0][0]
+                elif source_connection.Connection.Database.ConnectorType.Name =='ORACLE':
+                    data_count = source_connection_manager.fetch(PdiUtils.count_table_oracle(source_connection.Query))[0][0]
                 # Delete if target data truncate is true
                 if integration.IsTargetTruncate:
                     target_connection_manager.delete(
-                        PdiUtils.truncate_table(target_connection.Schema, target_connection.TableName,
-                                                target_connection.Connection.Database.ConnectorType.Name))
+                        PdiUtils.truncate_table(target_connection.Schema, target_connection.TableName))
                 limit = data_operation_integration.Limit
                 process_count = data_operation_integration.ProcessCount
                 if process_count > 1:

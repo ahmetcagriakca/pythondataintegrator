@@ -54,6 +54,7 @@ class ConnectionDatabaseModel(EntityModel):
                  Host: str = None,
                  Port: int = None,
                  Sid: str = None,
+                 ServiceName: str = None,
                  DatabaseName: str = None,
                  User: str = None,
                  Password: str = None,
@@ -65,6 +66,7 @@ class ConnectionDatabaseModel(EntityModel):
         self.Host: str = Host
         self.Port: int = Port
         self.Sid: str = Sid
+        self.ServiceName: str = ServiceName
         self.DatabaseName: str = DatabaseName
         self.User: str = User
         self.Password: str = Password
@@ -83,6 +85,7 @@ class ConnectionModels:
         'Host': fields.String(description='Host'),
         'Port': fields.Integer(description='Port'),
         'Sid': fields.String(description='Sid'),
+        'ServiceName': fields.String(description='ServiceName'),
         'DatabaseName': fields.String(description='DatabaseName'),
         'User': fields.String(description='User'),
         'Password': fields.String(description='Password'),
@@ -93,6 +96,7 @@ class ConnectionModels:
         'Host': fields.String(description='Host'),
         'Port': fields.Integer(description='Port'),
         'Sid': fields.String(description='Sid'),
+        'ServiceName': fields.String(description='ServiceName'),
         'DatabaseName': fields.String(description='DatabaseName'),
         'User': fields.String(description='User'),
         'Password': fields.String(description='Password'),
@@ -158,6 +162,7 @@ class ConnectionModels:
             Host=connection_database.Host,
             Port=connection_database.Port,
             Sid=connection_database.Sid,
+            ServiceName=connection_database.ServiceName,
             DatabaseName=connection_database.DatabaseName,
             User='***',  # connection_database.User
             Password='***'  # connection_database.Password

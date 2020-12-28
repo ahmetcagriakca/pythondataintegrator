@@ -375,6 +375,7 @@ def upgrade():
                     sa.Column('Host', sa.String(length=100), nullable=True),
                     sa.Column('Port', sa.Integer(), nullable=True),
                     sa.Column('Sid', sa.String(length=100), nullable=True),
+                    sa.Column('ServiceName', sa.String(length=100), nullable=True),
                     sa.Column('DatabaseName', sa.String(length=100), nullable=True),
                     sa.Column('User', sa.String(length=100), nullable=True),
                     sa.Column('Password', sa.String(length=100), nullable=True),

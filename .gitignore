@@ -114,3 +114,4 @@ entrypoint.sh
 Jenkinsfile
 example.json
 application.dev.yml
+tests/integrationtests/temp
