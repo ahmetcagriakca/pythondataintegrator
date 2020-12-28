@@ -71,6 +71,7 @@ class TestServiceScenarios:
         if data_operation_job.DataOperationJobExecutions is not None:
             for data_operation_job_execution in data_operation_job.DataOperationJobExecutions:
                 database_session_manager.session.delete(data_operation_job_execution)
+
         database_session_manager.session.delete(data_operation_job.ApSchedulerJob)
         database_session_manager.session.delete(data_operation_job)
         database_session_manager.commit()

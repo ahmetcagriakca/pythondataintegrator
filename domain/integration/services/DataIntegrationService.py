@@ -76,6 +76,7 @@ class DataIntegrationService(IScoped):
                                                             DataIntegration=data_integration)
             data_integration_columns.append(data_integration_column)
             self.data_integration_column_repository.insert(data_integration_column)
+        source_connection=None
         if data.SourceConnectionName is not None and data.SourceConnectionName != '':
             source = self.connection_repository.first(Name=data.SourceConnectionName)
             if source is None:
@@ -98,7 +99,7 @@ class DataIntegrationService(IScoped):
                 schema=target_connection.Schema, table_name=target_connection.TableName,
                 data_integration_columns=data_integration_columns)
             selected_rows = PdiUtils.get_selected_rows(column_rows)
-            if source_connection.Query is None or source_connection.Query == '':
+            if source_connection is not None and (source_connection.Query is None or source_connection.Query == ''):
                 query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
                 source_connection.Query = query
             if target_connection.Query is None or target_connection.Query == '':
@@ -204,25 +205,26 @@ class DataIntegrationService(IScoped):
             source_connection.Query = data.SourceQuery
 
         if data.TargetConnectionName is not None and data.TargetConnectionName != '':
-            target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
-            target = self.connection_repository.first(Name=data.TargetConnectionName)
-            if target is None:
-                raise OperationalException("Target Connection not found")
-            target_connection.Connection = target
-            target_connection.Schema = data.TargetSchema
-            target_connection.TableName = data.TargetTableName
-            target_connection.Query = data.TargetQuery
-            data_integration_columns = self.data_integration_column_repository.filter_by(
-                DataIntegration=data_integration)
-            column_rows, related_columns, target_execute_query = PdiUtils.get_row_column_and_values(
-                schema=target_connection.Schema, table_name=target_connection.TableName,
-                data_integration_columns=data_integration_columns)
-            selected_rows = PdiUtils.get_selected_rows(column_rows)
-            if source_connection.Query is None or source_connection.Query == '':
-                query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
-                source_connection.Query = query
-            if target_connection.Query is None or target_connection.Query == '':
-                target_connection.Query = target_execute_query
+            raise OperationalException("Target Connection cannot be empty")
+        target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
+        target = self.connection_repository.first(Name=data.TargetConnectionName)
+        if target is None:
+            raise OperationalException("Target Connection not found")
+        target_connection.Connection = target
+        target_connection.Schema = data.TargetSchema
+        target_connection.TableName = data.TargetTableName
+        target_connection.Query = data.TargetQuery
+        data_integration_columns = self.data_integration_column_repository.filter_by(
+            DataIntegration=data_integration)
+        column_rows, related_columns, target_execute_query = PdiUtils.get_row_column_and_values(
+            schema=target_connection.Schema, table_name=target_connection.TableName,
+            data_integration_columns=data_integration_columns)
+        selected_rows = PdiUtils.get_selected_rows(column_rows)
+        if source_connection.Query is None or source_connection.Query == '':
+            query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
+            source_connection.Query = query
+        if target_connection.Query is None or target_connection.Query == '':
+            target_connection.Query = target_execute_query
 
         if data.PreExecutions is not None and data.PreExecutions != "":
             self.update_execution_job(data.PreExecutions, True, False, data_integration)

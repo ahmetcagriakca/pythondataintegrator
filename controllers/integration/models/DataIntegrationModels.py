@@ -113,16 +113,19 @@ class DataIntegrationModels:
 
     @staticmethod
     def get_data_integration_model(data_integration: DataIntegration) -> DataIntegrationModel:
-        source_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 0][0]
-        entity_source = DataIntegrationConnectionModel(
-            Id=source_connection.Id,
-            SourceOrTarget=source_connection.SourceOrTarget,
-            Schema=source_connection.Schema,
-            TableName=source_connection.TableName,
-            Query=source_connection.Query,
-        )
-        source = json.loads(json.dumps(entity_source.__dict__, default=CommonModels.date_converter))
-        source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
+        source_list=[x for x in data_integration.Connections if x.SourceOrTarget == 0]
+        source=None
+        if source_list is not None and len(source_list)>0:
+            source_connection = source_list[0]
+            entity_source = DataIntegrationConnectionModel(
+                Id=source_connection.Id,
+                SourceOrTarget=source_connection.SourceOrTarget,
+                Schema=source_connection.Schema,
+                TableName=source_connection.TableName,
+                Query=source_connection.Query,
+            )
+            source = json.loads(json.dumps(entity_source.__dict__, default=CommonModels.date_converter))
+            source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
 
         target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
         entity_target = DataIntegrationConnectionModel(
@@ -155,8 +158,8 @@ class DataIntegrationModels:
         )
 
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-
-        result_model['SourceConnection'] = source
+        if source is not None:
+            result_model['SourceConnection'] = source
         result_model['TargetConnection'] = target
         result_model['Columns'] = columns
         return result_model
