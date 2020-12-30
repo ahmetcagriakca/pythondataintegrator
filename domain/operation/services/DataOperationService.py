@@ -461,45 +461,46 @@ class DataOperationService(IScoped):
                         PdiUtils.truncate_table(target_connection.Schema, target_connection.TableName))
                 limit = data_operation_integration.Limit
                 process_count = data_operation_integration.ProcessCount
-                if process_count > 1:
-                    # Integration Start
-                    self.sql_logger.info(
-                        f"{integration.Code} - operation will execute parallel. {process_count}-{limit}",
-                        job_id=job_id)
-                    limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
-                    unprocessed_task_list = self.process_service.start_parallel_process(process_id=integration.Id,
-                                                                                        datas=limit_modifiers,
-                                                                                        process_count=process_count,
-                                                                                        process_method=DataOperationService.parallel_operation,
-                                                                                        result_method=DataOperationService.parallel_operation_result)
-                    print("parallel finished")
-                    if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
-                        self.sql_logger.info(f"Unprocessed tasks founded",
+                if limit != 0:
+                    if process_count > 1 :
+                        # Integration Start
+                        self.sql_logger.info(
+                            f"{integration.Code} - operation will execute parallel. {process_count}-{limit}",
+                            job_id=job_id)
+                        limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
+                        unprocessed_task_list = self.process_service.start_parallel_process(process_id=integration.Id,
+                                                                                            datas=limit_modifiers,
+                                                                                            process_count=process_count,
+                                                                                            process_method=DataOperationService.parallel_operation,
+                                                                                            result_method=DataOperationService.parallel_operation_result)
+                        print("parallel finished")
+                        if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
+                            self.sql_logger.info(f"Unprocessed tasks founded",
+                                                 job_id=job_id)
+                            execute_operation_dto = ExecuteOperationFactory(
+                                connection_provider=self.connection_provider).GetExecuteOperationDto(
+                                source_connection=source_connection,
+                                target_connection=target_connection,
+                                integration_data_columns=integration.Columns)
+                            limit_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]
+
+                            DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
+                                                                         limit_modifiers=limit_modifiers,
+                                                                         execute_operation_dto=execute_operation_dto)
+
+                    else:
+                        self.sql_logger.info(f"{integration.Code} - operation will execute serial. {limit}",
                                              job_id=job_id)
+
                         execute_operation_dto = ExecuteOperationFactory(
                             connection_provider=self.connection_provider).GetExecuteOperationDto(
                             source_connection=source_connection,
                             target_connection=target_connection,
                             integration_data_columns=integration.Columns)
-                        limit_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]
-
+                        limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
                         DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
                                                                      limit_modifiers=limit_modifiers,
                                                                      execute_operation_dto=execute_operation_dto)
-
-                else:
-                    self.sql_logger.info(f"{integration.Code} - operation will execute serial. {limit}",
-                                         job_id=job_id)
-
-                    execute_operation_dto = ExecuteOperationFactory(
-                        connection_provider=self.connection_provider).GetExecuteOperationDto(
-                        source_connection=source_connection,
-                        target_connection=target_connection,
-                        integration_data_columns=integration.Columns)
-                    limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
-                    DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
-                                                                 limit_modifiers=limit_modifiers,
-                                                                 execute_operation_dto=execute_operation_dto)
 
                 # Post exec job
                 post_execution = [x for x in integration.ExecutionJobs if x.IsPost == 1]

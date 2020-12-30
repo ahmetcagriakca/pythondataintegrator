@@ -124,7 +124,7 @@ class PdiUtils:
                 indexer = '?'
             elif target_connector_name == 'POSTGRESQL':
                 indexer = '%s'
-            target_query = target_query.replace(f":{column_rows[2]}", indexer)
+            target_query = target_query.replace(f":{column_rows[1]}", indexer)
         return target_query
 
     @staticmethod

@@ -23,6 +23,7 @@ class OracleDbConnector(ConnectorStrategy):
         self.connection = cx_Oracle.connect(self.database_config.username, self.database_config.password, self._tns,
                                             encoding="UTF-8",
                                             nencoding="UTF-8")
+        self.cursor = self.connection.cursor()
 
     def disconnect(self):
         try:
