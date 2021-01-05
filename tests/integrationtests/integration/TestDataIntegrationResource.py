@@ -40,6 +40,6 @@ class TestDataIntegrationResuource(TestCase):
         except Exception as ex:
             assert True == False
         finally:
-            # clean integration test operations
+            # clean data_integration test operations
             self.test_manager.service_scenarios.clear_integration(
                 code=DataIntegrationTestData.test_insert_input['Code'])

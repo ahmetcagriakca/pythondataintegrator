@@ -149,6 +149,6 @@ class PdiUtils:
                 row = (column.ResourceType, column.SourceColumnName, column.TargetColumnName)
                 column_rows.append(row)
                 insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
-                insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.TargetColumnName}'
+                insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
         final_executable = PdiUtils.insert_into_table(schema, table_name, insert_row_columns, insert_row_values)
         return column_rows, related_columns, final_executable

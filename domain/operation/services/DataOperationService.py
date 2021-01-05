@@ -3,6 +3,8 @@ from datetime import datetime
 from time import time
 from typing import List
 from injector import inject
+
+from domain.integration.services.DataIntegrationService import DataIntegrationService
 from domain.process.services.ProcessService import ProcessService
 from infrastructor.IocManager import IocManager
 from infrastructor.data.ConnectionProvider import ConnectionProvider
@@ -89,8 +91,11 @@ class DataOperationService(IScoped):
                  database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
                  connection_provider: ConnectionProvider,
-                 process_service: ProcessService
+                 process_service: ProcessService,
+                 data_integration_service: DataIntegrationService,
+
                  ):
+        self.data_integration_service = data_integration_service
         self.process_service = process_service
         self.database_session_manager = database_session_manager
         self.data_integration_repository: Repository[DataIntegration] = Repository[
@@ -122,14 +127,14 @@ class DataOperationService(IScoped):
 
     def get_data_operations(self) -> List[DataOperation]:
         """
-        Data integration data preparing
+        Data data_integration data preparing
         """
         data_operations = self.data_operation_repository.filter_by(IsDeleted=0).all()
         return data_operations
 
     def get_integration_datas(self, integration_code=None) -> List[DataIntegration]:
         """
-        Data integration data preparing
+        Data data_integration data preparing
         """
         integration_datas = self.data_integration_repository.filter_by(IsDeleted=0)
         if integration_code is not None:
@@ -138,7 +143,7 @@ class DataOperationService(IScoped):
 
     def get_data_operation_by_id(self, data_operation_id=None) -> DataOperation:
         """
-        Data integration data preparing
+        Data data_integration data preparing
         """
         data_operation = self.data_operation_repository.first(IsDeleted=0, Id=data_operation_id)
         return data_operation
@@ -147,7 +152,17 @@ class DataOperationService(IScoped):
         data_operation = self.data_operation_repository.first(Name=name, IsDeleted=0)
         return data_operation is not None
 
-    def create_data_operation(self, data_operation_model: CreateDataOperationModel) -> DataOperation:
+    def post_data_operation(self, data_operation_model: CreateDataOperationModel) -> DataOperation:
+        """
+        Create Data Operation
+        """
+        data_operation = self.data_operation_repository.first(Name=data_operation_model.Name, IsDeleted=0)
+        if data_operation is None:
+            return self.insert_data_operation(data_operation_model)
+        else:
+            return self.update_data_operation(data_operation_model)
+
+    def insert_data_operation(self, data_operation_model: CreateDataOperationModel) -> DataOperation:
         """
         Create Data Operation
         """
@@ -156,13 +171,20 @@ class DataOperationService(IScoped):
         data_operation = DataOperation(Name=data_operation_model.Name)
 
         self.data_operation_repository.insert(data_operation)
-        for integration in data_operation_model.Integrations:
-            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=integration.Code)
-            if data_integration is None:
-                raise OperationalException(f"{integration.Code} integration can not be found")
+        order = 0
+        for operation_integration in data_operation_model.Integrations:
+            order = order + 1
+            # data_integration = self.data_integration_repository.first(IsDeleted=0,
+            #                                                           Code=operation_integration.Integration.Code)
+            # if data_integration is None:
+            data_integration = self.data_integration_service.create_data_integration(
+                data=operation_integration.Integration)
+            # raise OperationalException(f"{operation_integration.Integration.Code} data_integration can not be found")
+            # else:
+            #     self.data_integration_service.update_data_integration(data=operation_integration.Integration)
 
-            data_operation_integration = DataOperationIntegration(Order=integration.Order, Limit=integration.Limit,
-                                                                  ProcessCount=integration.ProcessCount,
+            data_operation_integration = DataOperationIntegration(Order=order, Limit=operation_integration.Limit,
+                                                                  ProcessCount=operation_integration.ProcessCount,
                                                                   DataIntegration=data_integration,
                                                                   DataOperation=data_operation)
             self.data_operation_integration_repository.insert(data_operation_integration)
@@ -180,37 +202,54 @@ class DataOperationService(IScoped):
         if not self.check_data_operation_name(data_operation_model.Name):
             raise OperationalException("Data Operation not found")
         data_operation = self.data_operation_repository.first(Name=data_operation_model.Name)
-        # insert or update integration
-        for integration in data_operation_model.Integrations:
-            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=integration.Code)
+        # insert or update data_integration
+        order = 0
+        for operation_integration in data_operation_model.Integrations:
+            order = order + 1
+            data_integration = self.data_integration_repository.first(IsDeleted=0,
+                                                                      Code=operation_integration.Integration.Code)
             if data_integration is None:
-                raise OperationalException(f"{integration.Code} integration can not be found")
+                data_integration = self.data_integration_service.create_data_integration(
+                    data=operation_integration.Integration)
+                # raise OperationalException(f"{operation_integration.Integration.Code} data_integration can not be found")
+            else:
+                self.data_integration_service.update_data_integration(data=operation_integration.Integration)
 
             data_operation_integration = self.data_operation_integration_repository.first(
                 DataOperationId=data_operation.Id,
                 DataIntegrationId=data_integration.Id)
             if data_operation_integration is None:
-                new_data_operation_integration = DataOperationIntegration(Order=integration.Order,
-                                                                          Limit=integration.Limit,
-                                                                          ProcessCount=integration.ProcessCount,
+                new_data_operation_integration = DataOperationIntegration(Order=order,
+                                                                          Limit=operation_integration.Limit,
+                                                                          ProcessCount=operation_integration.ProcessCount,
                                                                           DataIntegration=data_integration,
                                                                           DataOperation=data_operation)
                 self.data_operation_integration_repository.insert(new_data_operation_integration)
             else:
-                data_operation_integration.Order = integration.Order
-                data_operation_integration.Limit = integration.Limit
-                data_operation_integration.ProcessCount = integration.ProcessCount
+                data_operation_integration.Order = order
+                data_operation_integration.Limit = operation_integration.Limit
+                data_operation_integration.ProcessCount = operation_integration.ProcessCount
                 data_operation_integration.IsDeleted = 0
+        # data_operation_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
+        #                                                                                    DataOperationId=data_operation.Id)
+        # for data_operation_integration in data_operation_integrations:
+        #     founded=False
+        #     check_exists=[ x for x in data_operation_model.Integrations if x.Integration.Code ==data_operation_integration.DataIntegration.Code ]
+        #     if check_exists is not None and len(check_exists)>0:
+        #         founded=True
+        #     if not founded :
+        #         self.data_integration_service.delete_integration_data(data_operation_integration.DataIntegration.Code )
 
         check_existing_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
                                                                                            DataOperationId=data_operation.Id)
         for existing_integration in check_existing_integrations:
             founded = False
-            for integration in data_operation_model.Integrations:
-                if existing_integration.DataIntegration.Code == integration.Code:
+            for operation_integration in data_operation_model.Integrations:
+                if existing_integration.DataIntegration.Code == operation_integration.Integration.Code:
                     founded = True
             if not founded:
                 self.data_operation_integration_repository.delete_by_id(existing_integration.Id)
+                self.data_integration_service.delete_integration_data(data_operation_integration.DataIntegration.Code)
         self.database_session_manager.commit()
 
         data_operation = self.data_operation_repository.first(Id=data_operation.Id)
@@ -229,6 +268,7 @@ class DataOperationService(IScoped):
                                                                                            DataOperationId=data_operation.Id)
         for existing_integration in check_existing_integrations:
             self.data_operation_integration_repository.delete_by_id(existing_integration.Id)
+            self.data_integration_service.delete_integration_data(existing_integration.DataIntegration.Code)
         message = f'{data_operation.Name} data operation deleted'
         self.sql_logger.info(message)
         self.database_session_manager.commit()
@@ -379,6 +419,129 @@ class DataOperationService(IScoped):
             related_columns=execute_operation_dto.related_columns,
             final_executable=execute_operation_dto.target_query)
 
+    def execute_procedures(self, data_integration, target_connection_manager, is_pre, is_post):
+        pre_execution = [x for x in data_integration.ExecutionJobs if
+                         x.IsPre == is_pre and x.IsPost == is_post and x.IsDeleted == 0]
+        if len(pre_execution) > 0:
+            if pre_execution[0].ExecutionProcedure != '':
+                pre_execution_procedure = pre_execution[0].ExecutionProcedure
+                target_connection_manager.run_query(f'EXEC {pre_execution_procedure}')
+
+    def integration_run_query(self, data_integration, job_id):
+        self.sql_logger.info(
+            f"{data_integration.Code} - running query data_integration is began",
+            job_id=job_id)
+
+        target_connection = self.data_integration_connection_repository.first(IsDeleted=0,
+                                                                              DataIntegration=data_integration,
+                                                                              SourceOrTarget=1)
+        target_connection_manager = self.connection_provider.get_connection(
+            target_connection)  # Pre exec job
+
+        self.execute_procedures(data_integration=data_integration, target_connection_manager=target_connection_manager,
+                                is_pre=1, is_post=0)
+
+        if data_integration.IsTargetTruncate:
+            target_connection_manager.delete(
+                PdiUtils.truncate_table(target_connection.Schema,
+                                        target_connection.TableName))
+
+        target_connection_manager.run_query(target_connection.Query)
+
+        self.execute_procedures(data_integration=data_integration, target_connection_manager=target_connection_manager,
+                                is_pre=0, is_post=1)
+
+        self.sql_logger.info(
+            f"{data_integration.Code} - running query data_integration is completed",
+            job_id=job_id)
+
+    def integration_execute_operation(self, data_integration, limit,
+                                      process_count, job_id):
+        source_connection = self.data_integration_connection_repository.first(IsDeleted=0,
+                                                                              DataIntegration=data_integration,
+                                                                              SourceOrTarget=0)
+        target_connection = self.data_integration_connection_repository.first(IsDeleted=0,
+                                                                              DataIntegration=data_integration,
+                                                                              SourceOrTarget=1)
+        # Integration Start
+        self.sql_logger.info(
+            f"{data_integration.Code} - {target_connection.Schema}.{target_connection.TableName} data_integration is began",
+            job_id=job_id)
+
+        target_connection_manager = self.connection_provider.get_connection(target_connection)
+        source_connection_manager = self.connection_provider.get_connection(source_connection)
+        # Pre exec job
+
+        self.execute_procedures(data_integration=data_integration, target_connection_manager=target_connection_manager,
+                                is_pre=1, is_post=0)
+
+        if data_integration.IsTargetTruncate:
+            target_connection_manager.run_query(
+                PdiUtils.truncate_table(target_connection.Schema,
+                                        target_connection.TableName))
+        data_count = 0
+        if source_connection.Connection.Database.ConnectorType.Name == 'MSSQL':
+            data_count = \
+                source_connection_manager.fetch(PdiUtils.count_table_mssql(source_connection.Query))[
+                    0][0]
+        elif source_connection.Connection.Database.ConnectorType.Name == 'POSTGRESQL':
+            data_count = \
+                source_connection_manager.fetch(
+                    PdiUtils.count_table_postgresql(source_connection.Query))[0][0]
+        elif source_connection.Connection.Database.ConnectorType.Name == 'ORACLE':
+            data_count = \
+                source_connection_manager.fetch(PdiUtils.count_table_oracle(source_connection.Query))[
+                    0][0]
+        # Delete if target data truncate is true
+        if limit != 0:
+            if process_count > 1:
+                # Integration Start
+                self.sql_logger.info(
+                    f"{data_integration.Code} - operation will execute parallel. {process_count}-{limit}",
+                    job_id=job_id)
+                limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
+                unprocessed_task_list = self.process_service.start_parallel_process(process_id=data_integration.Id,
+                                                                                    datas=limit_modifiers,
+                                                                                    process_count=process_count,
+                                                                                    process_method=DataOperationService.parallel_operation,
+                                                                                    result_method=DataOperationService.parallel_operation_result)
+                print("parallel finished")
+                if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
+                    self.sql_logger.info(f"Unprocessed tasks founded",
+                                         job_id=job_id)
+                    execute_operation_dto = ExecuteOperationFactory(
+                        connection_provider=self.connection_provider).GetExecuteOperationDto(
+                        source_connection=source_connection,
+                        target_connection=target_connection,
+                        integration_data_columns=data_integration.Columns)
+                    limit_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]
+
+                    DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
+                                                                 limit_modifiers=limit_modifiers,
+                                                                 execute_operation_dto=execute_operation_dto)
+
+            else:
+                self.sql_logger.info(f"{data_integration.Code} - operation will execute serial. {limit}",
+                                     job_id=job_id)
+
+                execute_operation_dto = ExecuteOperationFactory(
+                    connection_provider=self.connection_provider).GetExecuteOperationDto(
+                    source_connection=source_connection,
+                    target_connection=target_connection,
+                    integration_data_columns=data_integration.Columns)
+                limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
+                DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
+                                                             limit_modifiers=limit_modifiers,
+                                                             execute_operation_dto=execute_operation_dto)
+
+        # Post exec job
+        self.execute_procedures(data_integration=data_integration, target_connection_manager=target_connection_manager,
+                                is_pre=0, is_post=1)
+
+        self.sql_logger.info(
+            f"{data_integration.Code} - {target_connection.Schema}.{target_connection.TableName} data_integration is completed",
+            job_id=job_id)
+
     def start_operation(self, data_operation_id: str = None, job_id=None):  # parallel_
         """
         Integration starting operation
@@ -395,10 +558,10 @@ class DataOperationService(IScoped):
         data_operation_job_execution = self.create_data_operation_job_execution(
             data_operation_job=data_operation_job)
         try:
-            self.sql_logger.info(f'{data_operation.Name} data integration is Begin with data:{data_operation_id}',
+            self.sql_logger.info(f'{data_operation.Name} data data_integration is Begin with data:{data_operation_id}',
                                  job_id=job_id)
             if data_operation.Integrations is None or len(data_operation.Integrations) == 0:
-                self.sql_logger.info('Data operation has no integration ', job_id=job_id)
+                self.sql_logger.info('Data operation has no data_integration ', job_id=job_id)
                 return None
             # execution started
             self.update_data_operation_job_execution_status(
@@ -407,117 +570,25 @@ class DataOperationService(IScoped):
             self.create_data_operation_job_execution_event(
                 data_operation_execution_id=data_operation_job_execution.Id,
                 event_code=EVENT_EXECUTION_STARTED)
-            data_operation_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
-                                                                                               DataOperationId=data_operation.Id).order_by(
-                "Order").all()
+            data_operation_integrations = self.data_operation_integration_repository.filter_by(
+                IsDeleted=0, DataOperationId=data_operation.Id).order_by("Order").all()
             for data_operation_integration in data_operation_integrations:
-                integration: DataIntegration = data_operation_integration.DataIntegration
-                integration_code = integration.Code
+                data_integration: DataIntegration = data_operation_integration.DataIntegration
                 # Source and target database managers instantiate
                 source_connection = self.data_integration_connection_repository.first(IsDeleted=0,
-                                                                                      DataIntegration=integration,
+                                                                                      DataIntegration=data_integration,
                                                                                       SourceOrTarget=0)
                 target_connection = self.data_integration_connection_repository.first(IsDeleted=0,
-                                                                                      DataIntegration=integration,
+                                                                                      DataIntegration=data_integration,
                                                                                       SourceOrTarget=1)
                 # only target query run
-                if source_connection is None:
-                    self.sql_logger.info(
-                        f"{integration.Code} - running query integration is began",
-                        job_id=job_id)
-                    target_connection_manager = self.connection_provider.get_connection(target_connection)
-                    target_connection_manager.run_query(target_connection.Query)
-                    continue
+                if source_connection is None or source_connection.Query is None or source_connection.Query == '':
+                    self.integration_run_query(data_integration=data_integration, job_id=job_id)
                 else:
-                    target_connection_manager = self.connection_provider.get_connection(target_connection)
-                    source_connection_manager = self.connection_provider.get_connection(source_connection)
-                # Pre exec job
-                pre_execution = [x for x in integration.ExecutionJobs if x.IsPre == 1]
-                if len(pre_execution) > 0:
-                    if pre_execution[0].ExecutionProcedure != '':
-                        pre_execution_procedure = pre_execution[0].ExecutionProcedure
-                        self.sql_logger.info(
-                            f'{integration_code} Pre Execution Job is Start. {pre_execution_procedure} procedure call start.',
-                            job_id=job_id)
-                        target_connection_manager.run_query(f'EXEC {pre_execution_procedure}')
-                        self.sql_logger.info(
-                            f'{integration_code} Pre Execution Job is End. {pre_execution_procedure} procedure call end.',
-                            job_id=job_id)
-
-                # Integration Start
-                self.sql_logger.info(
-                    f"{integration.Code} - {target_connection.Schema}.{target_connection.TableName} integration is began",
-                    job_id=job_id)
-                data_count=0
-                if source_connection.Connection.Database.ConnectorType.Name =='MSSQL':
-                    data_count = source_connection_manager.fetch(PdiUtils.count_table_mssql(source_connection.Query))[0][0]
-                elif source_connection.Connection.Database.ConnectorType.Name =='POSTGRESQL':
-                    data_count = source_connection_manager.fetch(PdiUtils.count_table_postgresql(source_connection.Query))[0][0]
-                elif source_connection.Connection.Database.ConnectorType.Name =='ORACLE':
-                    data_count = source_connection_manager.fetch(PdiUtils.count_table_oracle(source_connection.Query))[0][0]
-                # Delete if target data truncate is true
-                if integration.IsTargetTruncate:
-                    target_connection_manager.delete(
-                        PdiUtils.truncate_table(target_connection.Schema, target_connection.TableName))
-                limit = data_operation_integration.Limit
-                process_count = data_operation_integration.ProcessCount
-                if limit != 0:
-                    if process_count > 1 :
-                        # Integration Start
-                        self.sql_logger.info(
-                            f"{integration.Code} - operation will execute parallel. {process_count}-{limit}",
-                            job_id=job_id)
-                        limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
-                        unprocessed_task_list = self.process_service.start_parallel_process(process_id=integration.Id,
-                                                                                            datas=limit_modifiers,
-                                                                                            process_count=process_count,
-                                                                                            process_method=DataOperationService.parallel_operation,
-                                                                                            result_method=DataOperationService.parallel_operation_result)
-                        print("parallel finished")
-                        if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
-                            self.sql_logger.info(f"Unprocessed tasks founded",
-                                                 job_id=job_id)
-                            execute_operation_dto = ExecuteOperationFactory(
-                                connection_provider=self.connection_provider).GetExecuteOperationDto(
-                                source_connection=source_connection,
-                                target_connection=target_connection,
-                                integration_data_columns=integration.Columns)
-                            limit_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]
-
-                            DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
-                                                                         limit_modifiers=limit_modifiers,
-                                                                         execute_operation_dto=execute_operation_dto)
-
-                    else:
-                        self.sql_logger.info(f"{integration.Code} - operation will execute serial. {limit}",
-                                             job_id=job_id)
-
-                        execute_operation_dto = ExecuteOperationFactory(
-                            connection_provider=self.connection_provider).GetExecuteOperationDto(
-                            source_connection=source_connection,
-                            target_connection=target_connection,
-                            integration_data_columns=integration.Columns)
-                        limit_modifiers = PdiUtils.get_limit_modifiers(data_count=data_count, limit=limit)
-                        DataOperationService.execute_limit_modifiers(sql_logger=self.sql_logger,
-                                                                     limit_modifiers=limit_modifiers,
-                                                                     execute_operation_dto=execute_operation_dto)
-
-                # Post exec job
-                post_execution = [x for x in integration.ExecutionJobs if x.IsPost == 1]
-                if len(post_execution) > 0:
-                    if post_execution[0].ExecutionProcedure != '':
-                        post_execution_procedure = post_execution[0].ExecutionProcedure
-                        self.sql_logger.info(
-                            f'{integration_code} Post Execution Job is Start. {post_execution_procedure} procedure call start.',
-                            job_id=job_id)
-                        target_connection.run_query(f'EXEC {post_execution_procedure}')
-                        self.sql_logger.info(
-                            f'{integration_code} Post Execution Job is End. {post_execution_procedure} procedure call end.',
-                            job_id=job_id)
-
-                self.sql_logger.info(
-                    f"{integration.Code} - {target_connection.Schema}.{target_connection.TableName} integration is completed",
-                    job_id=job_id)
+                    self.integration_execute_operation(data_integration=data_integration,
+                                                       limit=data_operation_integration.Limit,
+                                                       process_count=data_operation_integration.ProcessCount,
+                                                       job_id=job_id)
 
             # execution started
             self.update_data_operation_job_execution_status(

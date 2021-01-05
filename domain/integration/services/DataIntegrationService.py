@@ -42,7 +42,7 @@ class DataIntegrationService(IScoped):
 
     def get_data_integrations(self) -> List[DataIntegration]:
         """
-        Data integration data preparing
+        Data data_integration data preparing
         """
         integration_datas = self.data_integration_repository.filter_by(IsDeleted=0)
         return integration_datas.all()
@@ -76,7 +76,7 @@ class DataIntegrationService(IScoped):
                                                             DataIntegration=data_integration)
             data_integration_columns.append(data_integration_column)
             self.data_integration_column_repository.insert(data_integration_column)
-        source_connection=None
+        source_connection = None
         if data.SourceConnectionName is not None and data.SourceConnectionName != '':
             source = self.connection_repository.first(Name=data.SourceConnectionName)
             if source is None:
@@ -145,8 +145,8 @@ class DataIntegrationService(IScoped):
             IsPost=IsPost)
         for data_integration_execution_job in data_integration_execution_jobs:
             check_execution = [execution for execution in execution_list if
-                               execution == data_integration_execution_job.ExecutionProcedure][0]
-            if check_execution is not None:
+                               execution == data_integration_execution_job.ExecutionProcedure]
+            if not (check_execution is not None and len(check_execution)>0 and check_execution[0] is not None):
                 self.data_integration_execution_job_repository.delete(data_integration_execution_job)
 
     def delete_execution_job(self, IsPre, IsPost, DataIntegration):
@@ -194,7 +194,7 @@ class DataIntegrationService(IScoped):
                     column_founded = True
             if not column_founded:
                 self.database_session_manager.session.delete(data_integration_column)
-
+        source_connection=None
         if data.SourceConnectionName is not None and data.SourceConnectionName != '':
             source_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 0][0]
             source = self.connection_repository.first(Name=data.SourceConnectionName)
@@ -204,7 +204,7 @@ class DataIntegrationService(IScoped):
             source_connection.Schema = data.SourceSchema
             source_connection.Query = data.SourceQuery
 
-        if data.TargetConnectionName is not None and data.TargetConnectionName != '':
+        if data.TargetConnectionName is None or data.TargetConnectionName == '':
             raise OperationalException("Target Connection cannot be empty")
         target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
         target = self.connection_repository.first(Name=data.TargetConnectionName)
@@ -220,7 +220,7 @@ class DataIntegrationService(IScoped):
             schema=target_connection.Schema, table_name=target_connection.TableName,
             data_integration_columns=data_integration_columns)
         selected_rows = PdiUtils.get_selected_rows(column_rows)
-        if source_connection.Query is None or source_connection.Query == '':
+        if source_connection is not None and (source_connection.Query is None or source_connection.Query == ''):
             query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
             source_connection.Query = query
         if target_connection.Query is None or target_connection.Query == '':
@@ -242,12 +242,16 @@ class DataIntegrationService(IScoped):
         self.sql_logger.info('PDI deletion for:' + code)
 
         if code is not None and code != "":
-            pdi = self.data_integration_repository.first(IsDeleted=0, Code=code)
-            if pdi is None:
+            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=code)
+            if data_integration is None:
                 raise OperationalException("Code not found")
         else:
             return "Code required"
-        pdi.IsDeleted = 1
+        for data_integration_connection in data_integration.Connections:
+            data_integration_connection.IsDeleted = 1
+        for data_integration_column in data_integration.Columns:
+            data_integration_column.IsDeleted = 1
+        data_integration.IsDeleted = 1
         self.database_session_manager.commit()
         message = f'PDI deletion for {code} is Completed'
         self.sql_logger.info(message)

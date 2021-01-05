@@ -266,7 +266,7 @@ def upgrade():
                     )
     op.create_index(op.f('ix_Integration_DataIntegration_Code'), 'DataIntegration', ['Code'], unique=True,
                     schema='Integration')
-    op.create_table('DataIntegrationLog',
+    op.create_table('Log',
                     sa.Column('Id', sa.Integer(), nullable=False),
                     sa.Column('TypeId', sa.Integer(), nullable=False),
                     sa.Column('Content', sa.String(length=4000), nullable=True),
@@ -280,12 +280,12 @@ def upgrade():
                     sa.Column('Comments', sa.String(length=1000), nullable=True),
                     sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
                     sa.PrimaryKeyConstraint('Id'),
-                    schema='Integration'
+                    schema='Common'
                     )
-    op.create_index(op.f('ix_Integration_DataIntegrationLog_JobId'), 'DataIntegrationLog', ['JobId'],
-                    unique=False, schema='Integration')
-    op.create_index(op.f('ix_Integration_DataIntegrationLog_TypeId'), 'DataIntegrationLog', ['TypeId'],
-                    unique=False, schema='Integration')
+    op.create_index(op.f('ix_Common_Log_JobId'), 'Log', ['JobId'],
+                    unique=False, schema='Common')
+    op.create_index(op.f('ix_Common_Log_TypeId'), 'Log', ['TypeId'],
+                    unique=False, schema='Common')
     op.create_table('ApSchedulerJobEvent',
                     sa.Column('Id', sa.Integer(), nullable=False),
                     sa.Column('ApSchedulerJobId', sa.Integer(), nullable=True),
@@ -425,11 +425,11 @@ def downgrade():
     op.drop_index(op.f('ix_Connection_Connection_Name'), table_name='Connection', schema='Connection')
     op.drop_table('Connection', schema='Connection')
     op.drop_table('ApSchedulerJobEvent', schema='Aps')
-    op.drop_index(op.f('ix_Integration_DataIntegrationLog_TypeId'), table_name='DataIntegrationLog',
-                  schema='Integration')
-    op.drop_index(op.f('ix_Integration_DataIntegrationLog_JobId'), table_name='DataIntegrationLog',
-                  schema='Integration')
-    op.drop_table('DataIntegrationLog', schema='Integration')
+    op.drop_index(op.f('ix_Common_Log_TypeId'), table_name='Log',
+                  schema='Common')
+    op.drop_index(op.f('ix_Common_Log_JobId'), table_name='Log',
+                  schema='Common')
+    op.drop_table('Log', schema='Common')
     op.drop_index(op.f('ix_Integration_DataIntegration_Code'), table_name='DataIntegration',
                   schema='Integration')
     op.drop_table('DataIntegration', schema='Integration')
