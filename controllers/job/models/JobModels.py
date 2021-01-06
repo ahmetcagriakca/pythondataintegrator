@@ -37,8 +37,8 @@ class ApSchedulerJobEventModel():
         self.EventName = EventName
 
 
-class JobSchedulerModels:
-    ns = IocManager.api.namespace('JobScheduler', description='Job scheduler endpoints', path='/api/JobScheduler')
+class JobModels:
+    ns = IocManager.api.namespace('Job', description='Job scheduler endpoints', path='/api/Job')
 
     RemoveJobModel = IocManager.api.model('RemoveJob', {
         'JobId': fields.Integer(description='', required=True),
@@ -60,7 +60,7 @@ class JobSchedulerModels:
     def get_ap_scheduler_job_models(ap_scheduler_jobs: List[ApSchedulerJob]) -> List[ApSchedulerJobModel]:
         entities = []
         for ap_scheduler_job in ap_scheduler_jobs:
-            entity = JobSchedulerModels.get_ap_scheduler_job_model(ap_scheduler_job)
+            entity = JobModels.get_ap_scheduler_job_model(ap_scheduler_job)
             entities.append(entity)
         return entities
 

@@ -10,7 +10,7 @@ from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataI
 from models.viewmodels.integration.UpdateDataIntegrationModel import UpdateDataIntegrationModel
 
 
-@DataIntegrationModels.ns.route("")
+@DataIntegrationModels.ns.route("", doc=False)
 class DataIntegrationResource(ResourceBase):
     @inject
     def __init__(self,
@@ -22,7 +22,7 @@ class DataIntegrationResource(ResourceBase):
     @DataIntegrationModels.ns.marshal_with(CommonModels.SuccessModel)
     def get(self):
         """
-        All integration data
+        All data_integration data
         """
         data_integrations = self.data_integration_service.get_data_integrations()
         result = DataIntegrationModels.get_data_integration_models(data_integrations)
@@ -61,4 +61,4 @@ class DataIntegrationResource(ResourceBase):
         data = IocManager.api.payload
         code = data.get('Code')  #
         deletion_result = self.data_integration_service.delete_integration_data(code)
-        return CommonModels.get_response(message=f'Data integration deletion for {code} is Completed')
+        return CommonModels.get_response(message=f'Data data_integration deletion for {code} is Completed')

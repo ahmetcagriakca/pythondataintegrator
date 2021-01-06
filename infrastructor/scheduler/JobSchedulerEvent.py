@@ -38,7 +38,9 @@ class JobSchedulerEvent(ISingleton):
             ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
                 database_session_manager)
             ap_scheduler_job: List[ApSchedulerJob] = ap_scheduler_job_repository.first(JobId=event.job_id)
-            job_id = ap_scheduler_job.Id
+            job_id=''
+            if ap_scheduler_job is not None:
+                job_id = ap_scheduler_job.Id
             job_detail = f'job_id:{job_id} - evennt_job_id:{event.job_id}  - job_store:{event.jobstore} - '
 
         if hasattr(event, 'exception') and event.exception:

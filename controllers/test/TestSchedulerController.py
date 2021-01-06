@@ -1,7 +1,7 @@
 from datetime import datetime
 from injector import inject
 from controllers.common.models.CommonModels import CommonModels
-from controllers.job.models.JobSchedulerModels import JobSchedulerModels
+from controllers.job.models.JobModels import JobModels
 from controllers.test.models.TestSchedulerModels import TestSchedulerModels
 from domain.job.services.JobOperationService import JobOperationService
 from infrastructor.IocManager import IocManager
@@ -30,7 +30,7 @@ class TestResource(ResourceBase):
                                                                         start_date=start_date,
                                                                         end_date=end_date,
                                                                         args=(None, value, value_for_sum))
-        result = JobSchedulerModels.get_ap_scheduler_job_model(ap_scheduler_job)
+        result = JobModels.get_ap_scheduler_job_model(ap_scheduler_job)
         return CommonModels.get_response(result=result)
 
 
@@ -55,7 +55,7 @@ class StartWithDate(ResourceBase):
         ap_scheduler_job = self.job_operation_service.add_job_with_date(job_function=TestScheduler.sum,
                                                                         run_date=run_date,
                                                                         args=(None, value, value_for_sum,))
-        result = JobSchedulerModels.get_ap_scheduler_job_model(ap_scheduler_job)
+        result = JobModels.get_ap_scheduler_job_model(ap_scheduler_job)
         return CommonModels.get_response(result=result)
 
 

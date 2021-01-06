@@ -29,7 +29,7 @@ class TestConnectionResuource(TestCase):
         except Exception as ex:
             assert True == False
         finally:
-            # clean integration test operations
+            # clean data_integration test operations
             database_session_manager: DatabaseSessionManager = self.test_manager.ioc_manager.injector.get(
                 DatabaseSessionManager)
             connection_database_repository: Repository[ConnectionDatabase] = Repository[ConnectionDatabase](

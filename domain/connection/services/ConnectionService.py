@@ -40,28 +40,28 @@ class ConnectionService(IScoped):
 
     def get_connection_types(self, ) -> List[ConnectionType]:
         """
-        Data integration data preparing
+        Data data_integration data preparing
         """
         connection_types = self.connection_type_repository.filter_by(IsDeleted=0).all()
         return connection_types
 
     def get_connector_types(self) -> List[ConnectorType]:
         """
-        Data integration data preparing
+        Data data_integration data preparing
         """
         connector_types = self.connector_type_repository.filter_by(IsDeleted=0).all()
         return connector_types
 
     def get_connections(self) -> List[Connection]:
         """
-        Data integration data preparing
+        Data data_integration data preparing
         """
         connections = self.connection_repository.filter_by(IsDeleted=0).all()
         return connections
 
     def get_connection_databases(self, ) -> List[ConnectionDatabase]:
         """
-        Data integration data preparing
+        Data data_integration data preparing
         """
         connection_databases = self.connection_database_repository.filter_by(IsDeleted=0).all()
         return connection_databases

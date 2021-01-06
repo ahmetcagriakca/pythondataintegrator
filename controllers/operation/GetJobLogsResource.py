@@ -8,7 +8,7 @@ from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.common.Log import Log
 
 
-@DataOperationModels.ns.route('/GetJobLogs/<int:job_id>')
+@DataOperationModels.ns.route('/GetJobLogs/<int:job_id>', doc=False)
 class GetJobLogsResource(ResourceBase):
     @inject
     def __init__(self,

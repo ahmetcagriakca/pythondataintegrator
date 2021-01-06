@@ -7,7 +7,7 @@ from infrastructor.data.Repository import Repository
 from models.dao.integration.DataIntegration import DataIntegration
 
 
-@DataOperationModels.ns.route('/GetJobDetails/<string:code>')
+@DataOperationModels.ns.route('/GetJobDetails/<string:code>', doc=False)
 class GetJobDetailsResource(ResourceBase):
     @inject
     def __init__(self,

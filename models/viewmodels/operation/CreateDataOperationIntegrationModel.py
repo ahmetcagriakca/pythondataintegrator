@@ -1,11 +1,12 @@
+from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
+
+
 class CreateDataOperationIntegrationModel:
     def __init__(self,
-                 Code: str = None,
-                 Order: str = None,
                  Limit: int = None,
                  ProcessCount: int = None,
+                 Integration: CreateDataIntegrationModel = None,
                  *args, **kwargs):
-        self.Code: str = Code
-        self.Order: int = Order
         self.Limit: int = Limit
         self.ProcessCount: int = ProcessCount
+        self.Integration: CreateDataIntegrationModel = Integration

@@ -1,6 +1,6 @@
 from injector import inject
 from controllers.common.models.CommonModels import CommonModels
-from controllers.job.models.JobSchedulerModels import JobSchedulerModels
+from controllers.job.models.JobModels import JobModels
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
@@ -9,7 +9,7 @@ from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 
 
-@JobSchedulerModels.ns.route('/RemoveJob')
+@JobModels.ns.route('/RemoveJob', doc=False)
 class RemoveJobResource(ResourceBase):
     @inject
     def __init__(self,
@@ -22,8 +22,8 @@ class RemoveJobResource(ResourceBase):
             database_session_manager)
         self.job_scheduler: JobScheduler = job_scheduler
 
-    @JobSchedulerModels.ns.expect(JobSchedulerModels.RemoveJobModel, validate=True)
-    @JobSchedulerModels.ns.marshal_with(CommonModels.SuccessModel)
+    @JobModels.ns.expect(JobModels.RemoveJobModel, validate=True)
+    @JobModels.ns.marshal_with(CommonModels.SuccessModel)
     def delete(self):
         data = IocManager.api.payload
         job_id = data.get('JobId')  #
