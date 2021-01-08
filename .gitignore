@@ -115,3 +115,4 @@ Jenkinsfile
 example.json
 application.dev.yml
 tests/integrationtests/temp
+tests/unittests/delivery
