@@ -54,8 +54,10 @@ class TestServiceScenarios:
             database_session_manager)
         data_operation = data_operation_repository.first(Name=name)
 
+        for data_operation_contact in data_operation.Contacts:
+            database_session_manager.session.delete(data_operation_contact)
         for data_operation_integration in data_operation.Integrations:
-            data_integration=data_operation_integration.DataIntegration
+            data_integration = data_operation_integration.DataIntegration
 
             for data_integration_column in data_integration.Columns:
                 database_session_manager.session.delete(data_integration_column)
@@ -81,7 +83,7 @@ class TestServiceScenarios:
 
         data_operation_job = data_operation_job_repository.first(IsDeleted=0,
                                                                  DataOperationId=data_operation_id)
-        if data_operation_job is  None:
+        if data_operation_job is None:
             return
         if data_operation_job.DataOperationJobExecutions is not None:
             for data_operation_job_execution in data_operation_job.DataOperationJobExecutions:
@@ -139,7 +141,8 @@ class TestServiceScenarios:
 
     def check_job_start(self, data_operation_job_id) -> DataOperationJobExecution:
         while True:
-            data_operation_job_execution: DataOperationJobExecution = self.get_data_operation_job_execution(data_operation_job_id)
+            data_operation_job_execution: DataOperationJobExecution = self.get_data_operation_job_execution(
+                data_operation_job_id)
             # checking job execution started
             if data_operation_job_execution is not None:
                 time.sleep(5)
@@ -147,11 +150,12 @@ class TestServiceScenarios:
 
     def check_job_finish(self, data_operation_job_id) -> DataOperationJobExecution:
         while True:
-            data_operation_job_execution: DataOperationJobExecution = self.get_data_operation_job_execution(data_operation_job_id)
+            data_operation_job_execution: DataOperationJobExecution = self.get_data_operation_job_execution(
+                data_operation_job_id)
             # checking job execution finish
             if data_operation_job_execution is not None and (
                     data_operation_job_execution.StatusId != 3 and data_operation_job_execution.StatusId != 4
             ):
-                time.sleep(5)
+                time.sleep(10)
             else:
                 return data_operation_job_execution

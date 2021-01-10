@@ -14,7 +14,7 @@ class TestDataOperationResource(TestCase):
         super(TestDataOperationResource, self).__init__(methodName)
         self.test_manager = TestManager()
 
-    def test_data_integration(self):
+    def test_data_operation(self):
         expected = True
         self.test_manager.service_scenarios.create_test_connection(DataOperationTestData.test_integration_connection)
         try:
@@ -24,6 +24,8 @@ class TestDataOperationResource(TestCase):
             assert response_data['Result']['Name'] == DataOperationTestData.test_insert_input['Name']
             assert response_data['Result']['Integrations'][0]["Integration"]["Code"] == \
                    DataOperationTestData.test_insert_input['Integrations'][0]["Integration"]["Code"]
+            assert response_data['Result']['Contacts'][0]["Email"] == \
+                   DataOperationTestData.test_insert_input['Contacts'][0]["Email"]
 
             response_data = self.test_manager.service_endpoints.insert_data_operation(
                 DataOperationTestData.test_update_input)
@@ -33,6 +35,8 @@ class TestDataOperationResource(TestCase):
                    DataOperationTestData.test_update_input['Integrations'][0]["Limit"]
             assert response_data['Result']['Integrations'][0]["ProcessCount"] == \
                    DataOperationTestData.test_update_input['Integrations'][0]["ProcessCount"]
+            assert response_data['Result']['Contacts'][0]["Email"] == \
+                   DataOperationTestData.test_update_input['Contacts'][0]["Email"]
 
             delete_request = {"Id": response_data["Result"]["Id"]}
             response_data = self.test_manager.service_endpoints.delete_data_operation(delete_request)

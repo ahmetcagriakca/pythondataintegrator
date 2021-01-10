@@ -44,9 +44,9 @@ class JobSchedulerEvent(ISingleton):
             job_detail = f'job_id:{job_id} - evennt_job_id:{event.job_id}  - job_store:{event.jobstore} - '
 
         if hasattr(event, 'exception') and event.exception:
-            sql_logger.error(f'{job_detail}{ap_scheduler_event.Name} - {log_text}', job_id=job_id)
+            sql_logger.error(f'{job_detail}{ap_scheduler_event.Name} - {log_text}')
         else:
-            sql_logger.info(f'{job_detail}{ap_scheduler_event.Name} - {log_text}', job_id=job_id)
+            sql_logger.info(f'{job_detail}{ap_scheduler_event.Name} - {log_text}')
 
     @staticmethod
     def add_job(event):

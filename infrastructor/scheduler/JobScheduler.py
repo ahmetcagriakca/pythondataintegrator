@@ -20,9 +20,11 @@ from tzlocal import get_localzone
 
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
+from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import ISingleton
 from infrastructor.scheduler.JobSchedulerEvent import JobSchedulerEvent
 from models.configs.DatabaseConfig import DatabaseConfig
+from models.dao.common.ConfigParameter import ConfigParameter
 
 
 class JobScheduler(ISingleton):

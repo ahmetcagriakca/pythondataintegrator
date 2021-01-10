@@ -1,6 +1,9 @@
 class DataOperationTestData:
     test_insert_input = {
         "Name": "TEST_DATA_OPERATION",
+        "Contacts": [
+            {"Email": "ahmetcagriakca@gmail.com"}
+        ],
         "Integrations": [
             {
                 "Limit": 10000,
@@ -29,6 +32,9 @@ class DataOperationTestData:
 
     test_update_input = {
         "Name": "TEST_DATA_OPERATION",
+        "Contacts": [
+            {"Email": "t@t.com"}
+        ],
         "Integrations": [
             {
                 "Limit": 100000,

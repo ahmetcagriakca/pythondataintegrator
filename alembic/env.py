@@ -50,6 +50,8 @@ from models.dao.operation.DataOperationIntegration import DataOperationIntegrati
 from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
 from models.dao.operation.DataOperationJob import DataOperationJob
+from models.dao.operation.DataOperationContact import DataOperationContact
+from models.dao.common.ConfigParameter import ConfigParameter
 
 config = context.config
 

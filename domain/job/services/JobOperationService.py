@@ -5,6 +5,7 @@ from typing import List
 from apscheduler.triggers.cron import CronTrigger
 from injector import inject
 
+from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
@@ -148,7 +149,6 @@ class JobOperationService(IScoped):
 
     @staticmethod
     def job_start_data_operation(job_id, data_operation_id: int):
-        data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
         job_scheduler: JobScheduler = IocManager.injector.get(JobScheduler)
 
         database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
@@ -176,5 +176,6 @@ class JobOperationService(IScoped):
             job_scheduler.scheduler.remove_job(job_id=founded_job.ApSchedulerJob.JobId)
             return
 
-        data_operation_service.start_operation(data_operation_id, job_id=job_id)
+        data_operation_job_service: DataOperationService = IocManager.injector.get(DataOperationJobService)
+        data_operation_job_service.start_operation(data_operation_id, job_id=job_id)
         return "Operation Completed"
