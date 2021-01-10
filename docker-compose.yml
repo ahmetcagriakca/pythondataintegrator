@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  postgresql:
+    restart: always
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - DEBUG=false
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=pdi
+      - PG_TRUST_LOCALNET=true
+    volumes:
+      - /var/lib/pdipostgresql/data
+
+  pdi:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '7100:7100'
+    environment:
+      - API_ENVIRONMENT=TEST
+      - DATABASE_TYPE=POSTGRESQL
+      - DATABASE_HOST=postgresql
+      - DATABASE_DATABASE=pdi
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=123456
+      - DATABASE_PORT=5432
+    depends_on:
+      - postgresql
