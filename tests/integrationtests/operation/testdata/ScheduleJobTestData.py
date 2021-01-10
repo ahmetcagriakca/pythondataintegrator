@@ -1,5 +1,4 @@
 class ScheduleJobTestData:
-
     test_job_connection = {
         "Name": "TestIntegrationConnection",
         "ConnectionTypeName": "Database",
@@ -14,11 +13,14 @@ class ScheduleJobTestData:
 
     test_data_operation = {
         "Name": "TEST_JOB_DATA_OPERATION",
+        "Contacts": [
+            {"Email": "ahmetcagriakca@gmail.com"}
+        ],
         "Integrations": [
             {
                 "Limit": 100,
                 "ProcessCount": 1,
-                "Integration":{
+                "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION",
                     "SourceConnectionName": "TestIntegrationConnection",
                     "SourceSchema": "test",
@@ -40,7 +42,7 @@ class ScheduleJobTestData:
             {
                 "Limit": 100,
                 "ProcessCount": 1,
-                "Integration":{
+                "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION_FOR_UPDATE",
                     "SourceConnectionName": "TestIntegrationConnection",
                     "SourceSchema": "test",
@@ -62,7 +64,7 @@ class ScheduleJobTestData:
             {
                 "Limit": 0,
                 "ProcessCount": 1,
-                "Integration":{
+                "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION_FOR_QUERY",
                     "SourceConnectionName": "",
                     "SourceSchema": "",

@@ -9,6 +9,7 @@ from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.viewmodels.integration.UpdateDataIntegrationModel import UpdateDataIntegrationModel
+from models.viewmodels.operation.CreateDataOperationContactModel import CreateDataOperationContactModel
 from models.viewmodels.operation.CreateDataOperationModel import CreateDataOperationModel
 from models.viewmodels.operation.CreateDataOperationIntegrationModel import CreateDataOperationIntegrationModel
 from models.viewmodels.operation.UpdateDataOperationIntegrationModel import UpdateDataOperationIntegrationModel
@@ -40,6 +41,8 @@ class DataOperationResource(ResourceBase):
         """
         data: CreateDataOperationModel = json.loads(json.dumps(IocManager.api.payload),
                                                     object_hook=lambda d: CreateDataOperationModel(**d))
+        data.Contacts = json.loads(json.dumps(IocManager.api.payload["Contacts"]),
+                                       object_hook=lambda d: CreateDataOperationContactModel(**d))
         data_operation_integrations: List[CreateDataOperationIntegrationModel] = []
         data_operation_integration: CreateDataOperationIntegrationModel = None
         for data_integration in IocManager.api.payload["Integrations"]:

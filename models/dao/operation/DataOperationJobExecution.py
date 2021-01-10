@@ -20,18 +20,12 @@ class DataOperationJobExecution(Entity, IocManager.Base):
     DataOperationJob = relationship("DataOperationJob", back_populates="DataOperationJobExecutions")
     DataOperationJobExecutionEvents = relationship("DataOperationJobExecutionEvent", back_populates="DataOperationJobExecution")
 
-    # Processes: List[DataOperationExecutionProcess] = relationship("DataOperationExecutionProcess",
-    #                                                             back_populates="DataOperationJobExecution")
-    # DataOperationExecutionEvents: List[DataOperationJobExecutionEvent] = relationship("DataOperationJobExecutionEvent",
-    #                                                             back_populates="DataOperationJobExecution")
-
     def __init__(self,
                  DataOperationId: int = None,
                  DataOperationJobId: int = None,
                  StatusId: int = None,
                  StartDate: datetime = None,
                  EndDate: datetime = None,
-                 DataOperation=None,
                  DataOperationJob=None,
                  Status=None,
                  *args, **kwargs):
@@ -41,6 +35,5 @@ class DataOperationJobExecution(Entity, IocManager.Base):
         self.StatusId: int = StatusId
         self.StartDate: datetime = StartDate
         self.EndDate: datetime = EndDate
-        self.DataOperation = DataOperation
         self.DataOperationJob = DataOperationJob
         self.Status = Status
