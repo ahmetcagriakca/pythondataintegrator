@@ -107,8 +107,6 @@ logs/
 .idea/
 #openshift configurations
 openshift/
-DockerFile
-docker-compose.yml
 alembic.ini
 entrypoint.sh
 Jenkinsfile
