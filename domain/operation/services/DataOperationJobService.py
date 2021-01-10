@@ -413,9 +413,19 @@ class DataOperationJobService(IScoped):
         data_operation_job_execution = self.data_operation_job_execution_repository.first(
             Id=data_operation_job_execution_id)
         if data_operation_job_execution is None:
-            self.sql_logger.info(f'{data_operation_job_execution_id} mail sending error',
+            self.sql_logger.info(f'{data_operation_job_execution_id} mail sending execution not found',
                                  job_id=data_operation_job_execution_id)
             return
+
+        operation_contacts = []
+        for contact in data_operation_job_execution.DataOperationJob.DataOperation.Contacts:
+            if contact.IsDeleted == 0:
+                operation_contacts.append(contact.Email)
+        if operation_contacts is None:
+            self.sql_logger.info(f'{data_operation_job_execution_id} mail sending contact not found',
+                                 job_id=data_operation_job_execution_id)
+            return
+
         data_operation_name = data_operation_job_execution.DataOperationJob.DataOperation.Name
         subject = f"{data_operation_name} execution completed"
         if data_operation_job_execution.StatusId == 3:
@@ -434,10 +444,6 @@ Job finished at : {data_operation_job_execution.EndDate.strftime('%Y-%m-%d %H:%M
 </br>
 Job Logs:{log_texts}
 '''
-        operation_contacts = []
-        for contact in data_operation_job_execution.DataOperationJob.DataOperation.Contacts:
-            if contact.IsDeleted == 0:
-                operation_contacts.append(contact.Email)
         self.email_provider.send(operation_contacts, subject, body)
 
     def start_operation(self, data_operation_id: str = None, job_id=None):  # parallel_
