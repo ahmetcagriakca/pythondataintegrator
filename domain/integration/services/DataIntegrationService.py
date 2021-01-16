@@ -59,6 +59,10 @@ class DataIntegrationService(IScoped):
         return data_integration_result
 
     def insert_data_integration(self, data: CreateDataIntegrationModel) -> DataIntegration:
+        if data.IsTargetTruncate \
+                and (data.TargetSchema is not None and data.TargetSchema != '') \
+                and (data.TargetTableName is not None and data.TargetTableName != ''):
+            raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
 
         data_integration = DataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
                                            IsDelta=data.IsDelta)
@@ -100,8 +104,9 @@ class DataIntegrationService(IScoped):
                 data_integration_columns=data_integration_columns)
             selected_rows = PdiUtils.get_selected_rows(column_rows)
             if source_connection is not None and (source_connection.Query is None or source_connection.Query == ''):
-                query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
-                source_connection.Query = query
+                if source_connection.Schema is not None and source_connection.Schema != '' and source_connection.TableName is not None and source_connection.TableName != '':
+                    query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
+                    source_connection.Query = query
             if target_connection.Query is None or target_connection.Query == '':
                 target_connection.Query = target_execute_query
 
@@ -146,7 +151,7 @@ class DataIntegrationService(IScoped):
         for data_integration_execution_job in data_integration_execution_jobs:
             check_execution = [execution for execution in execution_list if
                                execution == data_integration_execution_job.ExecutionProcedure]
-            if not (check_execution is not None and len(check_execution)>0 and check_execution[0] is not None):
+            if not (check_execution is not None and len(check_execution) > 0 and check_execution[0] is not None):
                 self.data_integration_execution_job_repository.delete(data_integration_execution_job)
 
     def delete_execution_job(self, IsPre, IsPost, DataIntegration):
@@ -165,6 +170,10 @@ class DataIntegrationService(IScoped):
                 raise OperationalException("Code not exists")
         else:
             raise OperationalException("Code required")
+        if data.IsTargetTruncate \
+                and (data.TargetSchema is not None and data.TargetSchema != '') \
+                and (data.TargetTableName is not None and data.TargetTableName != ''):
+            raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
         data_integration.IsTargetTruncate = data.IsTargetTruncate
         data_integration.IsDelta = data.IsDelta
 
@@ -194,7 +203,7 @@ class DataIntegrationService(IScoped):
                     column_founded = True
             if not column_founded:
                 self.database_session_manager.session.delete(data_integration_column)
-        source_connection=None
+        source_connection = None
         if data.SourceConnectionName is not None and data.SourceConnectionName != '':
             source_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 0][0]
             source = self.connection_repository.first(Name=data.SourceConnectionName)
@@ -221,8 +230,9 @@ class DataIntegrationService(IScoped):
             data_integration_columns=data_integration_columns)
         selected_rows = PdiUtils.get_selected_rows(column_rows)
         if source_connection is not None and (source_connection.Query is None or source_connection.Query == ''):
-            query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
-            source_connection.Query = query
+            if source_connection.Schema is not None and source_connection.Schema != '' and source_connection.TableName is not None and source_connection.TableName != '':
+                query = f'SELECT {selected_rows} FROM "{source_connection.Schema}"."{source_connection.TableName}"'
+                source_connection.Query = query
         if target_connection.Query is None or target_connection.Query == '':
             target_connection.Query = target_execute_query
 

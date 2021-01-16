@@ -41,8 +41,9 @@ class DataOperationResource(ResourceBase):
         """
         data: CreateDataOperationModel = json.loads(json.dumps(IocManager.api.payload),
                                                     object_hook=lambda d: CreateDataOperationModel(**d))
-        data.Contacts = json.loads(json.dumps(IocManager.api.payload["Contacts"]),
-                                       object_hook=lambda d: CreateDataOperationContactModel(**d))
+        if 'Contacts'  in IocManager.api.payload:
+            data.Contacts = json.loads(json.dumps(IocManager.api.payload["Contacts"]),
+                                           object_hook=lambda d: CreateDataOperationContactModel(**d))
         data_operation_integrations: List[CreateDataOperationIntegrationModel] = []
         data_operation_integration: CreateDataOperationIntegrationModel = None
         for data_integration in IocManager.api.payload["Integrations"]:

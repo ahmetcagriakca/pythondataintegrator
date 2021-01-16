@@ -7,6 +7,7 @@ from injector import inject
 from domain.integration.services.DataIntegrationService import DataIntegrationService
 from domain.process.services.ProcessService import ProcessService
 from infrastructor.IocManager import IocManager
+from infrastructor.configuration.ConfigService import ConfigService
 from infrastructor.data.ConnectionProvider import ConnectionProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
@@ -95,7 +96,8 @@ class DataOperationJobService(IScoped):
                  connection_provider: ConnectionProvider,
                  process_service: ProcessService,
                  data_integration_service: DataIntegrationService,
-                 email_provider: EmailProvider
+                 email_provider: EmailProvider,
+                 config_service: ConfigService
 
                  ):
         self.database_session_manager = database_session_manager
@@ -126,6 +128,7 @@ class DataOperationJobService(IScoped):
         self.email_provider = email_provider
         self.data_integration_service = data_integration_service
         self.process_service = process_service
+        self.config_service = config_service
 
     def get_data_operations(self) -> List[DataOperation]:
         """
@@ -298,25 +301,31 @@ class DataOperationJobService(IScoped):
         self.sql_logger.info(
             f"{data_integration.Code} integration run query started",
             job_id=job_id)
+        try:
+            target_connection = self.data_integration_connection_repository.first(IsDeleted=0,
+                                                                                  DataIntegration=data_integration,
+                                                                                  SourceOrTarget=1)
+            target_connection_manager = self.connection_provider.get_connection(
+                target_connection)  # Pre exec job
 
-        target_connection = self.data_integration_connection_repository.first(IsDeleted=0,
-                                                                              DataIntegration=data_integration,
-                                                                              SourceOrTarget=1)
-        target_connection_manager = self.connection_provider.get_connection(
-            target_connection)  # Pre exec job
+            self.execute_procedures(data_integration=data_integration,
+                                    target_connection_manager=target_connection_manager,
+                                    is_pre=1, is_post=0)
 
-        self.execute_procedures(data_integration=data_integration, target_connection_manager=target_connection_manager,
-                                is_pre=1, is_post=0)
+            if data_integration.IsTargetTruncate:
+                target_connection_manager.delete(
+                    PdiUtils.truncate_table(target_connection.Schema,
+                                            target_connection.TableName))
 
-        if data_integration.IsTargetTruncate:
-            target_connection_manager.delete(
-                PdiUtils.truncate_table(target_connection.Schema,
-                                        target_connection.TableName))
+            target_connection_manager.run_query(target_connection.Query)
 
-        target_connection_manager.run_query(target_connection.Query)
-
-        self.execute_procedures(data_integration=data_integration, target_connection_manager=target_connection_manager,
-                                is_pre=0, is_post=1)
+            self.execute_procedures(data_integration=data_integration,
+                                    target_connection_manager=target_connection_manager,
+                                    is_pre=0, is_post=1)
+        except Exception as ex:
+            self.sql_logger.info(
+                f"{data_integration.Code} integration run query getting error {ex}",
+                job_id=job_id)
 
         self.sql_logger.info(
             f"{data_integration.Code} integration run query finished",
@@ -421,6 +430,10 @@ class DataOperationJobService(IScoped):
         for contact in data_operation_job_execution.DataOperationJob.DataOperation.Contacts:
             if contact.IsDeleted == 0:
                 operation_contacts.append(contact.Email)
+
+        default_contact = self.config_service.get_config_by_name("DataOperationDefaultContact")
+        if default_contact is not None and default_contact != '':
+            operation_contacts.append(default_contact)
         if operation_contacts is None:
             self.sql_logger.info(f'{data_operation_job_execution_id} mail sending contact not found',
                                  job_id=data_operation_job_execution_id)
