@@ -66,10 +66,11 @@ class DataOperationService(IScoped):
         data_operation = DataOperation(Name=data_operation_model.Name)
 
         self.data_operation_repository.insert(data_operation)
-        for operation_contact in data_operation_model.Contacts:
-            data_operation_contact = DataOperationContact(Email=operation_contact.Email,
-                                                          DataOperation=data_operation)
-            self.data_operation_contact_repository.insert(data_operation_contact)
+        if data_operation_model.Contacts is not None and len(data_operation_model.Contacts)>0:
+            for operation_contact in data_operation_model.Contacts:
+                data_operation_contact = DataOperationContact(Email=operation_contact.Email,
+                                                              DataOperation=data_operation)
+                self.data_operation_contact_repository.insert(data_operation_contact)
         order = 0
         for operation_integration in data_operation_model.Integrations:
             order = order + 1
@@ -97,22 +98,25 @@ class DataOperationService(IScoped):
         data_operation = self.data_operation_repository.first(Name=data_operation_model.Name)
         # insert or update data_integration
 
-        for operation_contact in data_operation_model.Contacts:
-            data_operation_contact = self.data_operation_contact_repository.first(IsDeleted=0,
-                                                                                  DataOperationId=data_operation.Id,
-                                                                                  Email=operation_contact.Email)
-            if data_operation_contact is None:
-                data_operation_contact = DataOperationContact(Email=operation_contact.Email,
-                                                              DataOperation=data_operation)
-                self.data_operation_contact_repository.insert(data_operation_contact)
+        if data_operation_model.Contacts is not None and len(data_operation_model.Contacts)>0:
+            for operation_contact in data_operation_model.Contacts:
+                data_operation_contact = self.data_operation_contact_repository.first(IsDeleted=0,
+                                                                                      DataOperationId=data_operation.Id,
+                                                                                      Email=operation_contact.Email)
+                if data_operation_contact is None:
+                    data_operation_contact = DataOperationContact(Email=operation_contact.Email,
+                                                                  DataOperation=data_operation)
+                    self.data_operation_contact_repository.insert(data_operation_contact)
 
         check_existing_contacts = self.data_operation_contact_repository.filter_by(IsDeleted=0,
                                                                                    DataOperationId=data_operation.Id).all()
         for existing_contact in check_existing_contacts:
             founded = False
-            for operation_contact in data_operation_model.Contacts:
-                if existing_contact.Email == operation_contact.Email:
-                    founded = True
+
+            if data_operation_model.Contacts is not None and len(data_operation_model.Contacts) > 0:
+                for operation_contact in data_operation_model.Contacts:
+                    if existing_contact.Email == operation_contact.Email:
+                        founded = True
 
             if not founded:
                 self.data_operation_contact_repository.delete_by_id(existing_contact.Id)
