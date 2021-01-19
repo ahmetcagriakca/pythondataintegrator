@@ -23,10 +23,13 @@ class ConnectionManager(IScoped):
         return inner
 
     @connect
+    def fetch_query(self, query):
+        self.connector.cursor.execute(query)
+        datas = self.connector.cursor.fetchall()
+        return datas
+
     def fetch(self, query):
-        cur = self.connector.connection.cursor()
-        cur.execute(query)
-        datas = cur.fetchall()
+        datas = self.fetch_query(query=query)
         data_list = []
         for data in datas:
             rows = []
@@ -36,39 +39,55 @@ class ConnectionManager(IScoped):
         return data_list
 
     @connect
-    def insert(self, query) -> None:
-        return self.cursor.execute(query)
-
-    @connect
-    def delete(self, query) -> None:
-        cur = self.connector.connection.cursor()
-        cur.execute(query)
+    def execute(self, query) -> None:
+        self.connector.cursor.execute(query)
         self.connector.connection.commit()
-    
-    @connect
-    def run_query(self, query) -> None:
-        cur = self.connector.connection.cursor()
-        cur.execute(query)
-        self.connector.connection.commit()
+        return self.connector.cursor.rowcount
 
     @connect
-    def insert_many(self, executable_script, data):
-        return self._insert_to_db_with_retry(executable_script, data, self.default_retry)
+    def execute_many(self, query, data):
+        return self._execute_with_retry(query=query, data=data, retry=self.default_retry)
 
-    def _insert_many_start(self, executable_script, data):
-        self.connector.execute_many(executable_script,data)
+    def _execute_many_start(self, query, data):
+        self.connector.execute_many(query=query, data=data)
 
-    def _insert_to_db_with_retry(self, executable_script, data, retry):
+    def _execute_with_retry(self, query, data, retry):
         try:
-            self._insert_many_start(executable_script, data)
+            self._execute_many_start(query=query, data=data)
         except Exception as ex:
             if retry > self.retry_count:
                 self.sql_logger.error(f"Db write error on Error:{ex}")
-                return False
+                raise ex
             self.sql_logger.error(
                 f"Getting error on insert (Operation will be retried. Retry Count:{retry}). Error:{ex}")
             # retrying connect to db,
             self.connector.connect()
             time.sleep(1)
-            return self._insert_to_db_with_retry(executable_script, data, retry + 1)
+            return self._execute_with_retry(query=query, data=data, retry=retry + 1)
         return True
+
+    def execute_procedure(self, procedure) -> None:
+        procedure_query = self.connector.get_execute_procedure_query(procedure=procedure)
+        self.execute(query=procedure_query)
+
+    def get_table_count(self, query):
+        count_query = self.connector.get_table_count_query(query=query)
+        datas = self.fetch_query(query=count_query)
+        return datas[0][0]
+
+    def get_table_data(self, query, first_row, sub_limit, top_limit):
+        data_query = self.connector.get_table_data_query(query=query, first_row=first_row, sub_limit=sub_limit,
+                                                         top_limit=top_limit)
+        return self.fetch(data_query)
+
+    def truncate_table(self, schema, table):
+        truncate_query = self.connector.get_truncate_query(schema=schema, table=table)
+        self.execute(query=truncate_query)
+
+    def prepare_target_query(self, column_rows, query):
+        target_query = query
+        for column_row in column_rows:
+            index = column_rows.index(column_row)
+            indexer = self.connector.get_target_query_indexer().format(index=index)
+            target_query = target_query.replace(f":{column_row[1]}", indexer)
+        return target_query

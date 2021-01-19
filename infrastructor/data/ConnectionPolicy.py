@@ -1,5 +1,5 @@
 from injector import inject
-from infrastructor.data.ConnectorStrategy import ConnectorStrategy
+from infrastructor.data.connectors.ConnectorStrategy import ConnectorStrategy
 from infrastructor.data.connectors.MssqlDbConnector import MssqlDbConnector
 from infrastructor.data.connectors.OracleDbConnector import OracleDbConnector
 from infrastructor.data.connectors.PostgreDbConnector import PostgreDbConnector
