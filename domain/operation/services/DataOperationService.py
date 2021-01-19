@@ -157,7 +157,7 @@ class DataOperationService(IScoped):
                     founded = True
             if not founded:
                 self.data_operation_integration_repository.delete_by_id(existing_integration.Id)
-                self.data_integration_service.delete_integration_data(data_operation_integration.DataIntegration.Code)
+                self.data_integration_service.delete_data_integration(data_operation_integration.DataIntegration.Code)
         self.database_session_manager.commit()
 
         data_operation = self.data_operation_repository.first(Id=data_operation.Id)
@@ -177,7 +177,7 @@ class DataOperationService(IScoped):
                                                                                            DataOperationId=data_operation.Id)
         for existing_integration in check_existing_integrations:
             self.data_operation_integration_repository.delete_by_id(existing_integration.Id)
-            self.data_integration_service.delete_integration_data(existing_integration.DataIntegration.Code)
+            self.data_integration_service.delete_data_integration(existing_integration.DataIntegration.Code)
         message = f'{data_operation.Name} data operation deleted'
         self.sql_logger.info(message)
         self.database_session_manager.commit()

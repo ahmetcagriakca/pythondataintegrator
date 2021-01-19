@@ -16,7 +16,7 @@ class TestDataOperation(TestCase):
         from infrastructor.scheduler.JobScheduler import JobScheduler
         os.environ["PYTHON_ENVIRONMENT"] = 'test'
         self.root_directory = os.path.abspath(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir))
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir))
         IocManager.configure_startup(root_directory=self.root_directory,
                                      app_wrapper=FlaskAppWrapper,
                                      job_scheduler=JobScheduler)
@@ -28,6 +28,15 @@ class TestDataOperation(TestCase):
         print(data['message'] if 'message' in data else '')
 
     def test_folders1(self):
+        indexer = ':{index}'
+        st= indexer.format(index=5)
+        assert st == ':5'
+        indexer = '%s'
+        st= indexer.format(index=5)
+        assert st == '%s'
+        indexer = '?'
+        st= indexer.format(index=5)
+        assert st == '?'
         folders = Utils.find_sub_folders(self.root_directory + '\\models\\dao')
         module_list, module_attr_list = Utils.get_modules(folders)
         for module in module_list:

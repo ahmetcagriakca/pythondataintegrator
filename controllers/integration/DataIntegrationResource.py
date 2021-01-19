@@ -60,5 +60,5 @@ class DataIntegrationResource(ResourceBase):
         """
         data = IocManager.api.payload
         code = data.get('Code')  #
-        deletion_result = self.data_integration_service.delete_integration_data(code)
+        deletion_result = self.data_integration_service.delete_data_integration(code)
         return CommonModels.get_response(message=f'Data data_integration deletion for {code} is Completed')

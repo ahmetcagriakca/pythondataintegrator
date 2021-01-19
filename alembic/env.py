@@ -86,7 +86,6 @@ def run_migrations_offline():
     """
     print(f"run_migrations_offline")
     print(f"environment:{api_config.environment}")
-    print(f"connection string:{connection_string}")
     
     if connection_string is not None and connection_string != "":
         context.configure(

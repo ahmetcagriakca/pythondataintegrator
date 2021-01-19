@@ -1,6 +1,6 @@
 import psycopg2
 from injector import inject
-from infrastructor.data.ConnectorStrategy import ConnectorStrategy
+from infrastructor.data.connectors.ConnectorStrategy import ConnectorStrategy
 from models.configs.DatabaseConfig import DatabaseConfig
 import psycopg2.extras as extras
 
@@ -36,3 +36,14 @@ class PostgreDbConnector(ConnectorStrategy):
             self.connection.rollback()
             self.cursor.close()
             raise error
+
+    def get_execute_procedure_query(self, procedure):
+        return f'begin {procedure}; end;'
+
+    def get_table_count_query(self, query):
+        count_query = f"SELECT COUNT (*) FROM ({query})  as count_table"
+        return count_query
+
+    def get_target_query_indexer(self):
+        indexer = '%s'
+        return indexer
