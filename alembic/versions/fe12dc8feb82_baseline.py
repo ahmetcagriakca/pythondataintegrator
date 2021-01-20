@@ -660,8 +660,8 @@ def upgrade():
                     )
     op.create_table('DataOperationJobExecution',
                     sa.Column('Id', sa.Integer(), nullable=False),
-                    sa.Column('DataOperationJobId', sa.Integer(), nullable=True),
                     sa.Column('DefinitionId', sa.Integer(), nullable=True),
+                    sa.Column('DataOperationJobId', sa.Integer(), nullable=True),
                     sa.Column('StatusId', sa.Integer(), nullable=True),
                     sa.Column('StartDate', sa.DateTime(), nullable=False),
                     sa.Column('EndDate', sa.DateTime(), nullable=True),
