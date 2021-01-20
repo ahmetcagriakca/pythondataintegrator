@@ -18,7 +18,7 @@ class DataOperationJob(Entity, IocManager.Base):
     DataOperation = relationship("DataOperation", back_populates="DataOperationJobs")
     ApSchedulerJob = relationship("ApSchedulerJob", back_populates="DataOperationJobs")
     DataOperationJobExecutions: List[DataOperationJobExecution] = relationship("DataOperationJobExecution",
-                                                                            back_populates="DataOperationJob")
+                                                                               back_populates="DataOperationJob")
 
     def __init__(self,
                  DataOperationId: int = None,

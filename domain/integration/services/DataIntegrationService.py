@@ -8,6 +8,7 @@ from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.connection.Connection import Connection
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
+from models.dao.operation import Definition
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
 from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
@@ -46,14 +47,15 @@ class DataIntegrationService(IScoped):
         data_integrations = self.data_integration_repository.filter_by(IsDeleted=0)
         return data_integrations.all()
 
-    def create_data_integration(self, data: CreateDataIntegrationModel):
+    def create_data_integration(self, data: CreateDataIntegrationModel,
+                                definition: Definition):
         if data.Code is not None and data.Code != "":
             data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code)
             if data_integration is not None:
                 raise OperationalException("Code already exists")
         else:
             raise OperationalException("Code required")
-        data_integration = self.insert_data_integration(data)
+        data_integration = self.insert_data_integration(data, definition)
         data_integration_result = self.data_integration_repository.first(IsDeleted=0, Id=data_integration.Id)
         return data_integration_result
 
@@ -76,14 +78,16 @@ class DataIntegrationService(IScoped):
         query = f'INSERT INTO "{schema}"."{table_name}"({insert_row_columns}) VALUES ({insert_row_values})'
         return query
 
-    def insert_data_integration(self, data: CreateDataIntegrationModel) -> DataIntegration:
+    def insert_data_integration(self,
+                                data: CreateDataIntegrationModel,
+                                definition: Definition) -> DataIntegration:
         if data.IsTargetTruncate \
                 and ((data.TargetSchema is None or data.TargetSchema == '') \
                      or (data.TargetTableName is None or data.TargetTableName == '')):
             raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
 
         data_integration = DataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
-                                           IsDelta=data.IsDelta)
+                                           IsDelta=data.IsDelta, Definition=definition)
         self.data_integration_repository.insert(data_integration)
 
         source_columns_list = data.SourceColumns.split(",")
@@ -135,7 +139,6 @@ class DataIntegrationService(IScoped):
         if data.PostExecutions is not None and data.PostExecutions != "":
             self.insert_execution_job(data.PostExecutions, 0, 1, data_integration)
 
-        self.database_session_manager.commit()
         return data_integration
 
     def insert_execution_job(self, ExecutionList, IsPre, IsPost, DataIntegration):
@@ -183,7 +186,9 @@ class DataIntegrationService(IScoped):
         for data_integration_execution_job in data_integration_execution_jobs:
             self.data_integration_execution_job_repository.delete(data_integration_execution_job)
 
-    def update_data_integration(self, data: UpdateDataIntegrationModel):
+    def update_data_integration(self,
+                                data: UpdateDataIntegrationModel,
+                                definition: Definition):
         if data.Code is not None and data.Code != "":
             data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code)
             if data_integration is None:
@@ -196,7 +201,7 @@ class DataIntegrationService(IScoped):
             raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
         data_integration.IsTargetTruncate = data.IsTargetTruncate
         data_integration.IsDelta = data.IsDelta
-
+        data_integration.Definition = definition
         source_columns_list = data.SourceColumns.split(",")
         target_columns_list = data.TargetColumns.split(",")
 

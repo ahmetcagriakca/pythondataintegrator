@@ -121,8 +121,8 @@ class TestServiceScenarios:
         data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
             database_session_manager)
         data_operation = data_operation_repository.first(Name=test_data_operation["Name"])
-        if data_operation is not None:
-            self.clear_operation(name=test_data_operation["Name"])
+        # if data_operation is not None:
+        #     self.clear_operation(name=test_data_operation["Name"])
         response_data = self.service_endpoints.insert_data_operation(test_data_operation)
         return response_data
 

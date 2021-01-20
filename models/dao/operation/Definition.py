@@ -1,11 +1,8 @@
-from models.dao.operation.DataOperationContact import DataOperationContact
-from models.dao.operation.DataOperationJob import DataOperationJob
 from typing import List
 from sqlalchemy import Column, String, Integer, Text
 from sqlalchemy.orm import relationship
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
-from models.dao.operation.DataOperationIntegration import DataOperationIntegration
 
 
 class Definition(Entity, IocManager.Base):
@@ -16,9 +13,21 @@ class Definition(Entity, IocManager.Base):
     Content = Column(Text, index=False, unique=False, nullable=True)
     IsActive = Column(Integer, index=False, unique=False, nullable=False)
 
+    DataOperations = relationship("DataOperation",
+                                  back_populates="Definition")
+    DataIntegrations = relationship("DataIntegration",
+                                    back_populates="Definition")
+    DataOperationJobExecutions = relationship("DataOperationJobExecution",
+                                              back_populates="Definition")
 
     def __init__(self,
                  Name: str = None,
+                 Version: int = None,
+                 Content: str = None,
+                 IsActive: bool = None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Name: str = Name
+        self.Version: int = Version
+        self.Content: str = Content
+        self.IsActive: bool = IsActive

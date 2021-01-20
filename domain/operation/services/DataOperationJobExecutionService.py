@@ -45,21 +45,21 @@ class DataOperationJobExecutionService(IScoped):
         self.config_service = config_service
 
     def create_data_operation_job_execution(self, data_operation_job: DataOperationJob = None):
-        not_finished_execution = self.data_operation_job_execution_repository.table \
-            .filter(self.data_operation_job_execution_repository.type.StatusId != 3) \
-            .filter_by(DataOperationJobId=data_operation_job.Id).first()
+        # not_finished_execution = self.data_operation_job_execution_repository.table \
+        #     .filter_by(DataOperationJobId=data_operation_job.Id).first()
 
         # not_finished_execution = self.data_operation_job_execution_repository.table.first(
         #     self.data_operation_job_execution_repository.type.EventId != 3, DataOperationId=data_operation_id,
         #     ApSchedulerJobId=job_id)
-        if not_finished_execution is not None:
-            self.sql_logger.info(f'Data operation({data_operation_job.DataOperation.Name}) already running',
-                                 job_id=data_operation_job.ApSchedulerJobId)
-            raise OperationalException("Already running execution")
+        # if not_finished_execution is not None:
+        #     self.sql_logger.info(f'Data operation({data_operation_job.DataOperation.Name}) already running',
+        #                          job_id=data_operation_job.ApSchedulerJobId)
+        #     raise OperationalException("Already running execution")
         status = self.status_repository.first(Id=1)
         data_operation_job_execution = DataOperationJobExecution(
             DataOperationJob=data_operation_job,
-            Status=status)
+            Status=status,
+            Definition=data_operation_job.DataOperation.Definition)
         self.data_operation_job_execution_repository.insert(data_operation_job_execution)
         operation_event = self.operation_event_repository.first(Code=EVENT_EXECUTION_INITIALIZED)
         data_operation_job_execution_event = DataOperationJobExecutionEvent(
