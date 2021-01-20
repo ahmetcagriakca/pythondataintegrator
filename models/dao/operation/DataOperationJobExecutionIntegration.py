@@ -30,19 +30,29 @@ class DataOperationJobExecutionIntegration(Entity, IocManager.Base):
         back_populates="DataOperationJobExecutionIntegration")
 
     def __init__(self,
-                 DataOperationId: int = None,
-                 DataOperationJobId: int = None,
+                 DataOperationJobExecutionId: int = None,
+                 DataOperationIntegrationId: int = None,
                  StatusId: int = None,
                  StartDate: datetime = None,
                  EndDate: datetime = None,
-                 DataOperationJob=None,
-                 Status=None,
+                 Limit: int = None,
+                 ProcessCount: int = None,
+                 SourceDataCount: int = None,
+                 Log: str = None,
+                 DataOperationIntegration: any = None,
+                 DataOperationJobExecution: any = None,
+                 Status: any = None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.DataOperationId: int = DataOperationId
-        self.DataOperationJobId: int = DataOperationJobId
+        self.DataOperationJobExecutionId: int = DataOperationJobExecutionId
+        self.DataOperationIntegrationId: int = DataOperationIntegrationId
         self.StatusId: int = StatusId
         self.StartDate: datetime = StartDate
         self.EndDate: datetime = EndDate
-        self.DataOperationJob = DataOperationJob
-        self.Status = Status
+        self.Limit: int = Limit
+        self.ProcessCount: int = ProcessCount
+        self.SourceDataCount: int = SourceDataCount
+        self.Log: str = Log
+        self.DataOperationIntegration: any = DataOperationIntegration
+        self.DataOperationJobExecution: any = DataOperationJobExecution
+        self.Status: any = Status

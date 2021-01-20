@@ -234,7 +234,7 @@ def insert_event_datas():
     from models.enums.events import EVENT_EXECUTION_INITIALIZED, EVENT_EXECUTION_FINISHED, EVENT_EXECUTION_STARTED, \
         EVENT_EXECUTION_INTEGRATION_STARTED, EVENT_EXECUTION_INTEGRATION_EXECUTE_PRE_PROCEDURE, \
         EVENT_EXECUTION_INTEGRATION_EXECUTE_POST_PROCEDURE, EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
-        EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION
+        EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION,EVENT_EXECUTION_INTEGRATION_FINISHED
     from models.dao.common.OperationEvent import OperationEvent
     bind = op.get_bind()
     from sqlalchemy import orm
@@ -261,37 +261,43 @@ def insert_event_datas():
         {
             "Code": EVENT_EXECUTION_INTEGRATION_STARTED,
             "Name": "EVENT_EXECUTION_INTEGRATION_STARTED",
-            "Description": "Execution integration started",
+            "Description": "Execution operation integration started",
             "Class": "DataOperationJobExecutionIntegration"
         },
         {
             "Code": EVENT_EXECUTION_INTEGRATION_EXECUTE_PRE_PROCEDURE,
             "Name": "EVENT_EXECUTION_INTEGRATION_EXECUTE_PRE_PROCEDURE",
-            "Description": "Execution integration pre procedure executed",
+            "Description": "Execution operation integration pre procedure executed",
             "Class": "DataOperationJobExecutionIntegration"
         },
         {
             "Code": EVENT_EXECUTION_INTEGRATION_EXECUTE_POST_PROCEDURE,
             "Name": "EVENT_EXECUTION_INTEGRATION_EXECUTE_POST_PROCEDURE",
-            "Description": "Execution integration post procedure executed",
+            "Description": "Execution operation integration post procedure executed",
             "Class": "DataOperationJobExecutionIntegration"
         },
         {
             "Code": EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE,
             "Name": "EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE",
-            "Description": "Execution integration truncate executed",
+            "Description": "Execution operation integration truncate executed",
             "Class": "DataOperationJobExecutionIntegration"
         },
         {
             "Code": EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY,
             "Name": "EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY",
-            "Description": "Execution integration query executed",
+            "Description": "Execution operation integration query executed",
             "Class": "DataOperationJobExecutionIntegration"
         },
         {
             "Code": EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION,
             "Name": "EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION",
-            "Description": "Execution integration operation executed",
+            "Description": "Execution operation integration operation executed",
+            "Class": "DataOperationJobExecutionIntegration"
+        },
+        {
+            "Code": EVENT_EXECUTION_INTEGRATION_FINISHED,
+            "Name": "EVENT_EXECUTION_INTEGRATION_FINISHED",
+            "Description": "Execution operation integration started",
             "Class": "DataOperationJobExecutionIntegration"
         }
     ]

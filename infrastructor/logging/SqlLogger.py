@@ -8,6 +8,7 @@ from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.ConsoleLogger import ConsoleLogger
 from models.configs.ApiConfig import ApiConfig
+from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.common.Log import Log
 
 
@@ -28,7 +29,8 @@ class SqlLogger(IScoped):
     def log_to_db(type_of_log, log_string, job_id=None):
         api_config: ApiConfig = IocManager.injector.get(ApiConfig)
         console_logger: ConsoleLogger = IocManager.injector.get(ConsoleLogger)
-        database_session_manager = IocManager.injector.get(DatabaseSessionManager)
+        database_config = IocManager.injector.get(DatabaseConfig)
+        database_session_manager = DatabaseSessionManager(database_config=database_config,api_config=api_config)
         log_repository: Repository[Log] = Repository[
             Log](database_session_manager)
         log_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
@@ -42,10 +44,12 @@ class SqlLogger(IScoped):
             console_logger.error(f'Sql logging getting error{ex}')
         finally:
             console_logger.info(f'{type_of_log} - {log_string}')
+            database_session_manager.close()
 
     #######################################################################################
     def logger_method(self, type_of_log, log_string, job_id=None):
-        Process(target=SqlLogger.log_to_db(type_of_log, log_string, job_id), name="Log Process", args=(type_of_log, log_string, job_id,)).start()
+        SqlLogger.log_to_db(type_of_log, log_string, job_id)
+        # Process(target=SqlLogger.log_to_db(type_of_log, log_string, job_id), name="Log Process", args=(type_of_log, log_string, job_id,)).start()
 
     #######################################################################################
     def error(self, error_string, job_id=None):

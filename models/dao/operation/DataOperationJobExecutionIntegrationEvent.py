@@ -19,15 +19,17 @@ class DataOperationJobExecutionIntegrationEvent(Entity, IocManager.Base):
                                                         back_populates="DataOperationJobExecutionIntegrationEvents")
 
     def __init__(self,
-                 DataOperationJobExecutionId: int = None,
+                 DataOperationJobExecutionIntegrationId: int = None,
                  EventId: int = None,
                  EventDate: datetime = None,
-                 DataOperationJobExecution=None,
-                 Event=None,
+                 AffectedRowCount:int = None,
+                 Event:any=None,
+                 DataOperationJobExecutionIntegration:any=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.DataOperationJobExecutionId: int = DataOperationJobExecutionId
+        self.DataOperationJobExecutionIntegrationId: int = DataOperationJobExecutionIntegrationId
         self.EventId: int = EventId
-        self.EventDate: int = EventDate
-        self.DataOperationJobExecution = DataOperationJobExecution
+        self.EventDate: datetime = EventDate
+        self.AffectedRowCount: int = AffectedRowCount
         self.Event = Event
+        self.DataOperationJobExecutionIntegration = DataOperationJobExecutionIntegration
