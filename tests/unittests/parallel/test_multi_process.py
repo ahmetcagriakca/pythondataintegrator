@@ -79,7 +79,6 @@ class TestMultiProcess(TestCase):
     def test_performance_parallel(self):
 
         start = time()
-        print(f"StartTime :{start}")
         from domain.process.services.TestParallelService import TestParallelService
         test_parallel_service: TestParallelService = IocManager.injector.get(TestParallelService)
         result = test_parallel_service.test_performance_parallel(1000)
@@ -92,7 +91,6 @@ class TestMultiProcess(TestCase):
 
         from domain.process.services.TestParallelService import TaskValue
         start = time()
-        print(f"StartTime :{start}")
         start_datetime = datetime.now()
 
         sql_logger = IocManager.injector.get(SqlLogger)
@@ -117,7 +115,6 @@ class TestMultiProcess(TestCase):
 
         from domain.process.services.TestParallelService import TaskValue
         start = time()
-        print(f"StartTime :{start}")
         start_datetime = datetime.now()
         sql_logger = IocManager.injector.get(SqlLogger)
         sql_logger.info(f"One Thread Operations Started")

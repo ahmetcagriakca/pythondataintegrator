@@ -1,3 +1,4 @@
+from models.dao.operation.DataOperationContact import DataOperationContact
 from models.dao.operation.DataOperationJob import DataOperationJob
 from typing import List
 
@@ -16,6 +17,8 @@ class DataOperation(Entity, IocManager.Base):
     Name = Column(String(100), index=False, unique=False, nullable=False)
     DataOperationJobs: List[DataOperationJob] = relationship("DataOperationJob", back_populates="DataOperation")
     Integrations: List[DataOperationIntegration] = relationship("DataOperationIntegration",
+                                                                             back_populates="DataOperation")
+    Contacts: List[DataOperationContact] = relationship("DataOperationContact",
                                                                              back_populates="DataOperation")
 
     def __init__(self,

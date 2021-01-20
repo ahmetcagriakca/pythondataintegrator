@@ -49,7 +49,6 @@ class ProcessService(IScoped):
 
     def start_parallel_process(self, process_id, datas, process_count, process_method, result_method):
         start = time()
-        print(f"StartTime :{start}")
         start_datetime = datetime.now()
 
         sql_logger = IocManager.injector.get(SqlLogger)
@@ -67,4 +66,6 @@ class ProcessService(IScoped):
         print(f"Start :{start_datetime}")
         print(f"End :{end_datetime}")
         print(f"ElapsedTime :{end - start}")
-        return start_datetime, end_datetime, start, end
+
+        unprocessed_task = parallel_multi_processing.unprocessed_tasks()
+        return unprocessed_task

@@ -9,20 +9,22 @@ class DatabaseConfig(BaseConfig):
                  driver: str = None,
                  host: str = None,
                  port: int = None,
+                 sid: str = None,
+                 service_name: str = None,
                  database: str = None,
                  username: str = None,
                  password: str = None,
-                 schema: str = None,
                  ):
         self.connection_string = connection_string
         self.type = type
         self.driver: str = driver
         self.host: str = host
         self.port: int = port
+        self.sid: str = sid
+        self.service_name: str = service_name
         self.database: str = database
         self.username: str = username
         self.password: str = password
-        self.schema: str = schema
 
     def is_valid(self):
         pass

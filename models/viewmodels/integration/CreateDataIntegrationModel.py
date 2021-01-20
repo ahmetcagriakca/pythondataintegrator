@@ -1,12 +1,14 @@
-class CreateIntegrationDataModel:
+class CreateDataIntegrationModel:
     def __init__(self,
                  Code: str = None,
-                 SourceConnectionId: int = None,
+                 SourceConnectionName: str = None,
                  SourceSchema: str = None,
                  SourceTableName: str = None,
-                 TargetConnectionId: str = None,
+                 SourceQuery: str = None,
+                 TargetConnectionName: str = None,
                  TargetSchema: str = None,
                  TargetTableName: str = None,
+                 TargetQuery: str = None,
                  IsTargetTruncate: bool = None,
                  IsDelta: bool = None,
                  Comments: str = None,
@@ -16,12 +18,14 @@ class CreateIntegrationDataModel:
                  PostExecutions: str = None,
                  ):
         self.Code: str = Code
-        self.SourceConnectionId: int = SourceConnectionId
+        self.SourceConnectionName: str = SourceConnectionName
         self.SourceSchema: str = SourceSchema
         self.SourceTableName: str = SourceTableName
-        self.TargetConnectionId: int = TargetConnectionId
+        self.SourceQuery: str = SourceQuery
+        self.TargetConnectionName: str = TargetConnectionName
         self.TargetSchema: str = TargetSchema
         self.TargetTableName: str = TargetTableName
+        self.TargetQuery: str = TargetQuery
         self.IsTargetTruncate: bool = IsTargetTruncate
         self.IsDelta = IsDelta
         self.Comments: str = Comments

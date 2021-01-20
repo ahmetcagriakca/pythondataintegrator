@@ -28,7 +28,6 @@ database_config: DatabaseConfig = config_manager.get(DatabaseConfig)
 connection_string = Utils.get_connection_string(database_config=database_config)
 
 from infrastructor.IocManager import IocManager
-# IocManager.Base = declarative_base(metadata=MetaData(schema=database_config.schema))
 #this is the Alembic Config object, which provides
 #access to the values within the .ini file in use.
 
@@ -40,11 +39,10 @@ from models.dao.connection.ConnectorType import ConnectorType
 from models.dao.connection.ConnectionType import ConnectionType
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
-from models.dao.integration.PythonDataIntegration import PythonDataIntegration
-from models.dao.integration.PythonDataIntegrationConnection import PythonDataIntegrationConnection
-from models.dao.integration.PythonDataIntegrationColumn import PythonDataIntegrationColumn
-from models.dao.integration.PythonDataIntegrationLog import PythonDataIntegrationLog
-from models.dao.integration.PythonDataIntegrationJob import PythonDataIntegrationJob
+from models.dao.integration.DataIntegration import DataIntegration
+from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
+from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
+from models.dao.common.Log import Log
 from models.dao.common.OperationEvent import OperationEvent
 from models.dao.common.Status import Status
 from models.dao.operation.DataOperation import DataOperation
@@ -52,7 +50,8 @@ from models.dao.operation.DataOperationIntegration import DataOperationIntegrati
 from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
 from models.dao.operation.DataOperationJob import DataOperationJob
-
+from models.dao.operation.DataOperationContact import DataOperationContact
+from models.dao.common.ConfigParameter import ConfigParameter
 
 config = context.config
 
@@ -87,8 +86,6 @@ def run_migrations_offline():
     """
     print(f"run_migrations_offline")
     print(f"environment:{api_config.environment}")
-    print(f"schema:{database_config.schema}")
-    print(f"connection string:{connection_string}")
     
     if connection_string is not None and connection_string != "":
         context.configure(
@@ -129,13 +126,11 @@ def run_migrations_online():
     connectible = None
     print(f"run_migrations_online")
     print(f"environment:{api_config.environment}")
-    print(f"schema:{database_config.schema}")
     print(f"connection string:{connection_string}")
     connectible = create_engine(connection_string, poolclass=pool.NullPool)
     SCHEMA_NAME = "NOT_test_fktdb"
 
     def include_object(object, name, type_, reflected, compare_to):
-        # print(object.schema)
         if False:#(type_ == "table"):
             return object.schema == 'Common'
         else:
@@ -143,7 +138,7 @@ def run_migrations_online():
     if connectible is not None:
         # Create schema; if it already exists, skip this
         try:
-            connectible.execute(CreateSchema(database_config.schema))
+            connectible.execute(CreateSchema("Common"))
         except sqlalchemy.exc.ProgrammingError:
             pass
         with connectible.connect() as connection:

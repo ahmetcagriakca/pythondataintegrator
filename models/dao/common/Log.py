@@ -3,9 +3,9 @@ from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
 
 
-class PythonDataIntegrationLog(Entity, IocManager.Base):
-    __tablename__ = "PythonDataIntegrationLog"
-    __table_args__ = {"schema": "Integration"}
+class Log(Entity, IocManager.Base):
+    __tablename__ = "Log"
+    __table_args__ = {"schema": "Common"}
     TypeId = Column(Integer, index=True, unique=False, nullable=False)
     Content = Column(String(4000), index=False, unique=False, nullable=True)
     LogDatetime = Column(DateTime, index=False, unique=False, nullable=True)

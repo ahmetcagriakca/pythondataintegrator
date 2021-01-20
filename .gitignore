@@ -107,11 +107,6 @@ logs/
 .idea/
 #openshift configurations
 openshift/
-DockerFile
-docker-compose.yml
-alembic.ini
-entrypoint.sh
 Jenkinsfile
-example.json
 application.dev.yml
-application.test.yml
+tests/integrationtests/temp

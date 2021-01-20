@@ -54,6 +54,7 @@ class ConnectionDatabaseModel(EntityModel):
                  Host: str = None,
                  Port: int = None,
                  Sid: str = None,
+                 ServiceName: str = None,
                  DatabaseName: str = None,
                  User: str = None,
                  Password: str = None,
@@ -65,6 +66,7 @@ class ConnectionDatabaseModel(EntityModel):
         self.Host: str = Host
         self.Port: int = Port
         self.Sid: str = Sid
+        self.ServiceName: str = ServiceName
         self.DatabaseName: str = DatabaseName
         self.User: str = User
         self.Password: str = Password
@@ -78,22 +80,23 @@ class ConnectionModels:
 
     create_connection_database_model = IocManager.api.model('CreateConnectionDatabaseModel', {
         'Name': fields.String(description='Operation code value', required=True),
-        'ConnectionTypeId': fields.Integer(description='ConnectionTypeId'),
-        'ConnectorTypeId': fields.Integer(description='ConnectorTypeId'),
+        'ConnectionTypeName': fields.String(description='ConnectionTypeName'),
+        'ConnectorTypeName': fields.String(description='ConnectorTypeName'),
         'Host': fields.String(description='Host'),
         'Port': fields.Integer(description='Port'),
         'Sid': fields.String(description='Sid'),
+        'ServiceName': fields.String(description='ServiceName'),
         'DatabaseName': fields.String(description='DatabaseName'),
         'User': fields.String(description='User'),
         'Password': fields.String(description='Password'),
     })
     update_connection_database_model = IocManager.api.model('UpdateConnectionDatabaseModel', {
-        'Id': fields.Integer(description='Operation code value', required=True),
-        'Name': fields.String(description='Operation code value'),
-        'ConnectorTypeId': fields.Integer(description='ConnectorTypeId'),
+        'Name': fields.String(description='Connection Name'),
+        'ConnectorTypeName': fields.String(description='ConnectorTypeName'),
         'Host': fields.String(description='Host'),
         'Port': fields.Integer(description='Port'),
         'Sid': fields.String(description='Sid'),
+        'ServiceName': fields.String(description='ServiceName'),
         'DatabaseName': fields.String(description='DatabaseName'),
         'User': fields.String(description='User'),
         'Password': fields.String(description='Password'),
@@ -128,7 +131,7 @@ class ConnectionModels:
             Name=connector_type.Name,
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectionType'] = connection_type,
+        result_model['ConnectionType'] = connection_type
 
         return result_model
 
@@ -149,7 +152,7 @@ class ConnectionModels:
             Name=connection.Name,
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectionType'] = connection_type,
+        result_model['ConnectionType'] = connection_type
         return result_model
 
     @staticmethod
@@ -159,6 +162,7 @@ class ConnectionModels:
             Host=connection_database.Host,
             Port=connection_database.Port,
             Sid=connection_database.Sid,
+            ServiceName=connection_database.ServiceName,
             DatabaseName=connection_database.DatabaseName,
             User='***',  # connection_database.User
             Password='***'  # connection_database.Password
@@ -171,8 +175,8 @@ class ConnectionModels:
         connector_type = ConnectionModels.get_connector_type_model(connection_database.ConnectorType)
         entity_model = ConnectionModels.get_connection_database_entity_model(connection_database)
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectorType'] = connector_type,
-        result_model['Connection'] = connection,
+        result_model['ConnectorType'] = connector_type
+        result_model['Connection'] = connection
         return result_model
 
     @staticmethod
@@ -189,7 +193,7 @@ class ConnectionModels:
         connector_type = ConnectionModels.get_connector_type_model(connection_database.ConnectorType)
         entity_model = ConnectionModels.get_connection_database_entity_model(connection_database)
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectorType'] = connector_type,
+        result_model['ConnectorType'] = connector_type
         return result_model
 
     @staticmethod
@@ -200,9 +204,9 @@ class ConnectionModels:
             Name=connection.Name,
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
-        result_model['ConnectionType'] = connection_type,
+        result_model['ConnectionType'] = connection_type
         connection_database = ConnectionModels.get_connection_database_result_model(connection.Database)
-        result_model['Database'] = connection_database,
+        result_model['Database'] = connection_database
         return result_model
 
     @staticmethod

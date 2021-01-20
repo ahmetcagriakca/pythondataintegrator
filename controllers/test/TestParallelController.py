@@ -3,7 +3,7 @@ from datetime import datetime
 from injector import inject
 
 from controllers.common.models.CommonModels import CommonModels
-from controllers.job.models.JobSchedulerModels import JobSchedulerModels
+from controllers.job.models.JobModels import JobModels
 from controllers.test.models.TestParallelModels import TestParallelModels
 from domain.job.services.JobOperationService import JobOperationService
 from domain.process.services.TestParallelService import TestParallelService
@@ -38,7 +38,7 @@ class StartParallelJob(ResourceBase):
         ap_scheduler_job = self.job_operation_service.add_job_with_date(job_function=TestParallelScheduler.operation,
                                                                         run_date=run_date,
                                                                         args=(None, value, count,))
-        result = JobSchedulerModels.get_ap_scheduler_job_model(ap_scheduler_job)
+        result = JobModels.get_ap_scheduler_job_model(ap_scheduler_job)
         return CommonModels.get_response(result=result)
 
 

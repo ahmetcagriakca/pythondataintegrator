@@ -137,7 +137,7 @@ def upgrade():
     op.create_table('DataOperationIntegration',
     sa.Column('Id', sa.Integer(), nullable=False),
     sa.Column('DataOperationId', sa.Integer(), nullable=True),
-    sa.Column('PythonDataIntegrationId', sa.Integer(), nullable=True),
+    sa.Column('DataIntegrationId', sa.Integer(), nullable=True),
     sa.Column('Order', sa.Integer(), nullable=False),
     sa.Column('Limit', sa.Integer(), nullable=False),
     sa.Column('ProcessCount', sa.Integer(), nullable=False),
@@ -149,7 +149,7 @@ def upgrade():
     sa.Column('Comments', sa.String(length=1000), nullable=True),
     sa.Column('RowVersion', sa.TIMESTAMP(), nullable=True),
     sa.ForeignKeyConstraint(['DataOperationId'], ['Operation.DataOperation.Id'], ),
-    sa.ForeignKeyConstraint(['PythonDataIntegrationId'], ['Integration.PythonDataIntegration.Id'], ),
+    sa.ForeignKeyConstraint(['DataIntegrationId'], ['Integration.DataIntegration.Id'], ),
     sa.PrimaryKeyConstraint('Id'),
     schema='Operation'
     )

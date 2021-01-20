@@ -1,5 +1,5 @@
 import pyodbc
-from infrastructor.data.ConnectorStrategy import ConnectorStrategy
+from infrastructor.data.connectors.ConnectorStrategy import ConnectorStrategy
 from models.configs.DatabaseConfig import DatabaseConfig
 
 
@@ -28,4 +28,21 @@ class MssqlDbConnector(ConnectorStrategy):
                 self.connection.close()
         except Exception:
             pass
+
+    def execute_many(self, query, data):
+        self.cursor.fast_executemany = True
+        try:
+            self.cursor.executemany(query, data)
+            self.connection.commit()
+        except Exception as error:
+            self.connection.rollback()
+            self.cursor.close()
+            raise error
+
+    def get_execute_procedure_query(self, procedure):
+        return f'EXEC {procedure}'
+
+    def get_target_query_indexer(self):
+        indexer = '?'
+        return indexer
 

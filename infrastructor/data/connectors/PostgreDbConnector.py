@@ -1,7 +1,8 @@
 import psycopg2
 from injector import inject
-from infrastructor.data.ConnectorStrategy import ConnectorStrategy
+from infrastructor.data.connectors.ConnectorStrategy import ConnectorStrategy
 from models.configs.DatabaseConfig import DatabaseConfig
+import psycopg2.extras as extras
 
 
 class PostgreDbConnector(ConnectorStrategy):
@@ -12,7 +13,9 @@ class PostgreDbConnector(ConnectorStrategy):
         self.cursor = None
 
     def connect(self):
-        self.connection = psycopg2.connect(user=self.database_config.username,password=self.database_config.password,database=self.database_config.database,host=self.database_config.host,port=self.database_config.port)
+        self.connection = psycopg2.connect(user=self.database_config.username, password=self.database_config.password,
+                                           database=self.database_config.database, host=self.database_config.host,
+                                           port=self.database_config.port)
         self.cursor = self.connection.cursor()
 
     def disconnect(self):
@@ -24,3 +27,23 @@ class PostgreDbConnector(ConnectorStrategy):
                 self.connection.close()
         except Exception:
             pass
+
+    def execute_many(self, query, data):
+        try:
+            extras.execute_batch(self.cursor, query, data, 10000)
+            self.connection.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            self.connection.rollback()
+            self.cursor.close()
+            raise error
+
+    def get_execute_procedure_query(self, procedure):
+        return f'begin {procedure}; end;'
+
+    def get_table_count_query(self, query):
+        count_query = f"SELECT COUNT (*) FROM ({query})  as count_table"
+        return count_query
+
+    def get_target_query_indexer(self):
+        indexer = '%s'
+        return indexer

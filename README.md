@@ -19,3 +19,6 @@ alembic revision --autogenerate -m "baseline"
 
 # Build and Test
 After all installation, you can run application with "python startup.py" also you can run test scenarios  
+
+## Docker
+You can run application on docker container with "docker-compose up" command 
