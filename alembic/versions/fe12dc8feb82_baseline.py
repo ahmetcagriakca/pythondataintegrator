@@ -441,7 +441,7 @@ def upgrade():
                     sa.Column('Name', sa.String(length=100), nullable=False),
                     sa.Column('Version', sa.Integer(), nullable=False),
                     sa.Column('Content', sa.Text(), nullable=True),
-                    sa.Column('IsActive', sa.Integer(), nullable=False),
+                    sa.Column('IsActive', sa.Boolean(), nullable=False),
                     sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
                     sa.Column('CreationDate', sa.DateTime(), nullable=False),
                     sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),

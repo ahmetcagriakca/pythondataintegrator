@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import Column, String, Integer, Text
+from sqlalchemy import Column, String, Integer, Text, Boolean
 from sqlalchemy.orm import relationship
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
@@ -11,14 +11,11 @@ class Definition(Entity, IocManager.Base):
     Name = Column(String(100), index=False, unique=False, nullable=False)
     Version = Column(Integer, index=False, unique=False, nullable=False)
     Content = Column(Text, index=False, unique=False, nullable=True)
-    IsActive = Column(Integer, index=False, unique=False, nullable=False)
+    IsActive = Column(Boolean, index=False, unique=False, nullable=False)
 
-    DataOperations = relationship("DataOperation",
-                                  back_populates="Definition")
-    DataIntegrations = relationship("DataIntegration",
-                                    back_populates="Definition")
-    DataOperationJobExecutions = relationship("DataOperationJobExecution",
-                                              back_populates="Definition")
+    DataOperations = relationship("DataOperation", back_populates="Definition")
+    DataIntegrations = relationship("DataIntegration", back_populates="Definition")
+    DataOperationJobExecutions = relationship("DataOperationJobExecution", back_populates="Definition")
 
     def __init__(self,
                  Name: str = None,
