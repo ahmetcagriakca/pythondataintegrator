@@ -126,8 +126,8 @@ class DataIntegrationService(IScoped):
         if source_connection is not None \
                 and (source_connection.Query is None or source_connection.Query == '') \
                 and source_connection.Schema is not None and source_connection.Schema != '' and source_connection.TableName is not None and source_connection.TableName != '':
-            source_connection.Query = self.get_source_query(schema=target_connection.Schema,
-                                                            table_name=target_connection.TableName,
+            source_connection.Query = self.get_source_query(schema=source_connection.Schema,
+                                                            table_name=source_connection.TableName,
                                                             data_integration_columns=data_integration_columns)
         if target_connection.Query is None or target_connection.Query == '':
             target_connection.Query = self.get_target_query(schema=target_connection.Schema,
@@ -254,8 +254,8 @@ class DataIntegrationService(IScoped):
         if source_connection is not None \
                 and (source_connection.Query is None or source_connection.Query == '') \
                 and source_connection.Schema is not None and source_connection.Schema != '' and source_connection.TableName is not None and source_connection.TableName != '':
-            source_connection.Query = self.get_source_query(schema=target_connection.Schema,
-                                                            table_name=target_connection.TableName,
+            source_connection.Query = self.get_source_query(schema=source_connection.Schema,
+                                                            table_name=source_connection.TableName,
                                                             data_integration_columns=data_integration_columns)
         if target_connection.Query is None or target_connection.Query == '':
             target_connection.Query = self.get_target_query(schema=target_connection.Schema,
