@@ -6,14 +6,17 @@ from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
 
 
-class DataOperationJobExecutionEvent(Entity, IocManager.Base):
-    __tablename__ = "DataOperationJobExecutionEvent"
+class DataOperationJobExecutionIntegrationEvent(Entity, IocManager.Base):
+    __tablename__ = "DataOperationJobExecutionIntegrationEvent"
     __table_args__ = {"schema": "Operation"}
-    DataOperationJobExecutionId = Column(Integer, ForeignKey('Operation.DataOperationJobExecution.Id'))
+    DataOperationJobExecutionIntegrationId = Column(Integer,
+                                                    ForeignKey('Operation.DataOperationJobExecutionIntegration.Id'))
     EventId = Column(Integer, ForeignKey('Common.OperationEvent.Id'))
     EventDate = Column(DateTime, index=False, unique=False, nullable=False, default=datetime.now)
-    Event = relationship("OperationEvent", back_populates="DataOperationJobExecutionEvents")
-    DataOperationJobExecution = relationship("DataOperationJobExecution", back_populates="DataOperationJobExecutionEvents")
+    AffectedRowCount = Column(Integer, index=False, unique=False, nullable=True)
+    Event = relationship("OperationEvent", back_populates="DataOperationJobExecutionIntegrationEvents")
+    DataOperationJobExecutionIntegration = relationship("DataOperationJobExecutionIntegration",
+                                                        back_populates="DataOperationJobExecutionIntegrationEvents")
 
     def __init__(self,
                  DataOperationJobExecutionId: int = None,

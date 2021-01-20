@@ -1,9 +1,7 @@
 from datetime import datetime
 from typing import List
-
 from sqlalchemy import Column, String, Boolean, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
 from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution

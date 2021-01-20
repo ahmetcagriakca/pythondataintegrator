@@ -24,7 +24,6 @@ from apscheduler.events import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN
     EVENT_ALL_JOBS_REMOVED, EVENT_JOB_ADDED, EVENT_JOB_REMOVED, EVENT_JOB_MODIFIED, EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, \
     EVENT_JOB_MISSED, EVENT_JOB_SUBMITTED, EVENT_JOB_MAX_INSTANCES
 
-
 def insert_connection_types():
     bind = op.get_bind()
     from sqlalchemy import orm
@@ -410,8 +409,8 @@ def upgrade():
                     sa.PrimaryKeyConstraint('Id'),
                     schema='Integration'
                     )
-    insert_event_datas()
-    insert_connection_types()
+    # insert_event_datas()
+    # insert_connection_types()
     # ### end Alembic commands ###
 
 

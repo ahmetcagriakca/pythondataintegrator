@@ -17,6 +17,7 @@ class OperationEvent(Entity,IocManager.Base):
     Class = Column(String(255), nullable=False)
     
     DataOperationJobExecutionEvents = relationship("DataOperationJobExecutionEvent", back_populates="Event")
+    DataOperationJobExecutionIntegrationEvents = relationship("DataOperationJobExecutionIntegrationEvent", back_populates="Event")
 
     def __init__(self,
                  Code: int = None,

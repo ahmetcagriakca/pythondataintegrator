@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
 from models.dao.operation import DataOperationJobExecution
+from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
 class Status(Entity, IocManager.Base):
@@ -14,7 +15,11 @@ class Status(Entity, IocManager.Base):
     Name = Column(String(100), index=False, unique=False, nullable=False)
     Description = Column(String(250), index=False, unique=False, nullable=False)
     DataOperationJobExecutions: List[DataOperationJobExecution] = relationship("DataOperationJobExecution",
-                                                                  back_populates="Status")
+                                                                               back_populates="Status")
+    DataOperationJobExecutionIntegrations: List[DataOperationJobExecutionIntegration] = relationship(
+        "DataOperationJobExecutionIntegration",
+        back_populates="Status")
+
     def __init__(self,
                  Id: int = None,
                  Name: str = None,

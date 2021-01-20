@@ -2,12 +2,19 @@
 DATABASE:
   #POSTGRE
   TYPE: POSTGRESQL
-  HOST: localhost
+  HOST: 10.220.13.77
   PORT: 5432
-  DATABASE: test_pdi
-  USERNAME: postgres
-  PASSWORD: 123456
+  DATABASE: pdi
+  USERNAME: pdi_user
+  PASSWORD: PWD_011
   SCHEMA: Common
+#  TYPE: POSTGRESQL
+#  HOST: localhost
+#  PORT: 5432
+#  DATABASE: test
+#  USERNAME: postgres
+#  PASSWORD: 123456
+#  SCHEMA: Common
 
 API:
   ENVIRONMENT: DEVELOPMENT

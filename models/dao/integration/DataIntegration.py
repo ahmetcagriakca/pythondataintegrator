@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from infrastructor.IocManager import IocManager
@@ -15,6 +15,7 @@ class DataIntegration(Entity, IocManager.Base):
     __tablename__ = "DataIntegration"
     __table_args__ = {"schema": "Integration"}
     Code = Column(String(100), index=True, unique=True, nullable=False)
+    DefinitionId = Column(Integer, ForeignKey('Operation.Definition.Id'))
     IsTargetTruncate = Column(Boolean, index=False, unique=False, nullable=True)
     IsDelta = Column(Boolean, index=False, unique=False, nullable=True)
     Columns: List[DataIntegrationColumn] = relationship("DataIntegrationColumn",

@@ -68,13 +68,13 @@ def insert_event_datas():
         {
             "Code": EVENT_EXECUTION_STARTED,
             "Name": "EVENT_EXECUTION_STARTED",
-            "Description": "Execution was started",
+            "Description": "Execution started",
             "Class": "DataOperationJobExecution"
         },
         {
             "Code": EVENT_EXECUTION_FINISHED,
             "Name": "EVENT_EXECUTION_FINISHED",
-            "Description": "Execution was started",
+            "Description": "Execution finished",
             "Class": "DataOperationJobExecution"
         }
     ]
@@ -207,8 +207,8 @@ def upgrade():
     sa.PrimaryKeyConstraint('Id'),
     schema='Operation'
     )
-    insert_statuses()
-    insert_event_datas()
+    # insert_statuses()
+    # insert_event_datas()
     # ### end Alembic commands ###
 
 

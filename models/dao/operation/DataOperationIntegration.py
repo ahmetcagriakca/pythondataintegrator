@@ -1,8 +1,10 @@
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+from typing import List
 
+from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
+from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
 class DataOperationIntegration(Entity, IocManager.Base):
@@ -15,6 +17,9 @@ class DataOperationIntegration(Entity, IocManager.Base):
     ProcessCount = Column(Integer, index=False, unique=False, nullable=False)
     DataOperation = relationship("DataOperation", back_populates="Integrations")
     DataIntegration = relationship("DataIntegration", back_populates="DataOperationIntegrations")
+    DataOperationJobExecutionIntegrations: List[DataOperationJobExecutionIntegration] = relationship(
+        "DataOperationJobExecutionIntegration",
+        back_populates="DataOperationIntegration")
 
     def __init__(self,
                  DataOperationId: int = None,
@@ -22,8 +27,8 @@ class DataOperationIntegration(Entity, IocManager.Base):
                  Order: int = None,
                  Limit: int = None,
                  ProcessCount: int = None,
-                 DataOperation = None,
-                 DataIntegration = None,
+                 DataOperation=None,
+                 DataIntegration=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationId: int = DataOperationId
