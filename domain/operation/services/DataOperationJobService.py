@@ -214,7 +214,7 @@ class DataOperationJobService(IScoped):
     def integration_run_query(self, data_operation_integration: DataOperationIntegration, job_id):
         data_operation_job_execution_integration = self.data_operation_job_execution_service.create_data_operation_job_execution_integration(
             data_operation_job_execution_id=job_id, data_operation_integration=data_operation_integration)
-        data_operation_job_execution_integration_id=data_operation_job_execution_integration.Id
+        data_operation_job_execution_integration_id = data_operation_job_execution_integration.Id
         data_integration: DataIntegration = data_operation_integration.DataIntegration
         self.sql_logger.info(
             f"{data_integration.Code} integration run query started",
@@ -296,7 +296,7 @@ class DataOperationJobService(IScoped):
     def integration_execute_operation(self, data_operation_integration: DataOperationIntegration, job_id):
         data_operation_job_execution_integration = self.data_operation_job_execution_service.create_data_operation_job_execution_integration(
             data_operation_job_execution_id=job_id, data_operation_integration=data_operation_integration)
-        data_operation_job_execution_integration_id=data_operation_job_execution_integration.Id
+        data_operation_job_execution_integration_id = data_operation_job_execution_integration.Id
         data_integration: DataIntegration = data_operation_integration.DataIntegration
         try:
             self.data_operation_job_execution_service.update_data_operation_job_execution_integration_status(
@@ -328,6 +328,12 @@ class DataOperationJobService(IScoped):
                     data_operation_execution_integration_id=data_operation_job_execution_integration_id,
                     event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_PRE_PROCEDURE)
 
+            data_count = source_connection_manager.get_table_count(source_connection.Query)
+
+            self.data_operation_job_execution_service.update_data_operation_job_execution_integration_source_data_count(
+                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+                source_data_count=data_count)
+
             if data_integration.IsTargetTruncate:
                 truncate_affected_rowcount = target_connection_manager.truncate_table(schema=target_connection.Schema,
                                                                                       table=target_connection.TableName)
@@ -336,11 +342,6 @@ class DataOperationJobService(IScoped):
                     data_operation_execution_integration_id=data_operation_job_execution_integration_id,
                     event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, affected_row=truncate_affected_rowcount)
 
-            data_count = source_connection_manager.get_table_count(source_connection.Query)
-
-            self.data_operation_job_execution_service.update_data_operation_job_execution_integration_source_data_count(
-                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-                source_data_count=data_count)
             limit = data_operation_integration.Limit
             process_count = data_operation_integration.ProcessCount
             if limit != 0:
@@ -456,7 +457,8 @@ class DataOperationJobService(IScoped):
                 IsDeleted=0, DataOperationId=data_operation.Id).order_by("Order").all()
 
             for data_operation_integration in data_operation_integrations:
-                data_integration= self.data_integration_repository.first(Id=data_operation_integration.DataIntegrationId)
+                data_integration = self.data_integration_repository.first(
+                    Id=data_operation_integration.DataIntegrationId)
                 # data_integration: DataIntegration = data_operation_integration.DataIntegration
                 # Source and target database managers instantiate
                 source_connection = self.data_integration_connection_repository.first(IsDeleted=0,
