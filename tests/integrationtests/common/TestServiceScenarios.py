@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
@@ -121,8 +122,8 @@ class TestServiceScenarios:
         data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
             database_session_manager)
         data_operation = data_operation_repository.first(Name=test_data_operation["Name"])
-        if data_operation is not None:
-            self.clear_operation(name=test_data_operation["Name"])
+        # if data_operation is not None:
+        #     self.clear_operation(name=test_data_operation["Name"])
         response_data = self.service_endpoints.insert_data_operation(test_data_operation)
         return response_data
 
@@ -159,3 +160,37 @@ class TestServiceScenarios:
                 time.sleep(10)
             else:
                 return data_operation_job_execution
+
+    def run_data_operation(self, connections, data_operation):
+        expected = True
+        IocManager.injector.get(IocManager.job_scheduler).run()
+        for connection in connections:
+            self.create_test_connection(connection)
+        data_operation_response = self.create_test_operation(
+            data_operation)
+        try:
+            run_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            job_request = {
+                "OperationName": data_operation['Name'],
+                "RunDate": run_date
+            }
+            response_data = self.service_endpoints.run_schedule_job_operation(
+                job_request)
+            assert response_data['IsSuccess'] == expected
+            assert response_data['Result']['DataOperation']['Name'] == job_request['OperationName']
+            assert response_data['Result']['DataOperation']['Integrations'][0]["Integration"]["Code"] == \
+                   data_operation['Integrations'][0]["Integration"]["Code"]
+            data_operation_job_id = response_data['Result']['Id']
+            data_operation_job_execution = self.check_job_start(data_operation_job_id)
+            start_date = data_operation_job_execution.StartDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            print(f'Job Started at:{start_date}')
+            data_operation_job_execution = self.check_job_finish(data_operation_job_id)
+            end_date = data_operation_job_execution.EndDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            print(f'Job Finished at:{end_date}')
+            # checking execution successfully finished
+            assert data_operation_job_execution.StatusId == 3
+        except Exception as ex:
+            assert True == False
+        # finally:
+        #     # clean data_integration test operations
+        #     self.clear_data_operation_job(data_operation_response["Result"]["Id"])

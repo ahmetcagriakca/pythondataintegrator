@@ -39,7 +39,7 @@ class ConnectionManager(IScoped):
         return data_list
 
     @connect
-    def execute(self, query) -> None:
+    def execute(self, query) -> any:
         self.connector.cursor.execute(query)
         self.connector.connection.commit()
         return self.connector.cursor.rowcount
@@ -82,7 +82,7 @@ class ConnectionManager(IScoped):
 
     def truncate_table(self, schema, table):
         truncate_query = self.connector.get_truncate_query(schema=schema, table=table)
-        self.execute(query=truncate_query)
+        return self.execute(query=truncate_query)
 
     def prepare_target_query(self, column_rows, query):
         target_query = query

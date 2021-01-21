@@ -1,9 +1,7 @@
 from datetime import datetime
 from typing import List
-
 from sqlalchemy import Column, String, Boolean, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
 from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
@@ -20,7 +18,7 @@ class DataOperationJob(Entity, IocManager.Base):
     DataOperation = relationship("DataOperation", back_populates="DataOperationJobs")
     ApSchedulerJob = relationship("ApSchedulerJob", back_populates="DataOperationJobs")
     DataOperationJobExecutions: List[DataOperationJobExecution] = relationship("DataOperationJobExecution",
-                                                                            back_populates="DataOperationJob")
+                                                                               back_populates="DataOperationJob")
 
     def __init__(self,
                  DataOperationId: int = None,
