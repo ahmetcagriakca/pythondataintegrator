@@ -1,7 +1,5 @@
 from datetime import datetime
-from typing import List
-
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from infrastructor.IocManager import IocManager

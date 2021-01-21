@@ -54,7 +54,7 @@ class DataOperationResource(ResourceBase):
                                                                 object_hook=lambda d: CreateDataIntegrationModel(**d))
             data_operation_integrations.append(data_operation_integration)
         data.Integrations = data_operation_integrations
-        creation_result = self.data_operation_service.post_data_operation(data)
+        creation_result = self.data_operation_service.post_data_operation(data,definition_json=json.dumps(IocManager.api.payload))
         result = DataOperationModels.get_data_operation_result_model(creation_result)
         return CommonModels.get_response(result=result)
 

@@ -16,23 +16,31 @@ class DatabaseSessionManager(IScoped):
                  database_config: DatabaseConfig,
                  api_config: ApiConfig):
         self.api_config = api_config
+        self.database_config = database_config
         self.engine = None
-        connection_string = Utils.get_connection_string(database_config=database_config)
-        # if database_config.connection_string is not None and database_config.connection_string != '':
-        self.engine = create_engine(connection_string, poolclass=pool.NullPool)
-        # else:
-        #     console_logger.error("Connection string is empty")
-        # use session_factory() to get a new Session
         self._SessionFactory = None
-        if self.engine is not None:
-            self._SessionFactory = sessionmaker(bind=self.engine)
         self.session: Session = None
-        self.session: Session = self.session_factory()
+        self.connect()
 
     def __del__(self):
         close = getattr(self, "close", None)
         if callable(close):
             self.close()
+
+    def connect(self):
+        self.close()
+        connection_string = Utils.get_connection_string(database_config=self.database_config)
+        self.engine = create_engine(connection_string, poolclass=pool.NullPool)
+        if self.engine is not None:
+            self._SessionFactory = sessionmaker(bind=self.engine)
+        self.session: Session = self.session_factory()
+
+    def close(self):
+        if self.session is not None:
+            self.session.close()
+        if self.engine is not None:
+            self.engine.dispose()
+            self.engine = None
 
     def session_factory(self):
         if self._SessionFactory is not None:
@@ -49,10 +57,3 @@ class DatabaseSessionManager(IScoped):
             self.session.rollback()
             self.session.close()
             self.session: Session = self.session_factory()
-
-    def close(self):
-        if self.session is not None:
-            self.session.close()
-        if self.engine is not None:
-            self.engine.dispose()
-            self.engine = None

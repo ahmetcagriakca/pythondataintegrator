@@ -8,7 +8,7 @@ from infrastructor.dependency.scopes import IScoped
 from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.integration.DataIntegration import DataIntegration
-from models.dao.operation import DataOperation, DataOperationIntegration
+from models.dao.operation import DataOperation, DataOperationIntegration, Definition
 from models.dao.operation.DataOperationContact import DataOperationContact
 from models.viewmodels.operation import CreateDataOperationModel
 from models.viewmodels.operation.UpdateDataOperationModel import UpdateDataOperationModel
@@ -34,6 +34,8 @@ class DataOperationService(IScoped):
             DataOperationContact](database_session_manager)
         self.data_operation_integration_repository: Repository[DataOperationIntegration] = Repository[
             DataOperationIntegration](database_session_manager)
+        self.definition_repository: Repository[Definition] = Repository[
+            Definition](database_session_manager)
         self.sql_logger: SqlLogger = sql_logger
 
     def get_data_operations(self) -> List[DataOperation]:
@@ -47,26 +49,45 @@ class DataOperationService(IScoped):
         data_operation = self.data_operation_repository.first(Name=name, IsDeleted=0)
         return data_operation is not None
 
-    def post_data_operation(self, data_operation_model: CreateDataOperationModel) -> DataOperation:
+    def post_data_operation(self, data_operation_model: CreateDataOperationModel,
+                            definition_json: str) -> DataOperation:
         """
         Create Data Operation
         """
+
+        definition: Definition = self.create_definition(data_operation_model.Name, definition_json)
         data_operation = self.data_operation_repository.first(Name=data_operation_model.Name, IsDeleted=0)
         if data_operation is None:
-            return self.insert_data_operation(data_operation_model)
+            return self.insert_data_operation(data_operation_model, definition)
         else:
-            return self.update_data_operation(data_operation_model)
+            return self.update_data_operation(data_operation_model, definition)
 
-    def insert_data_operation(self, data_operation_model: CreateDataOperationModel) -> DataOperation:
+    def create_definition(self, name, definition_json) -> Definition:
+        definitions: List[Definition] = self.definition_repository.filter_by(
+            Name=name).order_by("Version").all()
+        if definitions is not None and len(definitions) > 0:
+            old_definition = definitions[len(definitions)-1]
+            old_definition.IsActive = False
+            new_version = old_definition.Version + 1
+            definition = Definition(Name=name, Version=new_version, Content=definition_json,
+                                    IsActive=True)
+        else:
+            definition = Definition(Name=name, Version=1, Content=definition_json, IsActive=True)
+        self.definition_repository.insert(definition)
+        return definition
+
+    def insert_data_operation(self, data_operation_model: CreateDataOperationModel,
+                              definition: Definition) -> DataOperation:
         """
         Create Data Operation
         """
         if self.check_data_operation_name(data_operation_model.Name):
             raise OperationalException("Name already defined for other data operation")
-        data_operation = DataOperation(Name=data_operation_model.Name)
+
+        data_operation = DataOperation(Name=data_operation_model.Name, Definition=definition)
 
         self.data_operation_repository.insert(data_operation)
-        if data_operation_model.Contacts is not None and len(data_operation_model.Contacts)>0:
+        if data_operation_model.Contacts is not None and len(data_operation_model.Contacts) > 0:
             for operation_contact in data_operation_model.Contacts:
                 data_operation_contact = DataOperationContact(Email=operation_contact.Email,
                                                               DataOperation=data_operation)
@@ -75,7 +96,7 @@ class DataOperationService(IScoped):
         for operation_integration in data_operation_model.Integrations:
             order = order + 1
             data_integration = self.data_integration_service.create_data_integration(
-                data=operation_integration.Integration)
+                data=operation_integration.Integration,definition=definition)
 
             data_operation_integration = DataOperationIntegration(Order=order, Limit=operation_integration.Limit,
                                                                   ProcessCount=operation_integration.ProcessCount,
@@ -89,7 +110,8 @@ class DataOperationService(IScoped):
         return data_operation
 
     def update_data_operation(self,
-                              data_operation_model: UpdateDataOperationModel) -> DataOperation:
+                              data_operation_model: UpdateDataOperationModel,
+                              definition: Definition) -> DataOperation:
         """
         Update Data Operation
         """
@@ -97,8 +119,8 @@ class DataOperationService(IScoped):
             raise OperationalException("Data Operation not found")
         data_operation = self.data_operation_repository.first(Name=data_operation_model.Name)
         # insert or update data_integration
-
-        if data_operation_model.Contacts is not None and len(data_operation_model.Contacts)>0:
+        data_operation.Definition = definition
+        if data_operation_model.Contacts is not None and len(data_operation_model.Contacts) > 0:
             for operation_contact in data_operation_model.Contacts:
                 data_operation_contact = self.data_operation_contact_repository.first(IsDeleted=0,
                                                                                       DataOperationId=data_operation.Id,
@@ -128,9 +150,10 @@ class DataOperationService(IScoped):
                                                                       Code=operation_integration.Integration.Code)
             if data_integration is None:
                 data_integration = self.data_integration_service.create_data_integration(
-                    data=operation_integration.Integration)
+                    data=operation_integration.Integration, definition=definition)
             else:
-                self.data_integration_service.update_data_integration(data=operation_integration.Integration)
+                self.data_integration_service.update_data_integration(data=operation_integration.Integration,
+                                                                      definition=definition)
 
             data_operation_integration = self.data_operation_integration_repository.first(
                 DataOperationId=data_operation.Id,

@@ -35,9 +35,15 @@ class MssqlDbConnector(ConnectorStrategy):
             self.cursor.executemany(query, data)
             self.connection.commit()
         except Exception as error:
-            self.connection.rollback()
-            self.cursor.close()
-            raise error
+
+            try:
+                self.cursor.fast_executemany = False
+                self.cursor.executemany(query, data)
+                self.connection.commit()
+            except Exception as error:
+                self.connection.rollback()
+                self.cursor.close()
+                raise error
 
     def get_execute_procedure_query(self, procedure):
         return f'EXEC {procedure}'
