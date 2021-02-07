@@ -107,14 +107,14 @@ class DataOperationJobService(IScoped):
         return insert_rows
 
     @staticmethod
-    def parallel_operation(process_id, sub_process_id, process_name, tasks, results):
+    def parallel_operation(process_id, job_id, sub_process_id, process_name, tasks, results):
+        root_directory = os.path.abspath(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir))
+        IocManager.configure_startup(root_directory)
+        sql_logger = IocManager.injector.get(SqlLogger)
         try:
             print('[%s] evaluation routine starts' % process_name)
 
-            root_directory = os.path.abspath(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir))
-            IocManager.configure_startup(root_directory)
-            sql_logger = IocManager.injector.get(SqlLogger)
             database_session_manager = IocManager.injector.get(DatabaseSessionManager)
             data_operation_job_service = IocManager.injector.get(DataOperationJobService)
 
@@ -160,9 +160,7 @@ class DataOperationJobService(IScoped):
                     results.put(new_task)
 
         except Exception as ex:
-            sql_logger.error(
-                f"{process_name} process finished task. limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit}. time:{end - start}- error:{ex}")
-
+            sql_logger.error(f"{process_name} process getting error:{ex}", job_id=job_id)
             data = TaskData(SubProcessId=sub_process_id, IsFinished=True)
             results.put(data)
 
@@ -185,9 +183,9 @@ class DataOperationJobService(IScoped):
 
     def execute_operation(self, execute_operation_dto: ExecuteOperationDto):
         source_connection_manager = self.connection_provider.get_connection_manager(
-            connection=execute_operation_dto.source_connection)
+            connection=execute_operation_dto.source_connection.Connection)
         target_connection_manager = self.connection_provider.get_connection_manager(
-            connection=execute_operation_dto.target_connection)
+            connection=execute_operation_dto.target_connection.Connection)
         # Extracted data fetched from source database
         extracted_data = source_connection_manager.get_table_data(
             query=execute_operation_dto.source_query,
@@ -228,7 +226,8 @@ class DataOperationJobService(IScoped):
             target_connection = self.data_integration_connection_repository.first(IsDeleted=0,
                                                                                   DataIntegration=data_integration,
                                                                                   SourceOrTarget=1)
-            target_connection_manager = self.connection_provider.get_connection_manager(connection=target_connection)
+            target_connection_manager = self.connection_provider.get_connection_manager(
+                connection=target_connection.Connection)
             pre_execution_jobs = self.data_integration_execution_job_repository.filter_by(
                 DataIntegration=data_integration, IsPre=True, IsPost=False, IsDeleted=0).all()
             if pre_execution_jobs is not None and len(pre_execution_jobs) > 0:
@@ -313,8 +312,10 @@ class DataOperationJobService(IScoped):
                 f"{data_integration.Code} - {target_connection.Schema}.{target_connection.TableName} integration execute operation started",
                 job_id=job_id)
 
-            source_connection_manager = self.connection_provider.get_connection_manager(connection=source_connection)
-            target_connection_manager = self.connection_provider.get_connection_manager(connection=target_connection)
+            source_connection_manager = self.connection_provider.get_connection_manager(
+                connection=source_connection.Connection)
+            target_connection_manager = self.connection_provider.get_connection_manager(
+                connection=target_connection.Connection)
 
             pre_execution_jobs = self.data_integration_execution_job_repository.filter_by(
                 DataIntegration=data_integration, IsPre=True, IsPost=False, IsDeleted=0).all()
@@ -354,8 +355,9 @@ class DataOperationJobService(IScoped):
                     unprocessed_task_list = self.process_service.start_parallel_process(process_id=data_integration.Id,
                                                                                         datas=limit_modifiers,
                                                                                         process_count=process_count,
-                                                                                        process_method=DataOperationJobService.parallel_operation,
-                                                                                        result_method=DataOperationJobService.parallel_operation_result)
+                                                                                        process_function=DataOperationJobService.parallel_operation,
+                                                                                        result_method=DataOperationJobService.parallel_operation_result,
+                                                                                        job_id=job_id)
                     print("parallel finished")
                     if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
                         print(f"Unprocessed tasks founded")

@@ -47,7 +47,7 @@ class ProcessService(IScoped):
         self.sql_logger: SqlLogger = sql_logger
         self.crypto_service = crypto_service
 
-    def start_parallel_process(self, process_id, datas, process_count, process_method, result_method):
+    def start_parallel_process(self, process_id, datas, process_count, process_function, result_method,job_id):
         start = time()
         start_datetime = datetime.now()
 
@@ -55,7 +55,7 @@ class ProcessService(IScoped):
         sql_logger.info(f"MultiThread Operations Started")
         parallel_multi_processing = ParallelMultiProcessing(process_count)
         parallel_multi_processing.configure_process()
-        parallel_multi_processing.start_processes(process_id, process_method)
+        parallel_multi_processing.start_processes(process_id=process_id,job_id=job_id, process_function=process_function)
         for data in datas:
             td = TaskData(data)
             parallel_multi_processing.add_task(td)

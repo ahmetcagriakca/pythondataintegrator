@@ -11,4 +11,7 @@ class BaseResponse(Response):
         if isinstance(response, str):
             if kwargs.get('status') is None or kwargs.get('status') == 200:
                 response_json = jsonpickle.encode({'result': jsonpickle.decode(response), 'isSuccess': 'true'})
+        if 'server' not in kwargs :
+            if isinstance(response, str):
+                kwargs['server'] = ''
         return super(BaseResponse, self).__init__(response_json, **kwargs)
