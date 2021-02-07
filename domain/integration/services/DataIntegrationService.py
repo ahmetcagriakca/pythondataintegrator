@@ -220,8 +220,11 @@ class DataIntegrationService(IScoped):
                 self.data_integration_column_repository.insert(data_integration_column)
         for data_integration_column in data_integration.Columns:
             column_founded = False
-            source_column_name = [source_column for source_column in source_columns_list if
-                                  source_column == data_integration_column.SourceColumnName][0]
+            source_columns = [source_column for source_column in source_columns_list if
+                              source_column == data_integration_column.SourceColumnName]
+            source_column_name = None
+            if source_columns is not None and len(source_columns) > 0:
+                source_column_name = source_columns[0]
             if source_column_name is not None:
                 target_column_name = target_columns_list[source_columns_list.index(source_column_name)]
                 if target_column_name == data_integration_column.TargetColumnName:

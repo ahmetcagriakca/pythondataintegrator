@@ -105,6 +105,12 @@ class ConnectionModels:
         'Id': fields.Integer(description='Connection Database Id', required=True),
     })
 
+    check_connection_database_model = IocManager.api.model('CheckConnectionDatabaseModel', {
+        'Name': fields.String(description='Connection Name', required=True),
+        'Schema': fields.String(description='Schema For Check Connection', required=False, example=""),
+        'Table': fields.String(description='Table For Check Connection', required=False, example=""),
+    })
+
     @staticmethod
     def get_connection_type_model(connection_type: ConnectionType) -> ConnectionTypeModel:
         entity_model = ConnectionTypeModel(
