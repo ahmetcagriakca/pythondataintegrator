@@ -45,7 +45,7 @@ class ParallelMultiProcessing:
         self.pool = multiprocessing.Pool(processes=self.number_of_process)
         self.processes: List[ProcessData] = []
 
-    def start_processes(self, process_id, process_function):
+    def start_processes(self, process_id, job_id, process_function):
         # Initiate the worker processes
         for i in range(self.number_of_process):
             # Set process name
@@ -54,7 +54,7 @@ class ParallelMultiProcessing:
             # Create the process, and connect it to the worker function
             new_process = multiprocessing.Process(target=process_function,
                                                   args=(
-                                                      process_id, sub_process_id, process_name, self.tasks,
+                                                      process_id, job_id, sub_process_id, process_name, self.tasks,
                                                       self.results))
             # Add new process to the list of processes
             process_data = ProcessData(Process=new_process, SubProcessId=sub_process_id)

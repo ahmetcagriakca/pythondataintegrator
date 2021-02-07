@@ -22,7 +22,7 @@ class ConnectionService(IScoped):
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
-                 database_provider: ConnectionProvider,
+                 connection_provider: ConnectionProvider,
                  crypto_service: CryptoService,
                  ):
         self.database_session_manager = database_session_manager
@@ -34,7 +34,7 @@ class ConnectionService(IScoped):
             database_session_manager)
         self.connection_repository: Repository[Connection] = Repository[Connection](
             database_session_manager)
-        self.database_provider: ConnectionProvider = database_provider
+        self.connection_provider: ConnectionProvider = connection_provider
         self.sql_logger: SqlLogger = sql_logger
         self.crypto_service = crypto_service
 
@@ -66,8 +66,12 @@ class ConnectionService(IScoped):
         connection_databases = self.connection_database_repository.filter_by(IsDeleted=0).all()
         return connection_databases
 
-    def check_connection_name(self, name):
+    def get_connection_by_name(self, name):
         connection = self.connection_repository.first(Name=name)
+        return connection
+
+    def check_connection_name(self, name):
+        connection = self.get_connection_by_name(name=name)
         return connection is not None
 
     def create_connection_database(self,
