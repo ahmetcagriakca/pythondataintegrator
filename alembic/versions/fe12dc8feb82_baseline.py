@@ -68,7 +68,7 @@ def insert_connection_types():
     session.commit()
 
 
-def insert_event_datas():
+def insert_ap_scheduler_event_datas():
     from models.dao.aps.ApSchedulerEvent import ApSchedulerEvent
     from apscheduler.events import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN, EVENT_SCHEDULER_PAUSED, \
         EVENT_SCHEDULER_RESUMED, EVENT_EXECUTOR_ADDED, EVENT_EXECUTOR_REMOVED, EVENT_JOBSTORE_ADDED, \
@@ -230,7 +230,7 @@ def insert_statuses():
     session.commit()
 
 
-def insert_event_datas():
+def insert_operation_event_datas():
     from models.enums.events import EVENT_EXECUTION_INITIALIZED, EVENT_EXECUTION_FINISHED, EVENT_EXECUTION_STARTED, \
         EVENT_EXECUTION_INTEGRATION_STARTED, EVENT_EXECUTION_INTEGRATION_EXECUTE_PRE_PROCEDURE, \
         EVENT_EXECUTION_INTEGRATION_EXECUTE_POST_PROCEDURE, EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
@@ -750,9 +750,9 @@ def upgrade():
     # ### end Alembic commands ###
 
     insert_connection_types()
-    insert_event_datas()
+    insert_ap_scheduler_event_datas()
     insert_statuses()
-    insert_event_datas()
+    insert_operation_event_datas()
 
 
 def downgrade():
