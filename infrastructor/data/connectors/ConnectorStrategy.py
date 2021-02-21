@@ -25,7 +25,7 @@ class ConnectorStrategy(IScoped):
 
     @abstractmethod
     def get_truncate_query(self, schema, table):
-        count_query = f'DELETE FROM "{schema}"."{table}"'
+        count_query = f'TRUNCATE TABLE "{schema}"."{table}"'
         return count_query
 
     @abstractmethod

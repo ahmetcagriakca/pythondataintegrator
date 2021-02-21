@@ -6,8 +6,7 @@ from models.configs.DatabaseConfig import DatabaseConfig
 class MssqlDbConnector(ConnectorStrategy):
     def __init__(self, database_config: DatabaseConfig):
         self.database_config: DatabaseConfig = database_config
-        if self.database_config.driver is None or self.database_config.driver == "":
-            self.database_config.driver = 'ODBC Driver 17 for SQL Server'
+        self.database_config.driver = 'ODBC Driver 17 for SQL Server'
         self.connection_string = 'DRIVER={%s};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s' % (
             self.database_config.driver, self.database_config.host, self.database_config.database,
             self.database_config.username, self.database_config.password)

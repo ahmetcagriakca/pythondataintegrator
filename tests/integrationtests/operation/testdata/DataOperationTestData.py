@@ -63,7 +63,6 @@ class DataOperationTestData:
 
     test_integration_connection = {
         "Name": "TestIntegrationConnection",
-        "ConnectionTypeName": "Database",
         "ConnectorTypeName": "POSTGRESQL",
         "Host": "localhost",
         "Port": 5432,

@@ -1,7 +1,10 @@
+from typing import List
+
 from sqlalchemy import Column, String, Integer, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
+from models.dao.integration.DataIntegrationConnectionFile import DataIntegrationConnectionFile
 
 
 class DataIntegrationConnection(Entity, IocManager.Base):
@@ -15,6 +18,8 @@ class DataIntegrationConnection(Entity, IocManager.Base):
     Query = Column(Text, index=False, unique=False, nullable=True)
     Connection = relationship("Connection", back_populates="DataIntegrationConnections")
     DataIntegration = relationship("DataIntegration", back_populates="Connections")
+    DataIntegrationConnectionFiles: List[DataIntegrationConnectionFile] = relationship("DataIntegrationConnectionFile",
+                                                                                       back_populates="DataIntegrationConnection")
 
     def __init__(self,
                  SourceOrTarget: int = None,

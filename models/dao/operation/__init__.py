@@ -1,4 +1,5 @@
 from models.dao.operation.DataOperation import DataOperation
+from models.dao.operation.DataOperationContact import DataOperationContact
 from models.dao.operation.DataOperationIntegration import DataOperationIntegration
 from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
@@ -6,4 +7,3 @@ from models.dao.operation.DataOperationJobExecutionIntegration import DataOperat
 from models.dao.operation.DataOperationJobExecutionIntegrationEvent import DataOperationJobExecutionIntegrationEvent
 from models.dao.operation.DataOperationJob import DataOperationJob
 from models.dao.operation.Definition import Definition
-

@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Integer, DateTime, TIMESTAMP, text, Column, String
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.declarative.api import declarative_base
+
 
 class Entity:
     Id = Column(

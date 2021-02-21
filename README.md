@@ -13,9 +13,11 @@ The application that we aim to perform the integration processes easily and quic
     After python installation run package install command :
     -   pip install -r requirements.txt 
 4. Database Initialize
-    -   database migration run scripts
-        alembic upgrade head
-alembic revision --autogenerate -m "baseline"
+    - database migration run scripts
+        * alembic upgrade head
+    
+    - new revision command
+        * alembic revision --autogenerate -m "baseline"
 
 # Build and Test
 After all installation, you can run application with "python startup.py" also you can run test scenarios  
