@@ -1,12 +1,6 @@
 from unittest import TestCase
-
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
-from models.dao.operation import DataOperation
 from tests.integrationtests.common.TestManager import TestManager
-from tests.integrationtests.connection.testdata.ConnectionTestData import ConnectionTestData
-from tests.integrationtests.integration.testdata.DataIntegrationTestData import DataIntegrationTestData
-from tests.integrationtests.operation.testdata.DataOperationTestData import DataOperationTestData
+from tests.integrationtests.operation.testdata import DataOperationTestData
 
 
 class TestDataOperationResource(TestCase):

@@ -1,7 +1,6 @@
 class ConnectionTestData:
     test_insert_input = {
         "Name": "TestConnection",
-        "ConnectionTypeName": "Database",
         "ConnectorTypeName": "POSTGRESQL",
         "Host": "string",
         "Port": 0,
@@ -20,3 +19,4 @@ class ConnectionTestData:
         "User": "test",
         "Password": "test"
     }
+

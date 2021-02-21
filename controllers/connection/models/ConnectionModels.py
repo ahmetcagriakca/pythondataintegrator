@@ -75,13 +75,11 @@ class ConnectionDatabaseModel(EntityModel):
 
 
 class ConnectionModels:
-    ns = IocManager.api.namespace('Connection', description='Connection endpoints',
-                                  path='/api/Connection')
+    ns = IocManager.api.namespace('Connection', description='Connection endpoints', path='/api/Connection')
 
-    create_connection_database_model = IocManager.api.model('CreateConnectionDatabaseModel', {
+    create_connection_database_model = IocManager.api.model('ConnectionDatabaseModel', {
         'Name': fields.String(description='Operation code value', required=True),
-        'ConnectionTypeName': fields.String(description='ConnectionTypeName'),
-        'ConnectorTypeName': fields.String(description='ConnectorTypeName'),
+        'ConnectorTypeName': fields.String(description='ConnectorTypeName', required=True),
         'Host': fields.String(description='Host'),
         'Port': fields.Integer(description='Port'),
         'Sid': fields.String(description='Sid'),
@@ -90,17 +88,14 @@ class ConnectionModels:
         'User': fields.String(description='User'),
         'Password': fields.String(description='Password'),
     })
-    update_connection_database_model = IocManager.api.model('UpdateConnectionDatabaseModel', {
-        'Name': fields.String(description='Connection Name'),
-        'ConnectorTypeName': fields.String(description='ConnectorTypeName'),
-        'Host': fields.String(description='Host'),
-        'Port': fields.Integer(description='Port'),
-        'Sid': fields.String(description='Sid'),
-        'ServiceName': fields.String(description='ServiceName'),
-        'DatabaseName': fields.String(description='DatabaseName'),
+
+    create_connection_file_model = IocManager.api.model('ConnectionFileModel', {
+        'Name': fields.String(description='Operation code value', required=True),
+        'ConnectorTypeName': fields.String(description='ConnectorTypeName', required=True),
         'User': fields.String(description='User'),
         'Password': fields.String(description='Password'),
     })
+
     delete_connection_database_model = IocManager.api.model('DeleteConnectionDatabaseModel', {
         'Id': fields.Integer(description='Connection Database Id', required=True),
     })

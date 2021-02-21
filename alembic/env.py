@@ -1,4 +1,3 @@
-
 import sys
 
 sys.path = ['', '..'] + sys.path[1:]
@@ -19,42 +18,43 @@ from infrastructor.utils.Utils import Utils
 from models.configs.ApiConfig import ApiConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from infrastructor.utils.ConfigManager import ConfigManager
+
 root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
 config_manager = ConfigManager(root_directory)
-# ApiConfig gettin with type
 api_config: ApiConfig = config_manager.get(ApiConfig)
 database_config: DatabaseConfig = config_manager.get(DatabaseConfig)
 connection_string = Utils.get_connection_string(database_config=database_config)
 
 from infrastructor.IocManager import IocManager
-#this is the Alembic Config object, which provides
-#access to the values within the .ini file in use.
 
-from models.dao.aps.ApSchedulerJob import ApSchedulerJob
-from models.dao.aps.ApSchedulerEvent import ApSchedulerEvent
-from models.dao.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
-from models.dao.aps.ApSchedulerJobsTable import ApSchedulerJobsTable
-from models.dao.connection.ConnectorType import ConnectorType
-from models.dao.connection.ConnectionType import ConnectionType
-from models.dao.connection.Connection import Connection
-from models.dao.connection.ConnectionDatabase import ConnectionDatabase
-from models.dao.integration.DataIntegration import DataIntegration
-from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
-from models.dao.common.Log import Log
-from models.dao.common.OperationEvent import OperationEvent
-from models.dao.common.Status import Status
-from models.dao.operation.DataOperation import DataOperation
-from models.dao.operation.DataOperationIntegration import DataOperationIntegration
-from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
-from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
-from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
-from models.dao.operation.DataOperationJobExecutionIntegrationEvent import DataOperationJobExecutionIntegrationEvent
-from models.dao.operation.DataOperationJob import DataOperationJob
-from models.dao.operation.DataOperationContact import DataOperationContact
-from models.dao.common.ConfigParameter import ConfigParameter
-from models.dao.operation.Definition import Definition
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+# dao_folder = os.path.join(root_directory, 'models', 'dao')
+# folders = Utils.find_sub_folders(dao_folder)
+# module_list, module_attr_list = Utils.get_modules(folders)
+
+# aps
+from models.dao.aps import ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent, ApSchedulerJobsTable
+
+# connection
+from models.dao.connection import Connection, ConnectionDatabase, ConnectorType, ConnectionType, ConnectionFile, \
+    ConnectionSecret
+
+# integration
+from models.dao.integration import DataIntegration, DataIntegrationConnection, DataIntegrationConnection, \
+    DataIntegrationColumn, DataIntegrationExecutionJob, DataIntegrationConnectionFile
+
+# common
+from models.dao.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent
+
+# operation
+from models.dao.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
+    DataOperationJobExecutionEvent, DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent, \
+    DataOperationJob, DataOperationContact, Definition
+
+# secret
+from models.dao.secret import Secret, SecretType, SecretSourceBasicAuthentication, SecretSource, AuthenticationType
 
 config = context.config
 
@@ -89,7 +89,7 @@ def run_migrations_offline():
     """
     print(f"run_migrations_offline")
     print(f"environment:{api_config.environment}")
-    
+
     if connection_string is not None and connection_string != "":
         context.configure(
             url=connection_string,
@@ -134,10 +134,11 @@ def run_migrations_online():
     SCHEMA_NAME = "NOT_test_fktdb"
 
     def include_object(object, name, type_, reflected, compare_to):
-        if False:#(type_ == "table"):
+        if False:  # (type_ == "table"):
             return object.schema == 'Common'
         else:
             return True
+
     if connectible is not None:
         # Create schema; if it already exists, skip this
         try:

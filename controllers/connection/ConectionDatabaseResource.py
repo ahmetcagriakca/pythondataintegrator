@@ -7,7 +7,6 @@ from domain.connection.services.ConnectionService import ConnectionService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 from models.viewmodels.connection.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel
-from models.viewmodels.connection.UpdateConnectionDatabaseModel import UpdateConnectionDatabaseModel
 
 
 @ConnectionModels.ns.route("/ConnectionDatabase")
@@ -27,18 +26,5 @@ class ConnectionDatabaseResource(ResourceBase):
         data: CreateConnectionDatabaseModel = json.loads(json.dumps(IocManager.api.payload),
                                                          object_hook=lambda d: CreateConnectionDatabaseModel(**d))
         creation_result = self.connection_service.create_connection_database(data)
-        result = ConnectionModels.get_connection_result_model(creation_result)
-        return CommonModels.get_response(result=result)
-
-    @ConnectionModels.ns.expect(ConnectionModels.update_connection_database_model, validate=True)
-    @ConnectionModels.ns.marshal_with(CommonModels.SuccessModel)
-    def put(self):
-        """
-        Update Existing Database Connection
-        """
-
-        data: CreateConnectionDatabaseModel = json.loads(json.dumps(IocManager.api.payload),
-                                                         object_hook=lambda d: UpdateConnectionDatabaseModel(**d))
-        creation_result = self.connection_service.update_connection_database(data)
         result = ConnectionModels.get_connection_result_model(creation_result)
         return CommonModels.get_response(result=result)

@@ -14,12 +14,12 @@ class TestServiceEndpoints:
         response_data = self.api_client.delete('/api/Connection', request)
         return response_data
 
-    def insert_connection_database(self, request):
+    def create_connection_database(self, request):
         response_data = self.api_client.post('/api/Connection/ConnectionDatabase', request)
         return response_data
 
-    def update_connection_database(self, request):
-        response_data = self.api_client.put('/api/Connection/ConnectionDatabase', request)
+    def delete_connection(self, request):
+        response_data = self.api_client.delete('/api/Connection', request)
         return response_data
 
     def get_connection_type(self):

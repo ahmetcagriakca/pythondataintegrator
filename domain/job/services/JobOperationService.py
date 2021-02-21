@@ -176,6 +176,6 @@ class JobOperationService(IScoped):
             job_scheduler.scheduler.remove_job(job_id=founded_job.ApSchedulerJob.JobId)
             return
 
-        data_operation_job_service: DataOperationService = IocManager.injector.get(DataOperationJobService)
+        data_operation_job_service: DataOperationJobService = IocManager.injector.get(DataOperationJobService)
         data_operation_job_service.start_operation(data_operation_id, job_id=job_id)
         return "Operation Completed"

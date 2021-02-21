@@ -1,4 +1,6 @@
 from injector import inject
+
+from domain.connection.services.ConnectionSecretService import ConnectionSecretService
 from infrastructor.cryptography.CryptoService import CryptoService
 from infrastructor.data.ConnectionManager import ConnectionManager
 from infrastructor.data.ConnectionPolicy import ConnectionPolicy
@@ -14,20 +16,23 @@ class ConnectionProvider(ISingleton):
                  crypto_service: CryptoService,
                  sql_logger: SqlLogger,
                  database_config: DatabaseConfig,
+                 connection_secret_service: ConnectionSecretService
                  ):
+        self.connection_secret_service = connection_secret_service
         self.database_config = database_config
         self.sql_logger = sql_logger
         self.crypto_service: CryptoService = crypto_service
 
     def get_connection_manager(self, connection: Connection) -> ConnectionManager:
         """
-        Creating connec
+        Creating Connection
         """
         if connection.ConnectionType.Name == 'Database':
+            connection_basic_authentication = self.connection_secret_service.get_connection_basic_authentication(
+                connection_id=connection.Id)
             if connection.Database.ConnectorType.Name == 'ORACLE':
-                user = self.crypto_service.decrypt_code(connection.Database.User.encode()).decode('utf-8')
-                password = self.crypto_service.decrypt_code(connection.Database.Password.encode()).decode(
-                    'utf-8')
+                user = connection_basic_authentication.User
+                password = connection_basic_authentication.Password
                 host = connection.Database.Host
                 port = connection.Database.Port
                 service_name = connection.Database.ServiceName
@@ -35,19 +40,16 @@ class ConnectionProvider(ISingleton):
                 config = DatabaseConfig(type=connection.Database.ConnectorType.Name, host=host, port=port,
                                         sid=sid, service_name=service_name, username=user, password=password)
             elif connection.Database.ConnectorType.Name == 'MSSQL':
-                driver = self.database_config.driver
-                user = self.crypto_service.decrypt_code(connection.Database.User.encode()).decode('utf-8')
-                password = self.crypto_service.decrypt_code(connection.Database.Password.encode()).decode(
-                    'utf-8')
+                user = connection_basic_authentication.User
+                password = connection_basic_authentication.Password
                 host = connection.Database.Host
                 port = connection.Database.Port
                 database_name = connection.Database.DatabaseName
                 config = DatabaseConfig(type=connection.Database.ConnectorType.Name, host=host, port=port,
-                                        database=database_name, username=user, password=password, driver=driver)
+                                        database=database_name, username=user, password=password)
             elif connection.Database.ConnectorType.Name == 'POSTGRESQL':
-                user = self.crypto_service.decrypt_code(connection.Database.User.encode()).decode('utf-8')
-                password = self.crypto_service.decrypt_code(connection.Database.Password.encode()).decode(
-                    'utf-8')
+                user = connection_basic_authentication.User
+                password = connection_basic_authentication.Password
                 host = connection.Database.Host
                 port = connection.Database.Port
                 database_name = connection.Database.DatabaseName
