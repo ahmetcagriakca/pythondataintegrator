@@ -14,8 +14,6 @@ class ConnectionDatabase(Entity, IocManager.Base):
     Sid = Column(String(100), index=False, unique=False, nullable=True)
     ServiceName = Column(String(100), index=False, unique=False, nullable=True)
     DatabaseName = Column(String(100), index=False, unique=False, nullable=True)
-    User = Column(String(100), index=False, unique=False, nullable=True)
-    Password = Column(String(100), index=False, unique=False, nullable=True)
     ConnectorType = relationship("ConnectorType", back_populates="Databases")
 
     def __init__(self,
@@ -26,8 +24,6 @@ class ConnectionDatabase(Entity, IocManager.Base):
                  Sid: str = None,
                  ServiceName: str = None,
                  DatabaseName: str = None,
-                 User: str = None,
-                 Password: str = None,
                  Connection = None,
                  ConnectorType = None,
                  *args, **kwargs):
@@ -39,7 +35,5 @@ class ConnectionDatabase(Entity, IocManager.Base):
         self.Sid: str = Sid
         self.ServiceName: str = ServiceName
         self.DatabaseName: str = DatabaseName
-        self.User: str = User
-        self.Password: str = Password
         self.Connection = Connection
         self.ConnectorType = ConnectorType

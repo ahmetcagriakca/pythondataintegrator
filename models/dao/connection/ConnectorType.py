@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from infrastructor.IocManager import IocManager
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
+from models.dao.connection.ConnectionFile import ConnectionFile
 from models.dao.Entity import Entity
 
 
@@ -14,6 +15,7 @@ class ConnectorType(Entity, IocManager.Base):
     Name = Column(String(100), index=False, unique=True, nullable=False)
     ConnectionType = relationship("ConnectionType", back_populates="Connectors")
     Databases: List[ConnectionDatabase] = relationship("ConnectionDatabase", back_populates="ConnectorType")
+    Files: List[ConnectionFile] = relationship("ConnectionFile", back_populates="ConnectorType")
 
     def __init__(self,
                  Name: int = None,

@@ -1,7 +1,6 @@
 class ScheduleJobTestData:
     test_job_connection = {
         "Name": "TestIntegrationConnection",
-        "ConnectionTypeName": "Database",
         "ConnectorTypeName": "POSTGRESQL",
         "Host": "localhost",
         "Port": 5432,

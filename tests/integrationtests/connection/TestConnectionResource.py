@@ -1,8 +1,5 @@
-import json
-import os
 from unittest import TestCase
 
-from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from models.dao.connection.Connection import Connection

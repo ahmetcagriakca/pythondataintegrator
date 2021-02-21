@@ -103,7 +103,7 @@ class TestServiceScenarios:
         connection = connection_repository.first(Name=test_data_connection["Name"])
         if connection is not None:
             self.clear_connection(name=test_data_connection["Name"])
-        response_data = self.service_endpoints.insert_connection_database(test_data_connection)
+        response_data = self.service_endpoints.create_connection_database(test_data_connection)
 
     def create_test_integration(self, test_data_integration):
         database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
