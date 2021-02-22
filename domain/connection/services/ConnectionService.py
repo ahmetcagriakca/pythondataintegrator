@@ -43,12 +43,12 @@ class ConnectionService(IScoped):
         connections = self.connection_repository.filter_by(IsDeleted=0).all()
         return connections
 
-    def get_connection_by_name(self, name):
+    def get_by_name(self, name):
         connection = self.connection_repository.first(IsDeleted=0, Name=name)
         return connection
 
     def check_connection_name(self, name):
-        connection = self.get_connection_by_name(name=name)
+        connection = self.get_by_name(name=name)
         return connection is not None
 
     def create_connection(self, name: str, connection_type_name: str) -> Connection:
@@ -61,7 +61,7 @@ class ConnectionService(IScoped):
         Create File connection
         """
 
-        connection = self.get_connection_by_name(name=connection_file_model.Name)
+        connection = self.get_by_name(name=connection_file_model.Name)
         if connection is None:
             connection = self.create_connection(name=connection_file_model.Name,
                                                 connection_type_name=ConnectionTypes.File.name)
