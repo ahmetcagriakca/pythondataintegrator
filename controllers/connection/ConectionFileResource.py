@@ -9,8 +9,8 @@ from infrastructor.api.ResourceBase import ResourceBase
 from models.viewmodels.connection.CreateConnectionFileModel import CreateConnectionFileModel
 
 
-@ConnectionModels.ns.route("/ConnectionDatabase")
-class ConnectionDatabaseResource(ResourceBase):
+@ConnectionModels.ns.route("/ConnectionFile")
+class ConnectionFileResource(ResourceBase):
     @inject
     def __init__(self, connection_service: ConnectionService,
                  *args, **kwargs):
