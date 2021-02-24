@@ -26,7 +26,7 @@ class CommonModels:
             return o.__str__()
     @staticmethod
     def get_response(result=None, message=None):
-        return {'Result': result,'Message': message}
+        return {'Result': result, 'Message': message}
 
     @staticmethod
     def get_error_response(message):
