@@ -10,7 +10,7 @@ from models.viewmodels.connection.CreateConnectionFileModel import CreateConnect
 
 
 @ConnectionModels.ns.route("/ConnectionFile")
-class ConnectionDatabaseResource(ResourceBase):
+class ConnectionFileResource(ResourceBase):
     @inject
     def __init__(self, connection_service: ConnectionService,
                  *args, **kwargs):
