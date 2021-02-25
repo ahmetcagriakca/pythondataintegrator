@@ -34,6 +34,11 @@ class TestConnectionDatabaseResuource(TestCase):
             assert basic_authentication.User == ConnectionTestData.test_update_input['User']
             assert basic_authentication.Password == ConnectionTestData.test_update_input['Password']
 
+            delete_request = {
+                "Id": response_data['Result']['Id']
+            }
+            response_data = self.test_manager.service_endpoints.delete_connection(delete_request)
+            assert response_data['IsSuccess'] == expected
 
 
         except Exception as ex:
@@ -41,9 +46,4 @@ class TestConnectionDatabaseResuource(TestCase):
         finally:
             # clean
             pass
-            delete_request = {
-                "Id": response_data['Result']['Id']
-            }
-            response_data = self.test_manager.service_endpoints.delete_connection(delete_request)
-            assert response_data['IsSuccess'] == expected
-            # self.test_manager.service_scenarios.clear_connection(ConnectionTestData.test_insert_input['Name'])
+            self.test_manager.service_scenarios.clear_connection(ConnectionTestData.test_insert_input['Name'])

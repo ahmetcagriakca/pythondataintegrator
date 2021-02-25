@@ -31,8 +31,7 @@ class SqlLogger(IScoped):
         console_logger: ConsoleLogger = IocManager.injector.get(ConsoleLogger)
         database_config = IocManager.injector.get(DatabaseConfig)
         database_session_manager = DatabaseSessionManager(database_config=database_config,api_config=api_config)
-        log_repository: Repository[Log] = Repository[
-            Log](database_session_manager)
+        log_repository: Repository[Log] = Repository[Log](database_session_manager)
         log_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
         comment = f'Data Integrator {api_config.environment}'
         try:

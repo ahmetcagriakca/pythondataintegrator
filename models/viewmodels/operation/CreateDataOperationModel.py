@@ -1,3 +1,5 @@
+from typing import List
+
 from models.viewmodels.operation.CreateDataOperationContactModel import CreateDataOperationContactModel
 from models.viewmodels.operation.CreateDataOperationIntegrationModel import CreateDataOperationIntegrationModel
 
@@ -5,9 +7,9 @@ from models.viewmodels.operation.CreateDataOperationIntegrationModel import Crea
 class CreateDataOperationModel:
     def __init__(self,
                  Name: str = None,
-                 Contacts:[CreateDataOperationContactModel]=None,
-                 Integrations:[CreateDataOperationIntegrationModel]=None,
+                 Contacts:List[CreateDataOperationContactModel]=None,
+                 Integrations:List[CreateDataOperationIntegrationModel]=None,
                  *args, **kwargs):
         self.Name: str = Name
-        self.Contacts: [CreateDataOperationContactModel] = Contacts
-        self.Integrations: [CreateDataOperationIntegrationModel] = Integrations
+        self.Contacts: List[CreateDataOperationContactModel] = Contacts
+        self.Integrations: List[CreateDataOperationIntegrationModel] = Integrations
