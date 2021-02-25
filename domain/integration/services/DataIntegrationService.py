@@ -1,18 +1,18 @@
 from typing import List
 
 from injector import inject
+
+from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
+from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
+from domain.integration.services.DataIntegrationExecutionJobService import DataIntegrationExecutionJobService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
-from models.dao.connection.Connection import Connection
-from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.dao.operation import Definition
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
-from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
-from models.dao.integration.DataIntegrationExecutionJob import DataIntegrationExecutionJob
 from models.viewmodels.integration.UpdateDataIntegrationModel import UpdateDataIntegrationModel
 
 
@@ -20,23 +20,17 @@ class DataIntegrationService(IScoped):
     @inject
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
-                 sql_logger: SqlLogger,
+                 data_integration_column_service: DataIntegrationColumnService,
+                 data_integration_connection_service: DataIntegrationConnectionService,
+                 data_integration_execution_job_service: DataIntegrationExecutionJobService,
+
                  ):
+        self.data_integration_execution_job_service = data_integration_execution_job_service
+        self.data_integration_connection_service = data_integration_connection_service
+        self.data_integration_column_service = data_integration_column_service
         self.database_session_manager = database_session_manager
         self.data_integration_repository: Repository[DataIntegration] = Repository[DataIntegration](
             database_session_manager)
-        self.data_integration_column_repository: Repository[DataIntegrationColumn] = Repository[
-            DataIntegrationColumn](
-            database_session_manager)
-        self.data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[
-            DataIntegrationConnection](
-            database_session_manager)
-        self.data_integration_execution_job_repository: Repository[DataIntegrationExecutionJob] = \
-            Repository[
-                DataIntegrationExecutionJob](
-                database_session_manager)
-        self.connection_repository: Repository[Connection] = Repository[Connection](database_session_manager)
-        self.sql_logger = sql_logger
 
     #######################################################################################
 
@@ -47,238 +41,89 @@ class DataIntegrationService(IScoped):
         data_integrations = self.data_integration_repository.filter_by(IsDeleted=0)
         return data_integrations.all()
 
-    def create_data_integration(self, data: CreateDataIntegrationModel,
+    def check_and_update_data_integration(self,
+                                          data: CreateDataIntegrationModel,
+                                          definition: Definition,
+                                          old_definition: Definition
+                                          ) -> DataIntegration:
+
+        if data.IsTargetTruncate \
+                and ((data.TargetSchema is None or data.TargetSchema == '') \
+                     or (data.TargetTableName is None or data.TargetTableName == '')):
+            raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
+
+        data_integration = self.data_integration_repository.first(IsDeleted=0,
+                                                                  Code=data.Code,
+                                                                  DefinitionId=old_definition.Id)
+        if data_integration is None:
+            data_integration = self.insert_data_integration(data=data, definition=definition)
+        else:
+            data_integration = self.update_data_integration(data_integration=data_integration,data=data, definition=definition)
+        return data_integration
+
+    def create_data_integration(self,
+                                data: CreateDataIntegrationModel,
                                 definition: Definition):
+
+        if data.IsTargetTruncate \
+                and ((data.TargetSchema is None or data.TargetSchema == '') \
+                     or (data.TargetTableName is None or data.TargetTableName == '')):
+            raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
+
         if data.Code is not None and data.Code != "":
-            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code)
+            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code,
+                                                                      DefinitionId=definition.Id)
             if data_integration is not None:
-                raise OperationalException("Code already exists")
+                raise OperationalException(f"{data_integration.Code} code already exists")
         else:
             raise OperationalException("Code required")
         data_integration = self.insert_data_integration(data, definition)
         data_integration_result = self.data_integration_repository.first(IsDeleted=0, Id=data_integration.Id)
         return data_integration_result
 
-    def get_source_query(self, schema: str, table_name: str, data_integration_columns: List[DataIntegrationColumn]):
-        column_rows = [(data_integration_column.ResourceType, data_integration_column.SourceColumnName,
-                        data_integration_column.TargetColumnName) for data_integration_column in
-                       data_integration_columns]
-        selected_rows = ""
-        for column_row in column_rows:
-            selected_rows += f'{"" if column_row == column_rows[0] else ", "}"{column_row[1].strip()}"'
-        query = f'SELECT {selected_rows} FROM "{schema}"."{table_name}"'
-        return query
-
-    def get_target_query(self, schema: str, table_name: str, data_integration_columns: List[DataIntegrationColumn]):
-        insert_row_columns = ""
-        insert_row_values = ""
-        for column in data_integration_columns:
-            insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
-            insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
-        query = f'INSERT INTO "{schema}"."{table_name}"({insert_row_columns}) VALUES ({insert_row_values})'
-        return query
-
     def insert_data_integration(self,
                                 data: CreateDataIntegrationModel,
                                 definition: Definition) -> DataIntegration:
-        if data.IsTargetTruncate \
-                and ((data.TargetSchema is None or data.TargetSchema == '') \
-                     or (data.TargetTableName is None or data.TargetTableName == '')):
-            raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
 
         data_integration = DataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
                                            IsDelta=data.IsDelta, Definition=definition)
         self.data_integration_repository.insert(data_integration)
+        self.data_integration_column_service.insert(
+            data_integration=data_integration,
+            source_columns=data.SourceColumns,
+            target_columns=data.TargetColumns)
 
-        source_columns_list = data.SourceColumns.split(",")
-        target_columns_list = data.TargetColumns.split(",")
-        if len(source_columns_list) != len(target_columns_list):
-            raise OperationalException("Source and Target Column List must be equal")
-        data_integration_columns = []
-        for relatedColumn in source_columns_list:
-            target_column_name = target_columns_list[source_columns_list.index(relatedColumn)]
-            data_integration_column = DataIntegrationColumn(SourceColumnName=relatedColumn,
-                                                            TargetColumnName=target_column_name,
-                                                            DataIntegration=data_integration)
-            data_integration_columns.append(data_integration_column)
-            self.data_integration_column_repository.insert(data_integration_column)
-        source_connection = None
-        if data.SourceConnectionName is not None and data.SourceConnectionName != '':
-            source = self.connection_repository.first(Name=data.SourceConnectionName)
-            if source is None:
-                raise OperationalException("Source Connection not found")
-            source_connection = DataIntegrationConnection(
-                SourceOrTarget=0, Schema=data.SourceSchema, TableName=data.SourceTableName, Query=data.SourceQuery,
-                DataIntegration=data_integration, Connection=source)
-            self.data_integration_connection_repository.insert(source_connection)
+        self.data_integration_connection_service.insert(data_integration=data_integration, data=data)
 
-        if data.TargetConnectionName is None or data.TargetConnectionName == '':
-            raise OperationalException("Target Connection cannot be empty")
-
-        target = self.connection_repository.first(Name=data.TargetConnectionName)
-        if target is None:
-            raise OperationalException("Target Connection not found")
-        target_connection = DataIntegrationConnection(
-            SourceOrTarget=1, Schema=data.TargetSchema, TableName=data.TargetTableName, Query=data.TargetQuery,
-            DataIntegration=data_integration, Connection=target)
-        self.data_integration_connection_repository.insert(target_connection)
-
-        if source_connection is not None \
-                and (source_connection.Query is None or source_connection.Query == '') \
-                and source_connection.Schema is not None and source_connection.Schema != '' and source_connection.TableName is not None and source_connection.TableName != '':
-            source_connection.Query = self.get_source_query(schema=source_connection.Schema,
-                                                            table_name=source_connection.TableName,
-                                                            data_integration_columns=data_integration_columns)
-        if target_connection.Query is None or target_connection.Query == '':
-            target_connection.Query = self.get_target_query(schema=target_connection.Schema,
-                                                            table_name=target_connection.TableName,
-                                                            data_integration_columns=data_integration_columns)
-
-        if data.PreExecutions is not None and data.PreExecutions != "":
-            self.insert_execution_job(data.PreExecutions, 1, 0, data_integration)
-        if data.PostExecutions is not None and data.PostExecutions != "":
-            self.insert_execution_job(data.PostExecutions, 0, 1, data_integration)
-
+        self.data_integration_execution_job_service.insert(
+            data_integration=data_integration,
+            pre_executions=data.PreExecutions,
+            post_executions=data.PostExecutions)
         return data_integration
 
-    def insert_execution_job(self, ExecutionList, IsPre, IsPost, DataIntegration):
-        pre_execution_list = ExecutionList.split(",")
-        for preExecution in pre_execution_list:
-            data_integration_execution_job = DataIntegrationExecutionJob(ExecutionProcedure=preExecution,
-                                                                         IsPre=IsPre,
-                                                                         IsPost=IsPost,
-                                                                         DataIntegration=DataIntegration)
-            self.data_integration_execution_job_repository.insert(data_integration_execution_job)
-
-    def update_execution_job(self, ExecutionList, IsPre, IsPost, DataIntegration):
-        execution_list = ExecutionList.split(",")
-        for preExecution in execution_list:
-            data_integration_execution_job = self.data_integration_execution_job_repository.first(
-                IsDeleted=0,
-                IsPre=IsPre,
-                IsPost=IsPost,
-                ExecutionProcedure=preExecution,
-                DataIntegration=DataIntegration)
-            if data_integration_execution_job is None:
-                data_integration_execution_job = DataIntegrationExecutionJob(ExecutionProcedure=preExecution,
-                                                                             IsPre=IsPre,
-                                                                             IsPost=IsPost,
-                                                                             DataIntegration=DataIntegration)
-                self.data_integration_execution_job_repository.insert(data_integration_execution_job)
-
-        data_integration_execution_jobs = self.data_integration_execution_job_repository.filter_by(
-            IsDeleted=0,
-            DataIntegration=DataIntegration,
-            IsPre=IsPre,
-            IsPost=IsPost)
-        for data_integration_execution_job in data_integration_execution_jobs:
-            check_execution = [execution for execution in execution_list if
-                               execution == data_integration_execution_job.ExecutionProcedure]
-            if not (check_execution is not None and len(check_execution) > 0 and check_execution[0] is not None):
-                self.data_integration_execution_job_repository.delete(data_integration_execution_job)
-
-    def delete_execution_job(self, IsPre, IsPost, DataIntegration):
-        data_integration_execution_jobs = self.data_integration_execution_job_repository.filter_by(
-            IsDeleted=0,
-            DataIntegration=DataIntegration,
-            IsPre=IsPre,
-            IsPost=IsPost)
-        for data_integration_execution_job in data_integration_execution_jobs:
-            self.data_integration_execution_job_repository.delete(data_integration_execution_job)
-
     def update_data_integration(self,
+                                data_integration: DataIntegration,
                                 data: UpdateDataIntegrationModel,
-                                definition: Definition):
-        if data.Code is not None and data.Code != "":
-            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code)
-            if data_integration is None:
-                raise OperationalException("Code not exists")
-        else:
-            raise OperationalException("Code required")
-        if data.IsTargetTruncate \
-                and ((data.TargetSchema is None or data.TargetSchema == '') \
-                     or (data.TargetTableName is None or data.TargetTableName == '')):
-            raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
+                                definition: Definition) -> DataIntegration:
         data_integration.IsTargetTruncate = data.IsTargetTruncate
         data_integration.IsDelta = data.IsDelta
         data_integration.Definition = definition
-        source_columns_list = data.SourceColumns.split(",")
-        target_columns_list = data.TargetColumns.split(",")
 
-        if len(source_columns_list) != len(target_columns_list):
-            raise OperationalException("Source and Target Column List must be equal")
-        for source_column_name in source_columns_list:
-            target_column_name = target_columns_list[source_columns_list.index(source_column_name)]
-            data_integration_column = self.data_integration_column_repository.first(
-                SourceColumnName=source_column_name, TargetColumnName=target_column_name,
-                DataIntegration=data_integration)
-            if data_integration_column is None:
-                data_integration_column = DataIntegrationColumn(
-                    SourceColumnName=source_column_name,
-                    TargetColumnName=target_column_name,
-                    DataIntegration=data_integration)
-                self.data_integration_column_repository.insert(data_integration_column)
-        for data_integration_column in data_integration.Columns:
-            column_founded = False
-            source_columns = [source_column for source_column in source_columns_list if
-                              source_column == data_integration_column.SourceColumnName]
-            source_column_name = None
-            if source_columns is not None and len(source_columns) > 0:
-                source_column_name = source_columns[0]
-            if source_column_name is not None:
-                target_column_name = target_columns_list[source_columns_list.index(source_column_name)]
-                if target_column_name == data_integration_column.TargetColumnName:
-                    column_founded = True
-            if not column_founded:
-                self.database_session_manager.session.delete(data_integration_column)
-        source_connection = None
-        if data.SourceConnectionName is not None and data.SourceConnectionName != '':
-            source_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 0][0]
-            source = self.connection_repository.first(Name=data.SourceConnectionName)
-            if source is None:
-                raise OperationalException("Source Connection not found")
-            source_connection.Connection = source
-            source_connection.Schema = data.SourceSchema
-            source_connection.Query = data.SourceQuery
+        self.data_integration_column_service.update(
+            data_integration=data_integration,
+            source_columns=data.SourceColumns,
+            target_columns=data.TargetColumns)
 
-        if data.TargetConnectionName is None or data.TargetConnectionName == '':
-            raise OperationalException("Target Connection cannot be empty")
-        target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
-        target = self.connection_repository.first(Name=data.TargetConnectionName)
-        if target is None:
-            raise OperationalException("Target Connection not found")
-        target_connection.Connection = target
-        target_connection.Schema = data.TargetSchema
-        target_connection.TableName = data.TargetTableName
-        target_connection.Query = data.TargetQuery
-        data_integration_columns = self.data_integration_column_repository.filter_by(
-            DataIntegration=data_integration)
+        self.data_integration_connection_service.update(data_integration=data_integration, data=data)
 
-        if source_connection is not None \
-                and (source_connection.Query is None or source_connection.Query == '') \
-                and source_connection.Schema is not None and source_connection.Schema != '' and source_connection.TableName is not None and source_connection.TableName != '':
-            source_connection.Query = self.get_source_query(schema=source_connection.Schema,
-                                                            table_name=source_connection.TableName,
-                                                            data_integration_columns=data_integration_columns)
-        if target_connection.Query is None or target_connection.Query == '':
-            target_connection.Query = self.get_target_query(schema=target_connection.Schema,
-                                                            table_name=target_connection.TableName,
-                                                            data_integration_columns=data_integration_columns)
+        self.data_integration_execution_job_service.update(
+            data_integration=data_integration,
+            pre_executions=data.PreExecutions,
+            post_executions=data.PostExecutions)
 
-        if data.PreExecutions is not None and data.PreExecutions != "":
-            self.update_execution_job(data.PreExecutions, True, False, data_integration)
-        else:
-            self.delete_execution_job(True, False, data_integration)
-        if data.PostExecutions is not None and data.PostExecutions != "":
-            self.update_execution_job(data.PostExecutions, False, True, data_integration)
-        else:
-            self.delete_execution_job(False, True, data_integration)
-
-        self.database_session_manager.commit()
         return data_integration
 
     def delete_data_integration(self, code):
-        self.sql_logger.info('PDI deletion for:' + code)
 
         if code is not None and code != "":
             data_integration = self.data_integration_repository.first(IsDeleted=0, Code=code)
@@ -286,11 +131,10 @@ class DataIntegrationService(IScoped):
                 raise OperationalException("Code not found")
         else:
             return "Code required"
+        self.data_integration_repository.delete_by_id(id=data_integration.Id)
         for data_integration_connection in data_integration.Connections:
-            data_integration_connection.IsDeleted = 1
+            self.data_integration_connection_service.delete(data_integration_connection.Id)
         for data_integration_column in data_integration.Columns:
-            data_integration_column.IsDeleted = 1
-        data_integration.IsDeleted = 1
-        self.database_session_manager.commit()
-        message = f'PDI deletion for {code} is Completed'
-        self.sql_logger.info(message)
+            self.data_integration_column_service.delete(data_integration_column.Id)
+        for data_integration_column in data_integration.ExecutionJobs:
+            self.data_integration_column_service.delete(data_integration_column.Id)

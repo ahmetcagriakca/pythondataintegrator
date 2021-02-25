@@ -10,6 +10,7 @@ from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from models.dao.integration.DataIntegration import DataIntegration
 from models.dao.operation import DataOperation, DataOperationJob, DataOperationJobExecution
+from models.dao.secret import Secret
 from tests.integrationtests.common.TestServiceEndpoints import TestServiceEndpoints
 
 
@@ -20,6 +21,26 @@ class TestServiceScenarios:
         self.ioc_manager = ioc_manager
         self.service_endpoints = service_endpoints
 
+    def get_data_operation(self, name):
+        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
+            DatabaseSessionManager)
+        data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
+            database_session_manager)
+        data_operation = data_operation_repository.first(Name=name)
+        return data_operation
+
+    def clear_secret(self, id):
+        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
+            DatabaseSessionManager)
+        secret_repository: Repository[Secret] = Repository[Secret](
+            database_session_manager)
+        secret = secret_repository.first(Id=id)
+        for secret_source in secret.SecretSources:
+            for basic_authentication in secret_source.SecretSourceBasicAuthentications:
+                database_session_manager.session.delete(basic_authentication)
+            database_session_manager.session.delete(secret_source)
+        database_session_manager.session.delete(secret)
+
     def clear_connection(self, name):
 
         database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
@@ -27,7 +48,13 @@ class TestServiceScenarios:
         connection_repository: Repository[Connection] = Repository[Connection](
             database_session_manager)
         connection = connection_repository.first(Name=name)
-        database_session_manager.session.delete(connection.Database)
+        for connection_secret in connection.ConnectionSecrets:
+            self.clear_secret(connection_secret.SecretId)
+            database_session_manager.session.delete(connection_secret)
+        if connection.Database is not None:
+            database_session_manager.session.delete(connection.Database)
+        if connection.File is not None:
+            database_session_manager.session.delete(connection.File)
         database_session_manager.session.delete(connection)
         database_session_manager.commit()
 
@@ -161,25 +188,24 @@ class TestServiceScenarios:
             else:
                 return data_operation_job_execution
 
-    def run_data_operation(self, connections, data_operation):
-        expected = True
-        IocManager.injector.get(IocManager.job_scheduler).run()
+    def create_data_operation(self, connections, data_operation):
         for connection in connections:
             self.create_test_connection(connection)
-        data_operation_response = self.create_test_operation(
-            data_operation)
+        self.create_test_operation(data_operation)
+
+    def run_job(self, data_operation_name):
+        expected = True
         try:
+            IocManager.injector.get(IocManager.job_scheduler).run()
             run_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
             job_request = {
-                "OperationName": data_operation['Name'],
+                "OperationName": data_operation_name,
                 "RunDate": run_date
             }
             response_data = self.service_endpoints.run_schedule_job_operation(
                 job_request)
             assert response_data['IsSuccess'] == expected
             assert response_data['Result']['DataOperation']['Name'] == job_request['OperationName']
-            assert response_data['Result']['DataOperation']['Integrations'][0]["Integration"]["Code"] == \
-                   data_operation['Integrations'][0]["Integration"]["Code"]
             data_operation_job_id = response_data['Result']['Id']
             data_operation_job_execution = self.check_job_start(data_operation_job_id)
             start_date = data_operation_job_execution.StartDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
@@ -194,3 +220,7 @@ class TestServiceScenarios:
         # finally:
         #     # clean data_integration test operations
         #     self.clear_data_operation_job(data_operation_response["Result"]["Id"])
+
+    def run_data_operation(self, connections, data_operation):
+        self.create_data_operation(connections, data_operation)
+        self.run_job(data_operation['Name'])

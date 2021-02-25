@@ -118,9 +118,7 @@ class DataOperationJobService(IScoped):
             database_session_manager = IocManager.injector.get(DatabaseSessionManager)
             data_operation_job_service = IocManager.injector.get(DataOperationJobService)
 
-            data_integration_repository: Repository[DataIntegration] = Repository[
-                DataIntegration](
-                database_session_manager)
+            data_integration_repository: Repository[DataIntegration] = Repository[DataIntegration](database_session_manager)
 
             data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[
                 DataIntegrationConnection](

@@ -15,7 +15,7 @@ class DataIntegration(Entity, IocManager.Base):
     __tablename__ = "DataIntegration"
     __table_args__ = {"schema": "Integration"}
     DefinitionId = Column(Integer, ForeignKey('Operation.Definition.Id'))
-    Code = Column(String(100), index=True, unique=True, nullable=False)
+    Code = Column(String(100), index=True, unique=False, nullable=False)
     IsTargetTruncate = Column(Boolean, index=False, unique=False, nullable=True)
     IsDelta = Column(Boolean, index=False, unique=False, nullable=True)
     Definition = relationship("Definition", back_populates="DataIntegrations")
