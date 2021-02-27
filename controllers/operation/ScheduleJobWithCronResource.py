@@ -43,11 +43,11 @@ class ScheduleJobWithCronResource(ResourceBase):
         Update existing Data Operation cron job
         """
         data = IocManager.api.payload
-        code = data.get('Code')  #
+        operation_name = data.get('OperationName')  #
         cron = data.get('Cron')  #
         start_date = data.get('StartDate')  #
         end_date = data.get('EndDate')  #
-        start_operation_result = self.job_operation_service.modify_job(code=code, cron=cron, start_date=start_date,
+        start_operation_result = self.job_operation_service.modify_job(operation_name=operation_name, cron=cron, start_date=start_date,
                                                                        end_date=end_date)
         if isinstance(start_operation_result, DataOperationJob):
             result = JobSchedulerModels.get_data_operation_job_model(start_operation_result)

@@ -57,7 +57,7 @@ class ConnectionManager(IScoped):
         except Exception as ex:
             if retry > self.retry_count:
                 self.sql_logger.error(f"Db write error on Error:{ex}")
-                raise ex
+                raise 
             self.sql_logger.error(
                 f"Getting error on insert (Operation will be retried. Retry Count:{retry}). Error:{ex}")
             # retrying connect to db,

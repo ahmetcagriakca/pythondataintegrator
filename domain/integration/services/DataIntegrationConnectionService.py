@@ -15,7 +15,7 @@ class DataIntegrationConnectionService(IScoped):
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
                  data_integration_column_service: DataIntegrationColumnService,
-                 connection_service:ConnectionService
+                 connection_service: ConnectionService
                  ):
         self.connection_service = connection_service
         self.data_integration_column_service = data_integration_column_service
@@ -25,6 +25,16 @@ class DataIntegrationConnectionService(IScoped):
             database_session_manager)
 
     #######################################################################################
+    def get_source_connection(self, data_integration_id: int) -> DataIntegrationConnection:
+        entity = self.data_integration_connection_repository.first(IsDeleted=0,
+                                                                   DataIntegrationId=data_integration_id,
+                                                                   SourceOrTarget=0)
+        return entity
+    def get_target_connection(self, data_integration_id: int) -> DataIntegrationConnection:
+        entity = self.data_integration_connection_repository.first(IsDeleted=0,
+                                                                   DataIntegrationId=data_integration_id,
+                                                                   SourceOrTarget=1)
+        return entity
 
     def insert(self,
                data_integration: DataIntegration,

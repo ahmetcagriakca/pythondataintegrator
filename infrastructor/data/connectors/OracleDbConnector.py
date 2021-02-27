@@ -43,7 +43,7 @@ class OracleDbConnector(ConnectorStrategy):
         except Exception as error:
             self.connection.rollback()
             self.cursor.close()
-            raise error
+            raise 
 
     def get_execute_procedure_query(self, procedure):
         return f'begin {procedure}; end;'

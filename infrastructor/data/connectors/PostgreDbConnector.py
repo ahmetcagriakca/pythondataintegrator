@@ -35,7 +35,7 @@ class PostgreDbConnector(ConnectorStrategy):
         except (Exception, psycopg2.DatabaseError) as error:
             self.connection.rollback()
             self.cursor.close()
-            raise error
+            raise 
 
     def get_execute_procedure_query(self, procedure):
         return f'begin {procedure}; end;'

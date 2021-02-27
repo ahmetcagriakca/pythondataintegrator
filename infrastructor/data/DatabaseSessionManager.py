@@ -2,9 +2,7 @@ from injector import inject
 from sqlalchemy import create_engine, pool
 from sqlalchemy.orm import sessionmaker, Session
 
-from infrastructor.IocManager import IocManager
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.logging.ConsoleLogger import ConsoleLogger
 from infrastructor.utils.Utils import Utils
 from models.configs.ApiConfig import ApiConfig
 from models.configs.DatabaseConfig import DatabaseConfig
@@ -30,16 +28,20 @@ class DatabaseSessionManager(IScoped):
     def connect(self):
         self.close()
         connection_string = Utils.get_connection_string(database_config=self.database_config)
-        self.engine = create_engine(connection_string, poolclass=pool.NullPool)
-        if self.engine is not None:
-            self._SessionFactory = sessionmaker(bind=self.engine)
+        self.engine = create_engine(connection_string,poolclass=pool.NullPool,
+                                      pool_pre_ping=True)
+        self._SessionFactory = sessionmaker(bind=self.engine)
         self.session: Session = self.session_factory()
+
+    def dispose(self):
+        if self.engine is not None:
+            self.engine.dispose()
 
     def close(self):
         if self.session is not None:
             self.session.close()
+        self.dispose()
         if self.engine is not None:
-            self.engine.dispose()
             self.engine = None
 
     def session_factory(self):
@@ -55,5 +57,6 @@ class DatabaseSessionManager(IScoped):
         if self.session is not None:
             self.session.flush()
             self.session.rollback()
-            self.session.close()
-            self.session: Session = self.session_factory()
+        self.close()
+        self.connect()
+            # self.session: Session = self.session_factory()
