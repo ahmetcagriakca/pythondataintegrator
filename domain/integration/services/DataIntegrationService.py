@@ -34,12 +34,19 @@ class DataIntegrationService(IScoped):
 
     #######################################################################################
 
+    def get_by_id(self,id:int) -> DataIntegration:
+        """
+        Data data_integration data preparing
+        """
+        entity = self.data_integration_repository.first(IsDeleted=0, Id=id)
+        return entity
+
     def get_data_integrations(self) -> List[DataIntegration]:
         """
         Data data_integration data preparing
         """
-        data_integrations = self.data_integration_repository.filter_by(IsDeleted=0)
-        return data_integrations.all()
+        entites = self.data_integration_repository.filter_by(IsDeleted=0)
+        return entites.all()
 
     def check_and_update_data_integration(self,
                                           data: CreateDataIntegrationModel,
@@ -58,7 +65,8 @@ class DataIntegrationService(IScoped):
         if data_integration is None:
             data_integration = self.insert_data_integration(data=data, definition=definition)
         else:
-            data_integration = self.update_data_integration(data_integration=data_integration,data=data, definition=definition)
+            data_integration = self.update_data_integration(data_integration=data_integration, data=data,
+                                                            definition=definition)
         return data_integration
 
     def create_data_integration(self,

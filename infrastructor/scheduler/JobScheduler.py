@@ -58,6 +58,7 @@ class JobScheduler(ISingleton):
         }
         self.scheduler = BackgroundScheduler(daemon=True, jobstores=jobstores, executors=executors,
                                              job_defaults=job_defaults)
+
         JobSchedulerEvent.job_scheduler_type = JobScheduler
         self.scheduler.add_listener(JobSchedulerEvent.listener_finish, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
         self.scheduler.add_listener(JobSchedulerEvent.listener_job_added, EVENT_JOB_ADDED)

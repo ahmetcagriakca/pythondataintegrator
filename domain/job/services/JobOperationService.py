@@ -1,6 +1,5 @@
 import time
 from datetime import datetime
-from typing import List
 
 from apscheduler.triggers.cron import CronTrigger
 from injector import inject
@@ -55,7 +54,7 @@ class JobOperationService(IScoped):
         if data_operation is None:
             raise OperationalException("Data operation not found")
         data_operation_jobs = self.data_operation_job_repository.filter_by(IsDeleted=0,
-                                                                         DataOperationId=data_operation.Id).all()
+                                                                           DataOperationId=data_operation.Id).all()
         if data_operation_jobs is None or len(data_operation_jobs) == 0:
             raise OperationalException("Job not found initialized with cron")
         founded_cron_job: DataOperationJob = None
@@ -65,13 +64,17 @@ class JobOperationService(IScoped):
                 break
         if founded_cron_job is None:
             raise OperationalException("Job not found initialized with cron")
-        if start_date is not None or start_date != '':
-            start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
-        if end_date is not None or end_date != '':
-            end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
+        if start_date is not None and start_date != '':
+            job_start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
+        else:
+            job_start_date = datetime.now().astimezone()
+        if end_date is not None and end_date != '':
+            job_end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
+        else:
+            job_end_date = None
         trigger = CronTrigger.from_crontab(cron)
-        trigger.start_date = start_date
-        trigger.end_date = end_date
+        trigger.start_date = job_start_date
+        trigger.end_date = job_end_date
         if founded_cron_job.ApSchedulerJob.IsDeleted == 0:
             self.job_scheduler.remove_job(job_id=founded_cron_job.ApSchedulerJob.JobId)
         self.data_operation_job_repository.delete_by_id(founded_cron_job.Id)
@@ -79,7 +82,8 @@ class JobOperationService(IScoped):
                                                   cron=cron, start_date=start_date, end_date=end_date,
                                                   args=(None, data_operation.Id,))
 
-        data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, cron, start_date, end_date)
+        data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, cron, start_date,
+                                                            end_date)
         return data_operation_job
 
     def add_job_with_cron(self, job_function, cron, start_date=None, end_date=None, args=None,
@@ -112,7 +116,7 @@ class JobOperationService(IScoped):
         data_operation = self.data_operation_repository.first(IsDeleted=0, Name=operation_name)
         if data_operation is None:
             raise OperationalException("Data operation not found")
-        if run_date is not None or run_date != '':
+        if run_date is not None and run_date != '':
             start_date = datetime.strptime(run_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
         else:
             start_date = datetime.now().astimezone()
@@ -137,49 +141,23 @@ class JobOperationService(IScoped):
             raise OperationalException("Data Operation not found")
 
         self.check_cron_initialized_jobs(data_operation.Id)
-        if not(start_date is None or start_date == ''):
+        if start_date is not None and start_date != '':
             start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
         else:
             start_date = datetime.now().astimezone()
-        if not(end_date is None or end_date == ''):
+        if end_date is not None and end_date != '':
             end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
         else:
-            end_date=None
+            end_date = None
         ap_scheduler_job = self.add_job_with_cron(job_function=JobOperationService.job_start_data_operation,
                                                   cron=cron, start_date=start_date, end_date=end_date,
                                                   args=(None, data_operation.Id,))
-        data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, cron, start_date, end_date)
+        data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, cron, start_date,
+                                                            end_date)
         return data_operation_job
 
     @staticmethod
     def job_start_data_operation(job_id, data_operation_id: int):
-        job_scheduler: JobScheduler = IocManager.injector.get(JobScheduler)
-
-        database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
-        data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
-            database_session_manager)
-        data_operation_job_repository: Repository[DataOperationJob] = Repository[DataOperationJob](
-            database_session_manager)
-        data_operations: List[DataOperation] = data_operation_repository.filter_by(Id=data_operation_id).all()
-        founded_pdi: DataOperation = None
-        if data_operations is not None and len(data_operations) > 0:
-            for pdi in data_operations:
-                if pdi.IsDeleted == 0:
-                    founded_pdi = pdi
-        if founded_pdi is None:
-            for pdi in data_operations:
-                if pdi.IsDeleted == 1:
-                    founded_jobs = data_operation_job_repository.filter_by(
-                        DataOperationId=pdi.Id).all()
-                    for founded_job in founded_jobs:
-                        job_scheduler.scheduler.remove_job(job_id=founded_job.ApSchedulerJob.JobId)
-                        return
-        founded_job = data_operation_job_repository.first(DataOperationId=founded_pdi.Id,
-                                                                   ApSchedulerJobId=job_id)
-        if founded_job is not None and founded_job.IsDeleted == 1:
-            job_scheduler.scheduler.remove_job(job_id=founded_job.ApSchedulerJob.JobId)
-            return
-
-        data_operation_job_service: DataOperationService = IocManager.injector.get(DataOperationJobService)
-        data_operation_job_service.start_operation(data_operation_id, job_id=job_id)
-        return "Operation Completed"
+        data_operation_job_service: DataOperationJobService = IocManager.injector.get(DataOperationJobService)
+        result = data_operation_job_service.start_operation(data_operation_id=data_operation_id,job_id=job_id)
+        return result
