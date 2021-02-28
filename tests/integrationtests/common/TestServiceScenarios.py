@@ -67,8 +67,6 @@ class TestServiceScenarios:
 
         for data_integration_column in data_integration.Columns:
             database_session_manager.session.delete(data_integration_column)
-        for data_integration_execution_job in data_integration.ExecutionJobs:
-            database_session_manager.session.delete(data_integration_execution_job)
         for data_integration_connection in data_integration.Connections:
             database_session_manager.session.delete(data_integration_connection)
 
@@ -89,8 +87,6 @@ class TestServiceScenarios:
 
             for data_integration_column in data_integration.Columns:
                 database_session_manager.session.delete(data_integration_column)
-            for data_integration_execution_job in data_integration.ExecutionJobs:
-                database_session_manager.session.delete(data_integration_execution_job)
             for data_integration_connection in data_integration.Connections:
                 database_session_manager.session.delete(data_integration_connection)
             database_session_manager.session.delete(data_integration)

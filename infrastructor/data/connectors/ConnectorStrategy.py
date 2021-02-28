@@ -16,10 +16,6 @@ class ConnectorStrategy(IScoped):
         pass
 
     @abstractmethod
-    def get_execute_procedure_query(self, procedure):
-        pass
-
-    @abstractmethod
     def get_target_query_indexer(self):
         pass
 

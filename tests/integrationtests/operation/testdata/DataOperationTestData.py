@@ -22,9 +22,7 @@ class DataOperationTestData:
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
                     "SourceColumns": "Id,Name,Value",
-                    "TargetColumns": "Id,Name,Value",
-                    "PreExecutions": "",
-                    "PostExecutions": ""
+                    "TargetColumns": "Id,Name,Value"
                 }
             }
         ]
@@ -53,9 +51,7 @@ class DataOperationTestData:
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
                     "SourceColumns": "Id,Name",
-                    "TargetColumns": "Id,Name",
-                    "PreExecutions": "",
-                    "PostExecutions": ""
+                    "TargetColumns": "Id,Name"
                 }
             }
         ]
@@ -95,9 +91,7 @@ class DataOperationTestData:
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
                     "SourceColumns": "Id,Name,Value",
-                    "TargetColumns": "Id,Name,Value",
-                    "PreExecutions": "",
-                    "PostExecutions": ""
+                    "TargetColumns": "Id,Name,Value"
                 }
             }
         ]
@@ -126,9 +120,7 @@ class DataOperationTestData:
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
                     "SourceColumns": "Id,Name,Value",
-                    "TargetColumns": "Id,Name,Value",
-                    "PreExecutions": "",
-                    "PostExecutions": ""
+                    "TargetColumns": "Id,Name,Value"
                 }
             }
         ]

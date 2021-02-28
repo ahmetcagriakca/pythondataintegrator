@@ -45,9 +45,6 @@ class OracleDbConnector(ConnectorStrategy):
             self.cursor.close()
             raise 
 
-    def get_execute_procedure_query(self, procedure):
-        return f'begin {procedure}; end;'
-
     def get_table_count_query(self, query):
         count_query = f"SELECT COUNT (*) FROM ({query})"
         return count_query

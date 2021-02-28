@@ -33,9 +33,7 @@ class ScheduleJobTestData:
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
                     "SourceColumns": "Id,Name",
-                    "TargetColumns": "Id,Name",
-                    "PreExecutions": "",
-                    "PostExecutions": ""
+                    "TargetColumns": "Id,Name"
                 }
             },
             {
@@ -55,9 +53,7 @@ class ScheduleJobTestData:
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
                     "SourceColumns": "Name,Id",
-                    "TargetColumns": "Name,Id",
-                    "PreExecutions": "",
-                    "PostExecutions": ""
+                    "TargetColumns": "Name,Id"
                 }
             },
             {
@@ -77,9 +73,7 @@ class ScheduleJobTestData:
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
                     "SourceColumns": "Name,Id",
-                    "TargetColumns": "Name,Id",
-                    "PreExecutions": "",
-                    "PostExecutions": ""
+                    "TargetColumns": "Name,Id"
                 }
             }
         ]

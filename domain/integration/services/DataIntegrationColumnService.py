@@ -5,15 +5,8 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exception.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
-from models.dao.connection.Connection import Connection
-from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.dao.operation import Definition
-from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
 from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
-from models.dao.integration.DataIntegrationExecutionJob import DataIntegrationExecutionJob
-from models.viewmodels.integration.UpdateDataIntegrationModel import UpdateDataIntegrationModel
 
 
 class DataIntegrationColumnService(IScoped):

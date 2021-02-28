@@ -4,7 +4,6 @@ from injector import inject
 
 from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
-from domain.integration.services.DataIntegrationExecutionJobService import DataIntegrationExecutionJobService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
@@ -22,10 +21,8 @@ class DataIntegrationService(IScoped):
                  database_session_manager: DatabaseSessionManager,
                  data_integration_column_service: DataIntegrationColumnService,
                  data_integration_connection_service: DataIntegrationConnectionService,
-                 data_integration_execution_job_service: DataIntegrationExecutionJobService,
 
                  ):
-        self.data_integration_execution_job_service = data_integration_execution_job_service
         self.data_integration_connection_service = data_integration_connection_service
         self.data_integration_column_service = data_integration_column_service
         self.database_session_manager = database_session_manager
@@ -106,10 +103,6 @@ class DataIntegrationService(IScoped):
 
         self.data_integration_connection_service.insert(data_integration=data_integration, data=data)
 
-        self.data_integration_execution_job_service.insert(
-            data_integration=data_integration,
-            pre_executions=data.PreExecutions,
-            post_executions=data.PostExecutions)
         return data_integration
 
     def update_data_integration(self,
@@ -127,11 +120,6 @@ class DataIntegrationService(IScoped):
 
         self.data_integration_connection_service.update(data_integration=data_integration, data=data)
 
-        self.data_integration_execution_job_service.update(
-            data_integration=data_integration,
-            pre_executions=data.PreExecutions,
-            post_executions=data.PostExecutions)
-
         return data_integration
 
     def delete_data_integration(self, code):
@@ -146,6 +134,4 @@ class DataIntegrationService(IScoped):
         for data_integration_connection in data_integration.Connections:
             self.data_integration_connection_service.delete(data_integration_connection.Id)
         for data_integration_column in data_integration.Columns:
-            self.data_integration_column_service.delete(data_integration_column.Id)
-        for data_integration_column in data_integration.ExecutionJobs:
             self.data_integration_column_service.delete(data_integration_column.Id)
