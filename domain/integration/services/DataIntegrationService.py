@@ -34,7 +34,7 @@ class DataIntegrationService(IScoped):
 
     #######################################################################################
 
-    def get_by_id(self,id:int) -> DataIntegration:
+    def get_by_id(self, id: int) -> DataIntegration:
         """
         Data data_integration data preparing
         """
@@ -58,10 +58,13 @@ class DataIntegrationService(IScoped):
                 and ((data.TargetSchema is None or data.TargetSchema == '') \
                      or (data.TargetTableName is None or data.TargetTableName == '')):
             raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
-
-        data_integration = self.data_integration_repository.first(IsDeleted=0,
-                                                                  Code=data.Code,
-                                                                  DefinitionId=old_definition.Id)
+        if old_definition is not None:
+            data_integration = self.data_integration_repository.first(IsDeleted=0,
+                                                                      Code=data.Code,
+                                                                      DefinitionId=old_definition.Id)
+        else:
+            data_integration = self.data_integration_repository.first(IsDeleted=0,
+                                                                      Code=data.Code)
         if data_integration is None:
             data_integration = self.insert_data_integration(data=data, definition=definition)
         else:
