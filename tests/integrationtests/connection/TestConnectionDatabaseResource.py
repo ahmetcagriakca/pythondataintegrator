@@ -29,17 +29,11 @@ class TestConnectionDatabaseResuource(TestCase):
             assert response_data['Result']['Database']['ConnectorType']['Name'] == \
                    ConnectionTestData.test_update_input["ConnectorTypeName"]
 
-            basic_authentication = connection_secret_service.get_connection_basic_authentication(
-                connection_id=response_data['Result']['Id'])
-            assert basic_authentication.User == ConnectionTestData.test_update_input['User']
-            assert basic_authentication.Password == ConnectionTestData.test_update_input['Password']
-
             delete_request = {
                 "Id": response_data['Result']['Id']
             }
             response_data = self.test_manager.service_endpoints.delete_connection(delete_request)
             assert response_data['IsSuccess'] == expected
-
 
         except Exception as ex:
             assert True == False

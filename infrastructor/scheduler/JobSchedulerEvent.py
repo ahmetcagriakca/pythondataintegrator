@@ -9,7 +9,9 @@ class JobSchedulerEvent:
     @staticmethod
     def job_scheduler_service() -> JobSchedulerService:
         service = IocManager.injector.get(JobSchedulerService)
-        service.set_job_scheduler_type(job_scheduler_type=JobSchedulerEvent.job_scheduler_type)
+        if service.job_scheduler_type is None:
+            print("job type not setted")
+            service.set_job_scheduler_type(job_scheduler_type=JobSchedulerEvent.job_scheduler_type)
         return service
 
     @staticmethod
