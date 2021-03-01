@@ -58,9 +58,9 @@ class JobOperationService(IScoped):
         if data_operation_jobs is None or len(data_operation_jobs) == 0:
             raise OperationalException("Job not found initialized with cron")
         founded_cron_job: DataOperationJob = None
-        for pdi_job in data_operation_jobs:
-            if pdi_job.Cron is not None:
-                founded_cron_job = pdi_job
+        for data_operation_job in data_operation_jobs:
+            if data_operation_job.Cron is not None:
+                founded_cron_job = data_operation_job
                 break
         if founded_cron_job is None:
             raise OperationalException("Job not found initialized with cron")
@@ -75,8 +75,14 @@ class JobOperationService(IScoped):
         trigger = CronTrigger.from_crontab(cron)
         trigger.start_date = job_start_date
         trigger.end_date = job_end_date
-        if founded_cron_job.ApSchedulerJob.IsDeleted == 0:
-            self.job_scheduler.remove_job(job_id=founded_cron_job.ApSchedulerJob.JobId)
+
+        for data_operation_job in data_operation_jobs:
+            ap_scheduler_job = self.ap_scheduler_job_repository.first(IsDeleted=0,
+                                                                      Id=data_operation_job.ApSchedulerJobId)
+            try:
+                self.job_scheduler.remove_job(job_id=ap_scheduler_job.JobId)
+            except Exception as ex:
+                pass
         self.data_operation_job_repository.delete_by_id(founded_cron_job.Id)
         ap_scheduler_job = self.add_job_with_cron(job_function=JobOperationService.job_start_data_operation,
                                                   cron=cron, start_date=start_date, end_date=end_date,
@@ -159,5 +165,5 @@ class JobOperationService(IScoped):
     @staticmethod
     def job_start_data_operation(job_id, data_operation_id: int):
         data_operation_job_service: DataOperationJobService = IocManager.injector.get(DataOperationJobService)
-        result = data_operation_job_service.start_operation(data_operation_id=data_operation_id,job_id=job_id)
+        result = data_operation_job_service.start_operation(data_operation_id=data_operation_id, job_id=job_id)
         return result
