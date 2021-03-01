@@ -57,6 +57,5 @@ class DatabaseSessionManager(IScoped):
         if self.session is not None:
             self.session.flush()
             self.session.rollback()
-        self.close()
-        self.connect()
+            # self.session.close()
             # self.session: Session = self.session_factory()

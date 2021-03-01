@@ -38,12 +38,16 @@ class JobSchedulerService(IScoped):
             if database_session_manager is None:
                 raise Exception("Database session manager required")
             try:
+                database_session_manager.close()
+                database_session_manager.connect()
                 result = func(*args, **kwargs)
                 database_session_manager.commit()
                 return result
             except psycopg2.exc.OperationalError as ex:
                 try:
                     database_session_manager.rollback()
+                    database_session_manager.close()
+                    database_session_manager.connect()
                     return func(*args, **kwargs)
 
                 except Exception as invalid_ex:
@@ -52,6 +56,8 @@ class JobSchedulerService(IScoped):
             except InvalidRequestError as ex:
                 try:
                     database_session_manager.rollback()
+                    database_session_manager.close()
+                    database_session_manager.connect()
                     return func(*args, **kwargs)
                 except Exception as invalid_ex:
                     print(ex)
@@ -59,6 +65,7 @@ class JobSchedulerService(IScoped):
 
             except Exception as ex:
                 database_session_manager.rollback()
+                database_session_manager.close()
                 print(ex)
                 raise
         return inner

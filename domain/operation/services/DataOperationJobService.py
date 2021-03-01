@@ -111,7 +111,6 @@ class DataOperationJobService(IScoped):
                     new_task.IsProcessed = True
                     results.put(new_task)
         except Exception as ex:
-            self.database_session_manager.rollback()
             self.sql_logger.error(f"{process_name} process getting error:{ex}", job_id=job_id)
             data = TaskData(SubProcessId=sub_process_id, IsFinished=True)
             results.put(data)
@@ -174,8 +173,10 @@ class DataOperationJobService(IScoped):
             data_operation_job_execution_id=job_id, data_operation_integration=data_operation_integration)
         data_operation_job_execution_integration_id = data_operation_job_execution_integration.Id
         data_integration: DataIntegration = data_operation_integration.DataIntegration
+        data_operation_integration_order = data_operation_integration.Order
+        data_integration_code = data_integration.Code
         self.sql_logger.info(
-            f"{data_integration.Code} integration run query started",
+            f"{data_operation_integration_order}-{data_integration_code} integration run query started",
             job_id=job_id)
         try:
 
@@ -212,11 +213,11 @@ class DataOperationJobService(IScoped):
                 event_code=EVENT_EXECUTION_INTEGRATION_FINISHED)
             # affected_rowcount_string=affected_rowcount>0
             self.sql_logger.info(
-                f"{data_integration.Code} integration run query finished. (affected row count:{affected_rowcount})",
+                f"{data_operation_integration_order}-{data_integration_code} integration run query finished. (affected row count:{affected_rowcount})",
                 job_id=job_id)
 
         except Exception as ex:
-            log = f"{data_integration.Code} integration run query getting error. Error:{ex}"
+            log = f"{data_operation_integration_order}-{data_integration_code} integration run query getting error. Error:{ex}"
             self.sql_logger.info(log, job_id=job_id)
             self.data_operation_job_execution_service.update_data_operation_job_execution_integration_status(
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
@@ -233,6 +234,8 @@ class DataOperationJobService(IScoped):
             data_operation_job_execution_id=job_id, data_operation_integration=data_operation_integration)
         data_operation_job_execution_integration_id = data_operation_job_execution_integration.Id
         data_integration: DataIntegration = data_operation_integration.DataIntegration
+        data_operation_integration_order = data_operation_integration.Order
+        data_integration_code = data_integration.Code
         try:
             self.data_operation_job_execution_service.update_data_operation_job_execution_integration_status(
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
@@ -243,7 +246,7 @@ class DataOperationJobService(IScoped):
                 data_integration_id=data_integration.Id)
             # Integration Start
             self.sql_logger.info(
-                f"{data_integration.Code} - {target_connection.Schema}.{target_connection.TableName} integration execute operation started",
+                f"{data_operation_integration_order}-{data_integration_code} - {target_connection.Schema}.{target_connection.TableName} integration execute operation started",
                 job_id=job_id)
 
             source_connection_manager = self.connection_provider.get_connection_manager(
@@ -270,7 +273,7 @@ class DataOperationJobService(IScoped):
                 if process_count > 1:
                     # Integration Start
                     self.sql_logger.info(
-                        f"{data_integration.Code} - operation will execute parallel. {process_count}-{limit}",
+                        f"{data_operation_integration_order}-{data_integration_code} - operation will execute parallel. {process_count}-{limit}",
                         job_id=job_id)
                     limit_modifiers = self.get_limit_modifiers(data_count=data_count, limit=limit)
                     unprocessed_task_list = self.process_service.start_parallel_process(process_id=data_integration.Id,
@@ -288,8 +291,9 @@ class DataOperationJobService(IScoped):
                                                      limit_modifiers=limit_modifiers)
 
                 else:
-                    self.sql_logger.info(f"{data_integration.Code} - operation will execute serial. {limit}",
-                                         job_id=job_id)
+                    self.sql_logger.info(
+                        f"{data_operation_integration_order}-{data_integration_code} - operation will execute serial. {limit}",
+                        job_id=job_id)
 
                     limit_modifiers = self.get_limit_modifiers(data_count=data_count, limit=limit)
                     self.execute_limit_modifiers(data_integration_id=data_integration.Id,
@@ -307,11 +311,11 @@ class DataOperationJobService(IScoped):
                 event_code=EVENT_EXECUTION_INTEGRATION_FINISHED)
 
             self.sql_logger.info(
-                f"{data_integration.Code} - {target_connection.Schema}.{target_connection.TableName} integration execute operation finished. (Source Data Count:{data_count})",
+                f"{data_operation_integration_order}-{data_integration_code} - {target_connection.Schema}.{target_connection.TableName} integration execute operation finished. (Source Data Count:{data_count})",
                 job_id=job_id)
 
         except Exception as ex:
-            log = f"{data_integration.Code} integration run query getting error. Error:{ex}"
+            log = f"{data_operation_integration_order}-{data_integration_code} integration run query getting error. Error:{ex}"
             self.sql_logger.info(log, job_id=job_id)
             self.data_operation_job_execution_service.update_data_operation_job_execution_integration_status(
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
@@ -343,8 +347,9 @@ class DataOperationJobService(IScoped):
             data_operation_job=data_operation_job)
 
         data_operation_job_execution_id = data_operation_job_execution.Id
+        data_operation_name = data_operation.Name
         try:
-            self.sql_logger.info(f'{data_operation.Name} data operation is begin',
+            self.sql_logger.info(f'{data_operation_name} data operation is begin',
                                  job_id=data_operation_job_execution_id)
             if data_operation.Integrations is None or len(data_operation.Integrations) == 0:
                 self.sql_logger.info('Data operation has no data_integration ',
@@ -374,7 +379,7 @@ class DataOperationJobService(IScoped):
                 else:
                     self.integration_execute_operation(data_operation_integration=data_operation_integration,
                                                        job_id=data_operation_job_execution_id)
-            self.sql_logger.info(f'{data_operation.Name} data operation is completed',
+            self.sql_logger.info(f'{data_operation_name} data operation is completed',
                                  job_id=data_operation_job_execution_id)
             self.data_operation_job_execution_service.update_data_operation_job_execution_status(
                 data_operation_job_execution_id=data_operation_job_execution_id,
@@ -385,9 +390,7 @@ class DataOperationJobService(IScoped):
             self.data_operation_job_execution_service.send_data_operation_finish_mail(data_operation_job_execution_id)
             return "Operation Completed"
         except Exception as ex:
-
-            self.database_session_manager.rollback()
-            self.sql_logger.error(f'{data_operation.Name} data operation has error. Error: {ex}',
+            self.sql_logger.error(f'{data_operation_name} data operation has error. Error: {ex}',
                                   job_id=data_operation_job_execution_id)
             self.data_operation_job_execution_service.update_data_operation_job_execution_status(
                 data_operation_job_execution_id=data_operation_job_execution_id,
