@@ -14,8 +14,6 @@ class UpdateDataIntegrationModel:
                  Comments: str = None,
                  SourceColumns: str = None,
                  TargetColumns: str = None,
-                 PreExecutions: str = None,
-                 PostExecutions: str = None,
                  ):
         self.Code: str = Code
         self.SourceConnectionName: str = SourceConnectionName
@@ -31,5 +29,3 @@ class UpdateDataIntegrationModel:
         self.Comments: str = Comments
         self.SourceColumns: str = SourceColumns
         self.TargetColumns: str = TargetColumns
-        self.PreExecutions: str = PreExecutions
-        self.PostExecutions: str = PostExecutions

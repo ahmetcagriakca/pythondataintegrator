@@ -84,8 +84,6 @@ class DataIntegrationModels:
         'IsTargetTruncate': fields.Boolean(description='IsTargetTruncate', required=True),
         'IsDelta': fields.Boolean(description='IsDelta'),
         'Comments': fields.String(description='Comments'),
-        'PreExecutions': fields.String(description='PreExecutions'),
-        'PostExecutions': fields.String(description='PostExecutions'),
     })
 
     update_data_integration_model = IocManager.api.model('UpdateIntegrationDataModel', {
@@ -103,8 +101,6 @@ class DataIntegrationModels:
         'Comments': fields.String(description='Comments'),
         'SourceColumns': fields.String(description='SourceColumns'),
         'TargetColumns': fields.String(description='TargetColumns'),
-        'PreExecutions': fields.String(description='PreExecutions'),
-        'PostExecutions': fields.String(description='PostExecutions'),
     })
 
     delete_data_integration_model = IocManager.api.model('DeleteIntegrationDataModel', {

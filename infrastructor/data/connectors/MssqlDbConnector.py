@@ -44,9 +44,6 @@ class MssqlDbConnector(ConnectorStrategy):
                 self.cursor.close()
                 raise 
 
-    def get_execute_procedure_query(self, procedure):
-        return f'EXEC {procedure}'
-
     def get_target_query_indexer(self):
         indexer = '?'
         return indexer

@@ -43,7 +43,7 @@ from models.dao.connection import Connection, ConnectionDatabase, ConnectorType,
 
 # integration
 from models.dao.integration import DataIntegration, DataIntegrationConnection, DataIntegrationConnection, \
-    DataIntegrationColumn, DataIntegrationExecutionJob, DataIntegrationConnectionFile
+    DataIntegrationColumn, DataIntegrationConnectionFile
 
 # common
 from models.dao.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent

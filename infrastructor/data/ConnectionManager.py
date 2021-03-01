@@ -66,10 +66,6 @@ class ConnectionManager(IScoped):
             return self._execute_with_retry(query=query, data=data, retry=retry + 1)
         return True
 
-    def execute_procedure(self, procedure) -> None:
-        procedure_query = self.connector.get_execute_procedure_query(procedure=procedure)
-        self.execute(query=procedure_query)
-
     def get_table_count(self, query):
         count_query = self.connector.get_table_count_query(query=query)
         datas = self.fetch_query(query=count_query)

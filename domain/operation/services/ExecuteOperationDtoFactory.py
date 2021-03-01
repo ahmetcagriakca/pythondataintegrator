@@ -1,32 +1,12 @@
-import os
-from time import time
 from typing import List
 from injector import inject
 
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
 from domain.integration.services.DataIntegrationService import DataIntegrationService
-from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
-from domain.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
-from domain.operation.services.DataOperationService import DataOperationService
-from domain.process.services.ProcessService import ProcessService
-from infrastructor.IocManager import IocManager
-from infrastructor.data.ConnectionManager import ConnectionManager
-from infrastructor.data.ConnectionProvider import ConnectionProvider
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.logging.SqlLogger import SqlLogger
-from infrastructor.multi_processing.ParallelMultiProcessing import TaskData
-from models.dao.integration.DataIntegration import DataIntegration
 from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.dao.integration.DataIntegrationExecutionJob import DataIntegrationExecutionJob
-from models.dao.operation import DataOperationIntegration, DataOperationJob
 from models.dto.ExecuteOperationDto import ExecuteOperationDto
-from models.dto.LimitModifier import LimitModifier
-from models.enums.events import EVENT_EXECUTION_STARTED, EVENT_EXECUTION_FINISHED, \
-    EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, \
-    EVENT_EXECUTION_INTEGRATION_FINISHED, EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION
 
 
 class ExecuteOperationDtoFactory(IScoped):
