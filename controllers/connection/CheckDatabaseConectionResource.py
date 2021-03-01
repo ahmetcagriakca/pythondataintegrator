@@ -25,7 +25,7 @@ class CheckConnectionDatabaseResource(ResourceBase):
         name = data.get('Name')  #
         schema = data.get('Schema')  #
         table = data.get('Table')  #
-        connection = self.connection_service.get_connection_by_name(name=name)
+        connection = self.connection_service.get_by_name(name=name)
         connection_manager = self.connection_service.connection_provider.get_connection_manager(connection=connection)
         connection_manager.connector.connect()
         count_of_table = ''

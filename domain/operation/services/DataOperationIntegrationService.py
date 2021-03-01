@@ -27,7 +27,7 @@ class DataOperationIntegrationService(IScoped):
         return entitites
 
     def get_by_id(self, id: int) -> DataOperationIntegration:
-        data_operation_integration = self.data_operation_integration_repository.filter_by(IsDeleted=0, Id=id)
+        data_operation_integration = self.data_operation_integration_repository.first(IsDeleted=0, Id=id)
         return data_operation_integration
 
     def insert(self,
@@ -84,8 +84,7 @@ class DataOperationIntegrationService(IScoped):
                 data_operation_integration.ProcessCount = data_operation_integration_model.ProcessCount
                 data_operation_integration.IsDeleted = 0
 
-        check_existing_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
-                                                                                           DataOperationId=data_operation.Id).all()
+        check_existing_integrations = self.get_all_by_data_operation_id(data_operation_id=data_operation.Id).all()
         for existing_integration in check_existing_integrations:
             founded = False
             for data_operation_integration_model in data_operation_integration_models:
@@ -93,11 +92,10 @@ class DataOperationIntegrationService(IScoped):
                     founded = True
             if not founded:
                 self.delete_by_id(existing_integration.Id)
-                self.data_integration_service.delete_data_integration(existing_integration.DataIntegration.Code)
 
     def delete_by_id(self, id: int):
         data_operation_integration = self.get_by_id(id=id)
-        self.data_operation_integration_repository.delete_by_id(data_operation_integration.Id)
+        self.data_operation_integration_repository.delete_by_id(id=id)
         self.data_integration_service.delete_data_integration(data_operation_integration.DataIntegration.Code)
 
     def delete_by_data_operation_id(self, data_operation_id: int):
@@ -107,5 +105,4 @@ class DataOperationIntegrationService(IScoped):
         check_existing_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
                                                                                            DataOperationId=data_operation_id)
         for existing_integration in check_existing_integrations:
-            self.data_operation_integration_repository.delete_by_id(existing_integration.Id)
-            self.data_integration_service.delete_data_integration(existing_integration.DataIntegration.Code)
+            self.delete_by_id(existing_integration.Id)
