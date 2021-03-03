@@ -4,13 +4,13 @@ from domain.connection.services.ConnectionSecretService import ConnectionSecretS
 from infrastructor.cryptography.CryptoService import CryptoService
 from infrastructor.data.ConnectionManager import ConnectionManager
 from infrastructor.data.ConnectionPolicy import ConnectionPolicy
-from infrastructor.dependency.scopes import ISingleton
+from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.connection.Connection import Connection
 
 
-class ConnectionProvider(ISingleton):
+class ConnectionProvider(IScoped):
     @inject
     def __init__(self,
                  crypto_service: CryptoService,
