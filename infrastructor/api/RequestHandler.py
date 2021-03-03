@@ -23,6 +23,4 @@ class RequestHandlers:
     @staticmethod
     def after_request(response):
         response = RequestHandlers.set_headers(response=response)
-        database_session_manager = IocManager.injector.get(DatabaseSessionManager)
-        database_session_manager.commit()
         return response

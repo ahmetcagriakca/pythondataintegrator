@@ -2,7 +2,7 @@ from datetime import datetime
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
-from infrastructor.dependency.scopes import ISingleton
+from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.ConsoleLogger import ConsoleLogger
 from models.configs.ApiConfig import ApiConfig
 from models.configs.DatabaseConfig import DatabaseConfig
