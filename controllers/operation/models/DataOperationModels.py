@@ -108,8 +108,9 @@ class DataOperationModels:
         DataOperationContactModel]:
         entities = []
         for data_operation_contact in data_operation_contacts:
-            entity = DataOperationModels.get_data_operation_contact_model(data_operation_contact)
-            entities.append(entity)
+            if data_operation_contact.IsDeleted == 0:
+                entity = DataOperationModels.get_data_operation_contact_model(data_operation_contact)
+                entities.append(entity)
         return entities
 
     @staticmethod
@@ -141,8 +142,9 @@ class DataOperationModels:
     def get_data_operation_result_models(data_operations: List[DataOperation]) -> List[DataOperationModel]:
         entities = []
         for data_operation in data_operations:
-            entity = DataOperationModels.get_data_operation_result_model(data_operation)
-            entities.append(entity)
+            if data_operation.IsDeleted == 0:
+                entity = DataOperationModels.get_data_operation_result_model(data_operation)
+                entities.append(entity)
         return entities
 
     @staticmethod
