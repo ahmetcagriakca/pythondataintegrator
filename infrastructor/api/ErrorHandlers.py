@@ -11,7 +11,9 @@ from infrastructor.logging.SqlLogger import SqlLogger
 class ErrorHandlers(ISingleton):
     @inject
     def __init__(self,
-                 sql_logger: SqlLogger):
+                 sql_logger: SqlLogger,
+                 database_session_manager:DatabaseSessionManager):
+        self.database_session_manager = database_session_manager
         self.sql_logger = sql_logger
         self.separator = '|'
         self.default_content_type = "application/json"
@@ -38,8 +40,8 @@ class ErrorHandlers(ISingleton):
 
     def handle_exception(self, exception):
         """Return JSON instead of HTML for HTTP errors."""
-        database_session_manager = IocManager.injector.get(DatabaseSessionManager)
-        database_session_manager.rollback()
+        # database_session_manager = IocManager.injector.get(DatabaseSessionManager)
+        self.database_session_manager.rollback()
         # start with the correct headers and status code from the error
         exception_traceback = traceback.format_exc()
         output = self.separator.join(exception.args)
@@ -60,8 +62,8 @@ class ErrorHandlers(ISingleton):
 
     def handle_operational_exception(self, exception):
         """Return JSON instead of HTML for HTTP errors."""
-        database_session_manager = IocManager.injector.get(DatabaseSessionManager)
-        database_session_manager.rollback()
+        # database_session_manager = IocManager.injector.get(DatabaseSessionManager)
+        self.database_session_manager.rollback()
         # start with the correct headers and status code from the error
         exception_traceback = traceback.format_exc()
         output = self.separator.join(exception.args)

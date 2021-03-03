@@ -1,3 +1,4 @@
+from infrastructor.api.RequestHandler import RequestHandlers
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 from infrastructor.api.ErrorHandlers import ErrorHandlers
@@ -24,6 +25,7 @@ class FlaskAppWrapper:
         IocManager.app.register_error_handler(OperationalException, self.handlers.handle_operational_exception)
         IocManager.app.register_error_handler(Exception, self.handlers.handle_exception)
         IocManager.app.register_error_handler(HTTPException, self.handlers.handle_http_exception)
+        IocManager.app.after_request(RequestHandlers.after_request)
 
     def run(self):
         IocManager.app.run(debug=self.api_config.is_debug, host='0.0.0.0', port=self.api_config.port)
