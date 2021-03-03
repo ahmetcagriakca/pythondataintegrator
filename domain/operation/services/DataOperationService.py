@@ -63,6 +63,10 @@ class DataOperationService(IScoped):
         else:
             return self.update_data_operation(data_operation_model, definition)
 
+        self.database_session_manager.commit()
+        data_operation = self.get_by_id(id=data_operation.Id)
+        return data_operation
+
     def insert_data_operation(self, data_operation_model: CreateDataOperationModel,
                               definition: Definition) -> DataOperation:
         """
@@ -80,10 +84,8 @@ class DataOperationService(IScoped):
                                                        definition=definition)
 
         self.data_operation_repository.insert(data_operation)
-        self.database_session_manager.commit()
-
-        data_operation = self.data_operation_repository.first(Id=data_operation.Id)
         return data_operation
+
 
     def update_data_operation(self,
                               data_operation_model: UpdateDataOperationModel,
@@ -93,7 +95,7 @@ class DataOperationService(IScoped):
         """
         if not self.check_by_name(data_operation_model.Name):
             raise OperationalException("Data Operation not found")
-        data_operation = self.data_operation_repository.first(Name=data_operation_model.Name)
+        data_operation = self.data_operation_repository.first(IsDeleted=0, Name=data_operation_model.Name)
         # insert or update data_integration
         old_definition = data_operation.Definition
         data_operation.Definition = definition
@@ -104,11 +106,6 @@ class DataOperationService(IScoped):
                                                        data_operation_integration_models=data_operation_model.Integrations,
                                                        definition=definition,
                                                        old_definition=old_definition)
-
-        self.database_session_manager.commit()
-
-        data_operation = self.get_by_id(id=data_operation.Id)
-
         return data_operation
 
     def delete_data_operation(self, id: int):
