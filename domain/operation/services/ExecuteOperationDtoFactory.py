@@ -46,6 +46,6 @@ class ExecuteOperationDtoFactory(IScoped):
             source_query=source_connection.Query,
             target_query=target_connection.Query,
             column_rows=column_rows,
-            first_row=data_integration_columns[0].SourceColumnName
+            first_row=f'"{data_integration_columns[0].SourceColumnName}"'
         )
         return execute_operation_dto
