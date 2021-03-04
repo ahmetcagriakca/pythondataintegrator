@@ -1,4 +1,6 @@
 import time
+import re
+
 from injector import inject
 from infrastructor.data.ConnectionPolicy import ConnectionPolicy
 from infrastructor.dependency.scopes import IScoped
@@ -20,6 +22,7 @@ class ConnectionManager(IScoped):
                 return func(*args, **kwargs)
             finally:
                 args[0].connector.disconnect()
+
         return inner
 
     @connect
@@ -57,7 +60,7 @@ class ConnectionManager(IScoped):
         except Exception as ex:
             if retry > self.retry_count:
                 self.sql_logger.error(f"Db write error on Error:{ex}")
-                raise 
+                raise
             self.sql_logger.error(
                 f"Getting error on insert (Operation will be retried. Retry Count:{retry}). Error:{ex}")
             # retrying connect to db,
@@ -80,10 +83,16 @@ class ConnectionManager(IScoped):
         truncate_query = self.connector.get_truncate_query(schema=schema, table=table)
         return self.execute(query=truncate_query)
 
+    def replace_regex(self, text, field, indexer):
+        text = re.sub(r'\(:' + field + r'\b', f'({indexer}', text)
+        text = re.sub(r':' + field + r'\b\)', f'{indexer})', text)
+        text = re.sub(r':' + field + r'\b', f'{indexer}', text)
+        return text
+
     def prepare_target_query(self, column_rows, query):
         target_query = query
         for column_row in column_rows:
             index = column_rows.index(column_row)
             indexer = self.connector.get_target_query_indexer().format(index=index)
-            target_query = target_query.replace(f":{column_row[1]}", indexer)
+            target_query = self.replace_regex(target_query, column_row[1], indexer)
         return target_query
