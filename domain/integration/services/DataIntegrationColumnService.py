@@ -74,8 +74,10 @@ class DataIntegrationColumnService(IScoped):
 
         if len(source_columns_list) != len(target_columns_list):
             raise OperationalException("Source and Target Column List must be equal")
-        for source_column_name in source_columns_list:
-            target_column_name = target_columns_list[source_columns_list.index(source_column_name)]
+        for source_column_name_data in source_columns_list:
+            target_column_name_data = target_columns_list[source_columns_list.index(source_column_name_data)]
+            source_column_name = source_column_name_data.strip()
+            target_column_name = target_column_name_data.strip()
             data_integration_column = self.data_integration_column_repository.first(
                 SourceColumnName=source_column_name, TargetColumnName=target_column_name,
                 DataIntegration=data_integration)
@@ -100,5 +102,5 @@ class DataIntegrationColumnService(IScoped):
                 self.database_session_manager.session.delete(data_integration_column)
         return data_integration
 
-    def delete(self, id:int):
+    def delete(self, id: int):
         self.data_integration_column_repository.delete_by_id(id)

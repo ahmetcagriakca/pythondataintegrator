@@ -33,41 +33,19 @@ class JobSchedulerService(IScoped):
     # handle transaction and handle unexpected errors
     def job_transaction_handler(func):
         def inner(*args, **kwargs):
-            # database_session_manager = IocManager.injector.get(DatabaseSessionManager)
-            database_session_manager = args[0].database_session_manager
-            if database_session_manager is None:
-                raise Exception("Database session manager required")
+            database_session_manager = IocManager.injector.get(DatabaseSessionManager)
             try:
-                database_session_manager.close()
-                database_session_manager.connect()
                 result = func(*args, **kwargs)
                 database_session_manager.commit()
                 return result
-            except psycopg2.exc.OperationalError as ex:
-                try:
-                    database_session_manager.rollback()
-                    database_session_manager.close()
-                    database_session_manager.connect()
-                    return func(*args, **kwargs)
-
-                except Exception as invalid_ex:
-                    print(ex)
-                    raise
-            except InvalidRequestError as ex:
-                try:
-                    database_session_manager.rollback()
-                    database_session_manager.close()
-                    database_session_manager.connect()
-                    return func(*args, **kwargs)
-                except Exception as invalid_ex:
-                    print(ex)
-                    raise
-
             except Exception as ex:
-                database_session_manager.rollback()
-                database_session_manager.close()
-                print(ex)
-                raise
+                try:
+                    database_session_manager.rollback()
+                    database_session_manager.connect()
+                    return func(*args, **kwargs)
+                except Exception as invalid_ex:
+                    print(ex)
+                    raise
         return inner
 
     def set_job_scheduler_type(self, job_scheduler_type):
@@ -82,7 +60,6 @@ class JobSchedulerService(IScoped):
     def add_log(self, event, log_text):
         ap_scheduler_event: ApSchedulerEvent = self.ap_scheduler_event_repository.first(Code=event.code)
         job_detail = ''
-        job_id = None
         if hasattr(event, 'job_id') and event.job_id:
             ap_scheduler_job: List[ApSchedulerJob] = self.ap_scheduler_job_repository.first(JobId=event.job_id)
             job_id = ''

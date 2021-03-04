@@ -29,12 +29,7 @@ from models.dao.common.ConfigParameter import ConfigParameter
 
 class JobScheduler(ISingleton):
     @inject
-    def __init__(self,
-                 database_config: DatabaseConfig,
-                 database_session_manager: DatabaseSessionManager,
-                 ):
-        self.database_session_manager: DatabaseSessionManager = database_session_manager
-        self.database_config: DatabaseConfig = database_config
+    def __init__(self):
         self.scheduler: BackgroundScheduler = None
 
     def run(self):
@@ -42,6 +37,9 @@ class JobScheduler(ISingleton):
         print("job_process started")
 
     def run_scheduler(self):
+        
+        self.database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
+        self.database_config: DatabaseConfig = IocManager.injector.get(DatabaseConfig)
         jobstores = {
             'default': SQLAlchemyJobStore(url=self.database_config.connection_string, tablename='ApSchedulerJobsTable',
                                           engine=self.database_session_manager.engine,
@@ -50,11 +48,11 @@ class JobScheduler(ISingleton):
         }
         executors = {
             'default': ThreadPoolExecutor(20),
-            'processpool': ProcessPoolExecutor(5)
+            'processpool': ProcessPoolExecutor(10)
         }
         job_defaults = {
             'coalesce': False,
-            'max_instances': 5
+            'max_instances': 10
         }
         self.scheduler = BackgroundScheduler(daemon=True, jobstores=jobstores, executors=executors,
                                              job_defaults=job_defaults)
@@ -70,7 +68,7 @@ class JobScheduler(ISingleton):
         self.scheduler.add_listener(JobSchedulerEvent.listener_scheduler_other_events,
                                     EVENT_SCHEDULER_STARTED | EVENT_SCHEDULER_SHUTDOWN | EVENT_SCHEDULER_PAUSED | EVENT_SCHEDULER_RESUMED | EVENT_EXECUTOR_ADDED | EVENT_EXECUTOR_REMOVED | EVENT_JOBSTORE_ADDED | EVENT_JOBSTORE_REMOVED)
         self.scheduler.start()
-
+        self.scheduler.print_jobs()
         print('To clear the alarms, delete the example.sqlite file.')
         print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 

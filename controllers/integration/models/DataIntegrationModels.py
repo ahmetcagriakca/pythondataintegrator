@@ -165,6 +165,7 @@ class DataIntegrationModels:
 
         entities = []
         for data_integration in data_integrations:
-            entity = DataIntegrationModels.get_data_integration_model(data_integration)
-            entities.append(entity)
+            if data_integration.IsDeleted == 0:
+                entity = DataIntegrationModels.get_data_integration_model(data_integration)
+                entities.append(entity)
         return entities

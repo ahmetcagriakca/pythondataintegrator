@@ -14,7 +14,7 @@ from infrastructor.IocManager import IocManager
 from infrastructor.data.ConnectionProvider import ConnectionProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
-from infrastructor.data.decorators.UnexpectedlyChecker import transaction_handler
+from infrastructor.data.decorators.TransactionHandler import transaction_handler
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.multi_processing.ParallelMultiProcessing import TaskData

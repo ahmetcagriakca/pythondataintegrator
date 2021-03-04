@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 
+from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
@@ -22,11 +23,9 @@ class TestServiceScenarios:
         self.service_endpoints = service_endpoints
 
     def get_data_operation(self, name):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
-            database_session_manager)
-        data_operation = data_operation_repository.first(Name=name)
+        data_operation_service: DataOperationService = self.ioc_manager.injector.get(
+            DataOperationService)
+        data_operation = data_operation_service.get_by_name(name=name)
         return data_operation
 
     def clear_secret(self, id):
