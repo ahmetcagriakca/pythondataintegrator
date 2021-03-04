@@ -59,12 +59,12 @@ class DataOperationService(IScoped):
         definition: Definition = self.definition_service.create_definition(data_operation_model.Name, definition_json)
         data_operation = self.get_by_name(name=data_operation_model.Name)
         if data_operation is None:
-            return self.insert_data_operation(data_operation_model, definition)
+            self.insert_data_operation(data_operation_model, definition)
         else:
-            return self.update_data_operation(data_operation_model, definition)
+            self.update_data_operation(data_operation_model, definition)
 
         self.database_session_manager.commit()
-        data_operation = self.get_by_id(id=data_operation.Id)
+        data_operation = self.get_by_name(name=data_operation_model.Name)
         return data_operation
 
     def insert_data_operation(self, data_operation_model: CreateDataOperationModel,
@@ -85,7 +85,6 @@ class DataOperationService(IScoped):
 
         self.data_operation_repository.insert(data_operation)
         return data_operation
-
 
     def update_data_operation(self,
                               data_operation_model: UpdateDataOperationModel,

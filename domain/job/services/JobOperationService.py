@@ -14,7 +14,6 @@ from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
-from models.dao.operation import DataOperation
 from models.dao.operation.DataOperationJob import DataOperationJob
 
 
@@ -31,8 +30,6 @@ class JobOperationService(IScoped):
         self.data_operation_service = data_operation_service
         self.job_scheduler = job_scheduler
         self.database_session_manager = database_session_manager
-        self.data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
-            database_session_manager)
         self.data_operation_job_repository: Repository[DataOperationJob] = Repository[DataOperationJob](
             database_session_manager)
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
@@ -47,14 +44,9 @@ class JobOperationService(IScoped):
             ap_scheduler_job = self.get_ap_scheduler_with_retry(job_id, retry + 1)
         return ap_scheduler_job
 
-    def modify_job(self, operation_name: str, cron: str, start_date: datetime = None, end_date: datetime = None):
-        if cron is None or cron == '':
-            raise OperationalException("Cron required")
-        data_operation = self.data_operation_repository.first(IsDeleted=0, Name=operation_name)
-        if data_operation is None:
-            raise OperationalException("Data operation not found")
+    def delete_existing_cron_jobs(self, data_operation_id):
         data_operation_jobs = self.data_operation_job_repository.filter_by(IsDeleted=0,
-                                                                           DataOperationId=data_operation.Id).all()
+                                                                           DataOperationId=data_operation_id).all()
         if data_operation_jobs is None or len(data_operation_jobs) == 0:
             raise OperationalException("Job not found initialized with cron")
         founded_cron_job: DataOperationJob = None
@@ -64,18 +56,6 @@ class JobOperationService(IScoped):
                 break
         if founded_cron_job is None:
             raise OperationalException("Job not found initialized with cron")
-        if start_date is not None and start_date != '':
-            job_start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
-        else:
-            job_start_date = datetime.now().astimezone()
-        if end_date is not None and end_date != '':
-            job_end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
-        else:
-            job_end_date = None
-        trigger = CronTrigger.from_crontab(cron)
-        trigger.start_date = job_start_date
-        trigger.end_date = job_end_date
-
         for data_operation_job in data_operation_jobs:
             ap_scheduler_job = self.ap_scheduler_job_repository.first(IsDeleted=0,
                                                                       Id=data_operation_job.ApSchedulerJobId)
@@ -84,12 +64,31 @@ class JobOperationService(IScoped):
             except Exception as ex:
                 pass
         self.data_operation_job_repository.delete_by_id(founded_cron_job.Id)
+
+    def modify_job(self, operation_name: str, cron: str, start_date: datetime = None, end_date: datetime = None):
+        if cron is None or cron == '':
+            raise OperationalException("Cron required")
+        data_operation = self.data_operation_service.get_by_name(name=operation_name)
+        if data_operation is None:
+            raise OperationalException("Data operation not found")
+        if start_date is not None and start_date != '':
+            job_start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
+        else:
+            job_start_date = datetime.now().astimezone()
+        if end_date is not None and end_date != '':
+            job_end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
+        else:
+            job_end_date = None
+
+        self.delete_existing_cron_jobs(data_operation_id=data_operation.Id)
+
         ap_scheduler_job = self.add_job_with_cron(job_function=JobOperationService.job_start_data_operation,
-                                                  cron=cron, start_date=start_date, end_date=end_date,
+                                                  cron=cron, start_date=job_start_date, end_date=job_end_date,
                                                   args=(None, data_operation.Id,))
 
         data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, cron, start_date,
                                                             end_date)
+        self.database_session_manager.commit()
         return data_operation_job
 
     def add_job_with_cron(self, job_function, cron, start_date=None, end_date=None, args=None,
@@ -114,12 +113,11 @@ class JobOperationService(IScoped):
                                               Cron=cron, ApSchedulerJob=ap_scheduler_job,
                                               DataOperation=data_operation)
         self.data_operation_job_repository.insert(data_operation_job)
-        self.database_session_manager.commit()
         return data_operation_job
 
     #######################################################################################
     def add_pdi_job_with_date(self, operation_name: str, run_date: datetime = None):
-        data_operation = self.data_operation_repository.first(IsDeleted=0, Name=operation_name)
+        data_operation = self.data_operation_service.get_by_name(name=operation_name)
         if data_operation is None:
             raise OperationalException("Data operation not found")
         if run_date is not None and run_date != '':
@@ -129,6 +127,7 @@ class JobOperationService(IScoped):
         ap_scheduler_job = self.add_job_with_date(job_function=JobOperationService.job_start_data_operation,
                                                   run_date=start_date, args=(None, data_operation.Id,))
         data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, None, start_date, None)
+        self.database_session_manager.commit()
         return data_operation_job
 
     def check_cron_initialized_jobs(self, data_operation_id):
@@ -142,24 +141,26 @@ class JobOperationService(IScoped):
                               end_date: datetime = None):
         if cron is None or cron == '':
             raise OperationalException("Cron required")
-        data_operation = self.data_operation_repository.first(IsDeleted=0, Name=operation_name)
+        data_operation = self.data_operation_service.get_by_name(name=operation_name)
         if data_operation is None:
             raise OperationalException("Data Operation not found")
 
         self.check_cron_initialized_jobs(data_operation.Id)
         if start_date is not None and start_date != '':
-            start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
+            job_start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
         else:
-            start_date = datetime.now().astimezone()
+            job_start_date = datetime.now().astimezone()
         if end_date is not None and end_date != '':
-            end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
+            job_end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
         else:
-            end_date = None
+            job_end_date = None
         ap_scheduler_job = self.add_job_with_cron(job_function=JobOperationService.job_start_data_operation,
-                                                  cron=cron, start_date=start_date, end_date=end_date,
+                                                  cron=cron, start_date=job_start_date, end_date=job_end_date,
                                                   args=(None, data_operation.Id,))
         data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, cron, start_date,
                                                             end_date)
+
+        self.database_session_manager.commit()
         return data_operation_job
 
     @staticmethod
