@@ -21,6 +21,7 @@ class DatabaseSessionManager(IScoped):
         self.connect()
 
     def __del__(self):
+        # super(DatabaseSessionManager, self).__del__()
         close = getattr(self, "close", None)
         if callable(close):
             self.close()

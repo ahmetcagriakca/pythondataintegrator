@@ -7,7 +7,8 @@ class MssqlDbConnector(ConnectorStrategy):
     def __init__(self, database_config: DatabaseConfig):
         self.database_config: DatabaseConfig = database_config
         self.database_config.driver = 'ODBC Driver 17 for SQL Server'
-        self.connection_string = 'DRIVER={%s};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s' % (
+        # ;Client_CSet=UTF-8;Server_CSet=WINDOWS-1251
+        self.connection_string = 'DRIVER={%s};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s;Client_CSet=UTF-8;Server_CSet=WINDOWS-1251' % (
             self.database_config.driver, self.database_config.host, self.database_config.database,
             self.database_config.username, self.database_config.password)
 
@@ -15,8 +16,10 @@ class MssqlDbConnector(ConnectorStrategy):
         self.cursor = None
 
     def connect(self):
-        self.connection = pyodbc.connect(self.connection_string)
+        self.connection = pyodbc.connect(self.connection_string)  # ,ansi=True)
+        self.connection.setencoding(encoding='utf-8')
         self.cursor = self.connection.cursor()
+        self.cursor.setinputsizes([(pyodbc.SQL_WVARCHAR, 0, 0)])
 
     def disconnect(self):
         try:
@@ -34,17 +37,16 @@ class MssqlDbConnector(ConnectorStrategy):
             self.cursor.executemany(query, data)
             self.connection.commit()
         except Exception as error:
-
             try:
+                self.connection.rollback()
                 self.cursor.fast_executemany = False
                 self.cursor.executemany(query, data)
                 self.connection.commit()
             except Exception as error:
                 self.connection.rollback()
                 self.cursor.close()
-                raise 
+                raise
 
     def get_target_query_indexer(self):
         indexer = '?'
         return indexer
-

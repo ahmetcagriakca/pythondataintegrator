@@ -6,6 +6,11 @@ class ProcessBaseData:
     def __init__(self,
                  Id: int = None):
         self.Id: int = Id
+        self.State: int = None
+        self.Result = None
+        self.Message: str = None
+        self.Exception: Exception = Id
+        self.Traceback: Exception = Id
 
 
 class TaskData:
@@ -34,8 +39,15 @@ class ParallelMultiProcessing:
     def __init__(self, number_of_process=5):
         self.number_of_process = number_of_process
 
+    def __del__(self):
+        print("multi processing finished")
+        self.finish_all_processes()
+        self.manager.shutdown()
+        self.pool.close()
+
     def configure_process(self):
         self.manager = multiprocessing.Manager()
+
         # Define a list (queue) for tasks and computation results
         self.tasks = self.manager.Queue()
         self.results = self.manager.Queue()
@@ -80,6 +92,7 @@ class ParallelMultiProcessing:
                 process_data.IsFinished = True
                 # data = TaskData(SubProcessId=process_data.SubProcessId, IsFinished=True)
                 # self.results.put(data)
+                process_data.Process.terminate()
 
     def check_all_processes_finish(self):
         check_finish = True
@@ -94,7 +107,7 @@ class ParallelMultiProcessing:
         print(f"All processes are expected to end . SubProcessId:{process_join}")
         return check_finish
 
-    def check_processes(self, result_function):
+    def check_processes(self, result_function=None):
         # Read calculation results
         while True:
             # Read result
@@ -105,6 +118,10 @@ class ParallelMultiProcessing:
                 for process_data in self.processes:
                     if process_data.SubProcessId == new_result.SubProcessId:
                         process_data.IsFinished = True
+                if new_result.Data is not None:
+                    for task in self.task_list:
+                        if task.Data.Id == new_result.Data.Id:
+                            task.Data = new_result.Data
                 self.check_unfinished_processes()
                 if self.check_all_processes_finish():
                     break
@@ -112,8 +129,14 @@ class ParallelMultiProcessing:
                 for task in self.task_list:
                     if task.Data.Id == new_result.Data.Id:
                         print(f"Task is finished :{task.Data}")
+                        task.Data = new_result.Data
                         task.IsProcessed = True
-                result_function(new_result)
+                if result_function is not None:
+                    result_function(new_result)
+
+    def finish_all_processes(self):
+        for process_data in self.processes:
+            process_data.Process.terminate()
 
     def unprocessed_tasks(self) -> List[TaskData]:
         unprocessed_task_list = [task for task in self.task_list if task.IsProcessed == False]
