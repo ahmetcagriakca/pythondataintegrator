@@ -42,7 +42,7 @@ class ConnectionSecretService(IScoped):
         connection_secret = self.connection_secret_repository.first(IsDeleted=0, Connection=connection)
         if connection_secret is None:
             raise OperationalException("Connection Secret Not Found")
-        self.secret_service.update_basic_authentication(name=connection.Name, user=user, password=password)
+        self.secret_service.update_basic_authentication(id=connection_secret.SecretId, user=user, password=password)
 
         return connection_secret
 
