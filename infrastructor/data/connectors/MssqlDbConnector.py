@@ -8,7 +8,7 @@ class MssqlDbConnector(ConnectorStrategy):
         self.database_config: DatabaseConfig = database_config
         self.database_config.driver = 'ODBC Driver 17 for SQL Server'
         # ;Client_CSet=UTF-8;Server_CSet=WINDOWS-1251
-        self.connection_string = 'DRIVER={%s};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s;Client_CSet=UTF-8;Server_CSet=WINDOWS-1251' % (
+        self.connection_string = 'DRIVER={%s};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s' % (
             self.database_config.driver, self.database_config.host, self.database_config.database,
             self.database_config.username, self.database_config.password)
 
@@ -17,7 +17,7 @@ class MssqlDbConnector(ConnectorStrategy):
 
     def connect(self):
         self.connection = pyodbc.connect(self.connection_string)  # ,ansi=True)
-        self.connection.setencoding(encoding='utf-8')
+        # self.connection.setencoding(encoding='utf-8')
         self.cursor = self.connection.cursor()
         self.cursor.setinputsizes([(pyodbc.SQL_WVARCHAR, 0, 0)])
 
