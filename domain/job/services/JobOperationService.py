@@ -12,6 +12,7 @@ from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exception.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructor.multi_processing.ParallelMultiProcessing import ParallelMultiProcessing, TaskData, ProcessBaseData
 from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.operation.DataOperationJob import DataOperationJob
@@ -165,6 +166,32 @@ class JobOperationService(IScoped):
 
     @staticmethod
     def job_start_data_operation(job_id, data_operation_id: int):
-        data_operation_job_service: DataOperationJobService = IocManager.injector.get(DataOperationJobService)
-        result = data_operation_job_service.start_operation(data_operation_id=data_operation_id, job_id=job_id)
-        return result
+        start = time.time()
+        start_datetime = datetime.now()
+
+        sql_logger = SqlLogger()
+        sql_logger.info(f"{job_id}-{data_operation_id} Data Operations Started")
+        parallel_multi_processing = ParallelMultiProcessing(1)
+        parallel_multi_processing.configure_process()
+        parallel_multi_processing.start_processes(process_id=data_operation_id, job_id=job_id,
+                                                  process_function=DataOperationJobService.job_start_thread)
+        data = ProcessBaseData(Id=1)
+        td = TaskData(data)
+        parallel_multi_processing.add_task(td)
+        parallel_multi_processing.check_processes()
+        parallel_multi_processing.finish_all_processes()
+        end_datetime = datetime.now()
+        end = time.time()
+        sql_logger.info(f"{job_id}-{data_operation_id} Start :{start_datetime}")
+        sql_logger.info(f"{job_id}-{data_operation_id} End :{end_datetime}")
+        sql_logger.info(f"{job_id}-{data_operation_id} ElapsedTime :{end - start}")
+
+        unprocessed_task = parallel_multi_processing.unprocessed_tasks()
+        if unprocessed_task[0].Data.State == 2:
+            sql_logger.info(
+                f"{job_id}-{data_operation_id} Data Operations Finished With Error: {unprocessed_task[0].Data.Message}")
+            exc = Exception(unprocessed_task[0].Data.Traceback+'\n'+str(unprocessed_task[0].Data.Exception))
+            raise exc
+        sql_logger.info(f"{job_id}-{data_operation_id} Data Operations Finished")
+        del parallel_multi_processing
+        return unprocessed_task[0].Data.Result

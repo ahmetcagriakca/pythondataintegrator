@@ -23,6 +23,7 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import ISingleton
 from infrastructor.scheduler.JobSchedulerEvent import JobSchedulerEvent
+from models.configs.ApsConfig import ApsConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.common.ConfigParameter import ConfigParameter
 
@@ -37,22 +38,22 @@ class JobScheduler(ISingleton):
         print("job_process started")
 
     def run_scheduler(self):
-        
-        self.database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
-        self.database_config: DatabaseConfig = IocManager.injector.get(DatabaseConfig)
+        database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
+        database_config: DatabaseConfig = IocManager.injector.get(DatabaseConfig)
+        aps_config: ApsConfig = IocManager.injector.get(ApsConfig)
         jobstores = {
-            'default': SQLAlchemyJobStore(url=self.database_config.connection_string, tablename='ApSchedulerJobsTable',
-                                          engine=self.database_session_manager.engine,
+            'default': SQLAlchemyJobStore(url=database_config.connection_string, tablename='ApSchedulerJobsTable',
+                                          engine=database_session_manager.engine,
                                           metadata=IocManager.Base.metadata,
                                           tableschema='Aps')
         }
         executors = {
-            'default': ThreadPoolExecutor(20),
-            'processpool': ProcessPoolExecutor(10)
+            'default': ThreadPoolExecutor(aps_config.thread_pool_executer_count),
+            'processpool': ProcessPoolExecutor(aps_config.process_pool_executer_count)
         }
         job_defaults = {
-            'coalesce': False,
-            'max_instances': 10
+            'coalesce': aps_config.coalesce,
+            'max_instances': aps_config.max_instances
         }
         self.scheduler = BackgroundScheduler(daemon=True, jobstores=jobstores, executors=executors,
                                              job_defaults=job_defaults)

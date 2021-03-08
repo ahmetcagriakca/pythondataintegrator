@@ -179,7 +179,7 @@ class TestServiceScenarios:
             if data_operation_job_execution is not None and (
                     data_operation_job_execution.StatusId != 3 and data_operation_job_execution.StatusId != 4
             ):
-                time.sleep(10)
+                time.sleep(20)
             else:
                 return data_operation_job_execution
 

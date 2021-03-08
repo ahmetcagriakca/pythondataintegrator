@@ -18,9 +18,9 @@ class SqlLogger(IScoped):
         pass
         # console_logger: ConsoleLogger = IocManager.injector.get(ConsoleLogger)
         # console_logger.info(f'{type_of_log} - {log_string}')
-        api_config: ApiConfig = IocManager.injector.get(ApiConfig)
+        api_config: ApiConfig = IocManager.config_manager.get(ApiConfig)
+        database_config = IocManager.config_manager.get(DatabaseConfig)
         console_logger: ConsoleLogger = IocManager.injector.get(ConsoleLogger)
-        database_config = IocManager.injector.get(DatabaseConfig)
         database_session_manager = DatabaseSessionManager(database_config=database_config, api_config=api_config)
         log_repository: Repository[Log] = Repository[Log](database_session_manager)
         log_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]

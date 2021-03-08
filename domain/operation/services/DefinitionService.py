@@ -1,17 +1,10 @@
 from typing import List
 from injector import inject
 
-from domain.operation.services.DataOperationContactService import DataOperationContactService
-from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
-from models.dao.operation import DataOperation, Definition
-from models.dao.operation.DataOperationContact import DataOperationContact
-from models.viewmodels.operation import CreateDataOperationModel
-from models.viewmodels.operation.UpdateDataOperationModel import UpdateDataOperationModel
+from models.dao.operation import Definition
 
 
 class DefinitionService(IScoped):
