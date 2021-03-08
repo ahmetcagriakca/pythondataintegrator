@@ -14,6 +14,11 @@ RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
 RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 RUN source ~/.bashrc
 # optional: for unixODBC development headers
+RUN yum update -y
+RUN yum install -y epel-release
+RUN yum install -y python3 python3-pip gcc-c++ python3-devel unixODBC-devel
+
+RUN pip3 install pyodbc
 
 # Oracle installation
 RUN yum install -y wget unzip libaio
@@ -25,18 +30,7 @@ RUN echo export LD_LIBRARY_PATH=/usr/lib/oracle/19.8/client64/lib/ >> /etc/bashr
 RUN echo export ORACLE_HOME=/usr/lib/oracle/19.8/client64 >> /etc/bashrc
 RUN echo export PATH=$ORACLE_HOME/bin:$PATH >> /etc/bashrc
 
-
-# python and unixODBC installation
-RUN yum update -y
-RUN yum install -y epel-release
-RUN yum install -y python3 python3-pip gcc-c++ python3-devel unixODBC-devel
-ARG         PIP_URL_PRIVATE
-RUN         echo "Python repository url: $PIP_URL_PRIVATE"
-#Python packages added to image
 RUN pip3 install  cx_Oracle
-RUN pip3 install  pyodbc
-
-
 
 ARG         PIP_URL_PRIVATE
 RUN         echo "Python repository url: $PIP_URL_PRIVATE"
@@ -50,6 +44,7 @@ COPY       	. /app
 WORKDIR    	/app
 RUN python3 --version
 RUN date
+
 ADD entrypoint.sh .
 # # openshift set permission to non-root users for /app directory
 RUN chgrp -R 0 /app && \

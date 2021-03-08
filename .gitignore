@@ -112,3 +112,7 @@ application.dev.yml
 tests/integrationtests/temp
 Dockerfile.prod
 docker-compose.prod.yml
+Dockerfile.test
+test_docker.py
+docker-compose.test.yml
+entrypoint_test.sh

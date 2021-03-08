@@ -88,7 +88,7 @@ class DataOperationIntegrationService(IScoped):
         for existing_integration in check_existing_integrations:
             founded = False
             for data_operation_integration_model in data_operation_integration_models:
-                if existing_integration.DataIntegration.Code == data_operation_integration_model.Integration.Code:
+                if existing_integration.DataIntegration.Code == data_operation_integration_model.Integration.Code and existing_integration.DataIntegration.IsDeleted == 0:
                     founded = True
             if not founded:
                 self.delete_by_id(existing_integration.Id)

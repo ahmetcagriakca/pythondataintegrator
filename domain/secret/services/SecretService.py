@@ -47,11 +47,11 @@ class SecretService(IScoped):
         self.secret_source_service.create_basic_authentication(secret=secret, user=user, password=password)
         return secret
 
-    def update_basic_authentication(self, name: str, user: str, password: str) -> Secret:
+    def update_basic_authentication(self, id: int, user: str, password: str) -> Secret:
         """
         Create File connection
         """
-        secret = self.secret_repository.first(IsDeleted=0, Name=name)
+        secret = self.secret_repository.first(IsDeleted=0, Id=id)
         if secret is None:
             raise OperationalException("Secret Not Found")
         else:
