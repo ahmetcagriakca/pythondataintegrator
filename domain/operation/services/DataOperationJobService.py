@@ -1,4 +1,6 @@
+import gc
 import os
+import traceback
 from time import time
 from typing import List
 from injector import inject
@@ -103,16 +105,22 @@ class DataOperationJobService(IScoped):
                     self.sql_logger.info(
                         f"{process_name}-{sub_process_id} process got a new task.Id:{new_task.Data.Id} limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit} ")
                     limit_modifier = new_task.Data
-                    self.start_execute_operation(data_integration_id=process_id,
-                                                 limit_modifier=limit_modifier)
+                    result = self.start_execute_operation(data_integration_id=process_id, limit_modifier=limit_modifier)
                     end = time()
                     self.sql_logger.info(
                         f"{process_name} process finished task. limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit}. time:{end - start}")
                     new_task.IsProcessed = True
+                    new_task.Data.State = 1
+                    new_task.Data.Message = result
                     results.put(new_task)
         except Exception as ex:
             self.sql_logger.error(f"{process_name} process getting error:{ex}", job_id=job_id)
-            data = TaskData(SubProcessId=sub_process_id, IsFinished=True)
+            data = new_task.Data
+            data.State = 2
+            data.Message = str(ex)
+            data.Exception = ex
+            data.Traceback = traceback.format_exc()
+            data = TaskData(Data=data, SubProcessId=sub_process_id, IsFinished=True)
             results.put(data)
 
     @staticmethod
@@ -135,18 +143,19 @@ class DataOperationJobService(IScoped):
         for limit_modifier in limit_modifiers:
             start = time()
             self.sql_logger.info(
-                f"Process got a new task. limits:{limit_modifier.SubLimit}-{limit_modifier.TopLimit} ")
+                f"Process got a new task.Id:{limit_modifier.Id}  limits:{limit_modifier.SubLimit}-{limit_modifier.TopLimit} ")
             self.start_execute_operation(data_integration_id=data_integration_id, limit_modifier=limit_modifier)
             end = time()
             self.sql_logger.info(
                 f"Process finished task. limits:{limit_modifier.SubLimit}-{limit_modifier.TopLimit}. time:{end - start}")
 
-    def start_execute_operation(self, data_integration_id, limit_modifier):
+    def start_execute_operation(self, data_integration_id, limit_modifier) -> str:
 
         execute_operation_dto = self.execute_operation_dto_factory.create_execute_operation_dto(
             data_integration_id=data_integration_id)
         execute_operation_dto.limit_modifier = limit_modifier
         self.execute_operation(execute_operation_dto=execute_operation_dto)
+        return "success"
 
     def execute_operation(self, execute_operation_dto: ExecuteOperationDto):
         source_connection_manager = self.connection_provider.get_connection_manager(
@@ -400,3 +409,46 @@ class DataOperationJobService(IScoped):
                 event_code=EVENT_EXECUTION_FINISHED)
             self.data_operation_job_execution_service.send_data_operation_finish_mail(data_operation_job_execution_id)
             raise
+
+    def job_start_operation(self, data_operation_id, job_id, sub_process_id, process_name, tasks, results):
+
+        try:
+            print('[%s] evaluation routine starts' % process_name)
+
+            while True:
+                # waiting for new task
+                new_task: TaskData = tasks.get()
+                new_task.SubProcessId = sub_process_id
+                start = time()
+                self.sql_logger.info(
+                    f"{job_id}-{data_operation_id} process started.")
+
+                result = self.start_operation(data_operation_id=data_operation_id,
+                                              job_id=job_id)
+                end = time()
+                self.sql_logger.info(
+                    f"{job_id}-{data_operation_id} process finished. time:{end - start}")
+                new_task.IsProcessed = True
+                new_task.IsFinished = True
+                new_task.Data.State = 1
+                new_task.Data.Result = result
+                results.put(new_task)
+        except Exception as ex:
+            self.sql_logger.error(f"{job_id}-{data_operation_id} process getting error:{ex}", job_id=job_id)
+            data = new_task.Data
+            data.State = 2
+            data.Message = str(ex)
+            data.Exception = ex
+            data.Traceback = traceback.format_exc()
+            data = TaskData(Data=data, SubProcessId=sub_process_id, IsFinished=True)
+            results.put(data)
+
+    @staticmethod
+    def job_start_thread(process_id, job_id, sub_process_id, process_name, tasks, results):
+        root_directory = os.path.abspath(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir))
+        IocManager.configure_startup(root_directory)
+        data_operation_job_service = IocManager.injector.get(DataOperationJobService)
+        data_operation_job_service.job_start_operation(data_operation_id=process_id, job_id=job_id,
+                                                       sub_process_id=sub_process_id, process_name=process_name,
+                                                       tasks=tasks, results=results)

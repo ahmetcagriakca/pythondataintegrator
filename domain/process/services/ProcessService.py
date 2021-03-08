@@ -1,7 +1,6 @@
 from datetime import datetime
 from time import time
 from injector import inject
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.multi_processing.ParallelMultiProcessing import TaskData, ParallelMultiProcessing
@@ -19,10 +18,8 @@ class ProcessService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
                  ):
-        self.database_session_manager = database_session_manager
         self.sql_logger: SqlLogger = sql_logger
 
     def start_parallel_process(self, process_id, datas, process_count, process_function, result_method,job_id):
@@ -46,4 +43,5 @@ class ProcessService(IScoped):
         print(f"ElapsedTime :{end - start}")
 
         unprocessed_task = parallel_multi_processing.unprocessed_tasks()
+        del parallel_multi_processing
         return unprocessed_task

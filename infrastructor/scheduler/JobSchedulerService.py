@@ -9,39 +9,40 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
+from models.configs.ApiConfig import ApiConfig
+from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.aps import ApSchedulerJobEvent
 from models.dao.aps.ApSchedulerEvent import ApSchedulerEvent
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 
 
-class JobSchedulerService(IScoped):
-    @inject
+class JobSchedulerService:
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
-                 sql_logger: SqlLogger,
                  ):
-        self.sql_logger = sql_logger
-        self.database_session_manager = database_session_manager
+
+        self.sql_logger = SqlLogger()
+        api_config: ApiConfig = IocManager.config_manager.get(ApiConfig)
+        database_config = IocManager.config_manager.get(DatabaseConfig)
+        self.database_session_manager = DatabaseSessionManager(database_config=database_config, api_config=api_config)
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
-            database_session_manager)
+            self.database_session_manager)
         self.ap_scheduler_event_repository: Repository[ApSchedulerEvent] = Repository[ApSchedulerEvent](
-            database_session_manager)
+            self.database_session_manager)
         self.ap_scheduler_job_event_repository: Repository[ApSchedulerJobEvent] = Repository[ApSchedulerJobEvent](
-            database_session_manager)
+            self.database_session_manager)
         self.job_scheduler_type = None
 
     # handle transaction and handle unexpected errors
     def job_transaction_handler(func):
         def inner(*args, **kwargs):
-            database_session_manager = IocManager.injector.get(DatabaseSessionManager)
             try:
                 result = func(*args, **kwargs)
-                database_session_manager.commit()
+                args[0].database_session_manager.commit()
                 return result
             except Exception as ex:
                 try:
-                    database_session_manager.rollback()
-                    database_session_manager.connect()
+                    args[0].database_session_manager.rollback()
+                    args[0].database_session_manager.connect()
                     return func(*args, **kwargs)
                 except Exception as invalid_ex:
                     print(ex)
