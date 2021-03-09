@@ -21,37 +21,27 @@ class ScheduleJobWithCronResource(ResourceBase):
     @JobSchedulerModels.ns.marshal_with(CommonModels.SuccessModel)
     def post(self):
         """
-        Schedule Data Operation cron job
+        Schedule Data Operation Cron Job
         """
         data = IocManager.api.payload
         operation_name = data.get('OperationName')  #
         cron = data.get('Cron')  #
         start_date = data.get('StartDate')  #
         end_date = data.get('EndDate')  #
-        start_operation_result = self.job_operation_service.add_pdi_job_with_cron(operation_name=operation_name,
-                                                                                  cron=cron,
-                                                                                  start_date=start_date,
-                                                                                  end_date=end_date)
+        start_operation_result = self.job_operation_service.create_job_with_cron(operation_name=operation_name,
+                                                                                 cron=cron,
+                                                                                 start_date=start_date,
+                                                                                 end_date=end_date)
         result = JobSchedulerModels.get_data_operation_job_model(start_operation_result)
         return CommonModels.get_response(result=result)
 
-    @JobSchedulerModels.ns.expect(JobSchedulerModels.start_operation_with_cron_model,
-                                  validate=True)
+    @JobSchedulerModels.ns.expect(JobSchedulerModels.delete_operation_cron_job_model, validate=True)
     @JobSchedulerModels.ns.marshal_with(CommonModels.SuccessModel)
-    def put(self):
+    def delete(self):
         """
-        Update existing Data Operation cron job
+        Delete Existing Cron Job
         """
         data = IocManager.api.payload
-        operation_name = data.get('OperationName')  #
-        cron = data.get('Cron')  #
-        start_date = data.get('StartDate')  #
-        end_date = data.get('EndDate')  #
-        start_operation_result = self.job_operation_service.modify_job(operation_name=operation_name, cron=cron, start_date=start_date,
-                                                                       end_date=end_date)
-        if isinstance(start_operation_result, DataOperationJob):
-            result = JobSchedulerModels.get_data_operation_job_model(start_operation_result)
-            return CommonModels.get_response(result=result)
-        else:
-            message = start_operation_result
-            return CommonModels.get_error_response(message=message)
+        data_operation_name = data.get('DataOperationName')  #
+        deletion_result = self.job_operation_service.delete_scheduler_cron_job(data_operation_name=data_operation_name)
+        return CommonModels.get_response(message="Data Operation Job Cron removed successfully")

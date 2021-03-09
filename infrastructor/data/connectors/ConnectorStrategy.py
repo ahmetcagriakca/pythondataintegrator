@@ -36,3 +36,7 @@ class ConnectorStrategy(IScoped):
     @abstractmethod
     def get_table_data_query(self, query, first_row, sub_limit, top_limit):
         return f"WITH TEMP_INTEGRATION AS(SELECT ordered_query.*,ROW_NUMBER() OVER ( order by {first_row}) row_number FROM ({query}) ordered_query) SELECT * FROM TEMP_INTEGRATION WHERE row_number >= {sub_limit} AND row_number < {top_limit}"
+
+    @abstractmethod
+    def prepare_data(self, data):
+        return data

@@ -40,7 +40,6 @@ class ParallelMultiProcessing:
         self.number_of_process = number_of_process
 
     def __del__(self):
-        print("multi processing finished")
         self.finish_all_processes()
         self.manager.shutdown()
         self.pool.close()

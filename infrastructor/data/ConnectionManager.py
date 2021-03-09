@@ -96,3 +96,13 @@ class ConnectionManager(IScoped):
             indexer = self.connector.get_target_query_indexer().format(index=index)
             target_query = self.replace_regex(target_query, column_row[1], indexer)
         return target_query
+
+    def prepare_insert_row(self, extracted_datas, column_rows):
+        insert_rows = []
+        for extracted_data in extracted_datas:
+            row = []
+            for column_row in column_rows:
+                data = self.connector.prepare_data(extracted_data[column_rows.index(column_row)])
+                row.append(data)
+            insert_rows.append(tuple(row))
+        return insert_rows
