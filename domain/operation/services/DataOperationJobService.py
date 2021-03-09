@@ -78,15 +78,6 @@ class DataOperationJobService(IScoped):
             sub_limit += limit
         return limit_modifiers
 
-    def prepare_insert_row(self, extracted_datas, column_rows):
-        insert_rows = []
-        for extracted_data in extracted_datas:
-            row = []
-            for column_row in column_rows:
-                row.append(extracted_data[column_rows.index(column_row)])
-            insert_rows.append(tuple(row))
-        return insert_rows
-
     def start_parallel_operation(self, process_id, job_id, sub_process_id, process_name, tasks, results):
         try:
             print('[%s] evaluation routine starts' % process_name)
@@ -169,8 +160,8 @@ class DataOperationJobService(IScoped):
             sub_limit=execute_operation_dto.limit_modifier.SubLimit,
             top_limit=execute_operation_dto.limit_modifier.TopLimit
         )
-        prepared_datas = self.prepare_insert_row(extracted_datas=extracted_data,
-                                                 column_rows=execute_operation_dto.column_rows)
+        prepared_datas = target_connection_manager.prepare_insert_row(extracted_datas=extracted_data,
+                                                                           column_rows=execute_operation_dto.column_rows)
         prepared_target_query = target_connection_manager.prepare_target_query(
             column_rows=execute_operation_dto.column_rows,
             query=execute_operation_dto.target_connection.Query)
@@ -343,15 +334,15 @@ class DataOperationJobService(IScoped):
         Integration starting operation
         """
         data_operation = self.data_operation_service.get_by_id(id=data_operation_id)
-
         if data_operation is None:
             self.sql_logger.info('Data operation not founded')
             return None
-        data_operation_job = self.get_by_operation_and_job_id(data_operation_id=data_operation_id, job_id=job_id)
 
+        data_operation_job = self.get_by_operation_and_job_id(data_operation_id=data_operation_id, job_id=job_id)
         if data_operation_job is None:
             self.sql_logger.info('Data operation job not founded')
             return None
+
         data_operation_job_execution = self.data_operation_job_execution_service.create_data_operation_job_execution(
             data_operation_job=data_operation_job)
 
@@ -360,10 +351,6 @@ class DataOperationJobService(IScoped):
         try:
             self.sql_logger.info(f'{data_operation_name} data operation is begin',
                                  job_id=data_operation_job_execution_id)
-            if data_operation.Integrations is None or len(data_operation.Integrations) == 0:
-                self.sql_logger.info('Data operation has no data_integration ',
-                                     job_id=data_operation_job_execution_id)
-                return None
             # execution started
             self.data_operation_job_execution_service.update_data_operation_job_execution_status(
                 data_operation_job_execution_id=data_operation_job_execution_id,
@@ -373,6 +360,9 @@ class DataOperationJobService(IScoped):
                 event_code=EVENT_EXECUTION_STARTED)
             data_operation_integrations = self.data_operation_integration_service.get_all_by_data_operation_id(
                 data_operation_id=data_operation.Id).order_by("Order").all()
+            if data_operation_integrations is None or len(data_operation_integrations) == 0:
+                self.sql_logger.info('Data operation has no data_integration ', job_id=data_operation_job_execution_id)
+                return None
 
             for data_operation_integration in data_operation_integrations:
                 data_integration = self.data_integration_service.get_by_id(
