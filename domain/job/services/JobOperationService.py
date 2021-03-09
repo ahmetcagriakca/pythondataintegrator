@@ -50,10 +50,11 @@ class JobOperationService(IScoped):
     def delete_job(self, data_operation_job_id: int, ap_scheduler_job_id):
         ap_scheduler_job = self.ap_scheduler_job_repository.first(IsDeleted=0,
                                                                   Id=ap_scheduler_job_id)
-        try:
-            self.job_scheduler.remove_job(job_id=ap_scheduler_job.JobId)
-        except Exception as ex:
-            pass
+        if ap_scheduler_job is not None:
+            try:
+                self.job_scheduler.remove_job(job_id=ap_scheduler_job.JobId)
+            except Exception as ex:
+                pass
         self.data_operation_job_repository.delete_by_id(data_operation_job_id)
 
     def delete_existing_cron_jobs(self, data_operation_id):
@@ -192,7 +193,7 @@ class JobOperationService(IScoped):
     def delete_scheduler_date_job(self, data_operation_job_id):
 
         data_operation_job: DataOperationJob = self.data_operation_job_repository.first(IsDeleted=0,
-                                                                                        DataOperationId=data_operation_job_id)
+                                                                                        Id=data_operation_job_id)
         if data_operation_job is None:
             raise OperationalException("Data operation job not found")
 
