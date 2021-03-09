@@ -25,7 +25,18 @@ class ScheduleJobResource(ResourceBase):
         data = IocManager.api.payload
         operation_name = data.get('OperationName')  #
         run_date = data.get('RunDate')  #
-        start_operation_result = self.job_operation_service.add_pdi_job_with_date(operation_name=operation_name, run_date=run_date)
+        start_operation_result = self.job_operation_service.insert_job_with_date(operation_name=operation_name,
+                                                                                 run_date=run_date)
         result = JobSchedulerModels.get_data_operation_job_model(start_operation_result)
         return CommonModels.get_response(result=result)
 
+    @JobSchedulerModels.ns.expect(JobSchedulerModels.delete_operation_job_model, validate=True)
+    @JobSchedulerModels.ns.marshal_with(CommonModels.SuccessModel)
+    def delete(self):
+        """
+        Delete Existing Date Job
+        """
+        data = IocManager.api.payload
+        data_operation_job_id = data.get('DataOperationJobId')  #
+        deletion_result = self.job_operation_service.delete_scheduler_date_job(data_operation_job_id=data_operation_job_id)
+        return CommonModels.get_response(message="Data Operation Job removed successfully")

@@ -17,7 +17,6 @@ from models.dao.operation import DataOperation, DataOperationJob
 class DataOperationJobModel(EntityModel):
     def __init__(self,
                  Id: int = None,
-                 Code: str = None,
                  StartDate: datetime = None,
                  EndDate: datetime = None,
                  Cron: str = None,
@@ -29,7 +28,6 @@ class DataOperationJobModel(EntityModel):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Id: int = Id
-        self.Code: str = Code
         self.StartDate: datetime = StartDate
         self.EndDate: datetime = EndDate
         self.Cron: int = Cron
@@ -38,15 +36,6 @@ class DataOperationJobModel(EntityModel):
         self.DataIntegration = DataIntegration
         self.ApSchedulerJob = ApSchedulerJob
         self.IsDeleted = IsDeleted
-
-
-class OperationIntegration(Raw):
-    def __init__(self,
-                 Code: str = None,
-                 Order: int = None,
-                 *args, **kwargs):
-        self.Code = Code
-        self.Order = Order
 
 
 class JobSchedulerModels:
@@ -59,8 +48,9 @@ class JobSchedulerModels:
             description="Job run date.", required=True,
             example=(datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'))
     })
+
     start_operation_with_cron_model = IocManager.api.model('ScheduleDataOperation', {
-        'OperationName': fields.String(description='Operation name', required=True),
+        'OperationName': fields.String(description='Data Operation Name', required=True),
         'Cron': fields.String(description="Job cron value. ", required=True, example='*/1 * * * *'),
         'StartDate': fields.DateTime(
             description="Job start date. The start date for the job can be entered if necessary.", required=False,
@@ -68,6 +58,12 @@ class JobSchedulerModels:
         'EndDate': fields.DateTime(
             description="Job End date. The end date for the job can be entered if necessary.", required=False,
             example=(datetime.now() + timedelta(seconds=10)).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'),
+    })
+    delete_operation_job_model = IocManager.api.model('DeleteOperationJob', {
+        'DataOperationJobId': fields.Integer(description='DataOperationJobId', required=True)
+    })
+    delete_operation_cron_job_model = IocManager.api.model('DeleteOperationCronJob', {
+        'DataOperationName': fields.String(description='Data Operation Name', required=True)
     })
 
     @staticmethod
