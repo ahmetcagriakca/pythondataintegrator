@@ -78,9 +78,12 @@ class TestServiceScenarios:
         data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
             database_session_manager)
         data_operation = data_operation_repository.first(Name=name)
+        if data_operation is None:
+            return
 
         for data_operation_contact in data_operation.Contacts:
             database_session_manager.session.delete(data_operation_contact)
+
         for data_operation_integration in data_operation.Integrations:
             data_integration = data_operation_integration.DataIntegration
 
@@ -150,11 +153,9 @@ class TestServiceScenarios:
         return response_data
 
     def get_data_operation_job_execution(self, data_operation_job_id) -> DataOperationJobExecution:
-        api_config: DatabaseSessionManager = self.ioc_manager.config_manager.get(
-            ApiConfig)
         database_config: DatabaseSessionManager = self.ioc_manager.config_manager.get(
             DatabaseConfig)
-        database_session_manager = DatabaseSessionManager(api_config=api_config, database_config=database_config)
+        database_session_manager = DatabaseSessionManager(database_config=database_config)
         database_session_manager.session = database_session_manager.session_factory()
         data_operation_job_execution_repository: Repository[DataOperationJobExecution] = Repository[
             DataOperationJobExecution](database_session_manager)
@@ -179,7 +180,7 @@ class TestServiceScenarios:
             if data_operation_job_execution is not None and (
                     data_operation_job_execution.StatusId != 3 and data_operation_job_execution.StatusId != 4
             ):
-                time.sleep(20)
+                time.sleep(10)
             else:
                 return data_operation_job_execution
 

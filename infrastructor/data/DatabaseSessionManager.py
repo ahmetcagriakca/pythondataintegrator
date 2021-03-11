@@ -4,16 +4,13 @@ from sqlalchemy.orm import sessionmaker, Session
 
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.utils.Utils import Utils
-from models.configs.ApiConfig import ApiConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 
 
 class DatabaseSessionManager(IScoped):
     @inject
     def __init__(self,
-                 database_config: DatabaseConfig,
-                 api_config: ApiConfig):
-        self.api_config = api_config
+                 database_config: DatabaseConfig):
         self.database_config = database_config
         self.engine = None
         self._SessionFactory = None
@@ -21,13 +18,12 @@ class DatabaseSessionManager(IScoped):
         self.connect()
 
     def __del__(self):
-        # super(DatabaseSessionManager, self).__del__()
-        close = getattr(self, "close", None)
-        if callable(close):
-            self.close()
+        # close = getattr(self, "close", None)
+        # if callable(close):
+        #     self.close()
+        pass
 
     def connect(self):
-        self.close()
         connection_string = Utils.get_connection_string(database_config=self.database_config)
         self.engine = create_engine(connection_string, poolclass=pool.NullPool,
                                     pool_pre_ping=True)
@@ -58,5 +54,3 @@ class DatabaseSessionManager(IScoped):
         if self.session is not None:
             self.session.flush()
             self.session.rollback()
-            # self.session.close()
-            # self.session: Session = self.session_factory()

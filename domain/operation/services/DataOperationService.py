@@ -47,6 +47,10 @@ class DataOperationService(IScoped):
         data_operation = self.data_operation_repository.first(Name=name, IsDeleted=0)
         return data_operation
 
+    def get_name(self, id) ->str:
+        data_operation = self.get_by_id(id=id)
+        return data_operation.Name
+
     def check_by_name(self, name) -> DataOperation:
         data_operation = self.get_by_name(name=name)
         return data_operation is not None

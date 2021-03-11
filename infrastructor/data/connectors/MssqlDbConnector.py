@@ -36,12 +36,14 @@ class MssqlDbConnector(ConnectorStrategy):
         try:
             self.cursor.executemany(query, data)
             self.connection.commit()
+            return self.cursor.rowcount
         except Exception as error:
             try:
                 self.connection.rollback()
                 self.cursor.fast_executemany = False
                 self.cursor.executemany(query, data)
                 self.connection.commit()
+                return self.cursor.rowcount
             except Exception as error:
                 self.connection.rollback()
                 self.cursor.close()

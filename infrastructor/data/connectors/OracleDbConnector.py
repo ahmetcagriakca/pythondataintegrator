@@ -40,6 +40,7 @@ class OracleDbConnector(ConnectorStrategy):
             self.cursor.prepare(query)
             self.cursor.executemany(None, data)
             self.connection.commit()
+            return self.cursor.rowcount
         except Exception as error:
             self.connection.rollback()
             self.cursor.close()

@@ -32,10 +32,11 @@ class PostgreDbConnector(ConnectorStrategy):
         try:
             extras.execute_batch(self.cursor, query, data, 10000)
             self.connection.commit()
+            return self.cursor.rowcount
         except (Exception, psycopg2.DatabaseError) as error:
             self.connection.rollback()
             self.cursor.close()
-            raise 
+            raise
 
     def get_table_count_query(self, query):
         count_query = f"SELECT COUNT (*) FROM ({query})  as count_table"

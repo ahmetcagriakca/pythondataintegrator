@@ -52,8 +52,7 @@ class TestMultiProcess(TestCase):
         print('[%s] evaluation routine starts' % process_name)
         api_config = IocManager.config_manager.get(ApiConfig)
         console_logger = IocManager.config_manager.get(ConsoleLogger)
-        database_session_manager = DatabaseSessionManager(database_config=database_config, api_config=api_config,
-                                                          console_logger=console_logger)
+        database_session_manager = DatabaseSessionManager(database_config=database_config)
         # database_session_manager = IocManager.config_manager.get(DatabaseSessionManager)
         sql_logger = SqlLogger(api_config=api_config, console_logger=console_logger,
                                database_session_manager=database_session_manager)

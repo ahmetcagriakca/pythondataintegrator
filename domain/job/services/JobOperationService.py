@@ -5,9 +5,9 @@ from typing import List
 from apscheduler.triggers.cron import CronTrigger
 from injector import inject
 
+from domain.operation.execution.OperationExecutor import OperationExecutor
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
-from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
@@ -28,13 +28,13 @@ class JobOperationService(IScoped):
                  database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
                  data_operation_service: DataOperationService,
-                 job_scheduler: JobScheduler
+                 job_scheduler: JobScheduler,
+                 data_operation_job_service: DataOperationJobService
                  ):
+        self.data_operation_job_service = data_operation_job_service
         self.data_operation_service = data_operation_service
         self.job_scheduler = job_scheduler
         self.database_session_manager = database_session_manager
-        self.data_operation_job_repository: Repository[DataOperationJob] = Repository[DataOperationJob](
-            database_session_manager)
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
             database_session_manager)
 
@@ -55,11 +55,11 @@ class JobOperationService(IScoped):
                 self.job_scheduler.remove_job(job_id=ap_scheduler_job.JobId)
             except Exception as ex:
                 pass
-        self.data_operation_job_repository.delete_by_id(data_operation_job_id)
+        self.data_operation_job_service.delete_by_id(id=data_operation_job_id)
 
     def delete_existing_cron_jobs(self, data_operation_id):
-        data_operation_jobs: List[DataOperationJob] = self.data_operation_job_repository.filter_by(IsDeleted=0,
-                                                                                                   DataOperationId=data_operation_id).all()
+        data_operation_jobs: List[DataOperationJob] = self.data_operation_job_service.get_all_by_data_operation_id(
+            data_operation_id=data_operation_id).all()
         for data_operation_job in data_operation_jobs:
             if data_operation_job.Cron is not None:
                 self.delete_job(data_operation_job_id=data_operation_job.Id,
@@ -74,8 +74,8 @@ class JobOperationService(IScoped):
         return ap_scheduler_job
 
     def check_cron_initialized_jobs(self, data_operation_id):
-        data_operation_jobs = self.data_operation_job_repository.filter_by(IsDeleted=0,
-                                                                           DataOperationId=data_operation_id).all()
+        data_operation_jobs: List[DataOperationJob] = self.data_operation_job_service.get_all_by_data_operation_id(
+            data_operation_id=data_operation_id).all()
         for job in data_operation_jobs:
             if job.Cron is not None and job.IsDeleted == 0:
                 return True
@@ -93,8 +93,8 @@ class JobOperationService(IScoped):
         return ap_scheduler_job
 
     def get_cron_job(self, data_operation_id: int):
-        data_operation_jobs = self.data_operation_job_repository.filter_by(IsDeleted=0,
-                                                                           DataOperationId=data_operation_id).all()
+        data_operation_jobs: List[DataOperationJob] = self.data_operation_job_service.get_all_by_data_operation_id(
+            data_operation_id=data_operation_id).all()
         if data_operation_jobs is None or len(data_operation_jobs) == 0:
             return None
         founded_cron_job: DataOperationJob = None
@@ -134,8 +134,11 @@ class JobOperationService(IScoped):
                                                          start_date=job_start_date,
                                                          end_date=job_end_date)
 
-        data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, cron, start_date,
-                                                            end_date)
+        data_operation_job = self.data_operation_job_service.insert_data_operation_job(
+            ap_scheduler_job=ap_scheduler_job,
+            data_operation=data_operation,
+            cron=cron, start_date=start_date,
+            end_date=end_date)
         self.database_session_manager.commit()
         return data_operation_job
 
@@ -156,13 +159,6 @@ class JobOperationService(IScoped):
         ap_scheduler_job = self.get_ap_scheduler_with_retry(job.id)
         return ap_scheduler_job
 
-    def insert_data_operation_job(self, ap_scheduler_job, data_operation, cron, start_date, end_date):
-        data_operation_job = DataOperationJob(StartDate=start_date, EndDate=end_date,
-                                              Cron=cron, ApSchedulerJob=ap_scheduler_job,
-                                              DataOperation=data_operation)
-        self.data_operation_job_repository.insert(data_operation_job)
-        return data_operation_job
-
     #######################################################################################
     def insert_job_with_date(self, operation_name: str, run_date: datetime = None):
         data_operation = self.data_operation_service.get_by_name(name=operation_name)
@@ -174,7 +170,12 @@ class JobOperationService(IScoped):
             start_date = datetime.now().astimezone()
         ap_scheduler_job = self.add_job_with_date(job_function=JobOperationService.job_start_data_operation,
                                                   run_date=start_date, args=(None, data_operation.Id,))
-        data_operation_job = self.insert_data_operation_job(ap_scheduler_job, data_operation, None, start_date, None)
+
+        data_operation_job = self.data_operation_job_service.insert_data_operation_job(
+            ap_scheduler_job=ap_scheduler_job,
+            data_operation=data_operation,
+            cron=None, start_date=start_date,
+            end_date=None)
         self.database_session_manager.commit()
         return data_operation_job
 
@@ -192,8 +193,7 @@ class JobOperationService(IScoped):
 
     def delete_scheduler_date_job(self, data_operation_job_id):
 
-        data_operation_job: DataOperationJob = self.data_operation_job_repository.first(IsDeleted=0,
-                                                                                        Id=data_operation_job_id)
+        data_operation_job: DataOperationJob = self.data_operation_job_service.get_by_id(id=data_operation_job_id)
         if data_operation_job is None:
             raise OperationalException("Data operation job not found")
 
@@ -211,7 +211,7 @@ class JobOperationService(IScoped):
         parallel_multi_processing = ParallelMultiProcessing(1)
         parallel_multi_processing.configure_process()
         parallel_multi_processing.start_processes(process_id=data_operation_id, job_id=job_id,
-                                                  process_function=DataOperationJobService.job_start_thread)
+                                                  process_function=OperationExecutor.job_start_thread)
         data = ProcessBaseData(Id=1)
         td = TaskData(data)
         parallel_multi_processing.add_task(td)

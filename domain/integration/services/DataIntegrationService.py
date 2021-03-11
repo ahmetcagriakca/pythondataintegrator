@@ -45,6 +45,10 @@ class DataIntegrationService(IScoped):
         entites = self.data_integration_repository.filter_by(IsDeleted=0)
         return entites.all()
 
+    def get_is_target_truncate(self, id:int) -> bool:
+        entity = self.get_by_id(id=id)
+        return entity.IsTargetTruncate
+
     def check_and_update_data_integration(self,
                                           data: CreateDataIntegrationModel,
                                           definition: Definition,

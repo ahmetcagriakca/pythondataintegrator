@@ -21,9 +21,8 @@ class JobSchedulerService:
                  ):
 
         self.sql_logger = SqlLogger()
-        api_config: ApiConfig = IocManager.config_manager.get(ApiConfig)
         database_config = IocManager.config_manager.get(DatabaseConfig)
-        self.database_session_manager = DatabaseSessionManager(database_config=database_config, api_config=api_config)
+        self.database_session_manager = DatabaseSessionManager(database_config=database_config)
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
             self.database_session_manager)
         self.ap_scheduler_event_repository: Repository[ApSchedulerEvent] = Repository[ApSchedulerEvent](

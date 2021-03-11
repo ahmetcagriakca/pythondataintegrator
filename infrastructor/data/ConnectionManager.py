@@ -52,11 +52,11 @@ class ConnectionManager(IScoped):
         return self._execute_with_retry(query=query, data=data, retry=self.default_retry)
 
     def _execute_many_start(self, query, data):
-        self.connector.execute_many(query=query, data=data)
+        return self.connector.execute_many(query=query, data=data)
 
     def _execute_with_retry(self, query, data, retry):
         try:
-            self._execute_many_start(query=query, data=data)
+            return self._execute_many_start(query=query, data=data)
         except Exception as ex:
             if retry > self.retry_count:
                 self.sql_logger.error(f"Db write error on Error:{ex}")
@@ -67,7 +67,6 @@ class ConnectionManager(IScoped):
             self.connector.connect()
             time.sleep(1)
             return self._execute_with_retry(query=query, data=data, retry=retry + 1)
-        return True
 
     def get_table_count(self, query):
         count_query = self.connector.get_table_count_query(query=query)
