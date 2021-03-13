@@ -3,7 +3,7 @@ from datetime import datetime
 from time import time
 from injector import inject
 from infrastructor.cryptography.CryptoService import CryptoService
-from infrastructor.data.ConnectionProvider import ConnectionProvider
+from infrastructor.connection.database.DatabaseProvider import DatabaseProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
@@ -30,7 +30,7 @@ class TestParallelService(IScoped):
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
-                 database_provider: ConnectionProvider,
+                 database_provider: DatabaseProvider,
                  crypto_service: CryptoService,
                  database_config: DatabaseConfig,
                  ):
@@ -44,7 +44,7 @@ class TestParallelService(IScoped):
             database_session_manager)
         self.connection_repository: Repository[Connection] = Repository[Connection](
             database_session_manager)
-        self.database_provider: ConnectionProvider = database_provider
+        self.database_provider: DatabaseProvider = database_provider
         self.sql_logger: SqlLogger = sql_logger
         self.crypto_service = crypto_service
 

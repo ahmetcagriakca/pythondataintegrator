@@ -4,7 +4,7 @@ from infrastructor.cryptography.CryptoService import CryptoService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.secret import SecretSource, SecretSourceBasicAuthentication
 from models.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication
 

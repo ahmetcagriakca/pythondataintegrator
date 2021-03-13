@@ -40,7 +40,6 @@ class ErrorHandlers(ISingleton):
 
     def handle_exception(self, exception):
         """Return JSON instead of HTML for HTTP errors."""
-        # database_session_manager = IocManager.injector.get(DatabaseSessionManager)
         self.database_session_manager.rollback()
         # start with the correct headers and status code from the error
         exception_traceback = traceback.format_exc()
@@ -62,7 +61,6 @@ class ErrorHandlers(ISingleton):
 
     def handle_operational_exception(self, exception):
         """Return JSON instead of HTML for HTTP errors."""
-        # database_session_manager = IocManager.injector.get(DatabaseSessionManager)
         self.database_session_manager.rollback()
         # start with the correct headers and status code from the error
         exception_traceback = traceback.format_exc()

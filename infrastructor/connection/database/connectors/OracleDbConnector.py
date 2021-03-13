@@ -1,10 +1,10 @@
 import cx_Oracle
 from injector import inject
-from infrastructor.data.connectors.ConnectorStrategy import ConnectorStrategy
+from infrastructor.connection.database.connectors.DatabaseConnector import DatabaseConnector
 from models.configs.DatabaseConfig import DatabaseConfig
 
 
-class OracleDbConnector(ConnectorStrategy):
+class OracleDbConnector(DatabaseConnector):
     @inject
     def __init__(self, database_config: DatabaseConfig):
         self.database_config = database_config
@@ -40,6 +40,7 @@ class OracleDbConnector(ConnectorStrategy):
             self.cursor.prepare(query)
             self.cursor.executemany(None, data)
             self.connection.commit()
+            return self.cursor.rowcount
         except Exception as error:
             self.connection.rollback()
             self.cursor.close()

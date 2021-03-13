@@ -2,7 +2,7 @@ from abc import abstractmethod
 from infrastructor.dependency.scopes import IScoped
 
 
-class ConnectorStrategy(IScoped):
+class DatabaseConnector(IScoped):
     @abstractmethod
     def connect(self):
         pass

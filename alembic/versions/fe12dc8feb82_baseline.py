@@ -232,8 +232,8 @@ def insert_statuses():
 
 def insert_operation_event_datas():
     from models.enums.events import EVENT_EXECUTION_INITIALIZED, EVENT_EXECUTION_FINISHED, EVENT_EXECUTION_STARTED, \
-        EVENT_EXECUTION_INTEGRATION_STARTED, EVENT_EXECUTION_INTEGRATION_EXECUTE_PRE_PROCEDURE, \
-        EVENT_EXECUTION_INTEGRATION_EXECUTE_POST_PROCEDURE, EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
+        EVENT_EXECUTION_INTEGRATION_INITIALIZED,EVENT_EXECUTION_INTEGRATION_STARTED, EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, \
+         EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
         EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION,EVENT_EXECUTION_INTEGRATION_FINISHED
     from models.dao.common.OperationEvent import OperationEvent
     bind = op.get_bind()
@@ -265,13 +265,13 @@ def insert_operation_event_datas():
             "Class": "DataOperationJobExecutionIntegration"
         },
         {
-            "Code": EVENT_EXECUTION_INTEGRATION_EXECUTE_PRE_PROCEDURE,
+            "Code": EVENT_EXECUTION_INTEGRATION_INITIALIZED,
             "Name": "EVENT_EXECUTION_INTEGRATION_EXECUTE_PRE_PROCEDURE",
             "Description": "Execution operation integration pre procedure executed",
             "Class": "DataOperationJobExecutionIntegration"
         },
         {
-            "Code": EVENT_EXECUTION_INTEGRATION_EXECUTE_POST_PROCEDURE,
+            "Code": EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT,
             "Name": "EVENT_EXECUTION_INTEGRATION_EXECUTE_POST_PROCEDURE",
             "Description": "Execution operation integration post procedure executed",
             "Class": "DataOperationJobExecutionIntegration"

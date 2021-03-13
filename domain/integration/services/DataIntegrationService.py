@@ -7,7 +7,7 @@ from domain.integration.services.DataIntegrationConnectionService import DataInt
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.operation import Definition
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
@@ -44,6 +44,10 @@ class DataIntegrationService(IScoped):
         """
         entites = self.data_integration_repository.filter_by(IsDeleted=0)
         return entites.all()
+
+    def get_is_target_truncate(self, id:int) -> bool:
+        entity = self.get_by_id(id=id)
+        return entity.IsTargetTruncate
 
     def check_and_update_data_integration(self,
                                           data: CreateDataIntegrationModel,

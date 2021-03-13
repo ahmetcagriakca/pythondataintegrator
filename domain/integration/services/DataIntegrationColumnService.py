@@ -4,7 +4,7 @@ from injector import inject
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegration import DataIntegration
 from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
 
@@ -19,6 +19,19 @@ class DataIntegrationColumnService(IScoped):
             DataIntegrationColumn](database_session_manager)
 
     #######################################################################################
+
+    def get_by_id(self, id: int) -> DataIntegrationColumn:
+        entity = self.data_integration_column_repository.first(IsDeleted=0, Id=id)
+        return entity
+
+    def get_first_row(self, data_integration_id) -> DataIntegrationColumn:
+        entity = self.data_integration_column_repository.first(IsDeleted=0, DataIntegrationId=data_integration_id)
+        return entity
+
+    def get_columns_by_integration_id(self, data_integration_id) -> DataIntegrationColumn:
+        entities = self.data_integration_column_repository.filter_by(IsDeleted=0,
+                                                                     DataIntegrationId=data_integration_id).all()
+        return entities
 
     def get_source_query(self, data_integration: DataIntegration, schema: str, table_name: str):
 

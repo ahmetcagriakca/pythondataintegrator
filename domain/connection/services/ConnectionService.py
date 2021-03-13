@@ -5,11 +5,11 @@ from domain.connection.services.ConnectionFileService import ConnectionFileServi
 from domain.connection.services.ConnectionDatabaseService import ConnectionDatabaseService
 from domain.connection.services.ConnectionSecretService import ConnectionSecretService
 from domain.connection.services.ConnectionTypeService import ConnectionTypeService
-from infrastructor.data.ConnectionProvider import ConnectionProvider
+from infrastructor.connection.database.DatabaseProvider import DatabaseProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.connection.Connection import Connection
 from models.enums.ConnectionTypes import ConnectionTypes
@@ -23,7 +23,7 @@ class ConnectionService(IScoped):
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
-                 connection_provider: ConnectionProvider,
+                 database_provider: DatabaseProvider,
                  connection_type_service: ConnectionTypeService,
                  connection_database_service: ConnectionDatabaseService,
                  connection_file_service: ConnectionFileService,
@@ -32,7 +32,7 @@ class ConnectionService(IScoped):
         self.connection_secret_service = connection_secret_service
         self.connection_type_service = connection_type_service
         self.sql_logger: SqlLogger = sql_logger
-        self.connection_provider = connection_provider
+        self.database_provider = database_provider
         self.connection_file_service = connection_file_service
         self.connection_database_service = connection_database_service
         self.database_session_manager = database_session_manager

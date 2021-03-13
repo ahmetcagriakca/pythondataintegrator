@@ -4,7 +4,7 @@ from domain.integration.services.DataIntegrationColumnService import DataIntegra
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
@@ -30,6 +30,7 @@ class DataIntegrationConnectionService(IScoped):
                                                                    DataIntegrationId=data_integration_id,
                                                                    SourceOrTarget=0)
         return entity
+
     def get_target_connection(self, data_integration_id: int) -> DataIntegrationConnection:
         entity = self.data_integration_connection_repository.first(IsDeleted=0,
                                                                    DataIntegrationId=data_integration_id,

@@ -1,9 +1,9 @@
 import pyodbc
-from infrastructor.data.connectors.ConnectorStrategy import ConnectorStrategy
+from infrastructor.connection.database.connectors.DatabaseConnector import DatabaseConnector
 from models.configs.DatabaseConfig import DatabaseConfig
 
 
-class MssqlDbConnector(ConnectorStrategy):
+class MssqlDbConnector(DatabaseConnector):
     def __init__(self, database_config: DatabaseConfig):
         self.database_config: DatabaseConfig = database_config
         self.database_config.driver = 'ODBC Driver 17 for SQL Server'
@@ -36,12 +36,14 @@ class MssqlDbConnector(ConnectorStrategy):
         try:
             self.cursor.executemany(query, data)
             self.connection.commit()
+            return self.cursor.rowcount
         except Exception as error:
             try:
                 self.connection.rollback()
                 self.cursor.fast_executemany = False
                 self.cursor.executemany(query, data)
                 self.connection.commit()
+                return self.cursor.rowcount
             except Exception as error:
                 self.connection.rollback()
                 self.cursor.close()

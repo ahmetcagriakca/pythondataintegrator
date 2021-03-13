@@ -7,7 +7,7 @@ from domain.operation.services.DefinitionService import DefinitionService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.operation import DataOperation, Definition
 from models.viewmodels.operation import CreateDataOperationModel
@@ -46,6 +46,10 @@ class DataOperationService(IScoped):
     def get_by_name(self, name) -> DataOperation:
         data_operation = self.data_operation_repository.first(Name=name, IsDeleted=0)
         return data_operation
+
+    def get_name(self, id) ->str:
+        data_operation = self.get_by_id(id=id)
+        return data_operation.Name
 
     def check_by_name(self, name) -> DataOperation:
         data_operation = self.get_by_name(name=name)

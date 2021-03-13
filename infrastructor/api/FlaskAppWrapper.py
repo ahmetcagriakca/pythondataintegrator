@@ -3,7 +3,7 @@ from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 from infrastructor.api.ErrorHandlers import ErrorHandlers
 from infrastructor.IocManager import IocManager
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from models.configs.ApiConfig import ApiConfig
 
 

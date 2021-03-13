@@ -3,7 +3,7 @@ from domain.secret.services.SecretService import SecretService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection import ConnectionSecret
 from models.dao.connection.Connection import Connection
 from models.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication

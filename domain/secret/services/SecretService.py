@@ -5,7 +5,7 @@ from domain.secret.services.SecretTypeService import SecretTypeService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.secret import Secret
 from models.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication
 from models.enums import SecretTypes
