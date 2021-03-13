@@ -2,14 +2,14 @@ import time
 import re
 
 from injector import inject
-from infrastructor.data.ConnectionPolicy import ConnectionPolicy
+from infrastructor.connection.database.DatabasePolicy import DatabasePolicy
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 
 
-class ConnectionManager(IScoped):
+class DatabaseContext(IScoped):
     @inject
-    def __init__(self, connection_policy: ConnectionPolicy, sql_logger: SqlLogger, retry_count=3):
+    def __init__(self, connection_policy: DatabasePolicy, sql_logger: SqlLogger, retry_count=3):
         self.sql_logger: SqlLogger = sql_logger
         self.connector = connection_policy.connector
         self.retry_count = retry_count

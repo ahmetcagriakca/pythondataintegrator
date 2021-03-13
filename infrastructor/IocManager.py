@@ -1,3 +1,4 @@
+import os
 import sys
 from flask import Flask
 from flask_injector import request, FlaskInjector
@@ -10,7 +11,6 @@ from infrastructor.dependency.scopes import ISingleton, IScoped
 from infrastructor.utils.ConfigManager import ConfigManager
 from infrastructor.utils.Utils import Utils
 from models.configs.ApiConfig import ApiConfig
-from models.configs.DatabaseConfig import DatabaseConfig
 
 
 class IocManager:
@@ -23,6 +23,11 @@ class IocManager:
     injector: Injector = None
     Base = declarative_base(metadata=MetaData(schema='Common'))
 
+    @staticmethod
+    def initialize():
+        root_directory = os.path.abspath(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
+        IocManager.configure_startup(root_directory)
     # wrapper required for dependency
     @staticmethod
     def configure_startup(root_directory, app_wrapper=None, job_scheduler=None):

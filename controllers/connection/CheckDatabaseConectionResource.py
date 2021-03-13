@@ -26,10 +26,10 @@ class CheckConnectionDatabaseResource(ResourceBase):
         schema = data.get('Schema')  #
         table = data.get('Table')  #
         connection = self.connection_service.get_by_name(name=name)
-        connection_manager = self.connection_service.connection_provider.get_connection_manager(connection=connection)
-        connection_manager.connector.connect()
+        database_context = self.connection_service.database_provider.get_database_context(connection=connection)
+        database_context.connector.connect()
         count_of_table = ''
         if schema is not None and schema != '' and table is not None and table != '':
-            count = connection_manager.get_table_count(f'select * from "{schema}"."{table}"')
+            count = database_context.get_table_count(f'select * from "{schema}"."{table}"')
             count_of_table = f"Count of table:{count}"
         return CommonModels.get_response(result=f"Connection connected successfully. {count_of_table}")

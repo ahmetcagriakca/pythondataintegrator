@@ -7,7 +7,7 @@ from domain.operation.services.DefinitionService import DefinitionService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.operation import DataOperation, Definition
 from models.viewmodels.operation import CreateDataOperationModel

@@ -2,15 +2,15 @@ from injector import inject
 
 from domain.connection.services.ConnectionSecretService import ConnectionSecretService
 from infrastructor.cryptography.CryptoService import CryptoService
-from infrastructor.data.ConnectionManager import ConnectionManager
-from infrastructor.data.ConnectionPolicy import ConnectionPolicy
+from infrastructor.connection.database.DatabaseContext import DatabaseContext
+from infrastructor.connection.database.DatabasePolicy import DatabasePolicy
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.connection.Connection import Connection
 
 
-class ConnectionProvider(IScoped):
+class DatabaseProvider(IScoped):
     @inject
     def __init__(self,
                  crypto_service: CryptoService,
@@ -23,7 +23,7 @@ class ConnectionProvider(IScoped):
         self.sql_logger = sql_logger
         self.crypto_service: CryptoService = crypto_service
 
-    def get_connection_manager(self, connection: Connection) -> ConnectionManager:
+    def get_database_context(self, connection: Connection) -> DatabaseContext:
         """
         Creating Connection
         """
@@ -56,6 +56,7 @@ class ConnectionProvider(IScoped):
                 config = DatabaseConfig(type=connection.Database.ConnectorType.Name, host=host, port=port,
                                         database=database_name, username=user, password=password)
 
-            connection_policy = ConnectionPolicy(config)
-            connection_manager: ConnectionManager = ConnectionManager(connection_policy, self.sql_logger)
-            return connection_manager
+            database_policy = DatabasePolicy(config)
+            database_context: DatabaseContext = DatabaseContext(
+                database_policy, self.sql_logger)
+            return database_context

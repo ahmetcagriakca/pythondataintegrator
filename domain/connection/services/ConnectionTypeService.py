@@ -1,20 +1,11 @@
 from typing import List
 from injector import inject
 
-from infrastructor.cryptography.CryptoService import CryptoService
-from infrastructor.data.ConnectionProvider import ConnectionProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
-from models.dao.connection.Connection import Connection
-from models.dao.connection.ConnectionFile import ConnectionFile
-from models.dao.connection.ConnectorType import ConnectorType
+from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection.ConnectionType import ConnectionType
-from models.enums.ConnectionTypes import ConnectionTypes
-from models.viewmodels.connection.CreateConnectionFileModel import CreateConnectionFileModel
-from models.viewmodels.connection.UpdateConnectionFileModel import UpdateConnectionFileModel
 
 
 class ConnectionTypeService(IScoped):

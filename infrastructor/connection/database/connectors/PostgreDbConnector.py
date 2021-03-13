@@ -1,11 +1,11 @@
 import psycopg2
 from injector import inject
-from infrastructor.data.connectors.ConnectorStrategy import ConnectorStrategy
+from infrastructor.connection.database.connectors.DatabaseConnector import DatabaseConnector
 from models.configs.DatabaseConfig import DatabaseConfig
 import psycopg2.extras as extras
 
 
-class PostgreDbConnector(ConnectorStrategy):
+class PostgreDbConnector(DatabaseConnector):
     @inject
     def __init__(self, database_config: DatabaseConfig):
         self.database_config = database_config

@@ -5,13 +5,13 @@ from typing import List
 from apscheduler.triggers.cron import CronTrigger
 from injector import inject
 
-from domain.operation.execution.OperationExecutor import OperationExecutor
+from domain.operation.execution.processes.ExecuteOperationProcess import ExecuteOperationProcess
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.multi_processing.ParallelMultiProcessing import ParallelMultiProcessing, TaskData, ProcessBaseData
 from infrastructor.scheduler.JobScheduler import JobScheduler
@@ -203,6 +203,12 @@ class JobOperationService(IScoped):
 
     @staticmethod
     def job_start_data_operation(job_id, data_operation_id: int):
+        """
+        :param job_id: Ap Scheduler Job Id
+        :param data_operation_id: Data Operation Id
+        :return:
+        TODO: Move this method to OperationExecution, but needs update as it will affect existing cron jobs
+        """
         start = time.time()
         start_datetime = datetime.now()
 
@@ -211,7 +217,7 @@ class JobOperationService(IScoped):
         parallel_multi_processing = ParallelMultiProcessing(1)
         parallel_multi_processing.configure_process()
         parallel_multi_processing.start_processes(process_id=data_operation_id, job_id=job_id,
-                                                  process_function=OperationExecutor.job_start_thread)
+                                                  process_function=ExecuteOperationProcess.job_start_thread)
         data = ProcessBaseData(Id=1)
         td = TaskData(data)
         parallel_multi_processing.add_task(td)

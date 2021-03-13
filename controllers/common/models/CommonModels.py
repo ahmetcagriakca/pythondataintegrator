@@ -3,7 +3,7 @@ from datetime import datetime
 from flask_restplus import fields
 
 from infrastructor.IocManager import IocManager
-from infrastructor.exception.OperationalException import OperationalException
+from infrastructor.exceptions.OperationalException import OperationalException
 
 
 @IocManager.api.errorhandler(OperationalException)
