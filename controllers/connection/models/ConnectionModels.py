@@ -5,6 +5,7 @@ from flask_restplus import fields
 
 from controllers.common.models.CommonModels import EntityModel, CommonModels
 from infrastructor.IocManager import IocManager
+from models.dao.connection import ConnectionFile
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from models.dao.connection.ConnectorType import ConnectorType
@@ -73,6 +74,24 @@ class ConnectionDatabaseModel(EntityModel):
         self.Connection = Connection
         self.ConnectorType = ConnectorType
 
+class ConnectionFileModel(EntityModel):
+
+    def __init__(self,
+                 Id=None,
+                 Folder: str = None,
+                 User: str = None,
+                 Password: str = None,
+                 Connection=None,
+                 ConnectorType=None,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Id = Id
+        self.Folder = Folder
+        self.User: str = User
+        self.Password: str = Password
+        self.Connection = Connection
+        self.ConnectorType = ConnectorType
+
 
 class ConnectionModels:
     ns = IocManager.api.namespace('Connection', description='Connection endpoints', path='/api/Connection')
@@ -92,6 +111,7 @@ class ConnectionModels:
     create_connection_file_model = IocManager.api.model('ConnectionFileModel', {
         'Name': fields.String(description='Operation code value', required=True),
         'ConnectorTypeName': fields.String(description='ConnectorTypeName', required=True),
+        'Folder': fields.String(description='Folder'),
         'User': fields.String(description='User'),
         'Password': fields.String(description='Password'),
     })
@@ -171,6 +191,15 @@ class ConnectionModels:
         return entity_model
 
     @staticmethod
+    def get_connection_file_entity_model(connection_file: ConnectionFile) -> ConnectionFileModel:
+        entity_model = ConnectionFileModel(
+            Id=connection_file.Id,
+            Folder=connection_file.Folder,
+            User='***',  # connection_database.User
+            Password='***'  # connection_database.Password
+        )
+        return entity_model
+    @staticmethod
     def get_connection_database_model(connection_database: ConnectionDatabase) -> ConnectionDatabaseModel:
         connection = ConnectionModels.get_connection_model(connection_database.Connection)
         connector_type = ConnectionModels.get_connector_type_model(connection_database.ConnectorType)
@@ -179,6 +208,17 @@ class ConnectionModels:
         result_model['ConnectorType'] = connector_type
         result_model['Connection'] = connection
         return result_model
+
+    @staticmethod
+    def get_connection_file_model(connection_file: ConnectionFile) -> ConnectionFileModel:
+        connection = ConnectionModels.get_connection_model(connection_file.Connection)
+        connector_type = ConnectionModels.get_connector_type_model(connection_file.ConnectorType)
+        entity_model = ConnectionModels.get_connection_file_entity_model(connection_file)
+        result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+        result_model['ConnectorType'] = connector_type
+        result_model['Connection'] = connection
+        return result_model
+
 
     @staticmethod
     def get_connection_database_models(connection_databases: List[ConnectionDatabase]) -> List[ConnectionDatabaseModel]:
@@ -198,6 +238,13 @@ class ConnectionModels:
         return result_model
 
     @staticmethod
+    def get_connection_file_result_model(connection_file: ConnectionFile) -> ConnectionFileModel:
+        connector_type = ConnectionModels.get_connector_type_model(connection_file.ConnectorType)
+        entity_model = ConnectionModels.get_connection_file_entity_model(connection_file)
+        result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
+        result_model['ConnectorType'] = connector_type
+        return result_model
+    @staticmethod
     def get_connection_result_model(connection: Connection) -> ConnectionModel:
         connection_type = ConnectionModels.get_connection_type_model(connection.ConnectionType)
         entity_model = ConnectionModel(
@@ -206,8 +253,12 @@ class ConnectionModels:
         )
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
         result_model['ConnectionType'] = connection_type
-        connection_database = ConnectionModels.get_connection_database_result_model(connection.Database)
-        result_model['Database'] = connection_database
+        if connection.Database is not None:
+            connection_database = ConnectionModels.get_connection_database_result_model(connection.Database)
+            result_model['Database'] = connection_database
+        if connection.File is not None:
+            connection_file = ConnectionModels.get_connection_file_result_model(connection.File)
+            result_model['File'] = connection_file
         return result_model
 
     @staticmethod

@@ -10,7 +10,7 @@ from infrastructor.IocManager import IocManager
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.multi_processing.ParallelMultiProcessing import TaskData
-from models.dto.LimitModifier import LimitModifier
+from models.dto.PagingModifier import PagingModifier
 
 
 class ExecuteIntegrationProcess(IScoped):
@@ -32,10 +32,10 @@ class ExecuteIntegrationProcess(IScoped):
 
         data_operation_integration = self.data_operation_integration_service.get_by_id(
             id=data_operation_integration_id)
-        limit_modifiers = self.get_limit_modifiers(data_count=data_count, limit=data_operation_integration.Limit)
+        paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=data_operation_integration.Limit)
         unprocessed_task_list, processed_task_list = self.process_service.start_parallel_process(
             process_id=data_operation_integration.DataIntegrationId,
-            datas=limit_modifiers,
+            datas=paging_modifiers,
             process_count=data_operation_integration.ProcessCount,
             process_function=ExecuteIntegrationProcess.parallel_operation,
             job_id=data_operation_job_execution_id)
@@ -44,10 +44,10 @@ class ExecuteIntegrationProcess(IScoped):
                                         processed_task.Data is not None])
         if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
             print(f"Unprocessed tasks founded")
-            limit_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]
-            result = self.execute_limit_modifiers(
+            paging_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]
+            result = self.execute_paging_modifiers(
                 data_integration_id=data_operation_integration.DataIntegrationId,
-                limit_modifiers=limit_modifiers)
+                paging_modifiers=paging_modifiers)
             total_affected_row_count = total_affected_row_count + result
         return total_affected_row_count
 
@@ -56,41 +56,43 @@ class ExecuteIntegrationProcess(IScoped):
 
         data_operation_integration = self.data_operation_integration_service.get_by_id(
             id=data_operation_integration_id)
-        limit_modifiers = self.get_limit_modifiers(data_count=data_count, limit=data_operation_integration.Limit)
-        total_affected_row_count = self.execute_limit_modifiers(
+        paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=data_operation_integration.Limit)
+        total_affected_row_count = self.execute_paging_modifiers(
             data_integration_id=data_operation_integration.DataIntegrationId,
-            limit_modifiers=limit_modifiers)
+            paging_modifiers=paging_modifiers)
         return total_affected_row_count
 
     @staticmethod
-    def get_limit_modifiers(data_count, limit):
-        top_limit = limit + 1
-        sub_limit = 1
-        limit_modifiers = []
+    def get_paging_modifiers(data_count, limit):
+        end = limit
+        start = 0
+        paging_modifiers = []
         id = 0
         while True:
-            if top_limit != limit and top_limit - data_count > limit:
+            if end != limit and end - data_count > limit:
                 break
             id = id + 1
-            limit_modifier = LimitModifier(Id=id, TopLimit=top_limit, SubLimit=sub_limit)
-            limit_modifiers.append(limit_modifier)
-            top_limit += limit
-            sub_limit += limit
-        return limit_modifiers
+            paging_modifier = PagingModifier(Id=id, End=end, Start=start, Limit=limit)
+            paging_modifiers.append(paging_modifier)
+            end += limit
+            start += limit
+        return paging_modifiers
 
-    def execute_limit_modifiers(self, data_integration_id: int, limit_modifiers: List[LimitModifier]) -> int:
+    def execute_paging_modifiers(self, data_integration_id: int, paging_modifiers: List[PagingModifier]) -> int:
         total_affected_row_count = 0
-        for limit_modifier in limit_modifiers:
+        for paging_modifier in paging_modifiers:
             start = time()
             self.sql_logger.info(
-                f"Process got a new task.Id:{limit_modifier.Id}  limits:{limit_modifier.SubLimit}-{limit_modifier.TopLimit} ")
+                f"Process got a new task.Id:{paging_modifier.Id}  limits:{paging_modifier.Start}-{paging_modifier.End} ")
             affected_row_count = self.integration_execution_service.start_execute_integration(
                 data_integration_id=data_integration_id,
-                limit_modifier=limit_modifier)
+                paging_modifier=paging_modifier)
+            if affected_row_count is None:
+                affected_row_count = 0
             total_affected_row_count = total_affected_row_count + affected_row_count
             end = time()
             self.sql_logger.info(
-                f"Process finished task. limits:{limit_modifier.SubLimit}-{limit_modifier.TopLimit}. time:{end - start}")
+                f"Process finished task. limits:{paging_modifier.Start}-{paging_modifier.End}. time:{end - start}")
 
         return total_affected_row_count
 
@@ -111,9 +113,10 @@ class ExecuteIntegrationProcess(IScoped):
                     start = time()
                     self.sql_logger.info(
                         f"{process_name}-{sub_process_id} process got a new task.Id:{new_task.Data.Id} limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit} ")
-                    limit_modifier: LimitModifier = new_task.Data
-                    result = self.integration_execution_service.start_execute_integration(data_integration_id=process_id,
-                                                                                          limit_modifier=limit_modifier)
+                    paging_modifier: PagingModifier = new_task.Data
+                    result = self.integration_execution_service.start_execute_integration(
+                        data_integration_id=process_id,
+                        paging_modifier=paging_modifier)
                     end = time()
                     self.sql_logger.info(
                         f"{process_name} process finished task. limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit}. time:{end - start}")

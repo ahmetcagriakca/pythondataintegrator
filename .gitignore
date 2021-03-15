@@ -116,3 +116,4 @@ Dockerfile.test
 test_docker.py
 docker-compose.test.yml
 entrypoint_test.sh
+files/

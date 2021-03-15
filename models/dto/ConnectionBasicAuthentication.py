@@ -1,5 +1,5 @@
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.dto.LimitModifier import LimitModifier
+from models.dto.PagingModifier import PagingModifier
 
 
 class ConnectionBasicAuthentication:

@@ -23,14 +23,22 @@ class ExecuteAdapterFactory(IScoped):
         source_connection = self.data_integration_connection_service.get_source_connection(
             data_integration_id=data_integration_id)
         # only target query run
-        if source_connection is None or source_connection.Query is None or source_connection.Query == '':
+        if source_connection is None or (
+                source_connection.Database is not None
+                and
+                (
+                        source_connection.Database.Query is None
+                        or
+                        source_connection.Database.Query == ''
+                )
+        ):
             if isinstance(self.execute_query_adapter, ExecuteAdapter):
                 return self.execute_query_adapter
             else:
-                raise IncompatibleAdapterException(f"{self.execute_query_adapter} is incompatible with ExecuteAdapter")
+                raise IncompatibleAdapterException(f"{self.execute_query_adapter} is incompatible with {ExecuteAdapter}")
         else:
             if isinstance(self.execute_operation_adapter, ExecuteAdapter):
                 return self.execute_operation_adapter
             else:
                 raise IncompatibleAdapterException(
-                    f"{self.execute_operation_adapter} is incompatible with ExecuteAdapter")
+                    f"{self.execute_operation_adapter} is incompatible with {ExecuteAdapter}")

@@ -7,6 +7,7 @@ from domain.connection.services.ConnectionService import ConnectionService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 from models.viewmodels.connection.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel
+from infrastructor.json.JsonConvert import JsonConvert
 
 
 @ConnectionModels.ns.route("/ConnectionDatabase")
@@ -23,8 +24,7 @@ class ConnectionDatabaseResource(ResourceBase):
         """
         Create New Database Connection
         """
-        data: CreateConnectionDatabaseModel = json.loads(json.dumps(IocManager.api.payload),
-                                                         object_hook=lambda d: CreateConnectionDatabaseModel(**d))
+        data: CreateConnectionDatabaseModel = JsonConvert.FromJSON(json.dumps(IocManager.api.payload))
         creation_result = self.connection_service.create_connection_database(data)
         result = ConnectionModels.get_connection_result_model(creation_result)
         return CommonModels.get_response(result=result)

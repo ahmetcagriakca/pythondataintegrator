@@ -15,14 +15,12 @@ class ConnectionFileService(IScoped):
     @inject
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
-                 crypto_service: CryptoService,
                  connector_type_service: ConnectorTypeService
                  ):
         self.connector_type_service = connector_type_service
         self.database_session_manager = database_session_manager
         self.connection_file_repository: Repository[ConnectionFile] = Repository[ConnectionFile](
             database_session_manager)
-        self.crypto_service = crypto_service
 
     def get_connection_files(self, ) -> List[ConnectionFile]:
         """
@@ -36,9 +34,10 @@ class ConnectionFileService(IScoped):
         Create File connection
         """
 
-        connector_type = self.connector_type_service.get_by_name(Name=model.ConnectorTypeName)
+        connector_type = self.connector_type_service.get_by_name(name=model.ConnectorTypeName)
 
         connection_file = ConnectionFile(Connection=connection,
+                                         Folder=model.Folder,
                                          ConnectorType=connector_type)
 
         self.connection_file_repository.insert(connection_file)
@@ -51,9 +50,10 @@ class ConnectionFileService(IScoped):
 
         connection_file = self.connection_file_repository.first(ConnectionId=connection.Id)
 
-        connector_type = self.connector_type_service.get_by_name(Name=model.ConnectorTypeName)
+        connector_type = self.connector_type_service.get_by_name(name=model.ConnectorTypeName)
 
         connection_file.ConnectorType = connector_type
+        connection_file.Folder = model.Folder
 
         return connection_file
 

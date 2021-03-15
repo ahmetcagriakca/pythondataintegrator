@@ -34,8 +34,8 @@ class DatabaseConnector(IScoped):
         return f'SELECT {selected_rows} FROM "{schema}"."{table}"'
 
     @abstractmethod
-    def get_table_data_query(self, query, first_row, sub_limit, top_limit):
-        return f"WITH TEMP_INTEGRATION AS(SELECT ordered_query.*,ROW_NUMBER() OVER ( order by {first_row}) row_number FROM ({query}) ordered_query) SELECT * FROM TEMP_INTEGRATION WHERE row_number >= {sub_limit} AND row_number < {top_limit}"
+    def get_table_data_query(self, query, first_row, start, end):
+        return f"WITH TEMP_INTEGRATION AS(SELECT ordered_query.*,ROW_NUMBER() OVER ( order by {first_row}) row_number FROM ({query}) ordered_query) SELECT * FROM TEMP_INTEGRATION WHERE row_number >= {start} AND row_number < {end}"
 
     @abstractmethod
     def prepare_data(self, data):

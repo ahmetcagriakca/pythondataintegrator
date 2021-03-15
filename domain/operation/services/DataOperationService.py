@@ -11,7 +11,6 @@ from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.operation import DataOperation, Definition
 from models.viewmodels.operation import CreateDataOperationModel
-from models.viewmodels.operation.UpdateDataOperationModel import UpdateDataOperationModel
 
 
 class DataOperationService(IScoped):
@@ -91,7 +90,7 @@ class DataOperationService(IScoped):
         return data_operation
 
     def update_data_operation(self,
-                              data_operation_model: UpdateDataOperationModel,
+                              data_operation_model: CreateDataOperationModel,
                               definition: Definition) -> DataOperation:
         """
         Update Data Operation

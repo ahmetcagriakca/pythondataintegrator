@@ -42,8 +42,8 @@ from models.dao.connection import Connection, ConnectionDatabase, ConnectorType,
     ConnectionSecret
 
 # integration
-from models.dao.integration import DataIntegration, DataIntegrationConnection, DataIntegrationConnection, \
-    DataIntegrationColumn, DataIntegrationConnectionFile
+from models.dao.integration import DataIntegration, DataIntegrationConnection, \
+    DataIntegrationColumn, DataIntegrationConnectionDatabase, DataIntegrationConnectionFile
 
 # common
 from models.dao.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent

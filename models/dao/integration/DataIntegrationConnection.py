@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
+from models.dao.integration.DataIntegrationConnectionDatabase import DataIntegrationConnectionDatabase
 from models.dao.integration.DataIntegrationConnectionFile import DataIntegrationConnectionFile
 
 
@@ -13,13 +14,12 @@ class DataIntegrationConnection(Entity, IocManager.Base):
     DataIntegrationId = Column(Integer, ForeignKey('Integration.DataIntegration.Id'))
     ConnectionId = Column(Integer, ForeignKey('Connection.Connection.Id'))
     SourceOrTarget = Column(Integer, index=False, unique=False, nullable=False)
-    Schema = Column(String(100), index=False, unique=False, nullable=True)
-    TableName = Column(String(100), index=False, unique=False, nullable=True)
-    Query = Column(Text, index=False, unique=False, nullable=True)
     Connection = relationship("Connection", back_populates="DataIntegrationConnections")
     DataIntegration = relationship("DataIntegration", back_populates="Connections")
-    DataIntegrationConnectionFiles: List[DataIntegrationConnectionFile] = relationship("DataIntegrationConnectionFile",
-                                                                                       back_populates="DataIntegrationConnection")
+    File: DataIntegrationConnectionFile = relationship("DataIntegrationConnectionFile", uselist=False,
+                                                             back_populates="DataIntegrationConnection")
+    Database: DataIntegrationConnectionDatabase = relationship("DataIntegrationConnectionDatabase", uselist=False,
+                                                                     back_populates="DataIntegrationConnection")
 
     def __init__(self,
                  SourceOrTarget: int = None,

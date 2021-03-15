@@ -10,19 +10,29 @@ class DataOperationTestData:
                 "ProcessCount": 1,
                 "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION",
-                    "SourceConnectionName": "TestIntegrationConnection",
-                    "SourceSchema": "test",
-                    "SourceTableName": "test_integration_source",
-                    "SourceQuery": "",
-                    "TargetConnectionName": "TestIntegrationConnection",
-                    "TargetSchema": "test",
-                    "TargetTableName": "test_integration_source",
-                    "TargetQuery": "",
+                    "SourceConnections": {
+
+                        "ConnectionName": "TestIntegrationConnection",
+                        "Database": {
+                            "Schema": "test",
+                            "TableName": "test_integration_source",
+                            "Query": ""
+                        },
+                        "Columns": "Id,Name,Value",
+                    },
+                    "TargetConnections": {
+
+                        "ConnectionName": "TestIntegrationConnection",
+                        "Database": {
+                            "Schema": "test",
+                            "TableName": "test_integration_target",
+                            "Query": ""
+                        },
+                        "Columns": "Id,Name,Value",
+                    },
                     "IsTargetTruncate": True,
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
-                    "SourceColumns": "Id,Name,Value",
-                    "TargetColumns": "Id,Name,Value"
                 }
             }
         ]
@@ -39,19 +49,29 @@ class DataOperationTestData:
                 "ProcessCount": 2,
                 "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION",
-                    "SourceConnectionName": "TestIntegrationConnection",
-                    "SourceSchema": "test",
-                    "SourceTableName": "test_integration_source",
-                    "SourceQuery": "",
-                    "TargetConnectionName": "TestIntegrationConnection",
-                    "TargetSchema": "test",
-                    "TargetTableName": "test_integration_source",
-                    "TargetQuery": "",
+                    "SourceConnections": {
+
+                        "ConnectionName": "TestIntegrationConnection",
+                        "Database": {
+                            "Schema": "test",
+                            "TableName": "test_integration_source",
+                            "Query": ""
+                        },
+                        "Columns": "Id,Name,Value",
+                    },
+                    "TargetConnections": {
+
+                        "ConnectionName": "TestIntegrationConnection",
+                        "Database": {
+                            "Schema": "test",
+                            "TableName": "test_integration_source",
+                            "Query": ""
+                        },
+                        "Columns": "Id,Name,Value",
+                    },
                     "IsTargetTruncate": True,
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
-                    "SourceColumns": "Id,Name",
-                    "TargetColumns": "Id,Name"
                 }
             }
         ]
@@ -79,19 +99,29 @@ class DataOperationTestData:
                 "ProcessCount": 1,
                 "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION",
-                    "SourceConnectionName": "TestIntegrationConnection",
-                    "SourceSchema": "test",
-                    "SourceTableName": "test_integration_source",
-                    "SourceQuery": "",
-                    "TargetConnectionName": "TestIntegrationConnection",
-                    "TargetSchema": "test",
-                    "TargetTableName": "test_integration_source",
-                    "TargetQuery": "",
+                    "SourceConnections": {
+
+                        "ConnectionName": "TestIntegrationConnection",
+                        "Database": {
+                            "Schema": "test",
+                            "TableName": "test_integration_source",
+                            "Query": ""
+                        },
+                        "Columns": "Id,Name,Value",
+                    },
+                    "TargetConnections": {
+
+                        "ConnectionName": "TestIntegrationConnection",
+                        "Database": {
+                            "Schema": "test",
+                            "TableName": "test_integration_source",
+                            "Query": ""
+                        },
+                        "Columns": "Id,Name,Value",
+                    },
                     "IsTargetTruncate": True,
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
-                    "SourceColumns": "Id,Name,Value",
-                    "TargetColumns": "Id,Name,Value"
                 }
             }
         ]
@@ -108,19 +138,29 @@ class DataOperationTestData:
                 "ProcessCount": 1,
                 "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION",
-                    "SourceConnectionName": "TestIntegrationConnection",
-                    "SourceSchema": "test",
-                    "SourceTableName": "test_integration_source",
-                    "SourceQuery": "",
-                    "TargetConnectionName": "TestIntegrationConnection",
-                    "TargetSchema": "test",
-                    "TargetTableName": "test_integration_source",
-                    "TargetQuery": "",
+                    "SourceConnections": {
+
+                        "ConnectionName": "TestIntegrationConnection",
+                        "Database": {
+                            "Schema": "test",
+                            "TableName": "test_integration_source",
+                            "Query": ""
+                        },
+                        "Columns": "Id,Name,Value",
+                    },
+                    "TargetConnections": {
+
+                        "ConnectionName": "TestIntegrationConnection",
+                        "Database": {
+                            "Schema": "test",
+                            "TableName": "test_integration_source",
+                            "Query": ""
+                        },
+                        "Columns": "Id,Name,Value",
+                    },
                     "IsTargetTruncate": True,
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
-                    "SourceColumns": "Id,Name,Value",
-                    "TargetColumns": "Id,Name,Value"
                 }
             }
         ]

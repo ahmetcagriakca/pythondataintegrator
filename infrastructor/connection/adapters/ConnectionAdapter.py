@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import List
 
-from models.dto.LimitModifier import LimitModifier
+from models.dto.PagingModifier import PagingModifier
 
 
 class ConnectionAdapter:
@@ -14,7 +14,7 @@ class ConnectionAdapter:
         pass
 
     @abstractmethod
-    def get_source_data(self, data_integration_id: int, limit_modifier: LimitModifier) -> List[any]:
+    def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
         pass
 
     @abstractmethod

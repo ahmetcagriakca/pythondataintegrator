@@ -8,11 +8,9 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.operation import Definition
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
-from models.viewmodels.integration.UpdateDataIntegrationModel import UpdateDataIntegrationModel
 
 
 class DataIntegrationService(IScoped):
@@ -45,7 +43,7 @@ class DataIntegrationService(IScoped):
         entites = self.data_integration_repository.filter_by(IsDeleted=0)
         return entites.all()
 
-    def get_is_target_truncate(self, id:int) -> bool:
+    def get_is_target_truncate(self, id: int) -> bool:
         entity = self.get_by_id(id=id)
         return entity.IsTargetTruncate
 
@@ -55,10 +53,12 @@ class DataIntegrationService(IScoped):
                                           old_definition: Definition
                                           ) -> DataIntegration:
 
-        if data.IsTargetTruncate \
-                and ((data.TargetSchema is None or data.TargetSchema == '') \
-                     or (data.TargetTableName is None or data.TargetTableName == '')):
-            raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
+        # if data.IsTargetTruncate \
+        #         and ((data.TargetConnections.Database.Schema is None or data.TargetConnections.Database.Schema == '') \
+        #              or (
+        #                      data.TargetConnections.Database.TableName is None or data.TargetConnections.Database.TableName == '')):
+        #     raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
+
         if old_definition is not None:
             data_integration = self.data_integration_repository.first(IsDeleted=0,
                                                                       Code=data.Code,
@@ -76,11 +76,19 @@ class DataIntegrationService(IScoped):
     def create_data_integration(self,
                                 data: CreateDataIntegrationModel,
                                 definition: Definition):
+        """
 
-        if data.IsTargetTruncate \
-                and ((data.TargetSchema is None or data.TargetSchema == '') \
-                     or (data.TargetTableName is None or data.TargetTableName == '')):
-            raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
+        :param data:
+        :param definition:
+        :return:
+
+        """
+        # TODO: target truncate check for only database
+        # if data.IsTargetTruncate \
+        #         and ((data.TargetConnections.Database.Schema is None or data.TargetConnections.Database.Schema == '') \
+        #              or (
+        #                      data.TargetConnections.Database.TableName is None or data.TargetConnections.Database.TableName == '')):
+        #     raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
 
         if data.Code is not None and data.Code != "":
             data_integration = self.data_integration_repository.first(IsDeleted=0, Code=data.Code,
@@ -100,10 +108,11 @@ class DataIntegrationService(IScoped):
         data_integration = DataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
                                            IsDelta=data.IsDelta, Definition=definition)
         self.data_integration_repository.insert(data_integration)
-        self.data_integration_column_service.insert(
-            data_integration=data_integration,
-            source_columns=data.SourceColumns,
-            target_columns=data.TargetColumns)
+        if data.SourceConnections is not None and data.SourceConnections.Columns is not None and data.SourceConnections != '':
+            self.data_integration_column_service.insert(
+                data_integration=data_integration,
+                source_columns=data.SourceConnections.Columns,
+                target_columns=data.TargetConnections.Columns)
 
         self.data_integration_connection_service.insert(data_integration=data_integration, data=data)
 
@@ -111,16 +120,18 @@ class DataIntegrationService(IScoped):
 
     def update_data_integration(self,
                                 data_integration: DataIntegration,
-                                data: UpdateDataIntegrationModel,
+                                data: CreateDataIntegrationModel,
                                 definition: Definition) -> DataIntegration:
         data_integration.IsTargetTruncate = data.IsTargetTruncate
         data_integration.IsDelta = data.IsDelta
         data_integration.Definition = definition
 
-        self.data_integration_column_service.update(
-            data_integration=data_integration,
-            source_columns=data.SourceColumns,
-            target_columns=data.TargetColumns)
+        if data.SourceConnections is not None and data.SourceConnections.Columns is not None and data.SourceConnections != '':
+            source_columns = data.SourceConnections.Columns
+            self.data_integration_column_service.update(
+                data_integration=data_integration,
+                source_columns=source_columns,
+                target_columns=data.TargetConnections.Columns)
 
         self.data_integration_connection_service.update(data_integration=data_integration, data=data)
 

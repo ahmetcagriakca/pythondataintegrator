@@ -35,20 +35,42 @@ class DataIntegrationConnectionModel:
     def __init__(self,
                  Id: int = None,
                  SourceOrTarget: int = None,
-                 Schema: str = None,
-                 TableName: str = None,
-                 Query: str = None,
                  DataIntegration=None,
+                 Database=None,
+                 File=None,
                  Connection=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Id: int = Id
         self.SourceOrTarget: int = SourceOrTarget
+        self.DataIntegration = DataIntegration
+        self.Database = Database
+        self.File = File
+        self.Connection = Connection
+
+
+class DataIntegrationConnectionDatabaseModel:
+
+    def __init__(self,
+                 Id: int = None,
+                 Schema: str = None,
+                 TableName: str = None,
+                 Query: str = None,
+                 *args, **kwargs):
+        self.Id: int = Id
         self.Schema: str = Schema
         self.TableName: str = TableName
         self.Query: str = Query
-        self.DataIntegration = DataIntegration
-        self.Connection = Connection
+
+
+class DataIntegrationConnectionFileModel:
+
+    def __init__(self,
+                 Id: int = None,
+                 FileName: str = None,
+                 *args, **kwargs):
+        self.Id: int = Id
+        self.FileName: str = FileName
 
 
 class DataIntegrationColumnModel:
@@ -69,69 +91,88 @@ class DataIntegrationColumnModel:
 class DataIntegrationModels:
     ns = IocManager.api.namespace('DataIntegration', description='Data Integration endpoints',
                                   path='/api/DataIntegration')
-    create_data_integration_model = IocManager.api.model('CreateDataIntegrationModel', {
+
+    data_integration_connection_database_model = IocManager.api.model('DataIntegrationConnetionDatabaseModel', {
+        'Schema': fields.String(description='Schema', required=False),
+        'TableName': fields.String(description='TableName', required=False),
+        'Query': fields.String(description='Query', required=False),
+    })
+    data_integration_connection_file_model = IocManager.api.model('DataIntegrationConnetionFileModel', {
+        'FileName': fields.String(description='FileName', required=False)
+    })
+    data_integration_connection_model = IocManager.api.model('DataIntegrationConnetionModel', {
+        'ConnectionName': fields.String(description='ConnectionName', required=False),
+        'Database': fields.Nested(data_integration_connection_database_model, description='Database connection'),
+        'File': fields.Nested(data_integration_connection_file_model, description='File connection'),
+        'Columns': fields.String(description='Columns'),
+    })
+
+    data_integration_model = IocManager.api.model('DataIntegrationModel', {
         'Code': fields.String(description='Operation code value', required=True),
-        'SourceConnectionName': fields.String(description='SourceConnectionName', required=False),
-        'SourceSchema': fields.String(description='SourceSchema', required=False),
-        'SourceTableName': fields.String(description='SourceTableName', required=False),
-        'SourceQuery': fields.String(description='SourceQuery', required=False),
-        'SourceColumns': fields.String(description='SourceColumns'),
-        'TargetConnectionName': fields.String(description='TargetConnectionName', required=True),
-        'TargetSchema': fields.String(description='TargetSchema'),
-        'TargetTableName': fields.String(description='TargetTableName'),
-        'TargetQuery': fields.String(description='TargetQuery'),
-        'TargetColumns': fields.String(description='TargetColumns'),
+        'SourceConnections': fields.Nested(data_integration_connection_model, description='Source Connections',
+                                           required=False),
+        'TargetConnections': fields.Nested(data_integration_connection_model,
+                                           description='Target Connections',
+                                           required=True),
         'IsTargetTruncate': fields.Boolean(description='IsTargetTruncate', required=True),
         'IsDelta': fields.Boolean(description='IsDelta'),
         'Comments': fields.String(description='Comments'),
     })
 
-    update_data_integration_model = IocManager.api.model('UpdateIntegrationDataModel', {
-        'Code': fields.String(description='Operation code value', required=True),
-        'SourceConnectionName': fields.String(description='SourceConnectionName'),
-        'SourceSchema': fields.String(description='SourceSchema'),
-        'SourceTableName': fields.String(description='SourceTableName'),
-        'SourceQuery': fields.String(description='SourceQuery'),
-        'TargetConnectionName': fields.String(description='TargetConnectionName'),
-        'TargetSchema': fields.String(description='TargetSchema'),
-        'TargetTableName': fields.String(description='TargetTableName'),
-        'TargetQuery': fields.String(description='TargetQuery'),
-        'IsTargetTruncate': fields.Boolean(description='IsTargetTruncate'),
-        'IsDelta': fields.Boolean(description='IsDelta'),
-        'Comments': fields.String(description='Comments'),
-        'SourceColumns': fields.String(description='SourceColumns'),
-        'TargetColumns': fields.String(description='TargetColumns'),
-    })
-
-    delete_data_integration_model = IocManager.api.model('DeleteIntegrationDataModel', {
-        'Code': fields.String(description='Operation code value', required=True),
-    })
-
     @staticmethod
     def get_data_integration_model(data_integration: DataIntegration) -> DataIntegrationModel:
-        source_list=[x for x in data_integration.Connections if x.SourceOrTarget == 0]
-        source=None
-        if source_list is not None and len(source_list)>0:
+        source_list = [x for x in data_integration.Connections if x.SourceOrTarget == 0]
+        source = None
+        if source_list is not None and len(source_list) > 0:
             source_connection = source_list[0]
             entity_source = DataIntegrationConnectionModel(
                 Id=source_connection.Id,
-                SourceOrTarget=source_connection.SourceOrTarget,
-                Schema=source_connection.Schema,
-                TableName=source_connection.TableName,
-                Query=source_connection.Query,
+                SourceOrTarget=source_connection.SourceOrTarget
             )
             source = json.loads(json.dumps(entity_source.__dict__, default=CommonModels.date_converter))
+
+            if source_connection.Database is not None:
+                entity_source_database = DataIntegrationConnectionDatabaseModel(
+                    Id=source_connection.Id,
+                    Schema=source_connection.Database.Schema,
+                    TableName=source_connection.Database.TableName,
+                    Query=source_connection.Database.Query,
+                )
+                source_database = json.loads(json.dumps(entity_source_database.__dict__, default=CommonModels.date_converter))
+                source['Database'] = source_database
+            if source_connection.File is not None:
+                entity_source_file = DataIntegrationConnectionFileModel(
+                    Id=source_connection.Id,
+                    FileName=source_connection.File.FileName
+                )
+                source_file = json.loads(json.dumps(entity_source_file.__dict__, default=CommonModels.date_converter))
+                source['File'] = source_file
+
             source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
 
         target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
         entity_target = DataIntegrationConnectionModel(
             Id=target_connection.Id,
-            SourceOrTarget=target_connection.SourceOrTarget,
-            Schema=target_connection.Schema,
-            TableName=target_connection.TableName,
-            Query=target_connection.Query,
+            SourceOrTarget=target_connection.SourceOrTarget
         )
         target = json.loads(json.dumps(entity_target.__dict__, default=CommonModels.date_converter))
+
+        if target_connection.Database is not None:
+            entity_target_database = DataIntegrationConnectionDatabaseModel(
+                Id=target_connection.Id,
+                Schema=target_connection.Database.Schema,
+                TableName=target_connection.Database.TableName,
+                Query=target_connection.Database.Query,
+            )
+            target_database = json.loads(json.dumps(entity_target_database.__dict__, default=CommonModels.date_converter))
+            target['Database'] = target_database
+        if target_connection.File is not None:
+            entity_target_file = DataIntegrationConnectionFileModel(
+                Id=target_connection.Id,
+                FileName=target_connection.File.FileName
+            )
+            target_file = json.loads(json.dumps(entity_target_file.__dict__, default=CommonModels.date_converter))
+            target['File'] = target_file
         target['Connection'] = ConnectionModels.get_connection_result_model(target_connection.Connection)
         columns = []
         for col in data_integration.Columns:

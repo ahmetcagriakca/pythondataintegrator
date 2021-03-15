@@ -9,7 +9,7 @@ class DataIntegrationConnectionFile(Entity, IocManager.Base):
     __table_args__ = {"schema": "Integration"}
     DataIntegrationConnectionId = Column(Integer, ForeignKey('Integration.DataIntegrationConnection.Id'))
     FileName = Column(String(1000), index=False, unique=False, nullable=False)
-    DataIntegrationConnection = relationship("DataIntegrationConnection", back_populates="DataIntegrationConnectionFiles")
+    DataIntegrationConnection = relationship("DataIntegrationConnection", back_populates="File")
 
     def __init__(self,
                  DataIntegrationConnectionId: int = None,

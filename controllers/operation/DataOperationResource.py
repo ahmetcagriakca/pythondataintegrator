@@ -1,5 +1,5 @@
 import json
-from typing import List
+from infrastructor.json.JsonConvert import JsonConvert
 
 from injector import inject
 from controllers.common.models.CommonModels import CommonModels
@@ -7,13 +7,7 @@ from controllers.operation.models.DataOperationModels import DataOperationModels
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
-from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
-from models.viewmodels.integration.UpdateDataIntegrationModel import UpdateDataIntegrationModel
-from models.viewmodels.operation.CreateDataOperationContactModel import CreateDataOperationContactModel
 from models.viewmodels.operation.CreateDataOperationModel import CreateDataOperationModel
-from models.viewmodels.operation.CreateDataOperationIntegrationModel import CreateDataOperationIntegrationModel
-from models.viewmodels.operation.UpdateDataOperationIntegrationModel import UpdateDataOperationIntegrationModel
-from models.viewmodels.operation.UpdateDataOperationModel import UpdateDataOperationModel
 
 
 @DataOperationModels.ns.route("")
@@ -39,50 +33,12 @@ class DataOperationResource(ResourceBase):
         """
         Data Operation definition
         """
-        data: CreateDataOperationModel = json.loads(json.dumps(IocManager.api.payload),
-                                                    object_hook=lambda d: CreateDataOperationModel(**d))
-        if 'Contacts'  in IocManager.api.payload:
-            data.Contacts = json.loads(json.dumps(IocManager.api.payload["Contacts"]),
-                                           object_hook=lambda d: CreateDataOperationContactModel(**d))
-        data_operation_integrations: List[CreateDataOperationIntegrationModel] = []
-        data_operation_integration: CreateDataOperationIntegrationModel = None
-        for data_integration in IocManager.api.payload["Integrations"]:
-            data_operation_integration = CreateDataOperationIntegrationModel()
-            data_operation_integration.Limit = data_integration["Limit"]
-            data_operation_integration.ProcessCount = data_integration["ProcessCount"]
-            data_operation_integration.Integration = json.loads(json.dumps(data_integration["Integration"]),
-                                                                object_hook=lambda d: CreateDataIntegrationModel(**d))
-            data_operation_integrations.append(data_operation_integration)
-        data.Integrations = data_operation_integrations
-        creation_result = self.data_operation_service.post_data_operation(data,definition_json=json.dumps(IocManager.api.payload))
+        data: CreateDataOperationModel = JsonConvert.FromJSON(json.dumps(IocManager.api.payload))
+        creation_result = self.data_operation_service.post_data_operation(
+            data_operation_model=data,
+            definition_json=JsonConvert.ToJSON(data))
         result = DataOperationModels.get_data_operation_result_model(creation_result)
         return CommonModels.get_response(result=result)
-
-    # @DataOperationModels.ns.expect(DataOperationModels.update_data_operation_model, validate=True)
-    # @DataOperationModels.ns.marshal_with(CommonModels.SuccessModel)
-    # def put(self):
-    #     """
-    #     Update Existing Data Operation
-    #     """
-    #     data: CreateDataOperationModel = json.loads(json.dumps(IocManager.api.payload),
-    #                                                 object_hook=lambda d: UpdateDataOperationModel(**d))
-    #     data_operation_integrations: List[CreateDataOperationIntegrationModel] = []
-    #     data_operation_integration: CreateDataOperationIntegrationModel = None
-    #     for data_integration in IocManager.api.payload["Integrations"]:
-    #         data_operation_integration = CreateDataOperationIntegrationModel()
-    #         data_operation_integration.Limit = data_integration["Limit"]
-    #         data_operation_integration.ProcessCount = data_integration["ProcessCount"]
-    #         data_operation_integration.Integration = json.loads(json.dumps(data_integration["Integration"]),
-    #                                                             object_hook=lambda d: UpdateDataIntegrationModel(**d))
-    #         data_operation_integrations.append(data_operation_integration)
-    #     data.Integrations = data_operation_integrations
-    #     # data: CreateDataOperationModel = json.loads(json.dumps(IocManager.api.payload),
-    #     #                                             object_hook=lambda d: UpdateDataOperationModel(**d))
-    #     # data.Integrations = json.loads(json.dumps(IocManager.api.payload["Integrations"]),
-    #     #                                object_hook=lambda d: UpdateDataOperationIntegrationModel(**d))
-    #     creation_result = self.data_operation_service.update_data_operation(data)
-    #     result = DataOperationModels.get_data_operation_result_model(creation_result)
-    #     return CommonModels.get_response(result=result)
 
     @DataOperationModels.ns.expect(DataOperationModels.delete_data_operation_model, validate=True)
     @DataOperationModels.ns.marshal_with(CommonModels.SuccessModel)

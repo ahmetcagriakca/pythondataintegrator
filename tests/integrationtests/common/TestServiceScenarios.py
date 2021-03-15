@@ -1,12 +1,16 @@
 import time
 from datetime import datetime
 
+from domain.operation.execution.processes.ExecuteOperationProcess import ExecuteOperationProcess
+from domain.operation.execution.services.OperationExecution import OperationExecution
+from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from models.configs.ApiConfig import ApiConfig
 from models.configs.DatabaseConfig import DatabaseConfig
+from models.dao.aps import ApSchedulerJob
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from models.dao.integration.DataIntegration import DataIntegration
@@ -119,7 +123,7 @@ class TestServiceScenarios:
         database_session_manager.session.delete(data_operation_job)
         database_session_manager.commit()
 
-    def create_test_connection(self, test_data_connection):
+    def create_test_connection_database(self, test_data_connection):
         database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
             DatabaseSessionManager)
         connection_repository: Repository[Connection] = Repository[Connection](
@@ -129,6 +133,17 @@ class TestServiceScenarios:
         if connection is not None:
             self.clear_connection(name=test_data_connection["Name"])
         response_data = self.service_endpoints.create_connection_database(test_data_connection)
+
+    def create_test_connection_file(self, test_data_connection):
+        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
+            DatabaseSessionManager)
+        connection_repository: Repository[Connection] = Repository[Connection](
+            database_session_manager)
+
+        connection = connection_repository.first(Name=test_data_connection["Name"])
+        if connection is not None:
+            self.clear_connection(name=test_data_connection["Name"])
+        response_data = self.service_endpoints.create_connection_file(test_data_connection)
 
     def create_test_integration(self, test_data_integration):
         database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
@@ -147,8 +162,8 @@ class TestServiceScenarios:
         data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
             database_session_manager)
         data_operation = data_operation_repository.first(Name=test_data_operation["Name"])
-        # if data_operation is not None:
-        #     self.clear_operation(name=test_data_operation["Name"])
+        if data_operation is not None:
+            self.clear_operation(name=test_data_operation["Name"])
         response_data = self.service_endpoints.insert_data_operation(test_data_operation)
         return response_data
 
@@ -184,10 +199,34 @@ class TestServiceScenarios:
             else:
                 return data_operation_job_execution
 
-    def create_data_operation(self, connections, data_operation):
+    def create_data_operation(self, connections, data_operation, connection_files):
         for connection in connections:
-            self.create_test_connection(connection)
+            self.create_test_connection_database(connection)
+        for connection_file in connection_files:
+            self.create_test_connection_file(connection_file)
         self.create_test_operation(data_operation)
+
+    def run_job_without_schedule(self, data_operation_name):
+        expected = True
+        try:
+            data_operation = self.get_data_operation(name=data_operation_name)
+            operation_execution = IocManager.injector.get(OperationExecution)
+            ap_scheduler_job = ApSchedulerJob(JobId='temp', NextRunTime=None, FuncRef='None')
+            data_operation_job_service = IocManager.injector.get(DataOperationJobService)
+            database_session_manager = IocManager.injector.get(DatabaseSessionManager)
+            ap_scheduler_job_repository = Repository[ApSchedulerJob](database_session_manager)
+            ap_scheduler_job_repository.insert(ap_scheduler_job)
+
+            data_operation_job = data_operation_job_service.insert_data_operation_job(
+                ap_scheduler_job=ap_scheduler_job,
+                data_operation=data_operation,
+                cron=None, start_date=datetime.now(),
+                end_date=None)
+            database_session_manager.commit()
+            operation_execution.start(data_operation_id=data_operation.Id,
+                                      job_id=ap_scheduler_job.Id)
+        except Exception as ex:
+            assert True == False
 
     def run_job(self, data_operation_name):
         expected = True
@@ -217,6 +256,10 @@ class TestServiceScenarios:
         #     # clean data_integration test operations
         #     self.clear_data_operation_job(data_operation_response["Result"]["Id"])
 
-    def run_data_operation(self, connections, data_operation):
-        self.create_data_operation(connections, data_operation)
+    def run_data_operation(self, connections, data_operation, connection_files):
+        self.create_data_operation(connections, data_operation, connection_files)
         self.run_job(data_operation['Name'])
+
+    def run_data_operation_without_schedule(self, connections, data_operation, connection_files):
+        self.create_data_operation(connections, data_operation, connection_files)
+        self.run_job_without_schedule(data_operation['Name'])

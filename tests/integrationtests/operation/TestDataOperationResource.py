@@ -13,7 +13,7 @@ class TestDataOperationResource(TestCase):
 
     def test_data_operation(self):
         expected = True
-        self.test_manager.service_scenarios.create_test_connection(DataOperationTestData.test_integration_connection)
+        self.test_manager.service_scenarios.create_test_connection_database(DataOperationTestData.test_integration_connection)
         try:
             response_data = self.test_manager.service_endpoints.insert_data_operation(
                 DataOperationTestData.test_insert_input)
@@ -36,6 +36,7 @@ class TestDataOperationResource(TestCase):
                    DataOperationTestData.test_update_input['Contacts'][0]["Email"]
             data_operation = self.test_manager.service_scenarios.get_data_operation(
                 name=DataOperationTestData.test_insert_input['Name'])
+            data_operation.Integrations[0].DataIntegration.Connections
             delete_request = {"Id": data_operation.Id}
             response_data = self.test_manager.service_endpoints.delete_data_operation(delete_request)
             assert response_data['Message'] == f'Data Operation removed successfully'
@@ -45,11 +46,11 @@ class TestDataOperationResource(TestCase):
         finally:
             # clean data_integration test operations
             pass
-            # self.test_manager.service_scenarios.clear_operation(name=DataOperationTestData.test_insert_input['Name'])
+            #self.test_manager.service_scenarios.clear_operation(name=DataOperationTestData.test_insert_input['Name'])
 
     def test_data_operation_same_integration(self):
         expected = True
-        self.test_manager.service_scenarios.create_test_connection(DataOperationTestData.test_integration_connection)
+        self.test_manager.service_scenarios.create_test_connection_database(DataOperationTestData.test_integration_connection)
         response_data = self.test_manager.service_endpoints.insert_data_operation(
             DataOperationTestData.test_insert_input_same_integration_1)
         assert response_data['IsSuccess'] == expected

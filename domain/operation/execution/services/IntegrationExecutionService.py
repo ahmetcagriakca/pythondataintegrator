@@ -7,7 +7,7 @@ from domain.operation.services.DataOperationJobExecutionIntegrationService impor
     DataOperationJobExecutionIntegrationService
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from models.dto.LimitModifier import LimitModifier
+from models.dto.PagingModifier import PagingModifier
 from models.enums.StatusTypes import StatusTypes
 from models.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
     EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY
@@ -18,20 +18,18 @@ class IntegrationExecutionService(IScoped):
     def __init__(self,
                  sql_logger: SqlLogger,
                  data_integration_service: DataIntegrationService,
-                 data_integration_connection_service: DataIntegrationConnectionService,
                  data_operation_job_execution_integration_service: DataOperationJobExecutionIntegrationService,
                  connection_adapter_factory: ConnectionAdapterFactory):
         self.data_integration_service = data_integration_service
         self.data_operation_job_execution_integration_service = data_operation_job_execution_integration_service
         self.sql_logger = sql_logger
         self.connection_adapter_factory = connection_adapter_factory
-        self.data_integration_connection_service = data_integration_connection_service
 
-    def start_execute_integration(self, data_integration_id: int, limit_modifier: LimitModifier) -> int:
+    def start_execute_integration(self, data_integration_id: int, paging_modifier: PagingModifier) -> int:
         source_connection_adapter = self.connection_adapter_factory.get_source_connection_adapter(
             data_integration_id=data_integration_id)
         source_data = source_connection_adapter.get_source_data(data_integration_id=data_integration_id,
-                                                                limit_modifier=limit_modifier)
+                                                                paging_modifier=paging_modifier)
 
         target_connection_adapter = self.connection_adapter_factory.get_target_connection_adapter(
             data_integration_id=data_integration_id)

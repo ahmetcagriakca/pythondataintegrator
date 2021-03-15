@@ -1,15 +1,10 @@
 from typing import List
 from apscheduler.job import Job
-from injector import inject
-from sqlalchemy.dialects.postgresql import psycopg2
-from sqlalchemy.exc import InvalidRequestError
 
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
-from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from models.configs.ApiConfig import ApiConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.aps import ApSchedulerJobEvent
 from models.dao.aps.ApSchedulerEvent import ApSchedulerEvent

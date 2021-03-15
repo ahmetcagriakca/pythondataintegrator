@@ -1,6 +1,7 @@
 from injector import inject
 
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
+from domain.operation.execution.adapters.connection.FileAdapter import FileAdapter
 from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
 from domain.operation.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
 from infrastructor.dependency.scopes import IScoped
@@ -12,7 +13,9 @@ class ConnectionAdapterFactory(IScoped):
     @inject
     def __init__(self,
                  data_integration_connection_service: DataIntegrationConnectionService,
-                 database_adapter: DatabaseAdapter):
+                 database_adapter: DatabaseAdapter,
+                 file_adapter: FileAdapter):
+        self.file_adapter = file_adapter
         self.data_integration_connection_service = data_integration_connection_service
         self.database_adapter = database_adapter
 
@@ -25,6 +28,11 @@ class ConnectionAdapterFactory(IScoped):
                 return self.database_adapter
             else:
                 raise IncompatibleAdapterException(f"{self.database_adapter} is incompatible with ConectionAdapter")
+        if source_connection.Connection.ConnectionType.Id == ConnectionTypes.File.value:
+            if isinstance(self.file_adapter, ConnectionAdapter):
+                return self.file_adapter
+            else:
+                raise IncompatibleAdapterException(f"{self.file_adapter} is incompatible with ConectionAdapter")
 
     def get_target_connection_adapter(self, data_integration_id) -> ConnectionAdapter:
 
@@ -35,3 +43,8 @@ class ConnectionAdapterFactory(IScoped):
                 return self.database_adapter
             else:
                 raise IncompatibleAdapterException(f"{self.database_adapter} is incompatible with ConectionAdapter")
+        if target_connection.Connection.ConnectionType.Id == ConnectionTypes.File.value:
+            if isinstance(self.file_adapter, ConnectionAdapter):
+                return self.file_adapter
+            else:
+                raise IncompatibleAdapterException(f"{self.file_adapter} is incompatible with ConectionAdapter")

@@ -3,7 +3,6 @@ from infrastructor.connection.database.connectors.DatabaseConnector import Datab
 from infrastructor.connection.database.connectors.MssqlDbConnector import MssqlDbConnector
 from infrastructor.connection.database.connectors.OracleDbConnector import OracleDbConnector
 from infrastructor.connection.database.connectors.PostgreDbConnector import PostgreDbConnector
-from infrastructor.dependency.scopes import IScoped
 from models.configs.DatabaseConfig import DatabaseConfig
 
 

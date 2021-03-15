@@ -9,9 +9,12 @@ from infrastructor.logging.SqlLogger import SqlLogger
 
 class DatabaseContext(IScoped):
     @inject
-    def __init__(self, connection_policy: DatabasePolicy, sql_logger: SqlLogger, retry_count=3):
+    def __init__(self,
+                 database_policy: DatabasePolicy,
+                 sql_logger: SqlLogger,
+                 retry_count=3):
         self.sql_logger: SqlLogger = sql_logger
-        self.connector = connection_policy.connector
+        self.connector = database_policy.connector
         self.retry_count = retry_count
         self.default_retry = 1
 
@@ -73,9 +76,9 @@ class DatabaseContext(IScoped):
         datas = self.fetch_query(query=count_query)
         return datas[0][0]
 
-    def get_table_data(self, query, first_row, sub_limit, top_limit):
-        data_query = self.connector.get_table_data_query(query=query, first_row=first_row, sub_limit=sub_limit,
-                                                         top_limit=top_limit)
+    def get_table_data(self, query, first_row, start, end):
+        data_query = self.connector.get_table_data_query(query=query, first_row=first_row, start=start,
+                                                         end=end)
         return self.fetch(data_query)
 
     def truncate_table(self, schema, table):
@@ -96,12 +99,12 @@ class DatabaseContext(IScoped):
             target_query = self.replace_regex(target_query, column_row[1], indexer)
         return target_query
 
-    def prepare_insert_row(self, extracted_datas, column_rows):
+    def prepare_insert_row(self, data, column_rows):
         insert_rows = []
-        for extracted_data in extracted_datas:
+        for extracted_data in data:
             row = []
             for column_row in column_rows:
-                data = self.connector.prepare_data(extracted_data[column_rows.index(column_row)])
-                row.append(data)
+                prepared_data = self.connector.prepare_data(extracted_data[column_rows.index(column_row)])
+                row.append(prepared_data)
             insert_rows.append(tuple(row))
         return insert_rows
