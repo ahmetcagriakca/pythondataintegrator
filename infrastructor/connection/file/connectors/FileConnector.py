@@ -1,10 +1,10 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from infrastructor.dependency.scopes import IScoped
 
 from pandas import DataFrame
 
 
-class FileConnector(IScoped):
+class FileConnector(ABC,IScoped):
     @abstractmethod
     def connect(self):
         pass
@@ -22,11 +22,14 @@ class FileConnector(IScoped):
                   header: int, separator: str) -> DataFrame:
         pass
 
+    @abstractmethod
     def write_data(self, file: str, data: DataFrame, separator: str):
         pass
 
+    @abstractmethod
     def recreate_file(self, file: str, headers: [], separator: str):
         pass
 
+    @abstractmethod
     def delete_file(self, file: str):
         pass
