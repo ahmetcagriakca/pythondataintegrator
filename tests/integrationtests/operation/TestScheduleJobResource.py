@@ -18,6 +18,7 @@ class TestScheduleJobResource(TestCase):
 
         self.test_manager.service_scenarios.run_data_operation(connections=connections,
                                                                data_operation=data_operation)
+
     def test_run_file_data_operation(self):
         connection_databases = [
             ScheduleJobFileTestData.test_job_connection,
@@ -30,5 +31,5 @@ class TestScheduleJobResource(TestCase):
         data_operation = ScheduleJobFileTestData.test_data_operation
 
         self.test_manager.service_scenarios.run_data_operation_without_schedule(connections=connection_databases,
-                                                               data_operation=data_operation,
-                                                               connection_files=connection_files)
+                                                                                data_operation=data_operation,
+                                                                                connection_files=connection_files)

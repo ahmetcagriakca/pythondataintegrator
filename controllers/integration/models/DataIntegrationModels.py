@@ -67,10 +67,26 @@ class DataIntegrationConnectionFileModel:
 
     def __init__(self,
                  Id: int = None,
+                 Folder: str = None,
                  FileName: str = None,
                  *args, **kwargs):
         self.Id: int = Id
+        self.Folder: str = Folder
         self.FileName: str = FileName
+
+
+class DataIntegrationConnectionFileCsvModel:
+
+    def __init__(self,
+                 Id: int = None,
+                 HasHeader: bool = None,
+                 Header: str = None,
+                 Separator: str = None,
+                 *args, **kwargs):
+        self.Id: int = Id
+        self.HasHeader: bool = HasHeader
+        self.Header: str = Header
+        self.Separator: str = Separator
 
 
 class DataIntegrationColumnModel:
@@ -138,14 +154,27 @@ class DataIntegrationModels:
                     TableName=source_connection.Database.TableName,
                     Query=source_connection.Database.Query,
                 )
-                source_database = json.loads(json.dumps(entity_source_database.__dict__, default=CommonModels.date_converter))
+                source_database = json.loads(
+                    json.dumps(entity_source_database.__dict__, default=CommonModels.date_converter))
                 source['Database'] = source_database
             if source_connection.File is not None:
                 entity_source_file = DataIntegrationConnectionFileModel(
                     Id=source_connection.Id,
+                    Folder=source_connection.File.Folder,
                     FileName=source_connection.File.FileName
                 )
                 source_file = json.loads(json.dumps(entity_source_file.__dict__, default=CommonModels.date_converter))
+
+                if source_connection.File.Csv is not None:
+                    entity_source_file_csv = DataIntegrationConnectionFileCsvModel(
+                        Id=source_connection.Id,
+                        HasHeader=source_connection.File.Csv.HasHeader,
+                        Header=source_connection.File.Csv.Header,
+                        Separator=source_connection.File.Csv.Separator,
+                    )
+                    source_file_csv = json.loads(
+                        json.dumps(entity_source_file_csv.__dict__, default=CommonModels.date_converter))
+                    source_file['Csv'] = source_file_csv
                 source['File'] = source_file
 
             source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
@@ -164,7 +193,8 @@ class DataIntegrationModels:
                 TableName=target_connection.Database.TableName,
                 Query=target_connection.Database.Query,
             )
-            target_database = json.loads(json.dumps(entity_target_database.__dict__, default=CommonModels.date_converter))
+            target_database = json.loads(
+                json.dumps(entity_target_database.__dict__, default=CommonModels.date_converter))
             target['Database'] = target_database
         if target_connection.File is not None:
             entity_target_file = DataIntegrationConnectionFileModel(

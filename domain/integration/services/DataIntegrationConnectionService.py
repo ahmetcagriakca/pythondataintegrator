@@ -189,8 +189,9 @@ class DataIntegrationConnectionService(IScoped):
 
     def delete(self, id: int):
         data_integration_connection = self.get_by_id(id=id)
-        if data_integration_connection.Database is not None:
-            self.data_integration_connection_database_service.delete(id=data_integration_connection.Database.Id)
-        if data_integration_connection.File is not None:
-            self.data_integration_connection_file_service.delete(id=data_integration_connection.File.Id)
-        self.data_integration_connection_repository.delete_by_id(id)
+        if data_integration_connection is not None:
+            if data_integration_connection.Database is not None:
+                self.data_integration_connection_database_service.delete(id=data_integration_connection.Database.Id)
+            if data_integration_connection.File is not None:
+                self.data_integration_connection_file_service.delete(id=data_integration_connection.File.Id)
+            self.data_integration_connection_repository.delete_by_id(id)

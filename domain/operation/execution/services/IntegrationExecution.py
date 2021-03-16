@@ -75,5 +75,5 @@ class IntegrationExecution(IScoped):
                 status=StatusTypes.Error,
                 event_code=EVENT_EXECUTION_INTEGRATION_FINISHED,
                 is_finished=True)
-            if execute_adapter.raise_error_check():
+            if execute_adapter.check_error_raise():
                 raise

@@ -226,6 +226,9 @@ class TestServiceScenarios:
             operation_execution.start(data_operation_id=data_operation.Id,
                                       job_id=ap_scheduler_job.Id)
         except Exception as ex:
+            import traceback
+            tb = traceback.format_exc()
+            print(tb)
             assert True == False
 
     def run_job(self, data_operation_name):

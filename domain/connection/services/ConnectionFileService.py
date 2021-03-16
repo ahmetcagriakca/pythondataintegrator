@@ -37,7 +37,8 @@ class ConnectionFileService(IScoped):
         connector_type = self.connector_type_service.get_by_name(name=model.ConnectorTypeName)
 
         connection_file = ConnectionFile(Connection=connection,
-                                         Folder=model.Folder,
+                                         Host=model.Host,
+                                         Port=model.Port,
                                          ConnectorType=connector_type)
 
         self.connection_file_repository.insert(connection_file)
@@ -53,7 +54,8 @@ class ConnectionFileService(IScoped):
         connector_type = self.connector_type_service.get_by_name(name=model.ConnectorTypeName)
 
         connection_file.ConnectorType = connector_type
-        connection_file.Folder = model.Folder
+        connection_file.Host = model.Host
+        connection_file.Port = model.Port
 
         return connection_file
 

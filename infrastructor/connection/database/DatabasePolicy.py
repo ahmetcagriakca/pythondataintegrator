@@ -10,7 +10,7 @@ class DatabasePolicy:
     @inject
     def __init__(self, database_config: DatabaseConfig):
         self.database_config = database_config
-        self.connecter: DatabaseConnector = None
+        self.connector: DatabaseConnector = None
         if database_config.type == "MSSQL":
             self.connector: DatabaseConnector = MssqlDbConnector(database_config)
         elif database_config.type == "ORACLE":

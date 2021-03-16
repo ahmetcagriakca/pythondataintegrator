@@ -16,25 +16,25 @@ class FileContext(IScoped):
                  ):
         self.connector: FileConnector = connector
 
-    def get_data_count(self, file_name):
-        count = self.connector.get_data_count(file_name=file_name)
+    def get_data_count(self, file):
+        count = self.connector.get_data_count(file=file)
         return count
 
-    def get_data(self, file_name: str, names: [], start: int, limit: int, header: int, separator: str) -> DataFrame:
+    def get_data(self, file: str, names: [], start: int, limit: int, header: int, separator: str) -> DataFrame:
 
-        data = self.connector.read_data(file_name=file_name, names=names, start=start, limit=limit, header=header,
+        data = self.connector.read_data(file=file, names=names, start=start, limit=limit, header=header,
                                         separator=separator)
 
         return data
 
-    def write_to_file(self, file_name: str, data: DataFrame, separator: str):
-        self.connector.write_data(file_name=file_name, data=data, separator=separator)
+    def write_to_file(self, file: str, data: DataFrame, separator: str):
+        self.connector.write_data(file=file, data=data, separator=separator)
 
-    def recreate_file(self, file_name: str, headers: [], separator: str):
-        self.connector.recreate_file(file_name=file_name, headers=headers, separator=separator)
+    def recreate_file(self, file: str, headers: [], separator: str):
+        self.connector.recreate_file(file=file, headers=headers, separator=separator)
 
-    def delete_file(self, file_name: str):
-        self.connector.delete_file(file_name=file_name)
+    def delete_file(self, file: str):
+        self.connector.delete_file(file=file)
 
     def prepare_insert_row(self, data, column_rows):
         insert_rows = []

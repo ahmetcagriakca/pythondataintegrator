@@ -112,14 +112,14 @@ class ExecuteIntegrationProcess(IScoped):
                 else:
                     start = time()
                     self.sql_logger.info(
-                        f"{process_name}-{sub_process_id} process got a new task.Id:{new_task.Data.Id} limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit} ")
+                        f"{process_name}-{sub_process_id} process got a new task.Id:{new_task.Data.Id} limits:{new_task.Data.Start}-{new_task.Data.End} ")
                     paging_modifier: PagingModifier = new_task.Data
                     result = self.integration_execution_service.start_execute_integration(
                         data_integration_id=process_id,
                         paging_modifier=paging_modifier)
                     end = time()
                     self.sql_logger.info(
-                        f"{process_name} process finished task. limits:{new_task.Data.SubLimit}-{new_task.Data.TopLimit}. time:{end - start}")
+                        f"{process_name} process finished task. limits:{new_task.Data.Start}-{new_task.Data.End}. time:{end - start}")
                     new_task.IsProcessed = True
                     new_task.Data.State = 1
                     new_task.Data.Message = result

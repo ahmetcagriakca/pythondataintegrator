@@ -29,21 +29,21 @@ class FileProvider(IScoped):
         Creating Connection
         """
         if connection.ConnectionType.Name == ConnectionTypes.File.name:
-            folder = connection.File.Folder
-            if folder is None or folder == '':
-                folder = os.path.join(self.api_config.root_directory, "files")
+            host = connection.File.Host
+            if host is None or host == '':
+                host = os.path.join(self.api_config.root_directory, "files")
             if connection.File.ConnectorType.Name == ConnectorTypes.CSV.name:
-                connector = CsvConnector(folder=folder)
+                connector = CsvConnector(host=host)
             file_context: FileContext = FileContext(connector=connector)
             return file_context
 
-    def get_file_context_with_folder(self, folder: str) -> FileContext:
+    def get_file_context_with_host(self, host: str) -> FileContext:
         """
         Creating Connection
         """
 
-        if folder is None or folder == '':
-            folder = self.api_config.root_directory
-        connector = CsvConnector(folder=folder)
+        if host is None or host == '':
+            host = os.path.join(self.api_config.root_directory, "files")
+        connector = CsvConnector(folder=host)
         file_context: FileContext = FileContext(connector=connector)
         return file_context

@@ -16,7 +16,7 @@ class ExecuteQueryAdapter(ExecuteAdapter, IScoped):
         self.data_operation_integration_service = data_operation_integration_service
 
     def execute(self, data_operation_integration_id: int, data_operation_job_execution_id: int,
-                 data_operation_job_execution_integration_id: int) -> int:
+                data_operation_job_execution_integration_id: int) -> int:
         data_operation_integration = self.data_operation_integration_service.get_by_id(
             id=data_operation_integration_id)
         data_integration_id = data_operation_integration.DataIntegration.Id
@@ -37,5 +37,5 @@ class ExecuteQueryAdapter(ExecuteAdapter, IScoped):
     def get_error_log(self, data_integration_id: int):
         return f"integration run query getting error."
 
-    def raise_error_check(self) -> bool:
+    def check_error_raise(self) -> bool:
         return False

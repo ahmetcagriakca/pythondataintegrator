@@ -12,9 +12,10 @@ class ScheduleJobFileTestData:
     test_file_connection = {
         "Name": "TestIntegrationConnectionFile",
         "ConnectorTypeName": "CSV",
-        "Folder": "",
-        "User": "postgres",
-        "Password": "123456"
+        "Host": "",
+        "Port": 0,
+        "User": "",
+        "Password": ""
     }
 
     test_data_operation = {
@@ -27,12 +28,18 @@ class ScheduleJobFileTestData:
                 "Limit": 100,
                 "ProcessCount": 1,
                 "Integration": {
-                    "Code": "TEST_FILE_TO_DB_INTEGRATION",
+                    "Code": "TEST_CSV_TO_DB_INTEGRATION",
                     "SourceConnections": {
 
                         "ConnectionName": "TestIntegrationConnectionFile",
                         "File": {
+                            "Folder": "",
                             "FileName": "test.csv",
+                            "Csv": {
+                                "HasHeader": True,
+                                "Header": "",
+                                "Separator": ";",
+                            }
                         },
                         "Columns": "Id,Name",
                     },
@@ -55,7 +62,7 @@ class ScheduleJobFileTestData:
                 "Limit": 100,
                 "ProcessCount": 1,
                 "Integration": {
-                    "Code": "TEST_DB_TO_FILE_INTEGRATION",
+                    "Code": "TEST_DB_TO_CSV_NONE_HEADER_INTEGRATION",
                     "SourceConnections": {
 
                         "ConnectionName": "TestIntegrationConnection",
@@ -69,7 +76,13 @@ class ScheduleJobFileTestData:
                     "TargetConnections": {
                         "ConnectionName": "TestIntegrationConnectionFile",
                         "File": {
-                            "FileName": "test_new.csv",
+                            "Folder": "",
+                            "FileName": "test_new_none_header.csv",
+                            "Csv": {
+                                "HasHeader": False,
+                                "Header": "",
+                                "Separator": ",",
+                            }
                         },
                         "Columns": "Id,Name",
                     },
@@ -77,6 +90,43 @@ class ScheduleJobFileTestData:
                     "IsDelta": True,
                     "Comments": "Test data_integration record",
                 }
-            }
+            },
+            {
+                "Limit": 100,
+                "ProcessCount": 1,
+                "Integration": {
+                    "Code": "TEST_CSV_TO_CSV_INTEGRATION",
+                    "SourceConnections": {
+
+                        "ConnectionName": "TestIntegrationConnectionFile",
+                        "File": {
+                            "Folder": "",
+                            "FileName": "test_new_none_header.csv",
+                            "Csv": {
+                                "HasHeader": False,
+                                "Header": "Id,Name",
+                                "Separator": ",",
+                            }
+                        },
+                        "Columns": "Name,Id",
+                    },
+                    "TargetConnections": {
+                        "ConnectionName": "TestIntegrationConnectionFile",
+                        "File": {
+                            "Folder": "",
+                            "FileName": "test_new_only_id.csv",
+                            "Csv": {
+                                "HasHeader": True,
+                                "Header": "Name;Id",
+                                "Separator": ";",
+                            }
+                        },
+                        "Columns": "Name,Id",
+                    },
+                    "IsTargetTruncate": True,
+                    "IsDelta": True,
+                    "Comments": "Test data_integration record",
+                }
+            },
         ]
     }

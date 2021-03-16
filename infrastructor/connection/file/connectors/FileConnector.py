@@ -14,19 +14,19 @@ class FileConnector(IScoped):
         pass
 
     @abstractmethod
-    def get_data_count(self, file_name: str):
+    def get_data_count(self, file: str):
         pass
 
     @abstractmethod
-    def read_data(self, file_name: str, names: [], start: int, limit: int,
+    def read_data(self, file: str, names: [], start: int, limit: int,
                   header: int, separator: str) -> DataFrame:
         pass
 
-    def write_data(self, file_name: str, data: DataFrame, separator: str) :
+    def write_data(self, file: str, data: DataFrame, separator: str):
         pass
 
-    def recreate_file(self, file_name: str, headers: [], separator: str):
+    def recreate_file(self, file: str, headers: [], separator: str):
         pass
 
-    def delete_file(self, file_name: str) :
+    def delete_file(self, file: str):
         pass

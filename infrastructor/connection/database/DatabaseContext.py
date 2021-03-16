@@ -85,7 +85,8 @@ class DatabaseContext(IScoped):
         truncate_query = self.connector.get_truncate_query(schema=schema, table=table)
         return self.execute(query=truncate_query)
 
-    def replace_regex(self, text, field, indexer):
+    @staticmethod
+    def replace_regex(text, field, indexer):
         text = re.sub(r'\(:' + field + r'\b', f'({indexer}', text)
         text = re.sub(r':' + field + r'\b\)', f'{indexer})', text)
         text = re.sub(r':' + field + r'\b', f'{indexer}', text)

@@ -8,7 +8,7 @@ from models.dao.common import OperationEvent
 from models.dao.common.Status import Status
 from models.dao.operation import DataOperationJobExecution, DataOperationJobExecutionIntegration, \
     DataOperationJobExecutionIntegrationEvent, DataOperationIntegration
-from models.enums.events import EVENT_EXECUTION_INTEGRATION_STARTED
+from models.enums.events import EVENT_EXECUTION_INTEGRATION_INITIALIZED
 
 
 class DataOperationJobExecutionIntegrationService(IScoped):
@@ -44,7 +44,7 @@ class DataOperationJobExecutionIntegrationService(IScoped):
             Limit=data_operation_integration.Limit,
             ProcessCount=data_operation_integration.ProcessCount)
         self.data_operation_job_execution_integration_repository.insert(data_operation_job_execution_integration)
-        operation_event = self.operation_event_repository.first(Code=EVENT_EXECUTION_INTEGRATION_STARTED)
+        operation_event = self.operation_event_repository.first(Code=EVENT_EXECUTION_INTEGRATION_INITIALIZED)
         data_operation_job_execution_integration_event = DataOperationJobExecutionIntegrationEvent(
             EventDate=datetime.now(),
             DataOperationJobExecutionIntegration=data_operation_job_execution_integration,

@@ -46,38 +46,39 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
             data_operation_integration_id=data_operation_integration_id,
             data_count=data_count)
-        if affected_row_count < 0:
-            affected_row_count = data_count
-        return affected_row_count
+        if affected_row_count > data_count:
+            return affected_row_count
+        else:
+            return data_count
 
     def get_start_log(self, data_integration_id: int):
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
         if target_connection.Database is not None:
-            log=f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation started"
+            log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation started"
         elif target_connection.File is not None:
-            log=f"{target_connection.File.FileName} integration execute operation started"
+            log = f"{target_connection.File.FileName} integration execute operation started"
         return log
 
     def get_finish_log(self, data_integration_id: int, data_count: int):
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
         if target_connection.Database is not None:
-            log=f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation finished. (Source Data Count:{data_count})"
+            log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation finished. (Source Data Count:{data_count})"
         elif target_connection.File is not None:
-            log=f"{target_connection.File.FileName} integration execute operation finished"
+            log = f"{target_connection.File.FileName} integration execute operation finished"
         return log
 
     def get_error_log(self, data_integration_id: int):
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
         if target_connection.Database is not None:
-            log=f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation getting error"
+            log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation getting error"
         elif target_connection.File is not None:
-            log=f"{target_connection.File.FileName} integration execute operation etting error"
+            log = f"{target_connection.File.FileName} integration execute operation etting error"
         return log
 
-    def raise_error_check(self) -> bool:
+    def check_error_raise(self) -> bool:
         return True
 
     def execute_integration(self,

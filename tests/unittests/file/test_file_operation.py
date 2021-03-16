@@ -41,44 +41,44 @@ class TestFileOperation(TestCase):
         assert len(data.index) == 10
         assert data['Id'][0] == 2
 
-    # def test_copy_file_from_remote(self):
-    #     from infrastructor.file.FileConnectionContext import FileConnectionContext
-    #     file_manager: FileConnectionContext = IocManager.injector.get(FileConnectionContext)
-    #     path = r'd:\Files\android_2020-01-01.csv'
-    #     file = open(path)
-    #     try:
-    #         file_name = str(uuid.uuid4()) + ".csv"
-    #         file_manager.write_binary_file_to_server(file=file, file_name=file_name)
-    #     finally:
-    #         if file is not None and hasattr(file, 'close'):
-    #             file.close()
-    #
-    # def test_copy_file(self):
-    #     from infrastructor.file.FileConnectionContext import FileConnectionContext
-    #     file_manager: FileConnectionContext = IocManager.injector.get(FileConnectionContext)
-    #     api_config: ApiConfig = IocManager.injector.get(ApiConfig)
-    #     path = os.path.join(api_config.root_directory, 'files', 'android_2021-01-26.csv')
-    #     file = open(path, 'rb')
-    #     file1 = open(path, 'rb')
-    #     try:
-    #         file_name = str(uuid.uuid4()) + ".csv"
-    #         file_manager.write_binary_file_to_server(file=file, file_name=file_name)
-    #     finally:
-    #         if file is not None and hasattr(file, 'close'):
-    #             file.close()
-    #
-    # def test_read_file(self):
-    #     path = r'd:\Files\android_2020-01-01.csv'
-    #     csv_connector: FileConnectorStrategy = CsvFileConnector(path)
-    #
-    #     # count = csv_connector.get_count()
-    #     df1 = csv_connector.read_data(row_count=10)
-    #     df2 = csv_connector.read_data(row_count=100)
-    #     df3 = csv_connector.read_data(row_count=10, skip_row_count=10)
-    #     df3 = csv_connector.read_data(row_count=100, skip_row_count=34300)
-    #     values1 = df1.values.tolist()
-    #     values2 = df2.values.tolist()
-    #     values3 = df3.values.tolist()
-    #     for data in values1.tolist():
-    #         print(data)
-    #     # pandas.errors.EmptyDataError: No columns to parse from file
+    def test_copy_file_from_remote(self):
+        from infrastructor.file.FileConnectionContext import FileConnectionContext
+        file_manager: FileConnectionContext = IocManager.injector.get(FileConnectionContext)
+        path = r'd:\Files\android_2020-01-01.csv'
+        file = open(path)
+        try:
+            file_name = str(uuid.uuid4()) + ".csv"
+            file_manager.write_binary_file_to_server(file=file, file_name=file_name)
+        finally:
+            if file is not None and hasattr(file, 'close'):
+                file.close()
+
+    def test_copy_file(self):
+        from infrastructor.file.FileConnectionContext import FileConnectionContext
+        file_manager: FileConnectionContext = IocManager.injector.get(FileConnectionContext)
+        api_config: ApiConfig = IocManager.injector.get(ApiConfig)
+        path = os.path.join(api_config.root_directory, 'files', 'android_2021-01-26.csv')
+        file = open(path, 'rb')
+        file1 = open(path, 'rb')
+        try:
+            file_name = str(uuid.uuid4()) + ".csv"
+            file_manager.write_binary_file_to_server(file=file, file_name=file_name)
+        finally:
+            if file is not None and hasattr(file, 'close'):
+                file.close()
+
+    def test_read_file(self):
+        path = r'd:\Files\android_2020-01-01.csv'
+        csv_connector: FileConnectorStrategy = CsvFileConnector(path)
+
+        # count = csv_connector.get_count()
+        df1 = csv_connector.read_data(row_count=10)
+        df2 = csv_connector.read_data(row_count=100)
+        df3 = csv_connector.read_data(row_count=10, skip_row_count=10)
+        df3 = csv_connector.read_data(row_count=100, skip_row_count=34300)
+        values1 = df1.values.tolist()
+        values2 = df2.values.tolist()
+        values3 = df3.values.tolist()
+        for data in values1.tolist():
+            print(data)
+        # pandas.errors.EmptyDataError: No columns to parse from file

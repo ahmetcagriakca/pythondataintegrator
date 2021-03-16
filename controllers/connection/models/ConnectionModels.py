@@ -78,7 +78,8 @@ class ConnectionFileModel(EntityModel):
 
     def __init__(self,
                  Id=None,
-                 Folder: str = None,
+                 Host: str = None,
+                 Port: int = None,
                  User: str = None,
                  Password: str = None,
                  Connection=None,
@@ -86,7 +87,8 @@ class ConnectionFileModel(EntityModel):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Id = Id
-        self.Folder = Folder
+        self.Host: str = Host
+        self.Port: int = Port
         self.User: str = User
         self.Password: str = Password
         self.Connection = Connection
@@ -111,7 +113,8 @@ class ConnectionModels:
     create_connection_file_model = IocManager.api.model('ConnectionFileModel', {
         'Name': fields.String(description='Operation code value', required=True),
         'ConnectorTypeName': fields.String(description='ConnectorTypeName', required=True),
-        'Folder': fields.String(description='Folder'),
+        'Host': fields.String(description='Host'),
+        'Port': fields.Integer(description='Port'),
         'User': fields.String(description='User'),
         'Password': fields.String(description='Password'),
     })
@@ -194,7 +197,8 @@ class ConnectionModels:
     def get_connection_file_entity_model(connection_file: ConnectionFile) -> ConnectionFileModel:
         entity_model = ConnectionFileModel(
             Id=connection_file.Id,
-            Folder=connection_file.Folder,
+            Host=connection_file.Host,
+            Port=connection_file.Port,
             User='***',  # connection_database.User
             Password='***'  # connection_database.Password
         )
