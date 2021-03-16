@@ -26,14 +26,24 @@ class CsvConnector(FileConnector):
 
     def get_data_count(self, file: str):
         file_path = os.path.join(self.host, file)
-        with open(file_path,'rb') as f:
+        with open(file_path, 'rb') as f:
             count = sum(1 for line in f)
         return count
+
+    def get_data_with_chunk(self, file: str, names: [], start: int, limit: int, header: int,
+                            separator: str) -> DataFrame:
+        count = 0
+        for chunk in pd.read_csv(file, names=names, sep=separator, header=header, chunksize=limit, iterator=True,
+                                 low_memory=False):
+            count += len(chunk)
+            if start < count:
+                return chunk
 
     def read_data(self, file: str, names: [], start: int, limit: int, header: int,
                   separator: str) -> DataFrame:
         file_path = os.path.join(self.host, file)
-        data = pd.read_csv(file_path, names=names, sep=separator, header=header, skiprows=start, nrows=limit)
+        data = self.get_data_with_chunk(file_path, names=names, start=start, limit=limit, header=header,
+                                        separator=separator)
 
         return data
 

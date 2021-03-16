@@ -37,7 +37,7 @@ class ScheduleJobFileTestData:
                             "FileName": "test.csv",
                             "Csv": {
                                 "HasHeader": True,
-                                "Header": "",
+                                "Header": "Id,Name",
                                 "Separator": ";",
                             }
                         },
@@ -114,7 +114,7 @@ class ScheduleJobFileTestData:
                         "ConnectionName": "TestIntegrationConnectionFile",
                         "File": {
                             "Folder": "",
-                            "FileName": "test_new_only_id.csv",
+                            "FileName": "test_new_change_column_order.csv",
                             "Csv": {
                                 "HasHeader": True,
                                 "Header": "Name;Id",
@@ -122,6 +122,43 @@ class ScheduleJobFileTestData:
                             }
                         },
                         "Columns": "Name,Id",
+                    },
+                    "IsTargetTruncate": True,
+                    "IsDelta": True,
+                    "Comments": "Test data_integration record",
+                }
+            },
+            {
+                "Limit": 100,
+                "ProcessCount": 1,
+                "Integration": {
+                    "Code": "TEST_CSV_TO_CSV_INTEGRATION",
+                    "SourceConnections": {
+
+                        "ConnectionName": "TestIntegrationConnectionFile",
+                        "File": {
+                            "Folder": "",
+                            "FileName": "test_new_none_header.csv",
+                            "Csv": {
+                                "HasHeader": False,
+                                "Header": "Id,Name",
+                                "Separator": ",",
+                            }
+                        },
+                        "Columns": "Id",
+                    },
+                    "TargetConnections": {
+                        "ConnectionName": "TestIntegrationConnectionFile",
+                        "File": {
+                            "Folder": "",
+                            "FileName": "test_new_only_id.csv",
+                            "Csv": {
+                                "HasHeader": True,
+                                "Header": "Id",
+                                "Separator": ";",
+                            }
+                        },
+                        "Columns": "Id",
                     },
                     "IsTargetTruncate": True,
                     "IsDelta": True,
