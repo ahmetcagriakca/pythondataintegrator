@@ -1,7 +1,8 @@
 from unittest import TestCase
 from tests.integrationtests.common.TestManager import TestManager
-from tests.integrationtests.operation.testdata import ScheduleJobTestData
-from tests.integrationtests.operation.testdata.ScheduleJobFileTestData import ScheduleJobFileTestData
+from tests.integrationtests.operation.testdata import TestScheduleJobData
+from tests.integrationtests.operation.testdata.TestScheduleJobFileData import TestScheduleJobFileData
+from tests.integrationtests.operation.testdata.TestScheduleJobQueueData import TestScheduleJobQueueData
 
 
 class TestScheduleJobResource(TestCase):
@@ -10,26 +11,45 @@ class TestScheduleJobResource(TestCase):
         self.test_manager = TestManager()
 
     def test_run_data_operation(self):
-        connections = [
-            ScheduleJobTestData.test_job_connection,
-            ScheduleJobTestData.test_job_connection,
+        connection_databases = [
+            TestScheduleJobData.test_job_connection,
+            TestScheduleJobData.test_job_connection,
         ]
-        data_operation = ScheduleJobTestData.test_data_operation
+        data_operation = TestScheduleJobData.test_data_operation
 
-        self.test_manager.service_scenarios.run_data_operation(connections=connections,
-                                                               data_operation=data_operation)
+        self.test_manager.service_scenarios.run_data_operation(
+            data_operation=data_operation,
+            connection_databases=connection_databases,
+        )
 
     def test_run_file_data_operation(self):
         connection_databases = [
-            ScheduleJobFileTestData.test_job_connection,
+            TestScheduleJobFileData.test_job_connection,
         ]
 
         connection_files = [
-            ScheduleJobFileTestData.test_file_connection,
+            TestScheduleJobFileData.test_file_connection,
         ]
 
-        data_operation = ScheduleJobFileTestData.test_data_operation
+        data_operation = TestScheduleJobFileData.test_data_operation
 
-        self.test_manager.service_scenarios.run_data_operation_without_schedule(connections=connection_databases,
-                                                                                data_operation=data_operation,
-                                                                                connection_files=connection_files)
+        self.test_manager.service_scenarios.run_data_operation_without_schedule(
+            data_operation=data_operation,
+            connection_databases=connection_databases,
+            connection_files=connection_files)
+
+    def test_run_queue_data_operation(self):
+        connection_databases = [
+            TestScheduleJobQueueData.test_job_connection,
+        ]
+
+        connection_queues = [
+            TestScheduleJobQueueData.test_queue_connection,
+        ]
+
+        data_operation = TestScheduleJobQueueData.test_data_operation
+
+        self.test_manager.service_scenarios.run_data_operation_without_schedule(
+            data_operation=data_operation,
+            connection_databases=connection_databases,
+            connection_queues=connection_queues)

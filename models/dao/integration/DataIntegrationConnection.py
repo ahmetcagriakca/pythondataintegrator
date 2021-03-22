@@ -6,6 +6,7 @@ from infrastructor.IocManager import IocManager
 from models.dao.Entity import Entity
 from models.dao.integration.DataIntegrationConnectionDatabase import DataIntegrationConnectionDatabase
 from models.dao.integration.DataIntegrationConnectionFile import DataIntegrationConnectionFile
+from models.dao.integration.DataIntegrationConnectionQueue import DataIntegrationConnectionQueue
 
 
 class DataIntegrationConnection(Entity, IocManager.Base):
@@ -16,27 +17,29 @@ class DataIntegrationConnection(Entity, IocManager.Base):
     SourceOrTarget = Column(Integer, index=False, unique=False, nullable=False)
     Connection = relationship("Connection", back_populates="DataIntegrationConnections")
     DataIntegration = relationship("DataIntegration", back_populates="Connections")
-    File: DataIntegrationConnectionFile = relationship("DataIntegrationConnectionFile", uselist=False,
-                                                             back_populates="DataIntegrationConnection")
     Database: DataIntegrationConnectionDatabase = relationship("DataIntegrationConnectionDatabase", uselist=False,
-                                                                     back_populates="DataIntegrationConnection")
+                                                               back_populates="DataIntegrationConnection")
+    File: DataIntegrationConnectionFile = relationship("DataIntegrationConnectionFile", uselist=False,
+                                                       back_populates="DataIntegrationConnection")
+    Queue: DataIntegrationConnectionQueue = relationship("DataIntegrationConnectionQueue", uselist=False,
+                                                        back_populates="DataIntegrationConnection")
 
     def __init__(self,
                  SourceOrTarget: int = None,
                  DataIntegrationId: int = None,
                  ConnectionId: int = None,
-                 Schema: str = None,
-                 TableName: str = None,
-                 Query: str = None,
                  DataIntegration=None,
                  Connection=None,
+                 Database=None,
+                 File=None,
+                 Queue=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.SourceOrTarget: int = SourceOrTarget
         self.DataIntegrationId: str = DataIntegrationId
         self.ConnectionId: str = ConnectionId
-        self.Schema: str = Schema
-        self.TableName: str = TableName
-        self.Query: str = Query
         self.DataIntegration = DataIntegration
         self.Connection = Connection
+        self.Database = Database
+        self.File = File
+        self.Queue = Queue

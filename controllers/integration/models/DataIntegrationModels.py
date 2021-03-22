@@ -75,6 +75,15 @@ class DataIntegrationConnectionFileModel:
         self.FileName: str = FileName
 
 
+class DataIntegrationConnectionQueueModel:
+    def __init__(self,
+                 Id: int = None,
+                 TopicName: str = None,
+                 *args, **kwargs):
+        self.Id: int = Id
+        self.TopicName: str = TopicName
+
+
 class DataIntegrationConnectionFileCsvModel:
 
     def __init__(self,
@@ -108,18 +117,31 @@ class DataIntegrationModels:
     ns = IocManager.api.namespace('DataIntegration', description='Data Integration endpoints',
                                   path='/api/DataIntegration')
 
-    data_integration_connection_database_model = IocManager.api.model('DataIntegrationConnetionDatabaseModel', {
+    data_integration_connection_database_model = IocManager.api.model('DataIntegrationConnectionDatabaseModel', {
         'Schema': fields.String(description='Schema', required=False),
         'TableName': fields.String(description='TableName', required=False),
         'Query': fields.String(description='Query', required=False),
     })
-    data_integration_connection_file_model = IocManager.api.model('DataIntegrationConnetionFileModel', {
-        'FileName': fields.String(description='FileName', required=False)
+
+    data_integration_connection_file_csv_model = IocManager.api.model('DataIntegrationConnectionFileCsvModel', {
+        'HasHeader': fields.Boolean(description='HasHeader', required=False),
+        'Header': fields.String(description='Header', required=False),
+        'Separator': fields.String(description='Separator', required=False),
     })
-    data_integration_connection_model = IocManager.api.model('DataIntegrationConnetionModel', {
+
+    data_integration_connection_file_model = IocManager.api.model('DataIntegrationConnectionFileModel', {
+        'Folder': fields.String(description='Folder', required=False),
+        'FileName': fields.String(description='FileName', required=False),
+        'Csv': fields.Nested(data_integration_connection_file_csv_model, description='Csv'),
+    })
+    data_integration_connection_queue_model = IocManager.api.model('DataIntegrationConnectionQueueModel', {
+        'TopicName': fields.String(description='TopicName', required=False),
+    })
+    data_integration_connection_model = IocManager.api.model('DataIntegrationConnectionModel', {
         'ConnectionName': fields.String(description='ConnectionName', required=False),
         'Database': fields.Nested(data_integration_connection_database_model, description='Database connection'),
         'File': fields.Nested(data_integration_connection_file_model, description='File connection'),
+        'Queue': fields.Nested(data_integration_connection_queue_model, description='Queue connection'),
         'Columns': fields.String(description='Columns'),
     })
 
@@ -177,6 +199,13 @@ class DataIntegrationModels:
                     source_file['Csv'] = source_file_csv
                 source['File'] = source_file
 
+            if source_connection.Queue is not None:
+                entity_source_queue = DataIntegrationConnectionQueueModel(
+                    Id=source_connection.Id,
+                    TopicName=source_connection.Queue.TopicName,
+                )
+                source_queue = json.loads(json.dumps(entity_source_queue.__dict__, default=CommonModels.date_converter))
+                source['Queue'] = source_queue
             source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
 
         target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
@@ -202,7 +231,25 @@ class DataIntegrationModels:
                 FileName=target_connection.File.FileName
             )
             target_file = json.loads(json.dumps(entity_target_file.__dict__, default=CommonModels.date_converter))
+
+            if target_connection.File.Csv is not None:
+                entity_target_file_csv = DataIntegrationConnectionFileCsvModel(
+                    Id=target_connection.Id,
+                    HasHeader=target_connection.File.Csv.HasHeader,
+                    Header=target_connection.File.Csv.Header,
+                    Separator=target_connection.File.Csv.Separator,
+                )
+                target_file_csv = json.loads(
+                    json.dumps(entity_target_file_csv.__dict__, default=CommonModels.date_converter))
+                target_file['Csv'] = target_file_csv
             target['File'] = target_file
+        if target_connection.Queue is not None:
+            entity_source_queue = DataIntegrationConnectionQueueModel(
+                Id=target_connection.Id,
+                TopicName=target_connection.Queue.TopicName,
+            )
+            target_queue = json.loads(json.dumps(entity_source_queue.__dict__, default=CommonModels.date_converter))
+            target['Queue'] = target_queue
         target['Connection'] = ConnectionModels.get_connection_result_model(target_connection.Connection)
         columns = []
         for col in data_integration.Columns:

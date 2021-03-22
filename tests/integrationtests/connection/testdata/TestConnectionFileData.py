@@ -1,21 +1,17 @@
-class ConnectionTestData:
+class TestConnectionFileData:
     test_insert_input = {
         "Name": "TestConnection",
-        "ConnectorTypeName": "POSTGRESQL",
+        "ConnectorTypeName": "CSV",
         "Host": "string",
         "Port": 0,
-        "Sid": "string",
-        "DatabaseName": "string",
         "User": "string",
         "Password": "string"
     }
     test_update_input = {
         "Name": "TestConnection",
-        "ConnectorTypeName": "MSSQL",
+        "ConnectorTypeName": "EXCEL",
         "Host": "Test",
         "Port": 1550,
-        "Sid": "test",
-        "DatabaseName": "test",
         "User": "test",
         "Password": "test"
     }

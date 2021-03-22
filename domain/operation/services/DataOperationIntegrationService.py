@@ -79,6 +79,7 @@ class DataOperationIntegrationService(IScoped):
                                                                           DataOperation=data_operation)
                 self.data_operation_integration_repository.insert(new_data_operation_integration)
             else:
+                data_operation_integration.DataIntegration = data_integration
                 data_operation_integration.Order = order
                 data_operation_integration.Limit = data_operation_integration_model.Limit
                 data_operation_integration.ProcessCount = data_operation_integration_model.ProcessCount

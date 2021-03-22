@@ -5,6 +5,7 @@ from infrastructor.cryptography.CryptoService import CryptoService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
+from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionFile import ConnectionFile
 from models.viewmodels.connection.CreateConnectionFileModel import CreateConnectionFileModel
@@ -36,9 +37,11 @@ class ConnectionFileService(IScoped):
 
         connector_type = self.connector_type_service.get_by_name(name=model.ConnectorTypeName)
 
+        if connector_type is None:
+            raise OperationalException(f"{model.ConnectorTypeName} not found")
+        if connector_type.ConnectionTypeId != connection.ConnectionTypeId:
+            raise OperationalException(f"{model.ConnectorTypeName} incompatible with {connection.ConnectionType.Name}")
         connection_file = ConnectionFile(Connection=connection,
-                                         Host=model.Host,
-                                         Port=model.Port,
                                          ConnectorType=connector_type)
 
         self.connection_file_repository.insert(connection_file)
@@ -50,12 +53,12 @@ class ConnectionFileService(IScoped):
         """
 
         connection_file = self.connection_file_repository.first(ConnectionId=connection.Id)
-
         connector_type = self.connector_type_service.get_by_name(name=model.ConnectorTypeName)
-
+        if connector_type is None:
+            raise OperationalException(f"{model.ConnectorTypeName} not found")
+        if connector_type.ConnectionTypeId != connection.ConnectionTypeId:
+            raise OperationalException(f"{model.ConnectorTypeName} incompatible with {connection.ConnectionType.Name}")
         connection_file.ConnectorType = connector_type
-        connection_file.Host = model.Host
-        connection_file.Port = model.Port
 
         return connection_file
 
@@ -63,5 +66,4 @@ class ConnectionFileService(IScoped):
         """
         Delete Database connection
         """
-
         self.connection_file_repository.delete_by_id(id)

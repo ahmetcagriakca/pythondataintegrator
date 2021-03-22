@@ -4,7 +4,7 @@ DATABASE:
   TYPE: POSTGRESQL
   HOST: localhost
   PORT: 5432
-  DATABASE: test_pdi_database_new
+  DATABASE: test_pdi_database_n
   USERNAME: postgres
   PASSWORD: 123456
 

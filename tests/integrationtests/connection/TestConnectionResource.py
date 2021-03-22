@@ -7,15 +7,14 @@ from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from tests.integrationtests.common.TestManager import TestManager
 
 
-class TestConnectionResuource(TestCase):
-    def __init__(self, methodName='TestConnectionResuource'):
-        super(TestConnectionResuource, self).__init__(methodName)
+class TestConnectionResource(TestCase):
+    def __init__(self, methodName='TestConnectionResource'):
+        super(TestConnectionResource, self).__init__(methodName)
         self.test_manager = TestManager()
 
     def test_get_connection(self):
         response_data = self.test_manager.service_endpoints.get_connection()
         assert response_data['IsSuccess'] == True
-
 
     def test_delete_connection(self):
         id = 1

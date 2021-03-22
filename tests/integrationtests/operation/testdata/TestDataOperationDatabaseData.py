@@ -1,4 +1,4 @@
-class DataOperationTestData:
+class TestDataOperationDatabaseData:
     test_insert_input = {
         "Name": "TEST_DATA_OPERATION",
         "Contacts": [

@@ -24,7 +24,7 @@ class FileProvider(IScoped):
         self.connection_secret_service = connection_secret_service
         self.sql_logger = sql_logger
 
-    def get_file_context(self, connection: Connection) -> FileContext:
+    def get_context(self, connection: Connection) -> FileContext:
         """
         Creating Connection
         """

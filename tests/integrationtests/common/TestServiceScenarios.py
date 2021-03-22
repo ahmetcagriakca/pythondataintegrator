@@ -54,6 +54,9 @@ class TestServiceScenarios:
         for connection_secret in connection.ConnectionSecrets:
             self.clear_secret(connection_secret.SecretId)
             database_session_manager.session.delete(connection_secret)
+        if connection.ConnectionServers is not None:
+            for connection_server in connection.ConnectionServers:
+                database_session_manager.session.delete(connection_server)
         if connection.Database is not None:
             database_session_manager.session.delete(connection.Database)
         if connection.File is not None:
@@ -145,6 +148,17 @@ class TestServiceScenarios:
             self.clear_connection(name=test_data_connection["Name"])
         response_data = self.service_endpoints.create_connection_file(test_data_connection)
 
+    def create_test_connection_queue(self, test_data_connection):
+        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
+            DatabaseSessionManager)
+        connection_repository: Repository[Connection] = Repository[Connection](
+            database_session_manager)
+
+        connection = connection_repository.first(Name=test_data_connection["Name"])
+        if connection is not None:
+            self.clear_connection(name=test_data_connection["Name"])
+        response_data = self.service_endpoints.create_connection_queue(test_data_connection)
+
     def create_test_integration(self, test_data_integration):
         database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
             DatabaseSessionManager)
@@ -199,11 +213,16 @@ class TestServiceScenarios:
             else:
                 return data_operation_job_execution
 
-    def create_data_operation(self, connections, data_operation, connection_files):
-        for connection in connections:
-            self.create_test_connection_database(connection)
-        for connection_file in connection_files:
-            self.create_test_connection_file(connection_file)
+    def create_data_operation(self, data_operation, connection_databases=None, connection_files=None, connection_queues=None):
+        if connection_databases is not None:
+            for connection_database in connection_databases:
+                self.create_test_connection_database(connection_database)
+        if connection_files is not None:
+            for connection_file in connection_files:
+                self.create_test_connection_file(connection_file)
+        if connection_queues is not None:
+            for connection_queue in connection_queues:
+                self.create_test_connection_queue(connection_queue)
         self.create_test_operation(data_operation)
 
     def run_job_without_schedule(self, data_operation_name):
@@ -263,6 +282,7 @@ class TestServiceScenarios:
         self.create_data_operation(connections, data_operation, connection_files)
         self.run_job(data_operation['Name'])
 
-    def run_data_operation_without_schedule(self, connections, data_operation, connection_files):
-        self.create_data_operation(connections, data_operation, connection_files)
+    def run_data_operation_without_schedule(self, data_operation, connection_databases=None, connection_files=None,
+                                            connection_queues=None):
+        self.create_data_operation(data_operation, connection_databases, connection_files, connection_queues)
         self.run_job_without_schedule(data_operation['Name'])

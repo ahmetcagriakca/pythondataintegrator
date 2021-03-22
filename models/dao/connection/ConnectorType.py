@@ -1,3 +1,4 @@
+from models.dao.connection.ConnectionQueue import ConnectionQueue
 from typing import List
 
 from sqlalchemy import Column, String, Integer, ForeignKey
@@ -16,6 +17,7 @@ class ConnectorType(Entity, IocManager.Base):
     ConnectionType = relationship("ConnectionType", back_populates="Connectors")
     Databases: List[ConnectionDatabase] = relationship("ConnectionDatabase", back_populates="ConnectorType")
     Files: List[ConnectionFile] = relationship("ConnectionFile", back_populates="ConnectorType")
+    Queues: List[ConnectionQueue] = relationship("ConnectionQueue", back_populates="ConnectorType")
 
     def __init__(self,
                  Name: int = None,

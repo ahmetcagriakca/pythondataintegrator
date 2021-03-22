@@ -28,7 +28,7 @@ class TestFileOperation(TestCase):
         file_provider = IocManager.injector.get(FileProvider)
         api_config: ApiConfig = IocManager.injector.get(ApiConfig)
         folder = os.path.join(api_config.root_directory, 'files')
-        file_context = file_provider.get_file_context(folder)
+        file_context = file_provider.get_context(folder)
         count = file_context.get_data_count(file_name='test.csv')
         assert count == 16
 

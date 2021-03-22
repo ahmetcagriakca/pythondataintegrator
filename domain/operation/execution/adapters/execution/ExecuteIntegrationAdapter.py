@@ -58,6 +58,10 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
             log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation started"
         elif target_connection.File is not None:
             log = f"{target_connection.File.FileName} integration execute operation started"
+        elif target_connection.Queue is not None:
+            log = f"{target_connection.Queue.TopicName} integration execute operation started"
+        else:
+            log = f"Integration execute operation started"
         return log
 
     def get_finish_log(self, data_integration_id: int, data_count: int):
@@ -67,6 +71,11 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
             log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation finished. (Source Data Count:{data_count})"
         elif target_connection.File is not None:
             log = f"{target_connection.File.FileName} integration execute operation finished"
+        elif target_connection.Queue is not None:
+            log = f"{target_connection.Queue.TopicName} integration execute operation finished"
+        else:
+            log = f"Integration execute operation finished"
+
         return log
 
     def get_error_log(self, data_integration_id: int):
@@ -76,6 +85,10 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
             log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute operation getting error"
         elif target_connection.File is not None:
             log = f"{target_connection.File.FileName} integration execute operation etting error"
+        elif target_connection.Queue is not None:
+            log = f"{target_connection.Queue.TopicName} integration execute operation etting error"
+        else:
+            log = f"Integration execute operation etting error"
         return log
 
     def check_error_raise(self) -> bool:

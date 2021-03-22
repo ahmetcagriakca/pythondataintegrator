@@ -4,6 +4,8 @@ from models.viewmodels.integration.CreateDataIntegrationConnectionFileModel impo
     CreateDataIntegrationConnectionFileModel
 
 from infrastructor.json.JsonConvert import JsonConvert
+from models.viewmodels.integration.CreateDataIntegrationConnectionQueueModel import \
+    CreateDataIntegrationConnectionQueueModel
 
 
 @JsonConvert.register
@@ -12,8 +14,10 @@ class CreateDataIntegrationConnectionModel:
                  ConnectionName: str = None,
                  Database: CreateDataIntegrationConnectionDatabaseModel = None,
                  File: CreateDataIntegrationConnectionFileModel = None,
+                 Queue: CreateDataIntegrationConnectionQueueModel=None,
                  Columns: str = None,
                  ):
+        self.Queue = Queue
         self.ConnectionName: str = ConnectionName
         self.File = File
         self.Database = Database

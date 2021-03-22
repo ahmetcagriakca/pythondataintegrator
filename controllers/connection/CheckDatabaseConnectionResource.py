@@ -26,7 +26,7 @@ class CheckConnectionDatabaseResource(ResourceBase):
         schema = data.get('Schema')  #
         table = data.get('Table')  #
         connection = self.connection_service.get_by_name(name=name)
-        database_context = self.connection_service.database_provider.get_database_context(connection=connection)
+        database_context = self.connection_service.database_provider.get_context(connection=connection)
         database_context.connector.connect()
         count_of_table = ''
         if schema is not None and schema != '' and table is not None and table != '':

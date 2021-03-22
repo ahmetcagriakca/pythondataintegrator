@@ -14,7 +14,8 @@ class DataIntegrationConnectionFile(Entity, IocManager.Base):
     DataIntegrationConnection = relationship("DataIntegrationConnection", back_populates="File")
 
     Csv: DataIntegrationConnectionFileCsv = relationship("DataIntegrationConnectionFileCsv", uselist=False,
-                                                             back_populates="DataIntegrationConnectionFile")
+                                                         back_populates="DataIntegrationConnectionFile")
+
     def __init__(self,
                  DataIntegrationConnectionId: int = None,
                  Folder: str = None,

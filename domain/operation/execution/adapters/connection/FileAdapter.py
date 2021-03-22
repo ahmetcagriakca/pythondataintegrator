@@ -27,7 +27,7 @@ class FileAdapter(ConnectionAdapter):
     def clear_data(self, data_integration_id) -> int:
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
-        target_file_context = self.file_provider.get_file_context(
+        target_context = self.file_provider.get_context(
             connection=target_connection.Connection)
         data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
@@ -38,11 +38,11 @@ class FileAdapter(ConnectionAdapter):
             else:
                 headers = [(data_integration_column.TargetColumnName) for data_integration_column in
                            data_integration_columns]
-            truncate_affected_rowcount = target_file_context.recreate_file(
+            truncate_affected_rowcount = target_context.recreate_file(
                 file=file_path, headers=headers,
                 separator=target_connection.File.Csv.Separator)
         else:
-            truncate_affected_rowcount = target_file_context.delete_file(
+            truncate_affected_rowcount = target_context.delete_file(
                 file=file_path)
 
         return truncate_affected_rowcount
@@ -51,9 +51,9 @@ class FileAdapter(ConnectionAdapter):
         source_connection = self.data_integration_connection_service.get_source_connection(
             data_integration_id=data_integration_id)
 
-        source_file_context = self.file_provider.get_file_context(connection=source_connection.Connection)
+        source_context = self.file_provider.get_context(connection=source_connection.Connection)
         file_path = os.path.join(source_connection.File.Folder, source_connection.File.FileName)
-        data_count = source_file_context.get_data_count(file=file_path)
+        data_count = source_context.get_data_count(file=file_path)
         if source_connection.File.Csv.HasHeader:
             data_count = data_count - 1
         return data_count
@@ -61,7 +61,7 @@ class FileAdapter(ConnectionAdapter):
     def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> DataFrame:
         source_connection = self.data_integration_connection_service.get_source_connection(
             data_integration_id=data_integration_id)
-        source_file_context = self.file_provider.get_file_context(connection=source_connection.Connection)
+        source_context = self.file_provider.get_context(connection=source_connection.Connection)
 
         data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
@@ -73,7 +73,7 @@ class FileAdapter(ConnectionAdapter):
             headers = source_connection.File.Csv.Header.split(source_connection.File.Csv.Separator)
 
         file_path = os.path.join(source_connection.File.Folder, source_connection.File.FileName)
-        readed_data = source_file_context.get_data(file=file_path,
+        readed_data = source_context.get_data(file=file_path,
                                                    names=headers,
                                                    header=has_header,
                                                    start=paging_modifier.Start,
@@ -89,7 +89,7 @@ class FileAdapter(ConnectionAdapter):
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
 
-        target_file_context = self.file_provider.get_file_context(connection=target_connection.Connection)
+        target_context = self.file_provider.get_context(connection=target_connection.Connection)
 
         data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
@@ -97,17 +97,17 @@ class FileAdapter(ConnectionAdapter):
         column_rows = [(data_integration_column.ResourceType, data_integration_column.SourceColumnName,
                         data_integration_column.TargetColumnName) for data_integration_column in
                        data_integration_columns]
-        prepared_data = target_file_context.prepare_insert_row(data=source_data, column_rows=column_rows)
+        prepared_data = target_context.prepare_insert_row(data=source_data, column_rows=column_rows)
         return prepared_data
 
     def write_target_data(self, data_integration_id: int, prepared_data: List[any], ) -> int:
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
 
-        target_file_context = self.file_provider.get_file_context(connection=target_connection.Connection)
+        target_context = self.file_provider.get_context(connection=target_connection.Connection)
         data = pd.DataFrame(prepared_data)
         file_path = os.path.join(target_connection.File.Folder, target_connection.File.FileName)
-        affected_row_count = target_file_context.write_to_file(file=file_path,
+        affected_row_count = target_context.write_to_file(file=file_path,
                                                                data=data,
                                                                separator=target_connection.File.Csv.Separator)
         return affected_row_count

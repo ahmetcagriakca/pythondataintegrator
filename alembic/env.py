@@ -39,12 +39,13 @@ from models.dao.aps import ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
 
 # connection
 from models.dao.connection import Connection, ConnectionDatabase, ConnectorType, ConnectionType, ConnectionFile, \
-    ConnectionSecret
+    ConnectionSecret, ConnectionQueue, ConnectionServer
+
 
 # integration
 from models.dao.integration import DataIntegration, DataIntegrationConnection, \
     DataIntegrationColumn, DataIntegrationConnectionDatabase, DataIntegrationConnectionFile, \
-    DataIntegrationConnectionFileCsv
+    DataIntegrationConnectionFileCsv,DataIntegrationConnectionQueue
 
 # common
 from models.dao.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent

@@ -1,4 +1,4 @@
-class ScheduleJobTestData:
+class TestScheduleJobData:
     test_job_connection = {
         "Name": "TestIntegrationConnection",
         "ConnectorTypeName": "POSTGRESQL",

@@ -3,4 +3,5 @@ from models.dao.integration.DataIntegrationConnection import DataIntegrationConn
 from models.dao.integration.DataIntegrationConnectionDatabase import DataIntegrationConnectionDatabase
 from models.dao.integration.DataIntegrationConnectionFile import DataIntegrationConnectionFile
 from models.dao.integration.DataIntegrationConnectionFileCsv import DataIntegrationConnectionFileCsv
+from models.dao.integration.DataIntegrationConnectionQueue import DataIntegrationConnectionQueue
 from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn

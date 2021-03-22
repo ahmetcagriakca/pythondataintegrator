@@ -6,6 +6,7 @@ from domain.integration.services.DataIntegrationColumnService import DataIntegra
 from domain.integration.services.DataIntegrationConnectionDatabaseService import \
     DataIntegrationConnectionDatabaseService
 from domain.integration.services.DataIntegrationConnectionFileService import DataIntegrationConnectionFileService
+from domain.integration.services.DataIntegrationConnectionQueueService import DataIntegrationConnectionQueueService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
@@ -23,8 +24,10 @@ class DataIntegrationConnectionService(IScoped):
                  data_integration_column_service: DataIntegrationColumnService,
                  data_integration_connection_database_service: DataIntegrationConnectionDatabaseService,
                  data_integration_connection_file_service: DataIntegrationConnectionFileService,
+                 data_integration_connection_queue_service: DataIntegrationConnectionQueueService,
                  connection_service: ConnectionService
                  ):
+        self.data_integration_connection_queue_service = data_integration_connection_queue_service
         self.data_integration_connection_file_service = data_integration_connection_file_service
         self.data_integration_connection_database_service = data_integration_connection_database_service
         self.connection_service = connection_service
@@ -81,6 +84,9 @@ class DataIntegrationConnectionService(IScoped):
             elif source.ConnectionType.Id == ConnectionTypes.File.value:
                 self.data_integration_connection_file_service.insert(data_integration_connection=source_connection,
                                                                      data=data.SourceConnections.File)
+            elif source.ConnectionType.Id == ConnectionTypes.Queue.value:
+                self.data_integration_connection_queue_service.insert(data_integration_connection=source_connection,
+                                                                      data=data.SourceConnections.Queue)
             else:
                 raise OperationalException("Connection Type not supported yet")
             self.data_integration_connection_repository.insert(source_connection)
@@ -104,6 +110,9 @@ class DataIntegrationConnectionService(IScoped):
         elif target.ConnectionType.Id == ConnectionTypes.File.value:
             self.data_integration_connection_file_service.insert(data_integration_connection=target_connection,
                                                                  data=data.TargetConnections.File)
+        elif target.ConnectionType.Id == ConnectionTypes.Queue.value:
+            self.data_integration_connection_queue_service.insert(data_integration_connection=target_connection,
+                                                                  data=data.TargetConnections.Queue)
         else:
             raise OperationalException("Connection Type not supported yet")
         self.data_integration_connection_repository.insert(target_connection)
@@ -147,6 +156,15 @@ class DataIntegrationConnectionService(IScoped):
                     self.data_integration_connection_file_service.insert(
                         data_integration_connection=source_connection,
                         data=data.SourceConnections.File)
+            elif source.ConnectionType.Id == ConnectionTypes.Queue.value:
+                if source_connection.Queue is not None:
+                    self.data_integration_connection_queue_service.update(
+                        data_integration_connection=source_connection,
+                        data=data.SourceConnections.Queue)
+                else:
+                    self.data_integration_connection_queue_service.insert(
+                        data_integration_connection=source_connection,
+                        data=data.SourceConnections.Queue)
             else:
                 raise OperationalException("Connection Type not supported yet")
 
@@ -173,14 +191,23 @@ class DataIntegrationConnectionService(IScoped):
                                                                          data=data.TargetConnections.Database)
 
         elif target.ConnectionType.Id == ConnectionTypes.File.value:
-                if target_connection.File is not None:
-                    self.data_integration_connection_file_service.update(
-                        data_integration_connection=target_connection,
-                        data=data.TargetConnections.File)
-                else:
-                    self.data_integration_connection_file_service.insert(
-                        data_integration_connection=target_connection,
-                        data=data.TargetConnections.File)
+            if target_connection.File is not None:
+                self.data_integration_connection_file_service.update(
+                    data_integration_connection=target_connection,
+                    data=data.TargetConnections.File)
+            else:
+                self.data_integration_connection_file_service.insert(
+                    data_integration_connection=target_connection,
+                    data=data.TargetConnections.File)
+        elif target.ConnectionType.Id == ConnectionTypes.Queue.value:
+            if target_connection.Queue is not None:
+                self.data_integration_connection_queue_service.update(
+                    data_integration_connection=target_connection,
+                    data=data.TargetConnections.Queue)
+            else:
+                self.data_integration_connection_queue_service.insert(
+                    data_integration_connection=target_connection,
+                    data=data.TargetConnections.Queue)
         else:
             raise OperationalException("Connection Type not supported yet")
         self.data_integration_connection_repository.insert(target_connection)
@@ -194,4 +221,6 @@ class DataIntegrationConnectionService(IScoped):
                 self.data_integration_connection_database_service.delete(id=data_integration_connection.Database.Id)
             if data_integration_connection.File is not None:
                 self.data_integration_connection_file_service.delete(id=data_integration_connection.File.Id)
+            if data_integration_connection.Queue is not None:
+                self.data_integration_connection_queue_service.delete(id=data_integration_connection.Queue.Id)
             self.data_integration_connection_repository.delete_by_id(id)

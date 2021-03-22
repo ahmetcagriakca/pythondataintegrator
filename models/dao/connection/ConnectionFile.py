@@ -9,22 +9,16 @@ class ConnectionFile(Entity, IocManager.Base):
     __table_args__ = {"schema": "Connection"}
     ConnectionId = Column(Integer, ForeignKey('Connection.Connection.Id'))
     ConnectorTypeId = Column(Integer, ForeignKey('Connection.ConnectorType.Id'))
-    Host = Column(String(100), index=False, unique=False, nullable=True)
-    Port = Column(Integer, index=False, unique=False, nullable=True)
     ConnectorType = relationship("ConnectorType", back_populates="Files")
 
     def __init__(self,
                  ConnectionId: int = None,
                  ConnectorTypeId: int = None,
-                 Host: str = None,
-                 Port: int = None,
                  Connection=None,
                  ConnectorType=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ConnectionId: str = ConnectionId
         self.ConnectorTypeId: str = ConnectorTypeId
-        self.Host: str = Host
-        self.Port: int = Port
         self.Connection = Connection
         self.ConnectorType = ConnectorType
