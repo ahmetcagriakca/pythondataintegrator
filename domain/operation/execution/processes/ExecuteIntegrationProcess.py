@@ -9,7 +9,7 @@ from domain.process.services.ProcessService import ProcessService
 from infrastructor.IocManager import IocManager
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from infrastructor.multi_processing.ParallelMultiProcessing import TaskData
+from infrastructor.multi_processing.models.TaskData import TaskData
 from models.dto.PagingModifier import PagingModifier
 
 
@@ -40,8 +40,8 @@ class ExecuteIntegrationProcess(IScoped):
             process_function=ExecuteIntegrationProcess.parallel_operation,
             job_id=data_operation_job_execution_id)
         print("parallel finished")
-        total_affected_row_count = sum([int(processed_task.Data.Message) for processed_task in processed_task_list if
-                                        processed_task.Data is not None])
+        total_affected_row_count = 0
+            # sum([int(processed_task.Data.Message) for processed_task in processed_task_list if processed_task.Data is not None])
         if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
             print(f"Unprocessed tasks founded")
             paging_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]

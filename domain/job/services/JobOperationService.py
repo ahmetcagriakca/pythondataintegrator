@@ -13,7 +13,9 @@ from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
-from infrastructor.multi_processing.ParallelMultiProcessing import ParallelMultiProcessing, TaskData, ProcessBaseData
+from infrastructor.multi_processing.ParallelMultiProcessing import ParallelMultiProcessing
+from infrastructor.multi_processing.models.TaskBaseData import TaskBaseData
+from infrastructor.multi_processing.models.TaskData import TaskData
 from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.operation import DataOperation
@@ -218,7 +220,7 @@ class JobOperationService(IScoped):
         parallel_multi_processing.configure_process()
         parallel_multi_processing.start_processes(process_id=data_operation_id, job_id=job_id,
                                                   process_function=ExecuteOperationProcess.job_start_thread)
-        data = ProcessBaseData(Id=1)
+        data = TaskBaseData(Id=1)
         td = TaskData(data)
         parallel_multi_processing.add_task(td)
         parallel_multi_processing.check_processes()

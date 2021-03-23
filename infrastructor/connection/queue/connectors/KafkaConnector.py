@@ -2,13 +2,16 @@ import csv
 import json
 import os
 from json import dumps
+from queue import Queue
 from typing import List
 
 import pandas as pd
 from kafka import KafkaProducer, KafkaAdminClient, KafkaConsumer
 from kafka.admin import NewTopic
+from kafka.errors import TopicAlreadyExistsError
 from pandas import DataFrame
 
+from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from infrastructor.connection.queue.connectors.QueueConnector import QueueConnector
 
 
@@ -83,6 +86,27 @@ class KafkaConnector(QueueConnector):
                                             group_id=group_id,
                                             value_deserializer=lambda x: json.loads(x.decode('utf-8')))
 
+    def start_get_data(self, limit: int, data_queue: Queue, result_queue: Queue) -> DataFrame:
+        data = []
+        data_count = 0
+        for message in self.__consumer:
+
+            data.append(message.value)
+            data_count = data_count + 1
+            if data_count >= limit:
+                data_queue_task = DataQueueTask(Data=data, IsFinished=False)
+                data_queue.put(data_queue_task)
+                data_count = 0
+                data = []
+
+                result = result_queue.get()
+                if result == False:
+                    break;
+
+        if data is not None and len(data) > 0:
+            data_queue_task = DataQueueTask(Data=data, IsFinished=False)
+            data_queue.put(data_queue_task)
+
     def get_data(self, limit: int) -> DataFrame:
         data = []
         data_count = 0
@@ -99,9 +123,11 @@ class KafkaConnector(QueueConnector):
         # KAFKA_TOPIC_NUM_PARTITIONS: int = 3
         # KAFKA_TOPIC_REPLICA_FACTOR: int = 3
         if not self.topic_exists(topic_name=topic_name):
-            topic = [NewTopic(name=topic_name, num_partitions=1, replication_factor=1)]
-            response = self.__admin.create_topics(new_topics=topic, validate_only=False)
-            print("Response:" + str(response))
+            try:
+                topic = [NewTopic(name=topic_name, num_partitions=1, replication_factor=1)]
+                response = self.__admin.create_topics(new_topics=topic, validate_only=False)
+            except TopicAlreadyExistsError as ex:
+                print(f"{topic_name} Topic Exist")
 
     def topic_exists(self, topic_name) -> bool:
         topic_metadata = self.__admin.list_topics()

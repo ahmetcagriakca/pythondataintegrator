@@ -1,38 +1,8 @@
 import multiprocessing
 from typing import List
 
-
-class ProcessBaseData:
-    def __init__(self,
-                 Id: int = None):
-        self.Id: int = Id
-        self.State: int = None
-        self.Result = None
-        self.Message: str = None
-        self.Exception: Exception = Id
-        self.Traceback: Exception = Id
-
-
-class TaskData:
-    def __init__(self,
-                 Data: ProcessBaseData = None,
-                 SubProcessId: int = None,
-                 IsFinished: bool = False,
-                 IsProcessed: bool = False):
-        self.Data: ProcessBaseData = Data
-        self.SubProcessId: int = SubProcessId
-        self.IsFinished: bool = IsFinished
-        self.IsProcessed: bool = IsProcessed
-
-
-class ProcessData:
-    def __init__(self,
-                 Process: any = None,
-                 SubProcessId: int = None,
-                 IsFinished: bool = False):
-        self.Process: multiprocessing.Process = Process
-        self.SubProcessId: int = SubProcessId
-        self.IsFinished: bool = IsFinished
+from infrastructor.multi_processing.models.ProcessData import ProcessData
+from infrastructor.multi_processing.models.TaskData import TaskData
 
 
 class ParallelMultiProcessing:

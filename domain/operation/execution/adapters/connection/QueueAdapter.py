@@ -1,3 +1,5 @@
+from queue import Queue
+from threading import Thread
 from typing import List
 
 from injector import inject
@@ -6,7 +8,9 @@ from pandas import DataFrame
 
 from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
+from infrastructor.IocManager import IocManager
 from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from infrastructor.connection.queue.QueueProvider import QueueProvider
 from infrastructor.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
 from models.dto.PagingModifier import PagingModifier
@@ -31,14 +35,37 @@ class QueueAdapter(ConnectionAdapter):
         target_context.create_topic(topic_name=target_connection.Queue.TopicName)
         return 1
 
+    @staticmethod
+    def source_data_process(data_integration_id: int, limit: int, data_queue: Queue,result_queue:Queue):
+        try:
+            IocManager.initialize()
+            data_integration_connection_service = IocManager.injector.get(DataIntegrationConnectionService)
+            queue_provider = IocManager.injector.get(QueueProvider)
+
+            source_connection = data_integration_connection_service.get_source_connection(
+                data_integration_id=data_integration_id)
+
+            source_context = queue_provider.get_context(connection=source_connection.Connection)
+            source_context.start_get_data(topic_name=source_connection.Queue.TopicName, group_id="test", limit=limit,
+                                          data_queue=data_queue,result_queue=result_queue)
+            data_queue_finish_task = DataQueueTask(IsFinished=True)
+            data_queue.put(data_queue_finish_task)
+        except Exception as ex:
+            data_queue_error_task = DataQueueTask(IsFinished=True, Exception=ex)
+            data_queue.put(data_queue_error_task)
+
+    def start_source_data_process(self, data_integration_id: int, limit: int, data_queue: Queue,result_queue:Queue):
+        main_t = Thread(target=self.source_data_process, args=(data_integration_id, limit, data_queue,result_queue,))
+        main_t.start()
+
     def get_source_data_count(self, data_integration_id) -> int:
         raise NotSupportedFeatureException("Queue Target Operation")
         # source_connection = self.data_integration_connection_service.get_source_connection(
         #     data_integration_id=data_integration_id)
         #
-        # source_file_context = self.queue_provider.get_context(connection=source_connection.Connection)
+        # source_context = self.queue_provider.get_context(connection=source_connection.Connection)
         # file_path = os.path.join(source_connection.File.Folder, source_connection.File.FileName)
-        # data_count = source_file_context.get_data_count(file=file_path)
+        # data_count = source_context.get_data_count(file=file_path)
         # if source_connection.File.Csv.HasHeader:
         #     data_count = data_count - 1
         # return data_count
@@ -47,7 +74,7 @@ class QueueAdapter(ConnectionAdapter):
         raise NotSupportedFeatureException("File Target Operation")
         # source_connection = self.data_integration_connection_service.get_source_connection(
         #     data_integration_id=data_integration_id)
-        # source_file_context = self.queue_provider.get_context(connection=source_connection.Connection)
+        # source_context = self.queue_provider.get_context(connection=source_connection.Connection)
         #
         # data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
         #     data_integration_id=data_integration_id)
@@ -59,7 +86,7 @@ class QueueAdapter(ConnectionAdapter):
         #     headers = source_connection.File.Csv.Header.split(source_connection.File.Csv.Separator)
         #
         # file_path = os.path.join(source_connection.File.Folder, source_connection.File.FileName)
-        # readed_data = source_file_context.get_data(file=file_path,
+        # readed_data = source_context.get_data(file=file_path,
         #                                            names=headers,
         #                                            header=has_header,
         #                                            start=paging_modifier.Start,
@@ -95,7 +122,8 @@ class QueueAdapter(ConnectionAdapter):
             data_integration_id=data_integration_id)
         columns = [(data_integration_column.TargetColumnName) for data_integration_column in
                    data_integration_columns]
-        data = pd.DataFrame(prepared_data, columns=columns)
+        df = pd.DataFrame(prepared_data, columns=columns)
+        data = df.where(pd.notnull(df), None)
         affected_row_count = target_context.write_data(
             topic_name=target_connection.Queue.TopicName, messages=data)
         return affected_row_count

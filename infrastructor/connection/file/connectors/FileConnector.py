@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from queue import Queue
+
 from infrastructor.dependency.scopes import IScoped
 
 from pandas import DataFrame
@@ -14,11 +16,15 @@ class FileConnector(ABC,IScoped):
         pass
 
     @abstractmethod
+    def start_get_data(self, file: str, names: [], header: int, separator: str, limit: int, data_queue: Queue,result_queue:Queue):
+        pass
+
+    @abstractmethod
     def get_data_count(self, file: str):
         pass
 
     @abstractmethod
-    def read_data(self, file: str, names: [], start: int, limit: int,
+    def get_data(self, file: str, names: [], start: int, limit: int,
                   header: int, separator: str) -> DataFrame:
         pass
 

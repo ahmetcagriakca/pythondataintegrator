@@ -24,7 +24,7 @@ class ConnectionAdapterFactory(IScoped):
         self.data_integration_connection_service = data_integration_connection_service
         self.database_adapter = database_adapter
 
-    def get_source_connection_adapter(self, data_integration_id) -> ConnectionAdapter:
+    def get_source_adapter(self, data_integration_id) -> ConnectionAdapter:
 
         source_connection = self.data_integration_connection_service.get_source_connection(
             data_integration_id=data_integration_id)
@@ -47,7 +47,7 @@ class ConnectionAdapterFactory(IScoped):
             raise NotSupportedFeatureException(f"{source_connection.Connection.ConnectionType}")
 
 
-    def get_target_connection_adapter(self, data_integration_id) -> ConnectionAdapter:
+    def get_target_adapter(self, data_integration_id) -> ConnectionAdapter:
 
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
@@ -56,7 +56,7 @@ class ConnectionAdapterFactory(IScoped):
                 return self.database_adapter
             else:
                 raise IncompatibleAdapterException(f"{self.database_adapter} is incompatible with ConectionAdapter")
-        if target_connection.Connection.ConnectionType.Id == ConnectionTypes.File.value:
+        elif target_connection.Connection.ConnectionType.Id == ConnectionTypes.File.value:
             if isinstance(self.file_adapter, ConnectionAdapter):
                 return self.file_adapter
             else:

@@ -11,7 +11,8 @@ from models.configs.ApiConfig import ApiConfig
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.logging.ConsoleLogger import ConsoleLogger
 from infrastructor.logging.SqlLogger import SqlLogger
-from infrastructor.multi_processing.ParallelMultiProcessing import TaskData, ParallelMultiProcessing
+from infrastructor.multi_processing.ParallelMultiProcessing import ParallelMultiProcessing
+from infrastructor.multi_processing.models.TaskData import TaskData
 
 
 class TestMultiProcess(TestCase):

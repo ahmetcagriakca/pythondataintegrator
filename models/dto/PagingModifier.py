@@ -1,7 +1,7 @@
-from infrastructor.multi_processing.ParallelMultiProcessing import ProcessBaseData
+from infrastructor.multi_processing.models.TaskBaseData import TaskBaseData
 
 
-class PagingModifier(ProcessBaseData):
+class PagingModifier(TaskBaseData):
     def __init__(self,
                  Id: int = None,
                  End: int = None,

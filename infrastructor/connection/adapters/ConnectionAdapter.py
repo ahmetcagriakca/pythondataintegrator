@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from queue import Queue
 from typing import List
 
 from models.dto.PagingModifier import PagingModifier
@@ -27,4 +28,7 @@ class ConnectionAdapter:
 
     @abstractmethod
     def do_target_operation(self, data_integration_id: int) -> int:
+        pass
+    @abstractmethod
+    def start_source_data_process(self, data_integration_id: int, limit: int, data_queue: Queue, result_queue: Queue) :
         pass

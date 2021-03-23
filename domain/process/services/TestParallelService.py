@@ -8,7 +8,8 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from infrastructor.multi_processing.ParallelMultiProcessing import TaskData, ParallelMultiProcessing
+from infrastructor.multi_processing.ParallelMultiProcessing import ParallelMultiProcessing
+from infrastructor.multi_processing.models.TaskData import TaskData
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from models.dao.connection.ConnectorType import ConnectorType

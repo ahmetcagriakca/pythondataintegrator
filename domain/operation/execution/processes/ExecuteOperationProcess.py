@@ -6,7 +6,7 @@ from domain.operation.execution.services.OperationExecution import OperationExec
 from infrastructor.IocManager import IocManager
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from infrastructor.multi_processing.ParallelMultiProcessing import TaskData
+from infrastructor.multi_processing.models.TaskData import TaskData
 
 
 class ExecuteOperationProcess(IScoped):

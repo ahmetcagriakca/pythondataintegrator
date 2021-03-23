@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from queue import Queue
+
 from infrastructor.dependency.scopes import IScoped
 
 from pandas import DataFrame
@@ -40,3 +42,8 @@ class QueueConnector(ABC, IScoped):
     @abstractmethod
     def get_data(self, limit: int) -> DataFrame:
         pass
+
+    @abstractmethod
+    def start_get_data(self, limit: int,data_queue:Queue,result_queue:Queue) -> DataFrame:
+        pass
+

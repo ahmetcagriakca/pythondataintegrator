@@ -47,9 +47,13 @@ class TestScheduleJobResource(TestCase):
             TestScheduleJobQueueData.test_queue_connection,
         ]
 
+        connection_files = [
+            TestScheduleJobQueueData.test_file_connection,
+        ]
         data_operation = TestScheduleJobQueueData.test_data_operation
 
         self.test_manager.service_scenarios.run_data_operation_without_schedule(
             data_operation=data_operation,
             connection_databases=connection_databases,
-            connection_queues=connection_queues)
+            connection_queues=connection_queues,
+            connection_files=connection_files)

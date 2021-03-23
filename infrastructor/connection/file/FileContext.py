@@ -1,6 +1,7 @@
 import base64
 import io
 import os
+from asyncio import Queue
 
 from injector import inject
 from pandas import DataFrame
@@ -20,9 +21,14 @@ class FileContext(IScoped):
         count = self.connector.get_data_count(file=file)
         return count
 
+    def start_get_data(self, file: str, names: [], header: int, separator: str, limit: int, data_queue: Queue,result_queue:Queue):
+        data = self.connector.start_get_data(file=file, names=names, header=header, separator=separator, limit=limit,
+                                             data_queue=data_queue,result_queue=result_queue)
+        return data
+
     def get_data(self, file: str, names: [], start: int, limit: int, header: int, separator: str) -> DataFrame:
 
-        data = self.connector.read_data(file=file, names=names, start=start, limit=limit, header=header,
+        data = self.connector.get_data(file=file, names=names, start=start, limit=limit, header=header,
                                         separator=separator)
 
         return data

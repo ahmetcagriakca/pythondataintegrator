@@ -1,3 +1,5 @@
+from queue import Queue
+
 from injector import inject
 from pandas import DataFrame
 
@@ -20,6 +22,14 @@ class QueueContext(IScoped):
 
     def write_data(self, topic_name: str, messages: DataFrame):
         return self.connector.write_data(topic_name=topic_name, messages=messages)
+
+    def start_get_data(self, topic_name: str, group_id: str, limit: int, data_queue: Queue,result_queue:Queue,
+                       auto_offset_reset: str = 'earliest',
+                       enable_auto_commit: bool = True):
+        self.connector.create_consumer(topic_name=topic_name, group_id=group_id, auto_offset_reset=auto_offset_reset,
+                                       enable_auto_commit=enable_auto_commit)
+        data = self.connector.start_get_data(limit=limit, data_queue=data_queue,result_queue=result_queue)
+        return data
 
     def get_data(self, topic_name: str, group_id: str, limit: int, auto_offset_reset: str = 'earliest',
                  enable_auto_commit: bool = True):

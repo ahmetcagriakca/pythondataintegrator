@@ -37,7 +37,7 @@ class TestScheduleJobFileData:
                             "FileName": "test.csv",
                             "Csv": {
                                 "HasHeader": True,
-                                "Header": "Id,Name",
+                                "Header": "Id;Name",
                                 "Separator": ";",
                             }
                         },
@@ -95,7 +95,7 @@ class TestScheduleJobFileData:
                 "Limit": 100,
                 "ProcessCount": 1,
                 "Integration": {
-                    "Code": "TEST_CSV_TO_CSV_INTEGRATION",
+                    "Code": "TEST_CSV_TO_CSV_INTEGRATION_WITHOUT_HEADER",
                     "SourceConnections": {
 
                         "ConnectionName": "TestIntegrationConnectionFile",

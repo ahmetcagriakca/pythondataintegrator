@@ -1,9 +1,13 @@
 import csv
+import json
 import os
+from queue import Queue
+
 import pandas as pd
 from pandas import DataFrame
 
 from infrastructor.connection.file.connectors.FileConnector import FileConnector
+from infrastructor.connection.models.DataQueueTask import DataQueueTask
 
 
 class CsvConnector(FileConnector):
@@ -24,28 +28,35 @@ class CsvConnector(FileConnector):
         # except Exception:
         #     pass
 
+    def start_get_data(self, file: str, names: [], header: int, separator: str, limit: int, data_queue: Queue,
+                       result_queue: Queue):
+        file_path = os.path.join(self.host, file)
+        for chunk in pd.read_csv(file_path, names=names, sep=separator, header=header, chunksize=limit, iterator=True,
+                                 low_memory=False):
+            data = json.loads(chunk.to_json(orient='records'))
+            data_queue_task = DataQueueTask(Data=data, IsFinished=False)
+            data_queue.put(data_queue_task)
+            result = result_queue.get()
+            if result == False:
+                break;
+
     def get_data_count(self, file: str):
         file_path = os.path.join(self.host, file)
         with open(file_path, 'rb') as f:
             count = sum(1 for line in f)
         return count
 
-    def get_data_with_chunk(self, file: str, names: [], start: int, limit: int, header: int,
-                            separator: str) -> DataFrame:
+    def get_data(self, file: str, names: [], start: int, limit: int, header: int,
+                 separator: str) -> DataFrame:
+        file_path = os.path.join(self.host, file)
         count = 0
-        for chunk in pd.read_csv(file, names=names, sep=separator, header=header, chunksize=limit, iterator=True,
+        for chunk in pd.read_csv(file_path, names=names, sep=separator, header=header, chunksize=limit, iterator=True,
                                  low_memory=False):
             count += len(chunk)
             if start < count:
                 return chunk
 
-    def read_data(self, file: str, names: [], start: int, limit: int, header: int,
-                  separator: str) -> DataFrame:
-        file_path = os.path.join(self.host, file)
-        data = self.get_data_with_chunk(file_path, names=names, start=start, limit=limit, header=header,
-                                        separator=separator)
-
-        return data
+        return None
 
     def write_data(self, file: str, data: DataFrame, separator: str):
         file_path = os.path.join(self.host, file)
