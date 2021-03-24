@@ -44,7 +44,7 @@ class DataIntegrationConnectionFileCsvService(IScoped):
                data_integration_connection_file: DataIntegrationConnectionFile,
                data: CreateDataIntegrationConnectionFileCsvModel) -> DataIntegrationConnectionFileCsv:
         data_integration_connection_file_csv = self.get_by_data_integration_connection_file_id(
-            data_integration_connection_id=data_integration_connection_file.Id,
+            data_integration_connection_file_id=data_integration_connection_file.Id,
         )
         data_integration_connection_file_csv.DataIntegrationConnectionFile = data_integration_connection_file
         data_integration_connection_file_csv.HasHeader = data.HasHeader
