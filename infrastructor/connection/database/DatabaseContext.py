@@ -1,5 +1,6 @@
 import time
 import re
+import pandas as pd
 
 from injector import inject
 from infrastructor.connection.database.DatabasePolicy import DatabasePolicy
@@ -45,6 +46,12 @@ class DatabaseContext(IScoped):
         return data_list
 
     @connect
+    def fetch_with_pd(self, query):
+        data = pd.read_sql(sql=query,con=self.connector.connection)
+
+        return data
+
+    @connect
     def execute(self, query) -> any:
         self.connector.cursor.execute(query)
         self.connector.connection.commit()
@@ -79,7 +86,7 @@ class DatabaseContext(IScoped):
     def get_table_data(self, query, first_row, start, end):
         data_query = self.connector.get_table_data_query(query=query, first_row=first_row, start=start,
                                                          end=end)
-        return self.fetch(data_query)
+        return self.fetch_with_pd(data_query)
 
     def truncate_table(self, schema, table):
         truncate_query = self.connector.get_truncate_query(schema=schema, table=table)

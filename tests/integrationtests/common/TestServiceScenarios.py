@@ -1,18 +1,15 @@
 import time
 from datetime import datetime
 
-from domain.operation.execution.processes.ExecuteOperationProcess import ExecuteOperationProcess
 from domain.operation.execution.services.OperationExecution import OperationExecution
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
-from models.configs.ApiConfig import ApiConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.aps import ApSchedulerJob
 from models.dao.connection.Connection import Connection
-from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from models.dao.integration.DataIntegration import DataIntegration
 from models.dao.operation import DataOperation, DataOperationJob, DataOperationJobExecution
 from models.dao.secret import Secret

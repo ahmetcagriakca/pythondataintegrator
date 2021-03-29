@@ -20,11 +20,15 @@ class EmailProvider(IScoped):
         try:
             host = self.config_service.get_config_by_name("EMAIL_HOST")
             port = self.config_service.get_config_by_name("EMAIL_PORT")
-            from_addr = self.config_service.get_config_by_name("EMAIL_FROM")
+            from_address = self.config_service.get_config_by_name("EMAIL_FROM")
             user = self.config_service.get_config_by_name("EMAIL_USER")
             password = self.config_service.get_config_by_name("EMAIL_PASSWORD")
+
             if host is None:
                 self.sql_logger.error("Email not configured")
+                return
+            if from_address is None:
+                self.sql_logger.error("Email from_address not configured")
                 return
 
             # Create the root message and fill in the from, to, and subject headers
@@ -62,7 +66,7 @@ class EmailProvider(IScoped):
                 smtp.ehlo()
                 smtp.starttls()
                 smtp.login(user, password)
-            smtp.sendmail(from_addr, to, msgRoot.as_string())
+            smtp.sendmail(from_address, to, msgRoot.as_string())
             smtp.quit()
         except (gaierror, ConnectionRefusedError):
             # tell the script to report if your message was sent or which errors need to be fixed

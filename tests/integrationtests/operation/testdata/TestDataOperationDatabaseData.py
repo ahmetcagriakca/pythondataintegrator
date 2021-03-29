@@ -6,8 +6,8 @@ class TestDataOperationDatabaseData:
         ],
         "Integrations": [
             {
-                "Limit": 10000,
-                "ProcessCount": 1,
+                "Limit": 5,
+                "ProcessCount": 2,
                 "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION",
                     "SourceConnections": {
@@ -45,7 +45,7 @@ class TestDataOperationDatabaseData:
         ],
         "Integrations": [
             {
-                "Limit": 100000,
+                "Limit": 5,
                 "ProcessCount": 2,
                 "Integration": {
                     "Code": "TEST_DATA_OPERATION_INTEGRATION",

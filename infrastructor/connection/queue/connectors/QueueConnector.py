@@ -44,6 +44,6 @@ class QueueConnector(ABC, IScoped):
         pass
 
     @abstractmethod
-    def start_get_data(self, limit: int,data_queue:Queue,result_queue:Queue) -> DataFrame:
+    def get_unpredicted_data(self, limit: int, process_count:int, data_queue:Queue, result_queue:Queue) -> DataFrame:
         pass
 

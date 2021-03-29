@@ -16,7 +16,7 @@ class FileConnector(ABC,IScoped):
         pass
 
     @abstractmethod
-    def start_get_data(self, file: str, names: [], header: int, separator: str, limit: int, data_queue: Queue,result_queue:Queue):
+    def get_unpredicted_data(self, file: str, names: [], header: int, separator: str, limit: int, process_count:int, data_queue: Queue, result_queue:Queue):
         pass
 
     @abstractmethod

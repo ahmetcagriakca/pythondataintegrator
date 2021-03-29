@@ -2,6 +2,8 @@ from abc import abstractmethod
 from queue import Queue
 from typing import List
 
+from pandas import DataFrame
+
 from models.dto.PagingModifier import PagingModifier
 
 
@@ -19,7 +21,7 @@ class ConnectionAdapter:
         pass
 
     @abstractmethod
-    def prepare_data(self, data_integration_id: int, source_data: List[any]) -> List[any]:
+    def prepare_data(self, data_integration_id: int, source_data: DataFrame) -> List[any]:
         pass
 
     @abstractmethod
@@ -29,6 +31,13 @@ class ConnectionAdapter:
     @abstractmethod
     def do_target_operation(self, data_integration_id: int) -> int:
         pass
+
     @abstractmethod
-    def start_source_data_process(self, data_integration_id: int, limit: int, data_queue: Queue, result_queue: Queue) :
+    def start_source_data_operation(self,
+                                    data_integration_id: int,
+                                    data_operation_job_execution_integration_id: int,
+                                    limit: int,
+                                    process_count: int,
+                                    data_queue: Queue,
+                                    data_result_queue: Queue):
         pass

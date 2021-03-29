@@ -2,6 +2,9 @@ import base64
 import io
 import os
 from asyncio import Queue
+from os import listdir
+from os.path import isfile, join
+from typing import List
 
 from injector import inject
 from pandas import DataFrame
@@ -21,15 +24,17 @@ class FileContext(IScoped):
         count = self.connector.get_data_count(file=file)
         return count
 
-    def start_get_data(self, file: str, names: [], header: int, separator: str, limit: int, data_queue: Queue,result_queue:Queue):
-        data = self.connector.start_get_data(file=file, names=names, header=header, separator=separator, limit=limit,
-                                             data_queue=data_queue,result_queue=result_queue)
+    def get_unpredicted_data(self, file: str, names: [], header: int, separator: str, limit: int, process_count: int,
+                             data_queue: Queue, result_queue: Queue):
+        data = self.connector.get_unpredicted_data(file=file, names=names, header=header, separator=separator,
+                                                   limit=limit, process_count=process_count,
+                                                   data_queue=data_queue, result_queue=result_queue)
         return data
 
     def get_data(self, file: str, names: [], start: int, limit: int, header: int, separator: str) -> DataFrame:
 
         data = self.connector.get_data(file=file, names=names, start=start, limit=limit, header=header,
-                                        separator=separator)
+                                       separator=separator)
 
         return data
 
@@ -41,6 +46,10 @@ class FileContext(IScoped):
 
     def delete_file(self, file: str):
         self.connector.delete_file(file=file)
+
+    def get_all_files(self, folder: str) -> List[str]:
+        folder_path = os.path.join(self.connector.host, folder)
+        return [f for f in listdir(folder_path) if isfile(join(folder_path, f))]
 
     def prepare_insert_row(self, data, column_rows):
         insert_rows = []

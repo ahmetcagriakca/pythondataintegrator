@@ -5,6 +5,7 @@ from domain.operation.services.DataOperationIntegrationService import DataOperat
 from domain.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
+from infrastructor.IocManager import IocManager
 from infrastructor.data.decorators.TransactionHandler import transaction_handler
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
@@ -27,6 +28,11 @@ class OperationExecution(IScoped):
         self.data_operation_job_execution_service = data_operation_job_execution_service
         self.data_operation_service = data_operation_service
         self.sql_logger = sql_logger
+
+    @staticmethod
+    def start_operation(sub_process_id, data_operation_id, job_id):
+        operation_execution = IocManager.injector.get(OperationExecution)
+        operation_execution.start(data_operation_id=data_operation_id, job_id=job_id)
 
     def __start_execution(self, data_operation_id: int, data_operation_job_execution_id: int):
         data_operation_integrations = self.data_operation_integration_service.get_all_by_data_operation_id(

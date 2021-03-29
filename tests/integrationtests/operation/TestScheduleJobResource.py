@@ -10,14 +10,13 @@ class TestScheduleJobResource(TestCase):
         super(TestScheduleJobResource, self).__init__(methodName)
         self.test_manager = TestManager()
 
-    def test_run_data_operation(self):
+    def test_run_database_data_operation(self):
         connection_databases = [
-            TestScheduleJobData.test_job_connection,
             TestScheduleJobData.test_job_connection,
         ]
         data_operation = TestScheduleJobData.test_data_operation
 
-        self.test_manager.service_scenarios.run_data_operation(
+        self.test_manager.service_scenarios.run_data_operation_without_schedule(
             data_operation=data_operation,
             connection_databases=connection_databases,
         )

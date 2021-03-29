@@ -1,11 +1,15 @@
+import json
+from asyncio import Queue
 from typing import List
 
 from injector import inject
+from pandas import DataFrame
 
 from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
 from infrastructor.connection.database.DatabaseProvider import DatabaseProvider
 from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from models.dto.PagingModifier import PagingModifier
 
 
@@ -23,7 +27,7 @@ class DatabaseAdapter(ConnectionAdapter):
     def clear_data(self, data_integration_id) -> int:
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
-        target_context = self.database_provider.get_context(            connection=target_connection.Connection)
+        target_context = self.database_provider.get_context(connection=target_connection.Connection)
         truncate_affected_rowcount = target_context.truncate_table(schema=target_connection.Database.Schema,
                                                                    table=target_connection.Database.TableName)
         return truncate_affected_rowcount
@@ -51,20 +55,57 @@ class DatabaseAdapter(ConnectionAdapter):
         )
         return data
 
-    def prepare_data(self, data_integration_id: int, source_data: List[any]) -> List[any]:
-        target_connection = self.data_integration_connection_service.get_target_connection(
+    @staticmethod
+    def get_paging_modifiers(data_count, limit):
+        end = limit
+        start = 0
+        paging_modifiers = []
+        id = 0
+        while True:
+            if end != limit and end - data_count > limit:
+                break
+            id = id + 1
+            paging_modifier = PagingModifier(Id=id, End=end, Start=start, Limit=limit)
+            paging_modifiers.append(paging_modifier)
+            end += limit
+            start += limit
+        return paging_modifiers
+
+    def start_source_data_operation(self,
+                                    data_integration_id: int,
+                                    data_operation_job_execution_integration_id: int,
+                                    limit: int,
+                                    process_count: int,
+                                    data_queue: Queue,
+                                    data_result_queue: Queue):
+
+        data_count = self.get_source_data_count(
             data_integration_id=data_integration_id)
+        paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=limit)
+        transmitted_data_count = 0
+        for paging_modifier in paging_modifiers:
+            df = self.get_source_data(data_integration_id=data_integration_id,
+                                      paging_modifier=paging_modifier)
+            data = json.loads(df.to_json(orient='records'))
+            data_queue_task = DataQueueTask(Id=paging_modifier.Id, Data=data, Start=paging_modifier.Start,
+                                            End=paging_modifier.End, Limit=limit, IsFinished=False)
+            data_queue.put(data_queue_task)
+            transmitted_data_count = transmitted_data_count + 1
+            if transmitted_data_count >= process_count:
+                result = data_result_queue.get()
+                if result:
+                    transmitted_data_count = transmitted_data_count - 1
+                else:
+                    break
 
-        target_context = self.database_provider.get_context(connection=target_connection.Connection)
-
+    def prepare_data(self, data_integration_id: int, source_data: DataFrame) -> List[any]:
         data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
 
-        column_rows = [(data_integration_column.ResourceType, data_integration_column.SourceColumnName,
-                        data_integration_column.TargetColumnName) for data_integration_column in
-                       data_integration_columns]
-        prepared_data = target_context.prepare_insert_row(data=source_data,
-                                                          column_rows=column_rows)
+        source_column_rows = [(data_integration_column.SourceColumnName) for data_integration_column in
+                              data_integration_columns]
+        data = source_data[source_column_rows]
+        prepared_data = data.values.tolist()
         return prepared_data
 
     def prepare_target_query(self, data_integration_id: int) -> str:

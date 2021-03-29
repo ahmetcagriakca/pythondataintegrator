@@ -1,6 +1,7 @@
 import os
+from os import listdir
+from os.path import isfile, join
 from queue import Queue
-from threading import Thread
 from typing import List
 
 from injector import inject
@@ -9,10 +10,8 @@ from pandas import DataFrame
 
 from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
-from infrastructor.IocManager import IocManager
 from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
 from infrastructor.connection.file.FileProvider import FileProvider
-from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from infrastructor.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
 from models.dto.PagingModifier import PagingModifier
 
@@ -52,55 +51,51 @@ class FileAdapter(ConnectionAdapter):
         return truncate_affected_rowcount
 
     def get_source_data_count(self, data_integration_id) -> int:
+        return -1
+
+    def start_source_data_operation(self,
+                                    data_integration_id: int,
+                                    data_operation_job_execution_integration_id: int,
+                                    limit: int,
+                                    process_count: int,
+                                    data_queue: Queue,
+                                    data_result_queue: Queue):
+
         source_connection = self.data_integration_connection_service.get_source_connection(
             data_integration_id=data_integration_id)
 
         source_context = self.file_provider.get_context(connection=source_connection.Connection)
-        file_path = os.path.join(source_connection.File.Folder, source_connection.File.FileName)
-        data_count = source_context.get_data_count(file=file_path)
+
+        has_header = None
         if source_connection.File.Csv.HasHeader:
-            data_count = data_count - 1
-        return data_count
-
-    @staticmethod
-    def source_data_process(data_integration_id: int, limit: int, data_queue: Queue, result_queue: Queue):
-
-        try:
-            IocManager.initialize()
-            data_integration_connection_service = IocManager.injector.get(DataIntegrationConnectionService)
-            file_provider = IocManager.injector.get(FileProvider)
-
-            source_connection = data_integration_connection_service.get_source_connection(
-                data_integration_id=data_integration_id)
-
-            source_context = file_provider.get_context(connection=source_connection.Connection)
-
-            has_header = None
-            if source_connection.File.Csv.HasHeader:
-                has_header = 0
-            headers = None
-            separator = source_connection.File.Csv.Separator
-            if source_connection.File.Csv.Header is not None and source_connection.File.Csv.Header != '':
-                headers = source_connection.File.Csv.Header.split(separator)
-
+            has_header = 0
+        headers = None
+        separator = source_connection.File.Csv.Separator
+        if source_connection.File.Csv.Header is not None and source_connection.File.Csv.Header != '':
+            headers = source_connection.File.Csv.Header.split(separator)
+        if source_connection.File.FileName is not None and source_connection.File.FileName != '':
             file_path = os.path.join(source_connection.File.Folder, source_connection.File.FileName)
-            source_context.start_get_data(file=file_path,
-                                          names=headers,
-                                          header=has_header,
-                                          limit=limit,
-                                          separator=separator,
-                                          data_queue=data_queue,
-                                          result_queue=result_queue)
-            data_queue_finish_task = DataQueueTask(IsFinished=True)
-            data_queue.put(data_queue_finish_task)
-        except Exception as ex:
-            data_queue_error_task = DataQueueTask(IsFinished=True, Exception=ex)
-            data_queue.put(data_queue_error_task)
+            source_context.get_unpredicted_data(file=file_path,
+                                                names=headers,
+                                                header=has_header,
+                                                separator=separator,
+                                                limit=limit,
+                                                process_count=process_count,
+                                                data_queue=data_queue,
+                                                result_queue=data_result_queue)
+        else:
 
-    def start_source_data_process(self, data_integration_id: int, limit: int, data_queue: Queue, result_queue: Queue):
-        main_t = Thread(target=FileAdapter.source_data_process,
-                        args=(data_integration_id, limit, data_queue, result_queue,))
-        main_t.start()
+            csv_files = source_context.get_all_files(source_connection.File.Folder)
+            for csv_file in csv_files:
+                file_path = os.path.join(source_connection.File.Folder, csv_file)
+                source_context.get_unpredicted_data(file=file_path,
+                                                    names=headers,
+                                                    header=has_header,
+                                                    separator=separator,
+                                                    limit=limit,
+                                                    process_count=process_count,
+                                                    data_queue=data_queue,
+                                                    result_queue=data_result_queue)
 
     def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> DataFrame:
         source_connection = self.data_integration_connection_service.get_source_connection(
@@ -129,19 +124,15 @@ class FileAdapter(ConnectionAdapter):
         replaced_data = data.where(pd.notnull(data), None)
         return replaced_data.values.tolist()
 
-    def prepare_data(self, data_integration_id: int, source_data: List[any]) -> List[any]:
-        target_connection = self.data_integration_connection_service.get_target_connection(
-            data_integration_id=data_integration_id)
-
-        target_context = self.file_provider.get_context(connection=target_connection.Connection)
+    def prepare_data(self, data_integration_id: int, source_data: DataFrame) -> List[any]:
 
         data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
 
-        column_rows = [(data_integration_column.ResourceType, data_integration_column.SourceColumnName,
-                        data_integration_column.TargetColumnName) for data_integration_column in
-                       data_integration_columns]
-        prepared_data = target_context.prepare_insert_row(data=source_data, column_rows=column_rows)
+        source_column_rows = [(data_integration_column.SourceColumnName) for data_integration_column in
+                              data_integration_columns]
+        data = source_data[source_column_rows]
+        prepared_data = data.values.tolist()
         return prepared_data
 
     def write_target_data(self, data_integration_id: int, prepared_data: List[any], ) -> int:

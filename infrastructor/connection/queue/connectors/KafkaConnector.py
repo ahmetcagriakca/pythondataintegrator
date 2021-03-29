@@ -1,11 +1,9 @@
-import csv
 import json
-import os
+import logging
 from json import dumps
 from queue import Queue
 from typing import List
 
-import pandas as pd
 from kafka import KafkaProducer, KafkaAdminClient, KafkaConsumer
 from kafka.admin import NewTopic
 from kafka.errors import TopicAlreadyExistsError
@@ -14,7 +12,8 @@ from pandas import DataFrame
 from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from infrastructor.connection.queue.connectors.QueueConnector import QueueConnector
 
-
+kafka_logger = logging.getLogger(name="kafka")
+kafka_logger.setLevel(level=logging.WARNING)
 class KafkaConnector(QueueConnector):
     def __init__(self,
                  servers: List[str],
@@ -86,25 +85,36 @@ class KafkaConnector(QueueConnector):
                                             group_id=group_id,
                                             value_deserializer=lambda x: json.loads(x.decode('utf-8')))
 
-    def start_get_data(self, limit: int, data_queue: Queue, result_queue: Queue) -> DataFrame:
+    def get_unpredicted_data(self, limit: int, process_count: int , data_queue: Queue, result_queue: Queue) -> DataFrame:
         data = []
-        data_count = 0
+        total_data_count = 0
+        limited_data_count = 0
+        transmitted_data_count = 0
+        task_id = 0
         for message in self.__consumer:
-
             data.append(message.value)
-            data_count = data_count + 1
-            if data_count >= limit:
-                data_queue_task = DataQueueTask(Data=data, IsFinished=False)
+            total_data_count = total_data_count + 1
+            limited_data_count = limited_data_count + 1
+            if limited_data_count >= limit:
+                task_id = task_id + 1
+                data_queue_task = DataQueueTask(Id=task_id, Data=data, Start=total_data_count - limited_data_count,
+                                                End=total_data_count, Limit=limit, IsFinished=False)
                 data_queue.put(data_queue_task)
-                data_count = 0
+                transmitted_data_count = transmitted_data_count + 1
+                limited_data_count = 0
                 data = []
-
-                result = result_queue.get()
-                if result == False:
-                    break;
+                if transmitted_data_count >= process_count:
+                    result = result_queue.get()
+                    if result:
+                        transmitted_data_count = transmitted_data_count - 1
+                    else:
+                        break
 
         if data is not None and len(data) > 0:
-            data_queue_task = DataQueueTask(Data=data, IsFinished=False)
+            task_id = task_id + 1
+            total_data_count=total_data_count+len(data)
+            data_queue_task = DataQueueTask(Id=task_id, Data=data, Start=total_data_count - limited_data_count,
+                                            End=total_data_count, Limit=limit, IsFinished=False)
             data_queue.put(data_queue_task)
 
     def get_data(self, limit: int) -> DataFrame:
@@ -137,14 +147,6 @@ class KafkaConnector(QueueConnector):
         if self.topic_exists(topic_name=topic_name):
             response = self.__admin.delete_topics([topic_name])
             return response
-
-    #
-    # def delete_topic(self, topic_name):
-    #     # KAFKA_TOPIC_NUM_PARTITIONS: int = 3
-    #     # KAFKA_TOPIC_REPLICA_FACTOR: int = 3
-    #     topic = [NewTopic(name=topic_name, num_partitions=1, replication_factor=3)]
-    #     response = self.__admin.delete_topics(topic, validate_only=False)
-    #     print("Response:" + str(response))
 
     def write_data(self, topic_name: str, messages: DataFrame):
         for message in json.loads(messages.to_json(orient='records')):

@@ -1,7 +1,7 @@
 import multiprocessing
 
 
-class ProcessData:
+class ProcessInfo:
     def __init__(self,
                  Process: any = None,
                  SubProcessId: int = None,

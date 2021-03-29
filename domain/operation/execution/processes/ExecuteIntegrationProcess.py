@@ -1,143 +1,212 @@
+import multiprocessing
 import traceback
+from queue import Queue
 from time import time
-from typing import List
 from injector import inject
-from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
+from pandas import DataFrame
+from infrastructor.multi_processing.ProcessManager import ProcessManager
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
 from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
-from domain.process.services.ProcessService import ProcessService
 from infrastructor.IocManager import IocManager
+from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from infrastructor.multi_processing.models.TaskData import TaskData
-from models.dto.PagingModifier import PagingModifier
 
 
 class ExecuteIntegrationProcess(IScoped):
     @inject
     def __init__(self,
                  sql_logger: SqlLogger,
-                 process_service: ProcessService,
                  data_operation_integration_service: DataOperationIntegrationService,
-                 data_integration_column_service: DataIntegrationColumnService,
                  integration_execution_service: IntegrationExecutionService):
-        self.integration_execution_service = integration_execution_service
-        self.process_service = process_service
-        self.sql_logger = sql_logger
-        self.data_integration_column_service = data_integration_column_service
         self.data_operation_integration_service = data_operation_integration_service
-
-    def start_parallel_process(self, data_operation_job_execution_id: int, data_operation_integration_id: int,
-                               data_count: int):
-
-        data_operation_integration = self.data_operation_integration_service.get_by_id(
-            id=data_operation_integration_id)
-        paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=data_operation_integration.Limit)
-        unprocessed_task_list, processed_task_list = self.process_service.start_parallel_process(
-            process_id=data_operation_integration.DataIntegrationId,
-            datas=paging_modifiers,
-            process_count=data_operation_integration.ProcessCount,
-            process_function=ExecuteIntegrationProcess.parallel_operation,
-            job_id=data_operation_job_execution_id)
-        print("parallel finished")
-        total_affected_row_count = 0
-            # sum([int(processed_task.Data.Message) for processed_task in processed_task_list if processed_task.Data is not None])
-        if unprocessed_task_list is not None and len(unprocessed_task_list) > 0:
-            print(f"Unprocessed tasks founded")
-            paging_modifiers = [unprocessed_task.Data for unprocessed_task in unprocessed_task_list]
-            result = self.execute_paging_modifiers(
-                data_integration_id=data_operation_integration.DataIntegrationId,
-                paging_modifiers=paging_modifiers)
-            total_affected_row_count = total_affected_row_count + result
-        return total_affected_row_count
-
-    def start_serial_process(self, data_operation_integration_id: int,
-                             data_count: int) -> int:
-
-        data_operation_integration = self.data_operation_integration_service.get_by_id(
-            id=data_operation_integration_id)
-        paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=data_operation_integration.Limit)
-        total_affected_row_count = self.execute_paging_modifiers(
-            data_integration_id=data_operation_integration.DataIntegrationId,
-            paging_modifiers=paging_modifiers)
-        return total_affected_row_count
+        self.integration_execution_service = integration_execution_service
+        self.sql_logger = sql_logger
 
     @staticmethod
-    def get_paging_modifiers(data_count, limit):
-        end = limit
-        start = 0
-        paging_modifiers = []
-        id = 0
-        while True:
-            if end != limit and end - data_count > limit:
-                break
-            id = id + 1
-            paging_modifier = PagingModifier(Id=id, End=end, Start=start, Limit=limit)
-            paging_modifiers.append(paging_modifier)
-            end += limit
-            start += limit
-        return paging_modifiers
+    def start_source_data_process(sub_process_id,
+                                  data_integration_id: int,
+                                  data_operation_job_execution_integration_id: int,
+                                  limit: int,
+                                  process_count: int,
+                                  data_queue: Queue,
+                                  data_result_queue: Queue):
+        return IocManager.injector.get(ExecuteIntegrationProcess).start_source_data_operation(
+            sub_process_id=sub_process_id,
+            data_integration_id=data_integration_id,
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+            limit=limit,
+            process_count=process_count,
+            data_queue=data_queue,
+            data_result_queue=data_result_queue,
+        )
 
-    def execute_paging_modifiers(self, data_integration_id: int, paging_modifiers: List[PagingModifier]) -> int:
-        total_affected_row_count = 0
-        for paging_modifier in paging_modifiers:
-            start = time()
-            self.sql_logger.info(
-                f"Process got a new task.Id:{paging_modifier.Id}  limits:{paging_modifier.Start}-{paging_modifier.End} ")
-            affected_row_count = self.integration_execution_service.start_execute_integration(
-                data_integration_id=data_integration_id,
-                paging_modifier=paging_modifier)
-            if affected_row_count is None:
-                affected_row_count = 0
-            total_affected_row_count = total_affected_row_count + affected_row_count
-            end = time()
-            self.sql_logger.info(
-                f"Process finished task. limits:{paging_modifier.Start}-{paging_modifier.End}. time:{end - start}")
-
-        return total_affected_row_count
-
-    def start_parallel_operation(self, process_id, job_id, sub_process_id, process_name, tasks, results):
+    def start_source_data_operation(self, sub_process_id,
+                                    data_integration_id: int,
+                                    data_operation_job_execution_integration_id: int,
+                                    limit: int,
+                                    process_count: int,
+                                    data_queue: Queue,
+                                    data_result_queue: Queue):
+        self.sql_logger.info(f"Source Data started on process. SubProcessId: {sub_process_id}")
         try:
-            print('[%s] evaluation routine starts' % process_name)
+            self.integration_execution_service.start_source_data_operation(
+                data_integration_id=data_integration_id,
+                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+                limit=limit,
+                process_count=process_count,
+                data_queue=data_queue,
+                data_result_queue=data_result_queue)
+            for i in range(process_count):
+                data_queue_finish_task = DataQueueTask(IsFinished=True)
+                data_queue.put(data_queue_finish_task)
+        except Exception as ex:
+            for i in range(process_count):
+                data_queue_error_task = DataQueueTask(IsFinished=True, Traceback=traceback.format_exc(), Exception=ex)
+                data_queue.put(data_queue_error_task)
+            raise
 
+    @staticmethod
+    def start_execute_data_process(sub_process_id,
+                                   data_integration_id: int,
+                                   data_operation_job_execution_integration_id: int,
+                                   data_queue: Queue,
+                                   data_result_queue: Queue) -> int:
+        return IocManager.injector.get(ExecuteIntegrationProcess).start_execute_data_operation(
+            sub_process_id=sub_process_id,
+            data_integration_id=data_integration_id,
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+            data_queue=data_queue,
+            data_result_queue=data_result_queue,
+        )
+
+    def start_execute_data_operation(self,
+                                     sub_process_id: int,
+                                     data_integration_id: int,
+                                     data_operation_job_execution_integration_id: int,
+                                     data_queue: Queue,
+                                     data_result_queue: Queue) -> int:
+        total_row_count = 0
+        try:
             while True:
-                # waiting for new task
-                new_task: TaskData = tasks.get()
-                new_task.SubProcessId = sub_process_id
-                if new_task.IsFinished:
-                    self.sql_logger.info(f"{process_name} process finished")
-                    # Indicate finished
-                    results.put(new_task)
-                    break
+                data_task: DataQueueTask = data_queue.get()
+                if data_task.IsFinished:
+                    if data_task.Exception is not None:
+                        exc = Exception(data_task.Traceback + '\n' + str(data_task.Exception))
+                        raise exc
+                    self.sql_logger.info(f"{sub_process_id} process tasks finished")
+                    return total_row_count
                 else:
                     start = time()
+                    source_data_json = data_task.Data
+                    source_data_frame: DataFrame = DataFrame(source_data_json)
+                    data = source_data_frame
                     self.sql_logger.info(
-                        f"{process_name}-{sub_process_id} process got a new task.Id:{new_task.Data.Id} limits:{new_task.Data.Start}-{new_task.Data.End} ")
-                    paging_modifier: PagingModifier = new_task.Data
-                    result = self.integration_execution_service.start_execute_integration(
-                        data_integration_id=process_id,
-                        paging_modifier=paging_modifier)
+                        f"{sub_process_id}-{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task")
+                    self.integration_execution_service.start_execute_integration(
+                        data_integration_id=data_integration_id,
+                        data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+                        data=data)
+                    total_row_count = total_row_count + len(data)
                     end = time()
                     self.sql_logger.info(
-                        f"{process_name} process finished task. limits:{new_task.Data.Start}-{new_task.Data.End}. time:{end - start}")
-                    new_task.IsProcessed = True
-                    new_task.Data.State = 1
-                    new_task.Data.Message = result
-                    results.put(new_task)
+                        f"{sub_process_id}-{data_task.Id}-{data_task.Start}-{data_task.End} process finished task. time:{end - start}")
+                    data_task.IsProcessed = True
+                    data_result_queue.put(True)
+            return total_row_count
         except Exception as ex:
-            self.sql_logger.error(f"{process_name} process getting error:{ex}", job_id=job_id)
-            data = new_task.Data
-            data.State = 2
-            data.Message = str(ex)
-            data.Exception = ex
-            data.Traceback = traceback.format_exc()
-            data = TaskData(Data=data, SubProcessId=sub_process_id, IsFinished=True)
-            results.put(data)
+            data_result_queue.put(False)
+            raise
 
-    @staticmethod
-    def parallel_operation(process_id, job_id, sub_process_id, process_name, tasks, results):
-        IocManager.initialize()
-        execute_operation_adapter = IocManager.injector.get(ExecuteIntegrationProcess)
-        execute_operation_adapter.start_parallel_operation(process_id=process_id, job_id=job_id,
-                                                           sub_process_id=sub_process_id, process_name=process_name,
-                                                           tasks=tasks, results=results)
+    def start_source_data_subprocess(self,
+                                     source_data_process_manager: ProcessManager,
+                                     data_integration_id: int,
+                                     data_operation_job_execution_integration_id: int,
+                                     limit: int,
+                                     process_count: int,
+                                     data_queue: Queue,
+                                     data_result_queue: Queue):
+
+        source_data_kwargs = {
+            "data_integration_id": data_integration_id,
+            "data_operation_job_execution_integration_id": data_operation_job_execution_integration_id,
+            "limit": limit,
+            "process_count": process_count,
+            "data_queue": data_queue,
+            "data_result_queue": data_result_queue,
+        }
+
+        source_data_process_manager.start_processes(
+            process_count=1,
+            target_method=self.start_source_data_process,
+            kwargs=source_data_kwargs)
+
+    def start_execute_data_subprocess(self, execute_data_process_manager: ProcessManager,
+                                      process_count: int,
+                                      data_integration_id: int,
+                                      data_operation_job_execution_integration_id: int,
+                                      data_queue: Queue,
+                                      data_result_queue: Queue) -> int:
+        total_row_count = 0
+        execute_data_kwargs = {
+            "data_integration_id": data_integration_id,
+            "data_operation_job_execution_integration_id": data_operation_job_execution_integration_id,
+            "data_queue": data_queue,
+            "data_result_queue": data_result_queue,
+        }
+        execute_data_process_manager.start_processes(
+            process_count=process_count,
+            target_method=self.start_execute_data_process,
+            kwargs=execute_data_kwargs)
+        execute_data_process_results = execute_data_process_manager.get_results()
+        for result in execute_data_process_results:
+            if result.Result is not None:
+                total_row_count = total_row_count + result.Result
+        return total_row_count
+
+    def start_integration_execution(self, data_operation_job_execution_integration_id: int,
+                                    data_operation_integration_id: int) -> int:
+        manager = multiprocessing.Manager()
+        source_data_process_manager = ProcessManager()
+        execute_data_process_manager = ProcessManager()
+        try:
+            data_operation_integration = self.data_operation_integration_service.get_by_id(
+                id=data_operation_integration_id)
+            if data_operation_integration.ProcessCount is not None and data_operation_integration.ProcessCount >= 1:
+                process_count = data_operation_integration.ProcessCount
+            else:
+                process_count = 1
+            data_integration_id = data_operation_integration.DataIntegrationId
+            limit = data_operation_integration.Limit
+
+            data_queue = manager.Queue()
+            data_result_queue = manager.Queue()
+
+            self.start_source_data_subprocess(source_data_process_manager=source_data_process_manager,
+                                              data_integration_id=data_integration_id,
+                                              data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+                                              limit=limit,
+                                              process_count=process_count, data_queue=data_queue,
+                                              data_result_queue=data_result_queue)
+            if process_count > 1:
+                total_row_count = self.start_execute_data_subprocess(
+                    execute_data_process_manager=execute_data_process_manager,
+                    process_count=process_count,
+                    data_integration_id=data_integration_id,
+                    data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+                    data_queue=data_queue,
+                    data_result_queue=data_result_queue)
+            else:
+                total_row_count = self.start_execute_data_operation(sub_process_id=0,
+                                                                    data_integration_id=data_integration_id,
+                                                                    data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+                                                                    data_queue=data_queue,
+                                                                    data_result_queue=data_result_queue)
+            return total_row_count
+        except Exception as ex:
+            self.sql_logger.error("Integration getting error")
+            raise
+        finally:
+            manager.shutdown()
+            del source_data_process_manager
+            del execute_data_process_manager

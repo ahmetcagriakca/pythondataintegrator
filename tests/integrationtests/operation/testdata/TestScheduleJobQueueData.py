@@ -37,8 +37,8 @@ class TestScheduleJobQueueData:
         ],
         "Integrations": [
             {
-                "Limit": 10,
-                "ProcessCount": 1,
+                "Limit": 5,
+                "ProcessCount": 3,
                 "Integration": {
                     "Code": "TEST_CSV_TO_DB_INTEGRATION",
                     "SourceConnections": {
@@ -50,10 +50,10 @@ class TestScheduleJobQueueData:
                             "Csv": {
                                 "HasHeader": True,
                                 "Header": "Id;Name",
-                                "Separator": ";",
+                                "Separator": ";"
                             }
                         },
-                        "Columns": "Id,Name",
+                        "Columns": "Id,Name"
                     },
                     "TargetConnections": {
 
@@ -67,7 +67,7 @@ class TestScheduleJobQueueData:
                     },
                     "IsTargetTruncate": True,
                     "IsDelta": True,
-                    "Comments": "Test data_integration record",
+                    "Comments": "Test data_integration record"
                 }
             },
             {
@@ -83,33 +83,33 @@ class TestScheduleJobQueueData:
                             "TableName": "test_integration_target",
                             "Query": ""
                         },
-                        "Columns": "Id,Name",
+                        "Columns": "Id,Name"
                     },
                     "TargetConnections": {
                         "ConnectionName": "TestIntegrationConnectionQueue",
                         "Queue": {
-                            "TopicName": "test_pdi_queue_topic",
+                            "TopicName": "test_pdi_queue_topic"
                         },
-                        "Columns": "Id,Name",
+                        "Columns": "Id,Name"
                     },
                     "IsTargetTruncate": True,
                     "IsDelta": True,
-                    "Comments": "Test data_integration record",
+                    "Comments": "Test data_integration record"
                 }
             },
 
             {
-                "Limit": 10,
-                "ProcessCount": 1,
+                "Limit": 5,
+                "ProcessCount": 3,
                 "Integration": {
                     "Code": "TEST_QUEUE_TO_FILE_INTEGRATION",
                     "SourceConnections": {
 
                         "ConnectionName": "TestIntegrationConnectionQueue",
                         "Queue": {
-                            "TopicName": "test_pdi_queue_topic",
+                            "TopicName": "test_pdi_queue_topic"
                         },
-                        "Columns": "Id,Name",
+                        "Columns": "Id,Name"
                     },
                     "TargetConnections": {
                         "ConnectionName": "TestIntegrationConnectionFile",
@@ -119,14 +119,14 @@ class TestScheduleJobQueueData:
                             "Csv": {
                                 "HasHeader": True,
                                 "Header": "a-b",
-                                "Separator": "-",
+                                "Separator": "-"
                             }
                         },
-                        "Columns": "Id,Name",
+                        "Columns": "Id,Name"
                     },
                     "IsTargetTruncate": True,
                     "IsDelta": True,
-                    "Comments": "Test data_integration record",
+                    "Comments": "Test data_integration record"
                 }
             }
         ]
