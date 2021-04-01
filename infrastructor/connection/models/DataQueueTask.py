@@ -8,6 +8,7 @@ class DataQueueTask:
                  State: int = None,
                  IsFinished: bool = None,
                  IsProcessed: bool = None,
+                 Message: str = None,
                  Traceback: str = None,
                  Exception: Exception = None,
 
@@ -20,5 +21,6 @@ class DataQueueTask:
         self.State: bool = State
         self.IsFinished: bool = IsFinished
         self.IsProcessed: bool = IsProcessed
+        self.Message: str = Message
         self.Traceback: str = Traceback
         self.Exception: Exception = Exception

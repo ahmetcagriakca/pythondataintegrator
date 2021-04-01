@@ -31,8 +31,7 @@ class OperationExecution(IScoped):
 
     @staticmethod
     def start_operation(sub_process_id, data_operation_id, job_id):
-        operation_execution = IocManager.injector.get(OperationExecution)
-        operation_execution.start(data_operation_id=data_operation_id, job_id=job_id)
+        return IocManager.injector.get(OperationExecution).start(data_operation_id=data_operation_id, job_id=job_id)
 
     def __start_execution(self, data_operation_id: int, data_operation_job_execution_id: int):
         data_operation_integrations = self.data_operation_integration_service.get_all_by_data_operation_id(

@@ -30,7 +30,7 @@ class CsvConnector(FileConnector):
 
     def get_unpredicted_data(self, file: str, names: [], header: int, separator: str, limit: int, process_count:int, data_queue: Queue,
                              result_queue: Queue):
-        file_path = os.path.join(self.host, file)
+        file_path = file
         total_data_count = 0
         transmitted_data_count = 0
         task_id = 0
@@ -41,7 +41,7 @@ class CsvConnector(FileConnector):
             data_count= len(chunk)
             total_data_count = total_data_count + data_count
             data_queue_task = DataQueueTask(Id=task_id, Data=data, Start=total_data_count - data_count,
-                                            End=total_data_count, Limit=limit, IsFinished=False)
+                                            End=total_data_count, Limit=limit,Message=f'{file_path} file readed', IsFinished=False)
             data_queue.put(data_queue_task)
             transmitted_data_count = transmitted_data_count + 1
             if transmitted_data_count >= process_count:

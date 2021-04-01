@@ -131,7 +131,16 @@ class ProcessManager:
                 # Process has finished
                 if process_task.State == 4:
                     self.__finish_all_processes()
-                    raise process_task.Exception
+                    for task in self._process_tasks:
+                        if task.SubProcessId == process_task.SubProcessId:
+                            task.Result = process_task.Result
+                            task.State = process_task.State
+                            task.Message = process_task.Message
+                            task.IsFinished = process_task.IsFinished
+                            task.Exception = process_task.Exception
+                            task.Traceback = process_task.Traceback
+                            task.Data = process_task.Data
+                    break
                 for process_data in self._processes:
                     if process_data.SubProcessId == process_task.SubProcessId:
                         process_data.IsFinished = True

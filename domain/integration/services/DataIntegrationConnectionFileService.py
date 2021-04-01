@@ -54,6 +54,7 @@ class DataIntegrationConnectionFileService(IScoped):
             data_integration_connection_id=data_integration_connection.Id,
         )
         data_integration_connection_file.DataIntegrationConnection = data_integration_connection
+        data_integration_connection_file.Folder = data.Folder
         data_integration_connection_file.FileName = data.FileName
 
         if data.Csv is not None and data_integration_connection_file.Csv is None:

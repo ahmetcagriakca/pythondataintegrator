@@ -1,6 +1,5 @@
+import multiprocessing
 import os
-from os import listdir
-from os.path import isfile, join
 from queue import Queue
 from typing import List
 
@@ -13,16 +12,19 @@ from domain.integration.services.DataIntegrationConnectionService import DataInt
 from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
 from infrastructor.connection.file.FileProvider import FileProvider
 from infrastructor.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
+from infrastructor.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
 
 
 class FileAdapter(ConnectionAdapter):
     @inject
     def __init__(self,
+                 sql_logger: SqlLogger,
                  file_provider: FileProvider,
                  data_integration_connection_service: DataIntegrationConnectionService,
                  data_integration_column_service: DataIntegrationColumnService,
                  ):
+        self.sql_logger = sql_logger
         self.file_provider = file_provider
         self.data_integration_column_service = data_integration_column_service
         self.data_integration_connection_service = data_integration_connection_service
@@ -74,7 +76,8 @@ class FileAdapter(ConnectionAdapter):
         if source_connection.File.Csv.Header is not None and source_connection.File.Csv.Header != '':
             headers = source_connection.File.Csv.Header.split(separator)
         if source_connection.File.FileName is not None and source_connection.File.FileName != '':
-            file_path = os.path.join(source_connection.File.Folder, source_connection.File.FileName)
+            file_path = source_context.get_file_path(folder_name=source_connection.File.Folder,
+                                                     file_name=source_connection.File.FileName)
             source_context.get_unpredicted_data(file=file_path,
                                                 names=headers,
                                                 header=has_header,
@@ -85,10 +88,10 @@ class FileAdapter(ConnectionAdapter):
                                                 result_queue=data_result_queue)
         else:
 
-            csv_files = source_context.get_all_files(source_connection.File.Folder)
+            csv_files = source_context.get_all_files(folder_name=source_connection.File.Folder, file_regex='(.*csv$)')
             for csv_file in csv_files:
-                file_path = os.path.join(source_connection.File.Folder, csv_file)
-                source_context.get_unpredicted_data(file=file_path,
+                self.sql_logger.info(f"file read started. FilePath:{csv_file} ")
+                source_context.get_unpredicted_data(file=csv_file,
                                                     names=headers,
                                                     header=has_header,
                                                     separator=separator,

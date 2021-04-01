@@ -102,7 +102,7 @@ class ExecuteIntegrationProcess(IScoped):
                     source_data_frame: DataFrame = DataFrame(source_data_json)
                     data = source_data_frame
                     self.sql_logger.info(
-                        f"{sub_process_id}-{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task")
+                        f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task")
                     self.integration_execution_service.start_execute_integration(
                         data_integration_id=data_integration_id,
                         data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
@@ -110,7 +110,7 @@ class ExecuteIntegrationProcess(IScoped):
                     total_row_count = total_row_count + len(data)
                     end = time()
                     self.sql_logger.info(
-                        f"{sub_process_id}-{data_task.Id}-{data_task.Start}-{data_task.End} process finished task. time:{end - start}")
+                        f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process finished task. time:{end - start}")
                     data_task.IsProcessed = True
                     data_result_queue.put(True)
             return total_row_count
@@ -160,6 +160,8 @@ class ExecuteIntegrationProcess(IScoped):
             kwargs=execute_data_kwargs)
         execute_data_process_results = execute_data_process_manager.get_results()
         for result in execute_data_process_results:
+            if result.Exception is not None:
+                raise result.Exception
             if result.Result is not None:
                 total_row_count = total_row_count + result.Result
         return total_row_count
