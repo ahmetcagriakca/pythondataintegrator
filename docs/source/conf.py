@@ -36,13 +36,12 @@ extensions = [
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-pygments_style = 'default'
-highlight_language = 'python'
+pygments_style = 'sphinx'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build']
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -53,9 +52,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # on_rtd is whether we are on readthedocs.org, this line of code grabbed from docs.readthedocs.org
 
-import sphinx_rtd_theme
+#import sphinx_rtd_theme
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+#html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 #html_theme = 'alabaster'
 
