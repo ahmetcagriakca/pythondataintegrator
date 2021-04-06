@@ -21,6 +21,20 @@ when an unknown printer took a galley of type and scrambled it to make a type sp
 It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. 
 It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
 
+
+.. code-block:: csharp
+
+    var migrationCommands = _migrationsSqlGenerator.Generate(prioritizedMigrationOperationList.OrderByDescending(o => o.RefHitCount).Select(s => s.Migration).ToList());
+                var preSql = string.Join("\n\r\n\r", migrationCommands.Select(s => s.CommandText));
+
+                migrationCommands = _migrationsSqlGenerator.Generate(migrationOperationList.OrderByDescending(o => o.RefHitCount).Select(s => s.Migration).ToList());
+                var midSql = string.Join("\n\r\n\r", migrationCommands.Select(s => s.CommandText));
+
+                migrationCommands = _migrationsSqlGenerator.Generate(latestMigrationOperationList.OrderByDescending(o => o.RefHitCount).Select(s => s.Migration).ToList());
+                var postSql = string.Join("\n\r\n\r", migrationCommands.Select(s => s.CommandText));
+
+                var sql = string.Join("\n\r\n\r", preSql, midSql, postSql);
+                return SuccessDataResult(sql);
    
 .. toctree::
    :maxdepth: 3

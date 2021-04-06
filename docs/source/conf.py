@@ -25,6 +25,8 @@ author = 'JediContributors'
 release = '1.0.0'
 version = '1.0.0'
 
+#highlight_language = 'csharp'
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
