@@ -12,7 +12,8 @@ from infrastructor.multi_processing.models.ProcessTask import ProcessTask
 
 
 class ProcessManager:
-    def __init__(self):
+    def __init__(self, fire_and_forget: bool = False):
+        self.fire_and_forget = fire_and_forget
         self._manager: SyncManager = None
         self._process_queue: Queue = None
         self._process_result_queue: Queue = None
@@ -21,12 +22,22 @@ class ProcessManager:
         self.sql_logger = SqlLogger()
 
     def __del__(self):
-        self.__finish_all_processes()
-        if self._manager is not None:
-            self._manager.shutdown()
-        del self.sql_logger
+        if not self.fire_and_forget:
+            self.__finish_all_processes()
+            if self._manager is not None:
+                self._manager.shutdown()
+            del self.sql_logger
 
-    def start_processes(self, process_count, target_method, kwargs):
+    def get_manager(self):
+        if self._manager is None:
+            self._manager = multiprocessing.Manager()
+        return self._manager
+
+    def create_queue(self) -> Queue:
+
+        return self.get_manager().Queue()
+
+    def start_processes(self, target_method, kwargs, process_count=1):
         self.__configure_process()
         # Initiate the worker processes
         for i in range(process_count):
@@ -52,7 +63,7 @@ class ProcessManager:
         return self._process_tasks
 
     def __configure_process(self):
-        self._manager = multiprocessing.Manager()
+        self._manager = self.get_manager()
         # Define a list (queue) for tasks and computation results
         self._process_queue = self._manager.Queue()
         self._process_result_queue = self._manager.Queue()
@@ -163,7 +174,7 @@ class ProcessManager:
                 if process.Process.is_alive():
                     process_task = ProcessTask(SubProcessId=process.SubProcessId, IsFinished=False)
                     self._process_queue.put(process_task)
-                    print(f"Unfinished process found. SubProcessId:{process.SubProcessId}")
+                    print(f"Process will terminate. SubProcessId:{process.SubProcessId}")
                     process.IsFinished = True
                     process.Process.terminate()
 

@@ -21,6 +21,7 @@ class IocManager:
     job_scheduler = None
     config_manager = None
     injector: Injector = None
+    job_event_handler = None
     Base = declarative_base(metadata=MetaData(schema='Common'))
 
     @staticmethod

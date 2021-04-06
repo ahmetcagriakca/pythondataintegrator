@@ -143,3 +143,35 @@ Job Logs:{log_texts}
             self.email_provider.send(operation_contacts, subject, body)
         except Exception as ex:
             self.sql_logger.error(f"Error on mail sending. Error:{ex}")
+
+    def send_data_operation_miss_mail(self, data_operation_job,next_run_time:datetime):
+        operation_contacts = []
+        for contact in data_operation_job.DataOperation.Contacts:
+            if contact.IsDeleted == 0:
+                operation_contacts.append(contact.Email)
+
+        default_contacts = self.config_service.get_config_by_name("DataOperationDefaultContact")
+        if default_contacts is not None and default_contacts != '':
+            default_contacts_emails = default_contacts.split(",")
+            for default_contact in default_contacts_emails:
+                if default_contact is not None and default_contact != '':
+                    operation_contacts.append(default_contact)
+        if operation_contacts is None:
+            self.sql_logger.info(f'{data_operation_job.DataOperation.Name} mail sending contact not found')
+            return
+
+        data_operation_name = data_operation_job.DataOperation.Name
+        subject = f"Job Missed"
+        subject = subject + f": {self.api_config.environment} » {data_operation_name} "
+
+        body = f'''
+                Scheduled job missed  
+                </br>
+                Job start time : {data_operation_job.StartDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}
+                </br>
+                Job next run time : {next_run_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}
+                '''
+        try:
+            self.email_provider.send(operation_contacts, subject, body)
+        except Exception as ex:
+            self.sql_logger.error(f"Error on mail sending. Error:{ex}")
