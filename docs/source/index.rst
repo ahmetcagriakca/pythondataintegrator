@@ -35,6 +35,16 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 
                 var sql = string.Join("\n\r\n\r", preSql, midSql, postSql);
                 return SuccessDataResult(sql);
+				
+				 //TODO: check constraint changes
+                    var ConstraintDiffOperations = _migrationOperationService.GetConstraintDiffOperations(currVersion, oldVersion);
+                    prioritizedMigrationOperationList.AddRange(ConstraintDiffOperations.Where(w => (w.Migration is DropCheckConstraintOperation || w.Migration is DropUniqueConstraintOperation)));
+                    latestMigrationOperationList.AddRange(columnDiffOperations.Where(w => (w.Migration is CreateCheckConstraintOperation || w.Migration is AddUniqueConstraintOperation)));
+
+                    //TODO: Primary key 
+                    migrationOperationList.AddRange(_migrationOperationService.GetPrimaryKeycChangeOperations(currVersion, oldVersion));
+
+                    await _entityService.SetEntityStatus(Guid.Parse(currVersion.Id), EntityVersionStatus.SentToProduction);
    
 .. toctree::
    :maxdepth: 3
