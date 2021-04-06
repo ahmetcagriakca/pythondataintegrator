@@ -39,8 +39,7 @@ class Repository(Generic[T]):
     def insert(self, entity: T):
         self.database_session_manager.session.add(entity)
 
-    def update(self, id: int, update_entity: T):
-        entity = self.get_by_id(id)
+    def update(self, entity: T):
         entity.LastUpdatedDate = datetime.now()
         entity.LastUpdatedUserId = 0
 

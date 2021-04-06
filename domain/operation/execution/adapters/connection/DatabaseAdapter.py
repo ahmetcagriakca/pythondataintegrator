@@ -81,22 +81,24 @@ class DatabaseAdapter(ConnectionAdapter):
 
         data_count = self.get_source_data_count(
             data_integration_id=data_integration_id)
-        paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=limit)
-        transmitted_data_count = 0
-        for paging_modifier in paging_modifiers:
-            df = self.get_source_data(data_integration_id=data_integration_id,
-                                      paging_modifier=paging_modifier)
-            data = json.loads(df.to_json(orient='records'))
-            data_queue_task = DataQueueTask(Id=paging_modifier.Id, Data=data, Start=paging_modifier.Start,
-                                            End=paging_modifier.End, Limit=limit, IsFinished=False)
-            data_queue.put(data_queue_task)
-            transmitted_data_count = transmitted_data_count + 1
-            if transmitted_data_count >= process_count:
-                result = data_result_queue.get()
-                if result:
-                    transmitted_data_count = transmitted_data_count - 1
-                else:
-                    break
+        if data_count > 0:
+            paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=limit)
+            transmitted_data_count = 0
+            for paging_modifier in paging_modifiers:
+                source_data = self.get_source_data(data_integration_id=data_integration_id,
+                                                   paging_modifier=paging_modifier)
+                df = DataFrame(source_data)
+                data = json.loads(df.to_json(orient='records', date_format="iso"))
+                data_queue_task = DataQueueTask(Id=paging_modifier.Id, Data=data, Start=paging_modifier.Start,
+                                                End=paging_modifier.End, Limit=limit, IsFinished=False)
+                data_queue.put(data_queue_task)
+                transmitted_data_count = transmitted_data_count + 1
+                if transmitted_data_count >= process_count:
+                    result = data_result_queue.get()
+                    if result:
+                        transmitted_data_count = transmitted_data_count - 1
+                    else:
+                        break
 
     def prepare_data(self, data_integration_id: int, source_data: DataFrame) -> List[any]:
         data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
@@ -104,6 +106,7 @@ class DatabaseAdapter(ConnectionAdapter):
 
         source_column_rows = [(data_integration_column.SourceColumnName) for data_integration_column in
                               data_integration_columns]
+
         data = source_data[source_column_rows]
         prepared_data = data.values.tolist()
         return prepared_data

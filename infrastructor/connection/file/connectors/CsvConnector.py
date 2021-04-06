@@ -36,7 +36,7 @@ class CsvConnector(FileConnector):
         task_id = 0
         for chunk in pd.read_csv(file_path, names=names, sep=separator, header=header, chunksize=limit, iterator=True,
                                  low_memory=False):
-            data = json.loads(chunk.to_json(orient='records'))
+            data = json.loads(chunk.to_json(orient='records', date_format="iso"))
             task_id = task_id + 1
             data_count= len(chunk)
             total_data_count = total_data_count + data_count

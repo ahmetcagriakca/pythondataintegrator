@@ -26,7 +26,7 @@ class DatabaseConnector(IScoped):
 
     @abstractmethod
     def get_table_count_query(self, query):
-        count_query = f"SELECT COUNT(*)  FROM ({query})  as count_table"
+        count_query = f"SELECT COUNT(*) as \"COUNT\"  FROM ({query})  as count_table"
         return count_query
 
     @abstractmethod

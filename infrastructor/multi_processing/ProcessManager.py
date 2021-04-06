@@ -57,7 +57,7 @@ class ProcessManager:
         self._process_queue = self._manager.Queue()
         self._process_result_queue = self._manager.Queue()
         number_of_cores = multiprocessing.cpu_count()
-        print(f"{number_of_cores} cores available")
+        # print(f"{number_of_cores} cores available")
         self._processes: List[ProcessInfo] = []
         self._process_tasks: List[ProcessTask] = []
 

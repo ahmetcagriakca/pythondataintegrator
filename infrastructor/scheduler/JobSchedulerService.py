@@ -41,6 +41,7 @@ class JobSchedulerService:
                 except Exception as invalid_ex:
                     print(ex)
                     raise
+
         return inner
 
     def set_job_scheduler_type(self, job_scheduler_type):
@@ -91,9 +92,9 @@ class JobSchedulerService:
     @job_transaction_handler
     def remove_job(self, event):
 
-        ap_scheduler_job: List[ApSchedulerJob] = self.ap_scheduler_job_repository.first(JobId=event.job_id)
+        ap_scheduler_job: ApSchedulerJob = self.ap_scheduler_job_repository.first(JobId=event.job_id)
         if ap_scheduler_job is not None:
-            ap_scheduler_job.IsDeleted = 1
+            self.ap_scheduler_job_repository.delete(ap_scheduler_job)
 
     @job_transaction_handler
     def add_job_event(self, event):

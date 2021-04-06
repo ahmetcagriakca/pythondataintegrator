@@ -149,5 +149,5 @@ class KafkaConnector(QueueConnector):
             return response
 
     def write_data(self, topic_name: str, messages: DataFrame):
-        for message in json.loads(messages.to_json(orient='records')):
+        for message in json.loads(messages.to_json(orient='records', date_format="iso")):
             response = self.__producer.send(topic=topic_name, value=message)
