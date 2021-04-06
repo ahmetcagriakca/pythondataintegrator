@@ -7,3 +7,4 @@ class ConnectorTypes(Enum):
     POSTGRESQL = 3
     EXCEL = 4
     CSV = 5
+    Kafka = 6

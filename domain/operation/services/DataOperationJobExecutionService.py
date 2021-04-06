@@ -138,4 +138,8 @@ Job finished at : {data_operation_job_execution.EndDate.strftime('%Y-%m-%d %H:%M
 </br>
 Job Logs:{log_texts}
 '''
-        self.email_provider.send(operation_contacts, subject, body)
+        try:
+
+            self.email_provider.send(operation_contacts, subject, body)
+        except Exception as ex:
+            self.sql_logger.error(f"Error on mail sending. Error:{ex}")

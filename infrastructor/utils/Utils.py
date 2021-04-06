@@ -26,7 +26,7 @@ class Utils:
         for name in os.listdir(directory):
             sub_folder = os.path.join(directory, name)
             if os.path.isdir(sub_folder) and not name.startswith('.') and not name.startswith(
-                    '__') and not name.startswith('__') and name != 'dao' and name != 'alembic' and name != 'unittests':
+                    '__') and not name.startswith('__') and name != 'dao' and name != 'alembic' and name != 'unittests'and name != 'files':
                 yield sub_folder
                 for folder in Utils.find_sub_folders(sub_folder):
                     yield folder

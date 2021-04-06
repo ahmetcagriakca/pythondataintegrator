@@ -1,15 +1,12 @@
-import json
-import os
 from unittest import TestCase
 
-from infrastructor.IocManager import IocManager
 from tests.integrationtests.common.TestManager import TestManager
 
 
-class TestConnectionTypeResuource(TestCase):
+class TestConnectionTypeResource(TestCase):
 
-    def __init__(self, methodName='TestConnectionTypeResuource'):
-        super(TestConnectionTypeResuource, self).__init__(methodName)
+    def __init__(self, methodName='TestConnectionTypeResource'):
+        super(TestConnectionTypeResource, self).__init__(methodName)
         self.test_manager = TestManager()
 
     def test_get_connection_type(self):

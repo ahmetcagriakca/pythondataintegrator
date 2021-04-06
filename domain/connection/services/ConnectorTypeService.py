@@ -30,5 +30,5 @@ class ConnectorTypeService(IScoped):
         """
         entity = self.connector_type_repository.first(IsDeleted=0, Name=name)
         if entity is None:
-            raise OperationalException("Connector Type Not Found")
+            raise OperationalException(f"{name} Connector Type Not Found")
         return entity

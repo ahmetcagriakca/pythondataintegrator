@@ -1,5 +1,5 @@
-from tests.integrationtests.operation.testdata.DataOperationTestData import DataOperationTestData
-from tests.integrationtests.operation.testdata.ScheduleJobTestData import ScheduleJobTestData
+from tests.integrationtests.operation.testdata.TestDataOperationDatabaseData import TestDataOperationDatabaseData
+from tests.integrationtests.operation.testdata.TestScheduleJobDatabaseData import TestScheduleJobData
 
 
 

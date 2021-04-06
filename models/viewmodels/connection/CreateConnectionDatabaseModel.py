@@ -1,3 +1,7 @@
+from infrastructor.json.JsonConvert import JsonConvert
+
+
+@JsonConvert.register
 class CreateConnectionDatabaseModel:
     def __init__(self,
                  Name: str = None,

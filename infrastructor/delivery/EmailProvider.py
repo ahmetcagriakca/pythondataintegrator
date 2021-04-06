@@ -20,18 +20,26 @@ class EmailProvider(IScoped):
         try:
             host = self.config_service.get_config_by_name("EMAIL_HOST")
             port = self.config_service.get_config_by_name("EMAIL_PORT")
-            from_addr = self.config_service.get_config_by_name("EMAIL_FROM")
+            smtp_address = self.config_service.get_config_by_name("EMAIL_SMTP")
+            from_address = self.config_service.get_config_by_name("EMAIL_FROM")
             user = self.config_service.get_config_by_name("EMAIL_USER")
             password = self.config_service.get_config_by_name("EMAIL_PASSWORD")
+
             if host is None:
                 self.sql_logger.error("Email not configured")
+                return
+            if smtp_address is None:
+                self.sql_logger.error("Email smtp not configured")
+                return
+            if from_address is None:
+                self.sql_logger.error("Email from_address not configured")
                 return
 
             # Create the root message and fill in the from, to, and subject headers
             msgRoot = MIMEMultipart('related')
             msgRoot[
                 'Subject'] = subject
-            msgRoot['From'] = f'PDI'
+            msgRoot['From'] = from_address
             recipients = ""
             if isinstance(to, list):
                 recipients = ", ".join(to)
@@ -56,13 +64,13 @@ class EmailProvider(IScoped):
             # fp_1.close()
             # msgImage_1.add_header('Content-ID', '<image1>')
             # msgRoot.attach(msgImage_1)
-            smtp = smtplib.SMTP()
-            smtp.connect(host, port)
+            smtp = smtplib.SMTP(host,port)
+            # smtp.connect(host, port)
             if user is not None and user != '' and password is not None and password != '':
                 smtp.ehlo()
                 smtp.starttls()
                 smtp.login(user, password)
-            smtp.sendmail(from_addr, to, msgRoot.as_string())
+            smtp.sendmail(smtp_address, to, msgRoot.as_string())
             smtp.quit()
         except (gaierror, ConnectionRefusedError):
             # tell the script to report if your message was sent or which errors need to be fixed

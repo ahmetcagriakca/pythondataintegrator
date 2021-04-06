@@ -44,6 +44,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+_trial_temp*
 
 # Translations
 *.mo
@@ -116,3 +117,4 @@ Dockerfile.test
 test_docker.py
 docker-compose.test.yml
 entrypoint_test.sh
+files/

@@ -72,7 +72,7 @@ class DataOperationModels:
     operation_integration = IocManager.api.model('Data Operation Integration', {
         'Limit': fields.Integer(description='Operation code value', required=False, example=10000),
         'ProcessCount': fields.Integer(description='Operation code value', required=True, example=1),
-        'Integration': fields.Nested(DataIntegrationModels.create_data_integration_model,
+        'Integration': fields.Nested(DataIntegrationModels.data_integration_model,
                                      description='Integration information', required=True)
     })
 

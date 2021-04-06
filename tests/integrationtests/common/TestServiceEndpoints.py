@@ -18,6 +18,13 @@ class TestServiceEndpoints:
         response_data = self.api_client.post('/api/Connection/ConnectionDatabase', request)
         return response_data
 
+    def create_connection_file(self, request):
+        response_data = self.api_client.post('/api/Connection/ConnectionFile', request)
+        return response_data
+    def create_connection_queue(self, request):
+        response_data = self.api_client.post('/api/Connection/ConnectionQueue', request)
+        return response_data
+
     def delete_connection(self, request):
         response_data = self.api_client.delete('/api/Connection', request)
         return response_data

@@ -5,7 +5,8 @@ from typing import List
 from apscheduler.triggers.cron import CronTrigger
 from injector import inject
 
-from domain.operation.execution.processes.ExecuteOperationProcess import ExecuteOperationProcess
+from infrastructor.multi_processing.ProcessManager import ProcessManager
+from domain.operation.execution.services.OperationExecution import OperationExecution
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
@@ -13,7 +14,6 @@ from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
-from infrastructor.multi_processing.ParallelMultiProcessing import ParallelMultiProcessing, TaskData, ProcessBaseData
 from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.operation import DataOperation
@@ -214,27 +214,31 @@ class JobOperationService(IScoped):
 
         sql_logger = SqlLogger()
         sql_logger.info(f"{job_id}-{data_operation_id} Data Operations Started")
-        parallel_multi_processing = ParallelMultiProcessing(1)
-        parallel_multi_processing.configure_process()
-        parallel_multi_processing.start_processes(process_id=data_operation_id, job_id=job_id,
-                                                  process_function=ExecuteOperationProcess.job_start_thread)
-        data = ProcessBaseData(Id=1)
-        td = TaskData(data)
-        parallel_multi_processing.add_task(td)
-        parallel_multi_processing.check_processes()
-        parallel_multi_processing.finish_all_processes()
+        operation_process_manager = ProcessManager()
+
+        operation_kwargs = {
+            "data_operation_id": data_operation_id,
+            "job_id": job_id,
+        }
+
+        operation_process_manager.start_processes(process_count=1,
+                                                  target_method=OperationExecution.start_operation,
+                                                  kwargs=operation_kwargs)
+        process_results = operation_process_manager.get_results()
         end_datetime = datetime.now()
         end = time.time()
         sql_logger.info(f"{job_id}-{data_operation_id} Start :{start_datetime}")
         sql_logger.info(f"{job_id}-{data_operation_id} End :{end_datetime}")
         sql_logger.info(f"{job_id}-{data_operation_id} ElapsedTime :{end - start}")
-
-        unprocessed_task = parallel_multi_processing.unprocessed_tasks()
-        if unprocessed_task[0].Data.State == 2:
+        if process_results[0].State == 4:
             sql_logger.info(
-                f"{job_id}-{data_operation_id} Data Operations Finished With Error: {unprocessed_task[0].Data.Message}")
-            exc = Exception(unprocessed_task[0].Data.Traceback + '\n' + str(unprocessed_task[0].Data.Exception))
+                f"{job_id}-{data_operation_id} Data Operations Finished With Error: {process_results[0].Exception}")
+            exc = Exception(process_results[0].Traceback + '\n' + str(process_results[0].Exception))
+            del operation_process_manager
+            del sql_logger
             raise exc
-        sql_logger.info(f"{job_id}-{data_operation_id} Data Operations Finished")
-        del parallel_multi_processing
-        return unprocessed_task[0].Data.Result
+        else:
+            sql_logger.info(f"{job_id}-{data_operation_id} Data Operations Finished")
+            del operation_process_manager
+            del sql_logger
+            return process_results[0].Result

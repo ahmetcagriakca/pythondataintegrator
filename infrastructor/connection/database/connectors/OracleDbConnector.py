@@ -47,7 +47,7 @@ class OracleDbConnector(DatabaseConnector):
             raise 
 
     def get_table_count_query(self, query):
-        count_query = f"SELECT COUNT (*) FROM ({query})"
+        count_query = f"SELECT COUNT (*)  \"COUNT\" FROM ({query})"
         return count_query
 
     def get_target_query_indexer(self):
