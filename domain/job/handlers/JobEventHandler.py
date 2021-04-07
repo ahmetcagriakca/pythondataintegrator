@@ -40,9 +40,10 @@ class JobEventHandler(IScoped):
         while True:
             try:
                 event = event_queue.get()
-                if event.code == EVENT_JOB_REMOVED:
-                    self.remove_job(job_id=event.job_id)
-                elif event.code == EVENT_JOB_MISSED:
+                # if event.code == EVENT_JOB_REMOVED:
+                #     self.remove_job(job_id=event.job_id)
+                # el
+                if event.code == EVENT_JOB_MISSED:
                     self.missed_job(job_id=event.job_id)
             except Exception as ex:
                 self.sql_logger.error(f"Job event getting error. Error:{ex}")
