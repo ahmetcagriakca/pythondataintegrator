@@ -1,3 +1,4 @@
+import pandas as pd
 from unittest import TestCase
 
 import os
@@ -46,8 +47,32 @@ class TestProcess(TestCase):
         print(f"property1:{property1}")
         print(f"property2:{property2}")
         return property1 + property2
+    @staticmethod
+    def check_type(d):
+        if d.dtype.name == 'datetime64[ns]':
+            data=d.dt.to_pydatetime()
+            return data
+        else:
+            data=d.values.tolist()
+            return data
 
     def test_dynamic_static_method_call_with_args(self):
+        df = pd.DataFrame([{"a": 1, "b": "2011-10-20T00:00:00.000Z","c":'asd'}])
+        df = df.astype(dtype={"a": "int", "b": "datetime64[ns]","c":"str"})
+        # test = df.apply(self.check_type )
+        #
+        # # df.apply(lambda d: d.dt.to_pydatetime() if d.dtype.name =='datetime64[ns]' else d)
+        # # df.dtypes
+        # df.select_dtypes(include=['datetime64[ns]']).dtypes.name
+        rows=[]
+        for row in df.values.tolist():
+            columns=[]
+            for column in row:
+                if column is not None and hasattr(column, 'to_pydatetime') :
+                    columns.append(column.to_pydatetime())
+                else:
+                    columns.append(column)
+            rows.append(columns)
         args = (3, 5,)
         method = self.static_method_call_test
         result = method(*args)

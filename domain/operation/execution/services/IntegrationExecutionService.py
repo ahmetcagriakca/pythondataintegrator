@@ -3,7 +3,7 @@ from typing import List
 
 from injector import inject
 from pandas import DataFrame, notnull
-
+import pandas as pd
 from domain.integration.services.DataIntegrationService import DataIntegrationService
 from domain.operation.execution.adapters.connection.ConnectionAdapterFactory import ConnectionAdapterFactory
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
@@ -50,6 +50,8 @@ class IntegrationExecutionService(IScoped):
                                   data: DataFrame):
         target_adapter = self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
         source_data = data.where(notnull(data), None)
+        source_data = source_data.replace({pd.NaT: None})
+
         prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id, source_data=source_data)
         target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
 
