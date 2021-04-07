@@ -1,7 +1,6 @@
 import json
 from asyncio import Queue
 from typing import List
-
 from injector import inject
 from pandas import DataFrame
 
@@ -89,7 +88,10 @@ class DatabaseAdapter(ConnectionAdapter):
                                                    paging_modifier=paging_modifier)
                 df = DataFrame(source_data)
                 data = json.loads(df.to_json(orient='records', date_format="iso"))
-                data_queue_task = DataQueueTask(Id=paging_modifier.Id, Data=data, Start=paging_modifier.Start,
+                data_types = dict((c, df[c].dtype.name) for c in df.columns)
+                # dict((c,df[c].dtype.name) for i in df.columns for j in i.items())
+                data_queue_task = DataQueueTask(Id=paging_modifier.Id, Data=data, DataTypes=data_types,
+                                                Start=paging_modifier.Start,
                                                 End=paging_modifier.End, Limit=limit, IsFinished=False)
                 data_queue.put(data_queue_task)
                 transmitted_data_count = transmitted_data_count + 1
@@ -106,7 +108,6 @@ class DatabaseAdapter(ConnectionAdapter):
 
         source_column_rows = [(data_integration_column.SourceColumnName) for data_integration_column in
                               data_integration_columns]
-
         data = source_data[source_column_rows]
         prepared_data = data.values.tolist()
         return prepared_data

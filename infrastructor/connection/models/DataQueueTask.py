@@ -2,6 +2,7 @@ class DataQueueTask:
     def __init__(self,
                  Id:int=None,
                  Data: any = None,
+                 DataTypes:any=None,
                  Start: int = None,
                  End: int = None,
                  Limit: int = None,
@@ -13,6 +14,7 @@ class DataQueueTask:
                  Exception: Exception = None,
 
                  ):
+        self.DataTypes = DataTypes
         self.Id = Id
         self.Start = Start
         self.End = End

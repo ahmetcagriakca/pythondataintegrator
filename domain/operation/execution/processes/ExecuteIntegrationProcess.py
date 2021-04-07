@@ -100,9 +100,11 @@ class ExecuteIntegrationProcess(IScoped):
                     start = time()
                     source_data_json = data_task.Data
                     source_data_frame: DataFrame = DataFrame(source_data_json)
-                    data = source_data_frame
                     if source_data_frame is not None and len(source_data_frame) > 0:
-
+                        if data_task.DataTypes is not None:
+                            data = source_data_frame.astype( dtype=data_task.DataTypes)
+                        else:
+                            data = source_data_frame
                         self.sql_logger.info(
                             f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task")
                         self.integration_execution_service.start_execute_integration(
