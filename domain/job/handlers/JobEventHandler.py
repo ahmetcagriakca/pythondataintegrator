@@ -38,8 +38,8 @@ class JobEventHandler(IScoped):
 
     def start_job_event_handler(self, event_queue: Queue):
         while True:
+            event = event_queue.get()
             try:
-                event = event_queue.get()
                 # if event.code == EVENT_JOB_REMOVED:
                 #     self.remove_job(job_id=event.job_id)
                 # el
