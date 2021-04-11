@@ -1,4 +1,3 @@
-
 from injector import inject
 from controllers.common.models.CommonModels import CommonModels
 from controllers.connection.models.ConnectionModels import ConnectionModels
@@ -30,6 +29,9 @@ class CheckConnectionDatabaseResource(ResourceBase):
         database_context.connector.connect()
         count_of_table = ''
         if schema is not None and schema != '' and table is not None and table != '':
-            count = database_context.get_table_count(f'select * from "{schema}"."{table}"')
-            count_of_table = f"Count of table:{count}"
+            try:
+                count = database_context.get_table_count(f'select * from "{schema}"."{table}"')
+                count_of_table = f"Count of table:{count}"
+            except Exception as ex:
+                count_of_table = f'Count of table getting error {ex}'
         return CommonModels.get_response(result=f"Connection connected successfully. {count_of_table}")
