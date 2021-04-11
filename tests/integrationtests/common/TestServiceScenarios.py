@@ -275,8 +275,9 @@ class TestServiceScenarios:
         #     # clean data_integration test operations
         #     self.clear_data_operation_job(data_operation_response["Result"]["Id"])
 
-    def run_data_operation(self, connections, data_operation, connection_files):
-        self.create_data_operation(connections, data_operation, connection_files)
+    def run_data_operation(self, data_operation, connection_databases=None, connection_files=None,
+                                            connection_queues=None):
+        self.create_data_operation(data_operation, connection_databases, connection_files, connection_queues)
         self.run_job(data_operation['Name'])
 
     def run_data_operation_without_schedule(self, data_operation, connection_databases=None, connection_files=None,
