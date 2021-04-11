@@ -28,6 +28,9 @@ class PostgreDbConnector(DatabaseConnector):
         except Exception:
             pass
 
+    def get_connection(self):
+        return self.connection
+
     def execute_many(self, query, data):
         try:
             extras.execute_batch(self.cursor, query, data, 10000)

@@ -31,6 +31,9 @@ class MssqlDbConnector(DatabaseConnector):
         except Exception:
             pass
 
+    def get_connection(self):
+        return self.connection
+
     def execute_many(self, query, data):
         self.cursor.fast_executemany = True
         try:

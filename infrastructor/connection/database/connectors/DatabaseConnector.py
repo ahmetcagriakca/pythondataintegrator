@@ -12,6 +12,10 @@ class DatabaseConnector(IScoped):
         pass
 
     @abstractmethod
+    def get_connection(self):
+        pass
+
+    @abstractmethod
     def execute_many(self, query, data):
         pass
 

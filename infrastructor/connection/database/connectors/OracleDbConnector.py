@@ -35,6 +35,9 @@ class OracleDbConnector(DatabaseConnector):
         except Exception:
             pass
 
+    def get_connection(self):
+        return self.connection
+
     def execute_many(self, query, data):
         try:
             self.cursor.prepare(query)
