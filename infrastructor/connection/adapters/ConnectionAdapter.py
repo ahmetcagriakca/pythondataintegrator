@@ -21,6 +21,13 @@ class ConnectionAdapter:
         pass
 
     @abstractmethod
+    def read_data(self,
+                  data_integration_id: int,
+                  limit: int,
+                  ):
+        pass
+
+    @abstractmethod
     def prepare_data(self, data_integration_id: int, source_data: DataFrame) -> List[any]:
         pass
 

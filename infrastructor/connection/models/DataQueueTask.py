@@ -3,6 +3,7 @@ class DataQueueTask:
                  Id:int=None,
                  Data: any = None,
                  DataTypes:any=None,
+                 IsDataFrame:bool=True,
                  Start: int = None,
                  End: int = None,
                  Limit: int = None,
@@ -14,6 +15,7 @@ class DataQueueTask:
                  Exception: Exception = None,
 
                  ):
+        self.IsDataFrame:bool = IsDataFrame
         self.DataTypes = DataTypes
         self.Id = Id
         self.Start = Start

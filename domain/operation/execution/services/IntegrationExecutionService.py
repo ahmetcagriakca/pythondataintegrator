@@ -1,4 +1,5 @@
 from queue import Queue
+from time import time
 from typing import List
 
 from injector import inject
@@ -44,16 +45,88 @@ class IntegrationExecutionService(IScoped):
                                                    data_queue=data_queue,
                                                    data_result_queue=data_result_queue)
 
+    @staticmethod
+    def get_paging_modifiers(data_count, limit):
+        end = limit
+        start = 0
+        paging_modifiers = []
+        id = 0
+        while True:
+            if end != limit and end - data_count > limit:
+                break
+            id = id + 1
+            paging_modifier = PagingModifier(Id=id, End=end, Start=start, Limit=limit)
+            paging_modifiers.append(paging_modifier)
+            end += limit
+            start += limit
+        return paging_modifiers
+
+    def start_integration(self,
+                          data_integration_id: int,
+                          limit: int,
+                          data_operation_job_execution_integration_id: int):
+
+        target_adapter = self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
+        data_count = self.get_source_data_count(
+            data_integration_id=data_integration_id,data_operation_job_execution_integration_id=data_operation_job_execution_integration_id)
+        if data_count > 0:
+            paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=limit)
+            for paging_modifier in paging_modifiers:
+                start_time = time()
+                source_data = self.get_source_data(data_integration_id=data_integration_id,
+                                                   paging_modifier=paging_modifier)
+                # df = DataFrame(source_data)
+                task_id = paging_modifier.Id
+                start = paging_modifier.Start
+                end = paging_modifier.End
+                self.sql_logger.info(f"0-data readed:{task_id}-{start}-{end} process got a new task")
+                prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id,
+                                                            source_data=source_data)
+                target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
+                end_time = time()
+                self.sql_logger.info(
+                    f"0-data readed:{task_id}-{start}-{end}  process finished task. time:{end_time - start_time}")
+        return data_count
+
+    def start_integration_temp(self,
+                               data_integration_id: int,
+                               limit: int,
+                               data_operation_job_execution_integration_id: int):
+
+        source_adapter = self.connection_adapter_factory.get_source_adapter(data_integration_id=data_integration_id)
+        target_adapter = self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
+        task_id = 0
+        total_data_count = 0
+        for data in source_adapter.read_data(data_integration_id=data_integration_id,
+                                             limit=limit):
+            start_time = time()
+            source_data = data.where(notnull(data), None)
+            source_data = source_data.replace({pd.NaT: None})
+            task_id = task_id + 1
+            data_count = len(source_data)
+            total_data_count = total_data_count + data_count
+            start = total_data_count - data_count
+            end = total_data_count
+            self.sql_logger.info(f"0-data readed:{task_id}-{start}-{end} process got a new task")
+            prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id,
+                                                        source_data=source_data)
+            target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
+            end_time = time()
+            self.sql_logger.info(
+                f"0-data readed:{task_id}-{start}-{end}  process finished task. time:{end_time - start_time}")
+        return total_data_count
+
     def start_execute_integration(self,
                                   data_integration_id: int,
                                   data_operation_job_execution_integration_id: int,
-                                  data: DataFrame):
+                                  paging_modifier:PagingModifier,
+                                  source_data: any):
+        if source_data is None:
+            source_data=self.get_source_data(data_integration_id=data_integration_id,paging_modifier=paging_modifier)
         target_adapter = self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
-        source_data = data.where(notnull(data), None)
-        source_data = source_data.replace({pd.NaT: None})
-
         prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id, source_data=source_data)
         target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
+        return len(source_data)
 
     def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
         source_adapter = self.connection_adapter_factory.get_source_adapter(
