@@ -70,8 +70,6 @@ class JobScheduler(ISingleton):
         JobSchedulerEvent.create_event_handler()
         self.scheduler.start()
         self.scheduler.print_jobs()
-        print('To clear the alarms, delete the example.sqlite file.')
-        print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
     def add_job_with_date(self, job_function, run_date, args=None, kwargs=None) -> Job:
         job: Job = self.scheduler.add_job(job_function, 'date', run_date=run_date, misfire_grace_time=30000, args=args,
