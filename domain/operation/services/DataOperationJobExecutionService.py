@@ -17,7 +17,6 @@ from models.enums.events import EVENT_EXECUTION_INITIALIZED
 
 
 class DataOperationJobExecutionService(IScoped):
-
     @inject
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
@@ -144,7 +143,7 @@ Job Logs:{log_texts}
         except Exception as ex:
             self.sql_logger.error(f"Error on mail sending. Error:{ex}")
 
-    def send_data_operation_miss_mail(self, data_operation_job,next_run_time:datetime):
+    def send_data_operation_miss_mail(self, data_operation_job, next_run_time: datetime):
         operation_contacts = []
         for contact in data_operation_job.DataOperation.Contacts:
             if contact.IsDeleted == 0:
@@ -162,14 +161,24 @@ Job Logs:{log_texts}
 
         data_operation_name = data_operation_job.DataOperation.Name
         subject = f"Job Missed"
-        subject = subject + f": {self.api_config.environment} » {data_operation_name} "
+        subject = subject + f": {self.api_config.environment} » {data_operation_name}"
+
+        if next_run_time is not None:
+            next_run_time_text = f"{next_run_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}"
+        else:
+            next_run_time_text = ''
+
+        if data_operation_job.StartDate is not None:
+            job_start_time_text = f"{data_operation_job.StartDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}"
+        else:
+            job_start_time_text = ''
 
         body = f'''
                 Scheduled job missed  
                 </br>
-                Job start time : {data_operation_job.StartDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}
+                Job start time : {job_start_time_text}
                 </br>
-                Job next run time : {next_run_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}
+                Job next run time : {next_run_time_text}
                 '''
         try:
             self.email_provider.send(operation_contacts, subject, body)
