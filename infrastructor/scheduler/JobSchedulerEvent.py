@@ -11,21 +11,20 @@ class JobSchedulerEvent:
     job_scheduler_type = None
     job_event_queue: Queue = None
     process_manager: ProcessManager = None
+
     def __del__(self):
         del JobSchedulerEvent.process_manager
+
     @staticmethod
     def create_event_handler():
-
         JobSchedulerEvent.process_manager = ProcessManager()
         JobSchedulerEvent.job_event_queue = JobSchedulerEvent.process_manager.create_queue()
-        # JobSchedulerEvent.job_event_queue = multiprocessing.Manager().Queue()
         process_kwargs = {
             "event_queue": JobSchedulerEvent.job_event_queue,
         }
         JobSchedulerEvent.process_manager.start_processes(target_method=JobEventHandler.start_job_event_handler_process,
                                                           kwargs=process_kwargs)
 
-    # handle transaction and handle unexpected errors
     def event_service_handler(func):
         def inner(*args, **kwargs):
             service = JobSchedulerService()

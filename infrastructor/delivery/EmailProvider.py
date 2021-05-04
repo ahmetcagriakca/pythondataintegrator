@@ -17,6 +17,7 @@ class EmailProvider(IScoped):
         self.config_service = config_service
 
     def send(self, to, subject, body):
+        smtp = None
         try:
             host = self.config_service.get_config_by_name("EMAIL_HOST")
             port = self.config_service.get_config_by_name("EMAIL_PORT")
@@ -64,20 +65,27 @@ class EmailProvider(IScoped):
             # fp_1.close()
             # msgImage_1.add_header('Content-ID', '<image1>')
             # msgRoot.attach(msgImage_1)
-            smtp = smtplib.SMTP(host,port)
-            # smtp.connect(host, port)
-            if user is not None and user != '' and password is not None and password != '':
-                smtp.ehlo()
-                smtp.starttls()
-                smtp.login(user, password)
-            smtp.sendmail(smtp_address, to, msgRoot.as_string())
-            smtp.quit()
-        except (gaierror, ConnectionRefusedError):
+            try:
+                smtp = smtplib.SMTP(host, port)
+                # smtp.connect(host, port)
+                if user is not None and user != '' and password is not None and password != '':
+                    smtp.ehlo()
+                    smtp.starttls()
+                    smtp.login(user, password)
+                smtp.sendmail(smtp_address, to, msgRoot.as_string())
+            finally:
+                if smtp is not None:
+                    smtp.quit()
+
+        except (gaierror, ConnectionRefusedError)as ex:
             # tell the script to report if your message was sent or which errors need to be fixed
-            print('Failed to connect to the server. Bad connection settings?')
-        except smtplib.SMTPServerDisconnected:
-            print('Failed to connect to the server. Wrong user/password?')
-        except smtplib.SMTPException as e:
-            print('SMTP error occurred: ' + str(e))
+            print('Failed to connect to the server. Bad connection settings? Error:' + str(ex))
+        except smtplib.SMTPServerDisconnected as ex:
+            print('Failed to connect to the server. Wrong user/password? Error:' + str(ex))
+        except smtplib.SMTPException as ex:
+            print('SMTP error occurred: ' + str(ex))
         else:
             print('Sent')
+        finally:
+            if smtp is not None:
+                smtp.close()
