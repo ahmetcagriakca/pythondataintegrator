@@ -145,7 +145,12 @@ class DatabaseAdapter(ConnectionAdapter):
 
         source_columns = [(data_integration_column.SourceColumnName) for data_integration_column in
                               data_integration_columns]
-        prepared_data=self.prepare_insert_row(data=source_data,columns=source_columns)
+
+        if isinstance(source_data, DataFrame):
+            data = source_data[source_columns]
+            prepared_data = data.values.tolist()
+        else:
+            prepared_data = self.prepare_insert_row(data=source_data, columns=source_columns)
         # data = source_data[source_column_rows]
         # prepared_data = data.values.tolist()
         return prepared_data

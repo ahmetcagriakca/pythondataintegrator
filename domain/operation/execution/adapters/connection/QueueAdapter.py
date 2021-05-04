@@ -59,10 +59,13 @@ class QueueAdapter(ConnectionAdapter):
         data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
 
-        source_column_rows = [(data_integration_column.SourceColumnName) for data_integration_column in
+        source_columns = [(data_integration_column.SourceColumnName) for data_integration_column in
                               data_integration_columns]
-        data = source_data[source_column_rows]
-        prepared_data = data.values.tolist()
+        if isinstance(source_data, pd.DataFrame):
+            data = source_data[source_columns]
+            prepared_data = data.values.tolist()
+        else:
+            prepared_data = self.prepare_insert_row(data=source_data, columns=source_columns)
         return prepared_data
 
     def write_target_data(self, data_integration_id: int, prepared_data: List[any], ) -> int:
