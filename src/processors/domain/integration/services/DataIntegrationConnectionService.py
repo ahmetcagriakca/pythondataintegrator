@@ -13,7 +13,7 @@ from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.enums import ConnectionTypes
-from models.viewmodels.integration.DataIntegration import DataIntegration
+from models.basemodels.integration.DataIntegration import DataIntegration
 from models.dao.integration.DataIntegration import DataIntegration
 
 

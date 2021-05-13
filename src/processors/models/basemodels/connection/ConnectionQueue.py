@@ -1,7 +1,7 @@
 from typing import List
 
 from infrastructor.json.JsonConvert import JsonConvert
-from models.viewmodels.connection.ConnectionServer import ConnectionServer
+from models.basemodels.connection.ConnectionServer import ConnectionServer
 
 
 @JsonConvert.register

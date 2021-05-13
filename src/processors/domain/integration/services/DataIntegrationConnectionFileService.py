@@ -6,7 +6,7 @@ from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from models.dao.integration import DataIntegrationConnectionFile
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.viewmodels.integration.DataIntegrationConnectionFile import \
+from models.basemodels.integration.DataIntegrationConnectionFile import \
     DataIntegrationConnectionFile
 
 

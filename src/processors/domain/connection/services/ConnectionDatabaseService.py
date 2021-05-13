@@ -8,7 +8,7 @@ from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
-from models.viewmodels.connection.ConnectionDatabase import ConnectionDatabase
+from models.basemodels.connection.ConnectionDatabase import ConnectionDatabase
 
 
 class ConnectionDatabaseService(IScoped):

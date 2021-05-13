@@ -15,9 +15,9 @@ from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.connection.Connection import Connection
 from models.enums.ConnectionTypes import ConnectionTypes
-from models.viewmodels.connection.ConnectionDatabase import ConnectionDatabase
-from models.viewmodels.connection.ConnectionFile import ConnectionFile
-from models.viewmodels.connection.ConnectionQueue import ConnectionQueue
+from models.basemodels.connection.ConnectionDatabase import ConnectionDatabase
+from models.basemodels.connection.ConnectionFile import ConnectionFile
+from models.basemodels.connection.ConnectionQueue import ConnectionQueue
 
 
 class ConnectionService(IScoped):

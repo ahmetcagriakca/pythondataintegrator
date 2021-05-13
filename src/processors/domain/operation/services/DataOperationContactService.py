@@ -6,7 +6,7 @@ from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from models.dao.operation import DataOperation
 from models.dao.operation.DataOperationContact import DataOperationContact
-from models.viewmodels.operation.DataOperationContact import DataOperationContact
+from models.basemodels.operation.DataOperationContact import DataOperationContact
 
 
 class DataOperationContactService(IScoped):

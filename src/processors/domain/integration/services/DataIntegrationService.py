@@ -9,7 +9,7 @@ from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.operation import Definition
-from models.viewmodels.integration.DataIntegration import DataIntegration
+from models.basemodels.integration.DataIntegration import DataIntegration
 from models.dao.integration.DataIntegration import DataIntegration
 
 

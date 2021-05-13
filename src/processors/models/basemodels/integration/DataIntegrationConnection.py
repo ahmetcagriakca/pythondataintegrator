@@ -1,15 +1,15 @@
-from models.viewmodels.integration.DataIntegrationConnectionDatabase import \
+from models.basemodels.integration.DataIntegrationConnectionDatabase import \
     DataIntegrationConnectionDatabase
-from models.viewmodels.integration.DataIntegrationConnectionFile import \
+from models.basemodels.integration.DataIntegrationConnectionFile import \
     DataIntegrationConnectionFile
 
 from infrastructor.json.JsonConvert import JsonConvert
-from models.viewmodels.integration.DataIntegrationConnectionQueue import \
+from models.basemodels.integration.DataIntegrationConnectionQueue import \
     DataIntegrationConnectionQueue
 
 
 @JsonConvert.register
-class CreateDataIntegrationConnectionModel:
+class DataIntegrationConnection:
     def __init__(self,
                  ConnectionName: str = None,
                  Database: DataIntegrationConnectionDatabase = None,

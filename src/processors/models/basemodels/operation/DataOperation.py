@@ -1,12 +1,12 @@
 from typing import List
 
 from infrastructor.json.JsonConvert import JsonConvert
-from models.viewmodels.operation.DataOperationContact import DataOperationContact
-from models.viewmodels.operation.DataOperationIntegration import DataOperationIntegration
+from models.basemodels.operation.DataOperationContact import DataOperationContact
+from models.basemodels.operation.DataOperationIntegration import DataOperationIntegration
 
 
 @JsonConvert.register
-class CreateDataOperationModel:
+class DataOperation:
     def __init__(self,
                  Name: str = None,
                  Contacts: List[DataOperationContact] = None,

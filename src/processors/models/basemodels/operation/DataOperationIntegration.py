@@ -1,9 +1,9 @@
 from infrastructor.json.JsonConvert import JsonConvert
-from models.viewmodels.integration.DataIntegration import DataIntegration
+from models.basemodels.integration.DataIntegration import DataIntegration
 
 
 @JsonConvert.register
-class CreateDataOperationIntegrationModel:
+class DataOperationIntegration:
     def __init__(self,
                  Limit: int = None,
                  ProcessCount: int = None,

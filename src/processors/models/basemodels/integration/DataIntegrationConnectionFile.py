@@ -1,9 +1,9 @@
 from infrastructor.json.JsonConvert import JsonConvert
-from models.viewmodels.integration import DataIntegrationConnectionFileCsv
+from models.basemodels.integration import DataIntegrationConnectionFileCsv
 
 
 @JsonConvert.register
-class CreateDataIntegrationConnectionFileModel:
+class DataIntegrationConnectionFile:
     def __init__(self,
                  Folder: str = None,
                  FileName: str = None,

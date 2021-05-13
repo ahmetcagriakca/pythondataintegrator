@@ -8,7 +8,7 @@ from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionFile import ConnectionFile
-from models.viewmodels.connection.ConnectionFile import ConnectionFile
+from models.basemodels.connection.ConnectionFile import ConnectionFile
 
 
 class ConnectionFileService(IScoped):

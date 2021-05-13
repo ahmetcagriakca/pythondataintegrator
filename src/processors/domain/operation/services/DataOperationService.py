@@ -10,7 +10,7 @@ from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.operation import DataOperation, Definition
-from models.viewmodels.operation import DataOperation
+from models.basemodels.operation import DataOperation
 
 
 class DataOperationService(IScoped):

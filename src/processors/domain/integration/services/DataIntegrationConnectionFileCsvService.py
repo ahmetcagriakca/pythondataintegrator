@@ -3,7 +3,7 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from models.dao.integration import DataIntegrationConnectionFile, DataIntegrationConnectionFileCsv
-from models.viewmodels.integration import DataIntegrationConnectionFileCsv
+from models.basemodels.integration import DataIntegrationConnectionFileCsv
 
 
 class DataIntegrationConnectionFileCsvService(IScoped):

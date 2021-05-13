@@ -4,7 +4,7 @@ from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from models.dao.integration import DataIntegrationConnectionQueue
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.viewmodels.integration.DataIntegrationConnectionQueue import \
+from models.basemodels.integration.DataIntegrationConnectionQueue import \
     DataIntegrationConnectionQueue
 
 

@@ -1,4 +1,4 @@
-from models.viewmodels.integration.DataIntegrationConnection import DataIntegrationConnection
+from models.basemodels.integration.DataIntegrationConnection import DataIntegrationConnection
 from infrastructor.json.JsonConvert import JsonConvert
 
 

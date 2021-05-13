@@ -6,7 +6,7 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from models.dao.operation import DataOperation, DataOperationIntegration, Definition
-from models.viewmodels.operation.DataOperationIntegration import DataOperationIntegration
+from models.basemodels.operation.DataOperationIntegration import DataOperationIntegration
 
 
 class DataOperationIntegrationService(IScoped):
