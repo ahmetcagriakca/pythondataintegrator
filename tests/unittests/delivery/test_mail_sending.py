@@ -25,4 +25,4 @@ class TestMailSending(TestCase):
 
     def test_get_data_count(self):
         email_provider = IocManager.injector.get(EmailProvider)
-        email_provider.send(["ahmetcagriakca@gmail.com"],"test","test")
+        email_provider.send(["cagri.akca@turkcell.com.tr"],"test","test")

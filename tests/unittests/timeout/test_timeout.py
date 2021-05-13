@@ -2,10 +2,20 @@ import json
 import os
 import signal
 from unittest import TestCase
+
+from apscheduler.events import EVENT_JOB_REMOVED
+
 from infrastructor.IocManager import IocManager
 from infrastructor.connection.queue.QueueProvider import QueueProvider
+from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
+from infrastructor.data.Repository import Repository
 from models.configs.ApiConfig import ApiConfig
 import pandas as pd
+
+from models.dao.aps import ApSchedulerJobEvent, ApSchedulerEvent, ApSchedulerJob
+from models.dao.aps.ApSchedulerJobsTable import ApSchedulerJobsTable
+from models.dao.common import ConfigParameter, Log
+from models.dao.operation import DataOperationJob
 
 
 class TestTimeout(TestCase):
@@ -62,3 +72,40 @@ class TestTimeout(TestCase):
         data = context.get_data('optiwisdom_automl_topic_test_data', group_id="consumer_group_id2", start=10,
                                 limit=100)
         assert len(data) <= 100
+
+    def test_sqlalchemy(self):
+        database_session_manager = IocManager.injector.get(DatabaseSessionManager)
+        # test_repo: Repository[ConfigParameter] = Repository[ConfigParameter](database_session_manager)
+        # data = test_repo.table \
+        #     .filter(ConfigParameter.Name.contains('EMAIL_HOST'))
+        # for d in data:
+        #     print(d)
+        #
+        # log_repo: Repository[Log] = Repository[Log](database_session_manager)
+        # data = log_repo.table \
+        #     .filter(Log.JobId == 356) \
+        #     .filter(Log.Content.contains("CrmCustomerOperation")).all()
+        #
+        # for d in data:
+        #     print(d)
+        result = database_session_manager.session.query(
+            DataOperationJob,ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
+        ) \
+            .filter(ApSchedulerJobEvent.ApSchedulerJobId == ApSchedulerJob.Id) \
+            .filter(ApSchedulerJobEvent.EventId == ApSchedulerEvent.Id) \
+            .filter(DataOperationJob.ApSchedulerJobId == ApSchedulerJob.Id) \
+            .filter(ApSchedulerEvent.Code == EVENT_JOB_REMOVED) \
+            .filter(ApSchedulerJob.JobId == '13b6cd62460b405fa8051b5ec9fafa6e')
+        all_result = result.one_or_none()
+        if all_result is not None:
+            print(all_result.ApSchedulerEvent.Name)
+        result = database_session_manager.session.query(
+            ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
+        ) \
+            .filter(ApSchedulerJobEvent.ApSchedulerJobId == ApSchedulerJob.Id) \
+            .filter(ApSchedulerJobEvent.EventId == ApSchedulerEvent.Id) \
+            .filter(ApSchedulerEvent.Code == EVENT_JOB_REMOVED) \
+            .filter(ApSchedulerJob.Id == 425)
+        all_result = result.all()
+        for r in result:
+            print(r)
