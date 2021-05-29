@@ -29,14 +29,16 @@ class IocManager:
         root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__))))
         IocManager.configure_startup(root_directory)
 
-    # wrapper required for dependency
     @staticmethod
-    def configure_startup(root_directory, app_wrapper=None, job_scheduler=None):
-        # Configuration initialize
-        IocManager.config_manager = ConfigManager(root_directory)
-
+    def set_app_wrapper(app_wrapper=None, job_scheduler=None):
         IocManager.app_wrapper = app_wrapper
         IocManager.job_scheduler = job_scheduler
+
+    # wrapper required for dependency
+    @staticmethod
+    def configure_startup(root_directory):
+        # Configuration initialize
+        IocManager.config_manager = ConfigManager(root_directory)
 
         # ApiConfig getting with type
         api_config = IocManager.config_manager.get(ApiConfig)
