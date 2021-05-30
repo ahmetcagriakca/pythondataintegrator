@@ -4,7 +4,8 @@ def start():
     from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
     from infrastructor.scheduler.JobScheduler import JobScheduler
 
-    IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper, job_scheduler=JobScheduler)
+    IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper)
+    IocManager.set_job_scheduler(job_scheduler=JobScheduler)
     IocManager.initialize()
     IocManager.run()
 

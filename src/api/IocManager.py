@@ -30,8 +30,11 @@ class IocManager:
         IocManager.configure_startup(root_directory)
 
     @staticmethod
-    def set_app_wrapper(app_wrapper=None, job_scheduler=None):
+    def set_app_wrapper(app_wrapper=None):
         IocManager.app_wrapper = app_wrapper
+        
+    @staticmethod
+    def set_job_scheduler(job_scheduler=None):
         IocManager.job_scheduler = job_scheduler
 
     # wrapper required for dependency
