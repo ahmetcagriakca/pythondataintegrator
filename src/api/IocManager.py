@@ -46,9 +46,35 @@ class IocManager:
         # ApiConfig getting with type
         api_config = IocManager.config_manager.get(ApiConfig)
 
-        # Flask instantiate
         IocManager.app = Flask(api_config.name)
-        IocManager.api = Api(app=IocManager.app)
+
+        authorizations = {
+            'apikey': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'X-API-KEY'
+            }
+        }
+        authorizations = {
+            'apikey': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'X-API'
+            },
+            'oauth2': {
+                'type': 'oauth2',
+                'flow': 'accessCode',
+                'tokenUrl': 'https://somewhere.com/token',
+                'authorizationUrl': 'https://somewhere.com/auth',
+                'scopes': {
+                    'read': 'Grant read-only access',
+                    'write': 'Grant read-write access',
+                }
+            }
+        }
+        IocManager.api = Api(IocManager.app, security=['apikey', {'oauth2': 'read'}], authorizations=authorizations)
+        # Flask instantiate
+        # IocManager.api = Api(app=IocManager.app,authorizations=authorizations, security='apikey')
 
         # Importing all modules for dependency
         sys.path.append(api_config.root_directory)

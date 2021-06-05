@@ -65,12 +65,17 @@ class JobScheduler(ISingleton):
         self.scheduler.print_jobs()
 
     def add_job_with_date(self, job_function, run_date, args=None, kwargs=None) -> Job:
-        job: Job = self.scheduler.add_job(job_function, 'date', run_date=run_date, misfire_grace_time=30000, args=args,
+        aps_config: ApsConfig = IocManager.injector.get(ApsConfig)
+        job: Job = self.scheduler.add_job(job_function, 'date', run_date=run_date,
+                                          misfire_grace_time=aps_config.default_misfire_grace_time_date_job, args=args,
                                           kwargs=kwargs)
         return job
 
     def add_job_with_cron(self, job_function, cron: CronTrigger, args=None, kwargs=None) -> Job:
-        job: Job = self.scheduler.add_job(job_function, cron, misfire_grace_time=15, args=args, kwargs=kwargs)
+        aps_config: ApsConfig = IocManager.injector.get(ApsConfig)
+        job: Job = self.scheduler.add_job(job_function, cron,
+                                          misfire_grace_time=aps_config.default_misfire_grace_time_cron_job, args=args,
+                                          kwargs=kwargs)
         return job
 
     def remove_job(self, job_id):
