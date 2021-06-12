@@ -11,6 +11,7 @@ from infrastructor.dependency.scopes import ISingleton, IScoped
 from infrastructor.utils.ConfigManager import ConfigManager
 from infrastructor.utils.Utils import Utils
 from models.configs.ApiConfig import ApiConfig
+from models.configs.ApplicationConfig import ApplicationConfig
 
 
 class IocManager:
@@ -19,6 +20,7 @@ class IocManager:
     binder: Binder = None
     app_wrapper = None
     job_scheduler = None
+    scheduler_service = None
     config_manager = None
     injector: Injector = None
     job_event_handler = None
@@ -32,63 +34,72 @@ class IocManager:
     @staticmethod
     def set_app_wrapper(app_wrapper=None):
         IocManager.app_wrapper = app_wrapper
-        
+
     @staticmethod
     def set_job_scheduler(job_scheduler=None):
         IocManager.job_scheduler = job_scheduler
+
+    @staticmethod
+    def set_scheduler_service(scheduler_service=None):
+        IocManager.scheduler_service = scheduler_service
 
     # wrapper required for dependency
     @staticmethod
     def configure_startup(root_directory):
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)
-
-        # ApiConfig getting with type
+        application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
         api_config = IocManager.config_manager.get(ApiConfig)
-
-        IocManager.app = Flask(api_config.name)
-
-        authorizations = {
-            'apikey': {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'X-API-KEY'
-            }
-        }
-        authorizations = {
-            'apikey': {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'X-API'
-            },
-            'oauth2': {
-                'type': 'oauth2',
-                'flow': 'accessCode',
-                'tokenUrl': 'https://somewhere.com/token',
-                'authorizationUrl': 'https://somewhere.com/auth',
-                'scopes': {
-                    'read': 'Grant read-only access',
-                    'write': 'Grant read-write access',
+        if application_config.api_node:
+            # ApiConfig getting with type
+            IocManager.app = Flask(api_config.name)
+            authorizations = {
+                'apikey': {
+                    'type': 'apiKey',
+                    'in': 'header',
+                    'name': 'X-API'
+                },
+                'oauth2': {
+                    'type': 'oauth2',
+                    'flow': 'accessCode',
+                    'tokenUrl': 'https://somewhere.com/token',
+                    'authorizationUrl': 'https://somewhere.com/auth',
+                    'scopes': {
+                        'read': 'Grant read-only access',
+                        'write': 'Grant read-write access',
+                    }
                 }
             }
-        }
-        IocManager.api = Api(IocManager.app, security=['apikey', {'oauth2': 'read'}], authorizations=authorizations)
-        # Flask instantiate
-        # IocManager.api = Api(app=IocManager.app,authorizations=authorizations, security='apikey')
+            IocManager.api = Api(IocManager.app, security=['apikey', {'oauth2': 'read'}], authorizations=authorizations)
+            # Flask instantiate
+            # IocManager.api = Api(app=IocManager.app,authorizations=authorizations, security='apikey')
 
-        # Importing all modules for dependency
-        sys.path.append(api_config.root_directory)
-        folders = Utils.find_sub_folders(api_config.root_directory)
-        module_list, module_attr_list = Utils.get_modules(folders)
-        IocManager.injector = Injector()
-        # Flask injector configuration
-        FlaskInjector(app=IocManager.app, modules=[IocManager.configure], injector=IocManager.injector)
+            # Importing all modules for dependency
+            sys.path.append(api_config.root_directory)
+            folders = Utils.find_sub_folders(api_config.root_directory)
+            module_list, module_attr_list = Utils.get_modules(folders)
+            IocManager.injector = Injector()
+            # Flask injector configuration
+            FlaskInjector(app=IocManager.app, modules=[IocManager.configure], injector=IocManager.injector)
+        elif application_config.process_node:
+            sys.path.append(api_config.root_directory)
+            folders = Utils.find_sub_folders(api_config.root_directory)
+            module_list, module_attr_list = Utils.get_modules(folders)
+            IocManager.injector = Injector(IocManager.configure)
 
     @staticmethod
     def run():
-        IocManager.injector.get(IocManager.job_scheduler).run()
-        IocManager.injector.get(IocManager.app_wrapper).run()
+        application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
+        if application_config.process_node:
+            job_scheduler=IocManager.injector.get(IocManager.job_scheduler)
+            job_scheduler.run()
+            # scheduler_service = SchedulerService()
+            IocManager.scheduler_service.initialize(job_scheduler=job_scheduler)
 
+        if application_config.api_node:
+            IocManager.injector.get(IocManager.app_wrapper).run()
+
+    @staticmethod
     def configure(binder: Binder):
         IocManager.binder = binder
 
@@ -119,9 +130,11 @@ class IocManager:
                 to=controller,
                 scope=request,
             )
-        if IocManager.app_wrapper is not None:
-            api_config = IocManager.config_manager.get(ApiConfig)
-            binder.bind(
-                IocManager.app_wrapper,
-                to=IocManager.app_wrapper(api_config)
-            )
+        application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
+        if application_config.api_node:
+            if IocManager.app_wrapper is not None:
+                api_config = IocManager.config_manager.get(ApiConfig)
+                binder.bind(
+                    IocManager.app_wrapper,
+                    to=IocManager.app_wrapper(api_config)
+                )

@@ -2,6 +2,7 @@ import time
 from datetime import datetime
 from typing import List
 
+import rpyc
 from apscheduler.triggers.cron import CronTrigger
 from injector import inject
 
@@ -15,6 +16,7 @@ from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from infrastructor.scheduler.JobScheduler import JobScheduler
+from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.operation import DataOperation
 from models.dao.operation.DataOperationJob import DataOperationJob
@@ -29,8 +31,10 @@ class JobOperationService(IScoped):
                  sql_logger: SqlLogger,
                  data_operation_service: DataOperationService,
                  job_scheduler: JobScheduler,
-                 data_operation_job_service: DataOperationJobService
+                 data_operation_job_service: DataOperationJobService,
+                 application_config: ApplicationConfig
                  ):
+        self.application_config = application_config
         self.data_operation_job_service = data_operation_job_service
         self.data_operation_service = data_operation_service
         self.job_scheduler = job_scheduler
@@ -148,14 +152,20 @@ class JobOperationService(IScoped):
         trigger = CronTrigger.from_crontab(cron)
         trigger.start_date = start_date
         trigger.end_date = end_date
+
         job = self.job_scheduler.add_job_with_cron(job_function=job_function, cron=trigger, args=args,
                                                    kwargs=kwargs)
+
         ap_scheduler_job = self.get_ap_scheduler_with_retry(job.id)
         return ap_scheduler_job
 
     def add_job_with_date(self, job_function, run_date, args=None, kwargs=None) -> ApSchedulerJob:
-        job = self.job_scheduler.add_job_with_date(job_function=job_function, run_date=run_date, args=args,
-                                                   kwargs=kwargs)
+        if not self.application_config.process_node:
+            conn = rpyc.connect('localhost', 7300)
+            job = conn.root.add_job_with_date('server:domain.job.services.JobOperationService.job_start_data_operation', run_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ"), args=args)
+        else:
+            job = self.job_scheduler.add_job_with_date(job_function=job_function, run_date=run_date, args=args,
+                                                       kwargs=kwargs)
         ap_scheduler_job = self.get_ap_scheduler_with_retry(job.id)
         return ap_scheduler_job
 
