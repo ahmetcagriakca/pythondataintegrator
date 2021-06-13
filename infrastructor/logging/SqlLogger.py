@@ -39,7 +39,7 @@ class SqlLogger(IScoped):
     #######################################################################################
     def logger_method(self, type_of_log, log_string, job_id=None):
         SqlLogger.log_to_db(type_of_log, log_string, job_id)
-        # Process(target=SqlLogger.log_to_db(type_of_log, log_string, job_id), name="Log Process", args=(type_of_log, log_string, job_id,)).start()
+        # Process(target=self.log_to_db, name="Log Process", args=(type_of_log, log_string, job_id,)).start()
 
     #######################################################################################
     def error(self, error_string, job_id=None):

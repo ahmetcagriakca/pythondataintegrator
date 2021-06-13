@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from infrastructor.IocManager import IocManager
 from infrastructor.utils.Utils import Utils
-from models.dto.LimitModifier import LimitModifier
+from models.dto.PagingModifier import PagingModifier
 
 
 class TestDataOperation(TestCase):
@@ -48,18 +48,18 @@ class TestDataOperation(TestCase):
         socket.get
         data_count = 700000
         limit = 10000
-        top_limit = limit
-        sub_limit = 0
-        limit_modifiers = []
+        end = limit
+        start = 0
+        paging_modifiers = []
         while True:
-            if top_limit != limit and top_limit - data_count > limit:
+            if end != limit and end - data_count > limit:
                 break
-            limit_modifier = LimitModifier(TopLimit=top_limit, SubLimit=sub_limit)
-            limit_modifiers.append(limit_modifier)
-            top_limit += limit
-            sub_limit += limit
-        for li in limit_modifiers:
-            print(f"{li.TopLimit} - {li.TopLimit}")
+            paging_modifier = PagingModifier(End=end, Start=start)
+            paging_modifiers.append(paging_modifier)
+            end += limit
+            start += limit
+        for li in paging_modifiers:
+            print(f"{li.End} - {li.End}")
 
     def test_parallel_data_operation(self):
         start = time()

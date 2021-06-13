@@ -9,8 +9,6 @@ class ConnectionDatabase(Entity, IocManager.Base):
     __table_args__ = {"schema": "Connection"}
     ConnectionId = Column(Integer, ForeignKey('Connection.Connection.Id'))
     ConnectorTypeId = Column(Integer, ForeignKey('Connection.ConnectorType.Id'))
-    Host = Column(String(100), index=False, unique=False, nullable=True)
-    Port = Column(Integer, index=False, unique=False, nullable=True)
     Sid = Column(String(100), index=False, unique=False, nullable=True)
     ServiceName = Column(String(100), index=False, unique=False, nullable=True)
     DatabaseName = Column(String(100), index=False, unique=False, nullable=True)

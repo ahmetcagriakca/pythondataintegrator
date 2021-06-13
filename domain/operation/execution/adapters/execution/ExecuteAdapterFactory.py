@@ -13,9 +13,10 @@ class ExecuteAdapterFactory(IScoped):
     def __init__(self,
                  data_integration_connection_service: DataIntegrationConnectionService,
                  execute_query_adapter: ExecuteQueryAdapter,
-                 execute_operation_adapter: ExecuteIntegrationAdapter):
+                 execute_integration_adapter: ExecuteIntegrationAdapter,
+                 ):
         self.data_integration_connection_service = data_integration_connection_service
-        self.execute_operation_adapter = execute_operation_adapter
+        self.execute_integration_adapter = execute_integration_adapter
         self.execute_query_adapter = execute_query_adapter
 
     def get_execute_adapter(self, data_integration_id) -> ExecuteAdapter:
@@ -23,14 +24,23 @@ class ExecuteAdapterFactory(IScoped):
         source_connection = self.data_integration_connection_service.get_source_connection(
             data_integration_id=data_integration_id)
         # only target query run
-        if source_connection is None or source_connection.Query is None or source_connection.Query == '':
+        if source_connection is None or (
+                source_connection.Database is not None
+                and
+                (
+                        source_connection.Database.Query is None
+                        or
+                        source_connection.Database.Query == ''
+                )
+        ):
             if isinstance(self.execute_query_adapter, ExecuteAdapter):
                 return self.execute_query_adapter
             else:
-                raise IncompatibleAdapterException(f"{self.execute_query_adapter} is incompatible with ExecuteAdapter")
+                raise IncompatibleAdapterException(
+                    f"{self.execute_query_adapter} is incompatible with {ExecuteAdapter}")
         else:
-            if isinstance(self.execute_operation_adapter, ExecuteAdapter):
-                return self.execute_operation_adapter
+            if isinstance(self.execute_integration_adapter, ExecuteAdapter):
+                return self.execute_integration_adapter
             else:
                 raise IncompatibleAdapterException(
-                    f"{self.execute_operation_adapter} is incompatible with ExecuteAdapter")
+                    f"{self.execute_integration_adapter} is incompatible with {ExecuteAdapter}")

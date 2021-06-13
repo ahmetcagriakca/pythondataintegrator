@@ -6,10 +6,10 @@ from infrastructor.IocManager import IocManager
 from tests.integrationtests.common.TestManager import TestManager
 
 
-class TestConnectorTypeResuource(TestCase):
+class TestConnectorTypeResource(TestCase):
 
-    def __init__(self, methodName='TestConnectorTypeResuource'):
-        super(TestConnectorTypeResuource, self).__init__(methodName)
+    def __init__(self, methodName='TestConnectorTypeResource'):
+        super(TestConnectorTypeResource, self).__init__(methodName)
         self.test_manager = TestManager()
 
     def print_error_detail(self, data):

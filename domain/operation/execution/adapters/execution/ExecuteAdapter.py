@@ -23,5 +23,5 @@ class ExecuteAdapter(ABC):
         pass
 
     @abstractmethod
-    def raise_error_check(self) -> bool:
+    def check_error_raise(self) -> bool:
         pass

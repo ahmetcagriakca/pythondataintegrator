@@ -1,3 +1,5 @@
+from models.dao.connection import ConnectionQueue
+from models.dao.connection.ConnectionServer import ConnectionServer
 from models.dao.connection.ConnectionSecret import ConnectionSecret
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from models.dao.connection.ConnectionFile import ConnectionFile
@@ -17,8 +19,10 @@ class Connection(Entity, IocManager.Base):
 
     Database: ConnectionDatabase = relationship("ConnectionDatabase", uselist=False, backref="Connection")
     File: ConnectionFile = relationship("ConnectionFile", uselist=False, backref="Connection")
+    Queue: ConnectionQueue = relationship("ConnectionQueue", uselist=False, backref="Connection")
     ConnectionType = relationship("ConnectionType", back_populates="Connections")
     ConnectionSecrets: List[ConnectionSecret] = relationship("ConnectionSecret", back_populates="Connection")
+    ConnectionServers: List[ConnectionServer] = relationship("ConnectionServer", back_populates="Connection")
     DataIntegrationConnections: List[DataIntegrationConnection] = relationship("DataIntegrationConnection",
                                                                                back_populates="Connection")
 

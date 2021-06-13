@@ -1,7 +1,10 @@
 from abc import abstractmethod
+from queue import Queue
 from typing import List
 
-from models.dto.LimitModifier import LimitModifier
+from pandas import DataFrame
+
+from models.dto.PagingModifier import PagingModifier
 
 
 class ConnectionAdapter:
@@ -14,11 +17,18 @@ class ConnectionAdapter:
         pass
 
     @abstractmethod
-    def get_source_data(self, data_integration_id: int, limit_modifier: LimitModifier) -> List[any]:
+    def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
         pass
 
     @abstractmethod
-    def prepare_data(self, data_integration_id: int, source_data: List[any]) -> List[any]:
+    def read_data(self,
+                  data_integration_id: int,
+                  limit: int,
+                  ):
+        pass
+
+    @abstractmethod
+    def prepare_data(self, data_integration_id: int, source_data: DataFrame) -> List[any]:
         pass
 
     @abstractmethod
@@ -27,4 +37,14 @@ class ConnectionAdapter:
 
     @abstractmethod
     def do_target_operation(self, data_integration_id: int) -> int:
+        pass
+
+    @abstractmethod
+    def start_source_data_operation(self,
+                                    data_integration_id: int,
+                                    data_operation_job_execution_integration_id: int,
+                                    limit: int,
+                                    process_count: int,
+                                    data_queue: Queue,
+                                    data_result_queue: Queue):
         pass

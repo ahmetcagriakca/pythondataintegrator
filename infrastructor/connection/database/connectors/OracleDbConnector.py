@@ -35,6 +35,9 @@ class OracleDbConnector(DatabaseConnector):
         except Exception:
             pass
 
+    def get_connection(self):
+        return self.connection
+
     def execute_many(self, query, data):
         try:
             self.cursor.prepare(query)
@@ -47,7 +50,7 @@ class OracleDbConnector(DatabaseConnector):
             raise 
 
     def get_table_count_query(self, query):
-        count_query = f"SELECT COUNT (*) FROM ({query})"
+        count_query = f"SELECT COUNT (*)  \"COUNT\" FROM ({query})"
         return count_query
 
     def get_target_query_indexer(self):
