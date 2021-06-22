@@ -7,7 +7,6 @@ from infrastructor.connection.queue.QueueContext import QueueContext
 from infrastructor.connection.queue.connectors.QueueConnector import QueueConnector
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from models.configs.ApiConfig import ApiConfig
 from models.dao.connection import Connection
 from models.enums import ConnectionTypes, ConnectorTypes
 
@@ -18,10 +17,8 @@ class QueueProvider(IScoped):
                  sql_logger: SqlLogger,
                  connection_secret_service: ConnectionSecretService,
                  connection_server_service: ConnectionServerService,
-                 api_config: ApiConfig
                  ):
         self.connection_server_service = connection_server_service
-        self.api_config = api_config
         self.connection_secret_service = connection_secret_service
         self.sql_logger = sql_logger
 

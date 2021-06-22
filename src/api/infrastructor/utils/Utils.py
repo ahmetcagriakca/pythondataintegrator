@@ -1,6 +1,8 @@
 import glob
 import inspect
+from multiprocessing.process import current_process
 import os
+import re
 import sys
 from datetime import datetime
 
@@ -22,11 +24,29 @@ class Utils:
         return head + replace_with + tail
 
     @staticmethod
+    def to_snake_case(name):
+        name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        name = re.sub('__([A-Z])', r'_\1', name)
+        name = re.sub('([a-z0-9])([A-Z])', r'\1_\2', name)
+        return name.lower()
+
+    @staticmethod
+    def get_config_name(class_name):
+        replace_what = 'Config'
+        replace_with = ''
+        replaced_name = Utils.replace_last(source_string=class_name, replace_what=replace_what,
+                                           replace_with=replace_with)
+        snaked_case = Utils.to_snake_case(replaced_name)
+        result = snaked_case.upper()
+        return result
+
+    @staticmethod
     def find_sub_folders(directory):
         for name in os.listdir(directory):
             sub_folder = os.path.join(directory, name)
             if os.path.isdir(sub_folder) and not name.startswith('.') and not name.startswith(
-                    '__') and not name.startswith('__') and name != 'dao' and name != 'alembic' and name != 'unittests'and name != 'files':
+                    '__') and not name.startswith(
+                '__') and name != 'dao' and name != 'alembic' and name != 'unittests' and name != 'files':
                 yield sub_folder
                 for folder in Utils.find_sub_folders(sub_folder):
                     yield folder
@@ -75,3 +95,10 @@ class Utils:
             connection_type = 'postgresql'
         connection_string = f'{connection_type}://{database_config.username}:{database_config.password}@{database_config.host}:{database_config.port}/{database_config.database}{driver_string}'
         return connection_string
+
+    def get_process_info():
+    
+        print(f"Application : {application_name}")
+        print(f"Process Name : {current_process().name}")
+        print(f"Pid : {os.getpid()}")
+        print(f"Parent Pid : {os.getppid()}")

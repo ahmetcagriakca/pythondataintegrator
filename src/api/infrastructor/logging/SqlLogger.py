@@ -4,7 +4,7 @@ from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.ConsoleLogger import ConsoleLogger
-from models.configs.ApiConfig import ApiConfig
+from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.common.Log import Log
 
@@ -18,13 +18,13 @@ class SqlLogger(IScoped):
         pass
         # console_logger: ConsoleLogger = IocManager.injector.get(ConsoleLogger)
         # console_logger.info(f'{type_of_log} - {log_string}')
-        api_config: ApiConfig = IocManager.config_manager.get(ApiConfig)
+        application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
         database_config = IocManager.config_manager.get(DatabaseConfig)
         console_logger: ConsoleLogger = IocManager.injector.get(ConsoleLogger)
         database_session_manager = DatabaseSessionManager(database_config=database_config)
         log_repository: Repository[Log] = Repository[Log](database_session_manager)
         log_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-        comment = f'Data Integrator {api_config.environment}'
+        comment = f'Data Integrator {application_config.environment}'
         try:
             log = Log(TypeId=type_of_log, Content=log_string[0:4000], LogDatetime=log_datetime,
                       JobId=job_id, Comments=comment)

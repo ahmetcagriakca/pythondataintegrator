@@ -4,7 +4,6 @@ from controllers.job.models.JobModels import JobModels
 from infrastructor.api.ResourceBase import ResourceBase
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
-from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps import ApSchedulerJobEvent
 
 
@@ -12,7 +11,6 @@ from models.dao.aps import ApSchedulerJobEvent
 class GetJobEvents(ResourceBase):
     @inject
     def __init__(self,
-                 job_scheduler: JobScheduler,
                  database_session_manager: DatabaseSessionManager,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)

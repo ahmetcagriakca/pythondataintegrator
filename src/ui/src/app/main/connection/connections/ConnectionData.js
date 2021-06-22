@@ -156,7 +156,7 @@ function ConnectionData() {
 	routeParams.PageSize = PageSize === 0 ? 10 : PageSize;
 
 	useEffect(() => {
-		dispatch(getConnections(routeParams));
+		dispatchConnections(routeParams);;
 	}, [dispatch]);
 
 	const handleRequestSort = (event, orderByValue) => {
@@ -167,9 +167,12 @@ function ConnectionData() {
 
 		routeParams.OrderBy = orderByValue;
 		routeParams.Order = order;
-		dispatch(getConnections(routeParams));
+		dispatchConnections(routeParams);
 	};
-
+	const dispatchConnections = (routeParams)=>{
+		let entities=getConnections(routeParams);;
+		dispatch(entities);
+	}
 	const handleClick = (event, connectionName) => {
 		const message = connectionName;
 		alert(message);
@@ -182,7 +185,7 @@ function ConnectionData() {
 		// }
 		routeParams.PageSize = rowsPerPage;
 		routeParams.PageNumber = newPage;
-		dispatch(getConnections(routeParams));
+		dispatchConnections(routeParams);;
 		setPage(newPage);
 	};
 
@@ -190,7 +193,7 @@ function ConnectionData() {
 		routeParams.PageSize = event.target.value;
 		routeParams.PageNumber = page;
 
-		dispatch(getConnections(routeParams));
+		dispatchConnections(routeParams);;
 		setRowsPerPage(event.target.value);
 	};
 	const isSelected = name => selected.indexOf(name) !== -1;

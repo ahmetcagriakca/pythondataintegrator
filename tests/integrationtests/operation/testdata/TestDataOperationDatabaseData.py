@@ -83,7 +83,7 @@ class TestDataOperationDatabaseData:
         "Host": "localhost",
         "Port": 5432,
         "Sid": "",
-        "DatabaseName": "test_pdi",
+        "DatabaseName": "test_pdi_integration",
         "User": "postgres",
         "Password": "123456"
     }

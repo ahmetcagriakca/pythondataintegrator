@@ -9,7 +9,7 @@ from infrastructor.connection.file.connectors.CsvConnector import CsvConnector
 from infrastructor.connection.file.connectors.FileConnector import FileConnector
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from models.configs.ApiConfig import ApiConfig
+from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.connection.Connection import Connection
 from models.enums import ConnectionTypes, ConnectorTypes
 
@@ -20,10 +20,10 @@ class FileProvider(IScoped):
                  sql_logger: SqlLogger,
                  connection_secret_service: ConnectionSecretService,
                  connection_server_service: ConnectionServerService,
-                 api_config: ApiConfig
+                 application_config: ApplicationConfig
                  ):
         self.connection_server_service = connection_server_service
-        self.api_config = api_config
+        self.application_config = application_config
         self.connection_secret_service = connection_secret_service
         self.sql_logger = sql_logger
 
@@ -41,7 +41,7 @@ class FileProvider(IScoped):
                 host = connection_server.Host
                 port = connection_server.Port
                 if host is None or host == '':
-                    host = os.path.join(self.api_config.root_directory, "files")
+                    host = os.path.join(self.application_config.root_directory, "files")
                 if connection.File.ConnectorType.Name == ConnectorTypes.CSV.name:
                     connector = CsvConnector(host=host)
             if connector is not None:
@@ -59,7 +59,7 @@ class FileProvider(IScoped):
         """
 
         if host is None or host == '':
-            host = os.path.join(self.api_config.root_directory, "files")
+            host = os.path.join(self.application_config.root_directory, "files")
         connector = CsvConnector(folder=host)
         file_context: FileContext = FileContext(connector=connector)
         return file_context

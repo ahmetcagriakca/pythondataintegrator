@@ -7,7 +7,7 @@ from infrastructor.data.Repository import Repository
 from infrastructor.delivery.EmailProvider import EmailProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from models.configs.ApiConfig import ApiConfig
+from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.common import OperationEvent
 from models.dao.common.Log import Log
 from models.dao.common.Status import Status
@@ -23,10 +23,10 @@ class DataOperationJobExecutionService(IScoped):
                  sql_logger: SqlLogger,
                  email_provider: EmailProvider,
                  config_service: ConfigService,
-                 api_config: ApiConfig
+                 application_config: ApplicationConfig
 
                  ):
-        self.api_config: ApiConfig = api_config
+        self.application_config: ApplicationConfig = application_config
         self.database_session_manager = database_session_manager
         self.data_operation_job_execution_repository: Repository[DataOperationJobExecution] = Repository[
             DataOperationJobExecution](database_session_manager)
@@ -123,7 +123,7 @@ class DataOperationJobExecutionService(IScoped):
             subject = subject + " successfully"
         elif data_operation_job_execution.StatusId == 4:
             subject = subject + " with error"
-        subject = subject + f": {self.api_config.environment} » {data_operation_name} » {data_operation_job_execution_id}"
+        subject = subject + f": {self.application_config.environment} » {data_operation_name} » {data_operation_job_execution_id}"
 
         logs = self.log_repository.filter_by(JobId=data_operation_job_execution_id).order_by("Id").all()
         log_texts = ""
@@ -161,7 +161,7 @@ Job Logs:{log_texts}
 
         data_operation_name = data_operation_job.DataOperation.Name
         subject = f"Job Missed"
-        subject = subject + f": {self.api_config.environment} » {data_operation_name}"
+        subject = subject + f": {self.application_config.environment} » {data_operation_name}"
 
         if next_run_time is not None:
             next_run_time_text = f"{next_run_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}"

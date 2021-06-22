@@ -6,7 +6,7 @@ from domain.operation.services.DataOperationJobExecutionService import DataOpera
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
-from models.dao.aps import ApSchedulerJob
+from models.dao.aps import ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
 from models.dao.operation import DataOperationJob, DataOperation
 
 
@@ -62,3 +62,14 @@ class DataOperationJobService(IScoped):
         if data_operation_job is not None:
             self.data_operation_job_execution_service.send_data_operation_miss_mail(
                 data_operation_job=data_operation_job, next_run_time=ap_scheduler_job.NextRunTime)
+
+    def check_removed_job(self, ap_scheduler_job_id):
+        job_detail = self.database_session_manager.session.query(
+            ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
+        ) \
+            .filter(ApSchedulerJobEvent.ApSchedulerJobId == ApSchedulerJob.Id) \
+            .filter(ApSchedulerJobEvent.EventId == ApSchedulerEvent.Id) \
+            .filter(ApSchedulerEvent.Code == 2 ** 10) \
+            .filter(ApSchedulerJob.Id == ap_scheduler_job_id).first()
+        if job_detail is not None:
+            self.remove_data_operation_job(ap_scheduler_job_id=job_detail.ApSchedulerJob.Id)

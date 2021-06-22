@@ -1,16 +1,11 @@
+from IocManager import IocManager
+from rpc.ProcessService import ProcessService
 
 
 def start():
-    from IocManager import IocManager
-
-    from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
-    from infrastructor.scheduler.JobScheduler import JobScheduler
-    from infrastructor.rpc.SchedulerService import SchedulerService
-
-    IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper)
-    IocManager.set_job_scheduler(job_scheduler=JobScheduler)
-    IocManager.set_scheduler_service(scheduler_service=SchedulerService)
+    IocManager.set_process_service(process_service=ProcessService)
     IocManager.initialize()
+    IocManager.process_info()
     IocManager.run()
 
 

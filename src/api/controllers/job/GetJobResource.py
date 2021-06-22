@@ -4,7 +4,6 @@ from controllers.job.models.JobModels import JobModels
 from infrastructor.api.ResourceBase import ResourceBase
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
-from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 
 
@@ -12,14 +11,12 @@ from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 class GetJobResource(ResourceBase):
     @inject
     def __init__(self,
-                 job_scheduler: JobScheduler,
                  database_session_manager: DatabaseSessionManager,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.database_session_manager = database_session_manager
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
             database_session_manager)
-        self.job_scheduler: JobScheduler = job_scheduler
 
     @JobModels.ns.marshal_with(CommonModels.SuccessModel)
     def get(self, job_id):

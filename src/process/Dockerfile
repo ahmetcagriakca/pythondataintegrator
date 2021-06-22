@@ -16,7 +16,7 @@ RUN source ~/.bashrc
 # optional: for unixODBC development headers
 RUN yum update -y
 RUN yum install -y epel-release
-RUN yum install -y python3 python3-pip gcc-c++ python3-devel unixODBC-devel
+RUN yum install -y python3 python3-pip gcc-c++ python3-devel unixODBC-devel 
 
 RUN pip3 install pyodbc
 

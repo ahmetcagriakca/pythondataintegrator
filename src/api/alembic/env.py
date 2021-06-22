@@ -15,14 +15,14 @@ from sqlalchemy import pool
 from alembic import context
 
 from infrastructor.utils.Utils import Utils
-from models.configs.ApiConfig import ApiConfig
+from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from infrastructor.utils.ConfigManager import ConfigManager
 
 root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
 config_manager = ConfigManager(root_directory)
-api_config: ApiConfig = config_manager.get(ApiConfig)
+application_config: ApplicationConfig = config_manager.get(ApplicationConfig)
 database_config: DatabaseConfig = config_manager.get(DatabaseConfig)
 connection_string = Utils.get_connection_string(database_config=database_config)
 
@@ -34,18 +34,31 @@ from IocManager import IocManager
 # folders = Utils.find_sub_folders(dao_folder)
 # module_list, module_attr_list = Utils.get_modules(folders)
 
-# aps
 
 # connection
+from models.dao.aps import ApSchedulerJob, ApSchedulerJobEvent, ApSchedulerJobsTable, ApSchedulerEvent
+
+# connection
+from models.dao.connection import Connection, ConnectionDatabase, ConnectorType, ConnectionType, ConnectionFile, \
+    ConnectionSecret, ConnectionQueue, ConnectionServer
 
 
 # integration
+from models.dao.integration import DataIntegration, DataIntegrationConnection, \
+    DataIntegrationColumn, DataIntegrationConnectionDatabase, DataIntegrationConnectionFile, \
+    DataIntegrationConnectionFileCsv,DataIntegrationConnectionQueue
 
 # common
+from models.dao.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent
 
 # operation
+from models.dao.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
+    DataOperationJobExecutionEvent, DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent, \
+    DataOperationJob, DataOperationContact, Definition
 
 # secret
+from models.dao.secret import Secret, SecretType, SecretSourceBasicAuthentication, SecretSource, AuthenticationType
+
 
 config = context.config
 
@@ -79,7 +92,7 @@ def run_migrations_offline():
 
     """
     print(f"run_migrations_offline")
-    print(f"environment:{api_config.environment}")
+    print(f"environment:{application_config.environment}")
 
     if connection_string is not None and connection_string != "":
         context.configure(
@@ -119,7 +132,7 @@ def run_migrations_online():
     """
     connectible = None
     print(f"run_migrations_online")
-    print(f"environment:{api_config.environment}")
+    print(f"environment:{application_config.environment}")
     print(f"connection string:{connection_string}")
     connectible = create_engine(connection_string, poolclass=pool.NullPool)
     SCHEMA_NAME = "NOT_test_fktdb"

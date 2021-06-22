@@ -5,7 +5,6 @@ from IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
-from infrastructor.scheduler.JobScheduler import JobScheduler
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 
 
@@ -13,14 +12,12 @@ from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 class RemoveJobResource(ResourceBase):
     @inject
     def __init__(self,
-                 job_scheduler: JobScheduler,
                  database_session_manager: DatabaseSessionManager,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.database_session_manager = database_session_manager
         self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
             database_session_manager)
-        self.job_scheduler: JobScheduler = job_scheduler
 
     @JobModels.ns.expect(JobModels.RemoveJobModel, validate=True)
     @JobModels.ns.marshal_with(CommonModels.SuccessModel)
@@ -30,5 +27,5 @@ class RemoveJobResource(ResourceBase):
         ap_scheduler_job = self.ap_scheduler_job_repository.filter_by(IsDeleted=0, Id=job_id).first()
         if ap_scheduler_job is None:
             return CommonModels.get_error_response(f"Job {job_id} not found")
-        self.job_scheduler.remove_job(job_id=ap_scheduler_job.JobId)
+        # self.job_scheduler.remove_job(job_id=ap_scheduler_job.JobId)
         return CommonModels.get_response(message=f"Job {job_id} removed successfully")

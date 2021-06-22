@@ -7,7 +7,6 @@ from domain.connection.services.ConnectionQueueService import ConnectionQueueSer
 from domain.connection.services.ConnectionSecretService import ConnectionSecretService
 from domain.connection.services.ConnectionServerService import ConnectionServerService
 from domain.connection.services.ConnectionTypeService import ConnectionTypeService
-from infrastructor.connection.database.DatabaseProvider import DatabaseProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
@@ -26,7 +25,6 @@ class ConnectionService(IScoped):
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
-                 database_provider: DatabaseProvider,
                  connection_type_service: ConnectionTypeService,
                  connection_database_service: ConnectionDatabaseService,
                  connection_file_service: ConnectionFileService,
@@ -39,7 +37,6 @@ class ConnectionService(IScoped):
         self.connection_secret_service = connection_secret_service
         self.connection_type_service = connection_type_service
         self.sql_logger: SqlLogger = sql_logger
-        self.database_provider = database_provider
         self.connection_file_service = connection_file_service
         self.connection_database_service = connection_database_service
         self.database_session_manager = database_session_manager

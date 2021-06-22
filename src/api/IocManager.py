@@ -1,3 +1,4 @@
+from multiprocessing.process import current_process
 import os
 import sys
 from flask import Flask
@@ -12,6 +13,7 @@ from infrastructor.utils.ConfigManager import ConfigManager
 from infrastructor.utils.Utils import Utils
 from models.configs.ApiConfig import ApiConfig
 from models.configs.ApplicationConfig import ApplicationConfig
+from models.configs.SchedulerRpcClientConfig import SchedulerRpcClientConfig
 
 
 class IocManager:
@@ -19,11 +21,8 @@ class IocManager:
     api: Api = None
     binder: Binder = None
     app_wrapper = None
-    job_scheduler = None
-    scheduler_service = None
     config_manager = None
     injector: Injector = None
-    job_event_handler = None
     Base = declarative_base(metadata=MetaData(schema='Common'))
 
     @staticmethod
@@ -35,69 +34,45 @@ class IocManager:
     def set_app_wrapper(app_wrapper=None):
         IocManager.app_wrapper = app_wrapper
 
-    @staticmethod
-    def set_job_scheduler(job_scheduler=None):
-        IocManager.job_scheduler = job_scheduler
-
-    @staticmethod
-    def set_scheduler_service(scheduler_service=None):
-        IocManager.scheduler_service = scheduler_service
-
     # wrapper required for dependency
     @staticmethod
     def configure_startup(root_directory):
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
-        api_config = IocManager.config_manager.get(ApiConfig)
-        if application_config.api_node:
-            # ApiConfig getting with type
-            IocManager.app = Flask(api_config.name)
-            authorizations = {
-                'apikey': {
-                    'type': 'apiKey',
-                    'in': 'header',
-                    'name': 'X-API'
-                },
-                'oauth2': {
-                    'type': 'oauth2',
-                    'flow': 'accessCode',
-                    'tokenUrl': 'https://somewhere.com/token',
-                    'authorizationUrl': 'https://somewhere.com/auth',
-                    'scopes': {
-                        'read': 'Grant read-only access',
-                        'write': 'Grant read-write access',
-                    }
+        IocManager.app = Flask(application_config.name)
+        authorizations = {
+            'apikey': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'X-API'
+            },
+            'oauth2': {
+                'type': 'oauth2',
+                'flow': 'accessCode',
+                'tokenUrl': 'https://somewhere.com/token',
+                'authorizationUrl': 'https://somewhere.com/auth',
+                'scopes': {
+                    'read': 'Grant read-only access',
+                    'write': 'Grant read-write access',
                 }
             }
-            IocManager.api = Api(IocManager.app, security=['apikey', {'oauth2': 'read'}], authorizations=authorizations)
-            # Flask instantiate
-            # IocManager.api = Api(app=IocManager.app,authorizations=authorizations, security='apikey')
+        }
+        IocManager.api = Api(IocManager.app, security=['apikey', {'oauth2': 'read'}], authorizations=authorizations)
+        # Flask instantiate
+        # IocManager.api = Api(app=IocManager.app,authorizations=authorizations, security='apikey')
 
-            # Importing all modules for dependency
-            sys.path.append(api_config.root_directory)
-            folders = Utils.find_sub_folders(api_config.root_directory)
-            module_list, module_attr_list = Utils.get_modules(folders)
-            IocManager.injector = Injector()
-            # Flask injector configuration
-            FlaskInjector(app=IocManager.app, modules=[IocManager.configure], injector=IocManager.injector)
-        elif application_config.process_node:
-            sys.path.append(api_config.root_directory)
-            folders = Utils.find_sub_folders(api_config.root_directory)
-            module_list, module_attr_list = Utils.get_modules(folders)
-            IocManager.injector = Injector(IocManager.configure)
+        # Importing all modules for dependency
+        sys.path.append(root_directory)
+        folders = Utils.find_sub_folders(root_directory)
+        module_list, module_attr_list = Utils.get_modules(folders)
+        IocManager.injector = Injector()
+        # Flask injector configuration
+        FlaskInjector(app=IocManager.app, modules=[IocManager.configure], injector=IocManager.injector)
 
     @staticmethod
     def run():
-        application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
-        if application_config.process_node:
-            job_scheduler=IocManager.injector.get(IocManager.job_scheduler)
-            job_scheduler.run()
-            # scheduler_service = SchedulerService()
-            IocManager.scheduler_service.initialize(job_scheduler=job_scheduler)
-
-        if application_config.api_node:
-            IocManager.injector.get(IocManager.app_wrapper).run()
+        IocManager.injector.get(IocManager.app_wrapper).run()
 
     @staticmethod
     def configure(binder: Binder):
@@ -130,11 +105,17 @@ class IocManager:
                 to=controller,
                 scope=request,
             )
+        if IocManager.app_wrapper is not None:
+            api_config = IocManager.config_manager.get(ApiConfig)
+            binder.bind(
+                IocManager.app_wrapper,
+                to=IocManager.app_wrapper(api_config)
+            )
+
+    @staticmethod
+    def process_info():
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
-        if application_config.api_node:
-            if IocManager.app_wrapper is not None:
-                api_config = IocManager.config_manager.get(ApiConfig)
-                binder.bind(
-                    IocManager.app_wrapper,
-                    to=IocManager.app_wrapper(api_config)
-                )
+        print(f"Application : {application_config.name}")
+        print(f"Process Name : {current_process().name}")
+        print(f"Pid : {os.getpid()}")
+        print(f"Parent Pid : {os.getppid()}")
