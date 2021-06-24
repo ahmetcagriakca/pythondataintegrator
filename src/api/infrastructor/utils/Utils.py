@@ -96,9 +96,6 @@ class Utils:
         connection_string = f'{connection_type}://{database_config.username}:{database_config.password}@{database_config.host}:{database_config.port}/{database_config.database}{driver_string}'
         return connection_string
 
+    @staticmethod
     def get_process_info():
-    
-        print(f"Application : {application_name}")
-        print(f"Process Name : {current_process().name}")
-        print(f"Pid : {os.getpid()}")
-        print(f"Parent Pid : {os.getppid()}")
+        return f"{current_process().name} ({os.getpid()},{os.getppid()})"

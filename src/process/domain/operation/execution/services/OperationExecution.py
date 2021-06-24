@@ -98,11 +98,11 @@ class OperationExecution(IScoped):
                 is_finished: bool = False):
         self.sql_logger.info(log,
                              job_id=data_operation_job_execution_id)
-        self.data_operation_job_execution_service.update_status(
-            data_operation_job_execution_id=data_operation_job_execution_id,
-            status_id=status.value, is_finished=is_finished)
         self.data_operation_job_execution_service.create_event(
             data_operation_execution_id=data_operation_job_execution_id,
             event_code=event_code)
+        self.data_operation_job_execution_service.update_status(
+            data_operation_job_execution_id=data_operation_job_execution_id,
+            status_id=status.value, is_finished=is_finished)
         if is_finished:
             self.data_operation_job_execution_service.send_data_operation_finish_mail(data_operation_job_execution_id)

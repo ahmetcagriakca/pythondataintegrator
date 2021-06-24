@@ -7,9 +7,11 @@ from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
 
 from infrastructor.dependency.scopes import ISingleton, IScoped
+from infrastructor.logging.ConsoleLogger import ConsoleLogger
 from infrastructor.utils.ConfigManager import ConfigManager
 from infrastructor.utils.Utils import Utils
 from models.configs.ApplicationConfig import ApplicationConfig
+from models.configs.DatabaseConfig import DatabaseConfig
 from models.configs.SchedulerRpcServerConfig import SchedulerRpcServerConfig
 
 
@@ -37,12 +39,25 @@ class IocManager:
     # wrapper required for dependency
     @staticmethod
     def configure_startup(root_directory):
-        # Configuration initialize
-        IocManager.config_manager = ConfigManager(root_directory)
+        # Importing all modules for dependency
         sys.path.append(root_directory)
         folders = Utils.find_sub_folders(root_directory)
         module_list, module_attr_list = Utils.get_modules(folders)
+
+        # Configuration initialize
+        IocManager.config_manager = ConfigManager(root_directory)
+        IocManager.process_info()
+        IocManager.set_database_application_name()
         IocManager.injector = Injector(IocManager.configure)
+
+    @staticmethod
+    def set_database_application_name():
+        application_config = IocManager.config_manager.get(ApplicationConfig)
+        database_config: DatabaseConfig = IocManager.config_manager.get(DatabaseConfig)
+        if database_config.application_name is None:
+            process_info = IocManager.get_process_info()
+            IocManager.config_manager.set(DatabaseConfig, "application_name",
+                                          f"{application_config.name}-({process_info})")
 
     @staticmethod
     def run():
@@ -78,9 +93,12 @@ class IocManager:
             )
 
     @staticmethod
+    def get_process_info():
+        return f"{current_process().name} ({os.getpid()},{os.getppid()})"
+
+    @staticmethod
     def process_info():
+        logger = ConsoleLogger()
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
-        print(f"Application : {application_config.name}")
-        print(f"Process Name : {current_process().name}")
-        print(f"Pid : {os.getpid()}")
-        print(f"Parent Pid : {os.getppid()}")
+        logger.info(f"Application : {application_config.name}")
+        logger.info(IocManager.get_process_info())

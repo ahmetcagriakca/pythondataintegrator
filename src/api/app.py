@@ -9,7 +9,6 @@ def start():
 
     IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper)
     IocManager.initialize()
-    IocManager.process_info()
     IocManager.run()
 
 

@@ -21,9 +21,7 @@ class JobService:
 
         sql_logger = SqlLogger()
         sql_logger.info(f"{job_id}-{data_operation_id} Data Operations Started")
-        """
-        TODO: process operations
-        """
+
         IocManager.injector.get(ProcessRpcClientService).job_start(job_id, data_operation_id)
         end_datetime = datetime.now()
         end = time.time()

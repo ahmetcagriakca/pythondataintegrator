@@ -4,6 +4,7 @@ import os
 import re
 import sys
 from datetime import datetime
+from multiprocessing.process import current_process
 
 
 class Utils:
@@ -94,3 +95,7 @@ class Utils:
             connection_type = 'postgresql'
         connection_string = f'{connection_type}://{database_config.username}:{database_config.password}@{database_config.host}:{database_config.port}/{database_config.database}{driver_string}'
         return connection_string
+
+    @staticmethod
+    def get_process_info():
+        return f"{current_process().name} ({os.getpid()},{os.getppid()})"

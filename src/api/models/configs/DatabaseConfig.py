@@ -14,6 +14,7 @@ class DatabaseConfig(BaseConfig):
                  database: str = None,
                  username: str = None,
                  password: str = None,
+                 application_name: str = None
                  ):
         self.connection_string = connection_string
         self.type = type
@@ -25,6 +26,7 @@ class DatabaseConfig(BaseConfig):
         self.database: str = database
         self.username: str = username
         self.password: str = password
+        self.application_name = application_name
 
     def is_valid(self):
         pass

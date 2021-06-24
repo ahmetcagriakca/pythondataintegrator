@@ -5,6 +5,7 @@ from apscheduler.job import Job
 from IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.aps import ApSchedulerJobEvent
@@ -17,14 +18,10 @@ class JobSchedulerService:
                  ):
 
         self.sql_logger = SqlLogger()
-        database_config = IocManager.config_manager.get(DatabaseConfig)
-        self.database_session_manager = DatabaseSessionManager(database_config=database_config)
-        self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
-            self.database_session_manager)
-        self.ap_scheduler_event_repository: Repository[ApSchedulerEvent] = Repository[ApSchedulerEvent](
-            self.database_session_manager)
-        self.ap_scheduler_job_event_repository: Repository[ApSchedulerJobEvent] = Repository[ApSchedulerJobEvent](
-            self.database_session_manager)
+        self.repository_provider = RepositoryProvider()
+        self.ap_scheduler_job_repository = self.repository_provider.get(ApSchedulerJob)
+        self.ap_scheduler_event_repository = self.repository_provider.get(ApSchedulerEvent)
+        self.ap_scheduler_job_event_repository = self.repository_provider.get(ApSchedulerJobEvent)
         self.job_scheduler_type = None
         self.job_event_queue: Queue = None
 
@@ -33,13 +30,16 @@ class JobSchedulerService:
         def inner(*args, **kwargs):
             try:
                 result = func(*args, **kwargs)
-                args[0].database_session_manager.commit()
+                args[0].repository_provider.database_session_manager.commit()
                 return result
             except Exception as ex:
                 try:
-                    args[0].database_session_manager.rollback()
-                    args[0].database_session_manager.connect()
-                    return func(*args, **kwargs)
+                    args[0].repository_provider.database_session_manager.rollback()
+                    args[0].repository_provider.database_session_manager.close()
+                    args[0].repository_provider.database_session_manager.connect()
+                    result = func(*args, **kwargs)
+                    args[0].repository_provider.database_session_manager.commit()
+                    return result
                 except Exception as invalid_ex:
                     print(ex)
                     raise

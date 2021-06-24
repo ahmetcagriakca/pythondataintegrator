@@ -30,7 +30,6 @@ def start():
     IocManager.set_job_scheduler(job_scheduler=JobScheduler)
     IocManager.set_scheduler_service(scheduler_service=SchedulerService)
     IocManager.initialize()
-    IocManager.process_info()
     IocManager.run()
 
 

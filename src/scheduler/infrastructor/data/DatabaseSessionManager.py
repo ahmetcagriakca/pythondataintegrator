@@ -25,8 +25,10 @@ class DatabaseSessionManager(IScoped):
 
     def connect(self):
         connection_string = Utils.get_connection_string(database_config=self.database_config)
-        self.engine = create_engine(connection_string, poolclass=pool.NullPool,
-                                    pool_pre_ping=True)
+        self.engine = create_engine(connection_string,
+                                    poolclass=pool.NullPool,
+                                    pool_pre_ping=True,
+                                    connect_args={"application_name": self.database_config.application_name})
         self._SessionFactory = sessionmaker(bind=self.engine)
         self.session: Session = self.session_factory()
 

@@ -1,6 +1,7 @@
-from flask import request
+from flask import request, Response
 
 from IocManager import IocManager
+from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from models.configs.ApiConfig import ApiConfig
 
 
@@ -20,6 +21,7 @@ class RequestHandlers:
         return response
 
     @staticmethod
-    def after_request(response):
+    def after_request(response:Response):
         response = RequestHandlers.set_headers(response=response)
+        IocManager.injector.get(DatabaseSessionManager).close()
         return response

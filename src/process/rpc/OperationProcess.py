@@ -6,9 +6,13 @@ from IocManager import IocManager
 from datetime import datetime
 from domain.operation.execution.services.OperationExecution import OperationExecution
 from domain.operation.services.DataOperationJobService import DataOperationJobService
+from domain.operation.services.DataOperationService import DataOperationService
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.logging.SqlLogger import SqlLogger
 
 from multiprocessing.context import Process
+
+from models.dao.operation import DataOperation
 
 
 class OperationProcess:
@@ -48,10 +52,16 @@ class OperationProcess:
         start_datetime = datetime.now()
 
         sql_logger = SqlLogger()
-        sql_logger.info(f"{job_id}-{data_operation_id} Execution Create started")
+        data_operation_query = IocManager.injector.get(RepositoryProvider).get(DataOperation).filter_by(Id=data_operation_id)
+        data_operation=data_operation_query.first()
+        if data_operation is None:
+            raise Exception('Operation Not Found')
+
+        sql_logger.info(f"{job_id}-{data_operation_id}-{data_operation.Name} Execution Create started")
         operation_process = Process(target=OperationProcess.start_operation, args=(data_operation_id, job_id))
         operation_process.start()
         end_datetime = datetime.now()
         end = time.time()
         sql_logger.info(
             f"{job_id}-{data_operation_id} Execution Create finished. Start :{start_datetime} - End :{end_datetime} - ElapsedTime :{end - start}")
+        return

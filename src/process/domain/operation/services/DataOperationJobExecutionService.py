@@ -1,17 +1,19 @@
 from datetime import datetime
+from typing import List
+
 from injector import inject
 
-from infrastructor.configuration.ConfigService import ConfigService
+from domain.delivery.EmailService import EmailService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
-from infrastructor.delivery.EmailProvider import EmailProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
-from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.common import OperationEvent
 from models.dao.common.Log import Log
 from models.dao.common.Status import Status
-from models.dao.operation import DataOperationJobExecution, DataOperationJob
+from models.dao.integration import DataIntegrationConnection
+from models.dao.operation import DataOperationJobExecution, DataOperationJob, DataOperationJobExecutionIntegration, \
+    DataOperationIntegration
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
 from models.enums.events import EVENT_EXECUTION_INITIALIZED
 
@@ -21,26 +23,27 @@ class DataOperationJobExecutionService(IScoped):
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
-                 email_provider: EmailProvider,
-                 config_service: ConfigService,
-                 application_config: ApplicationConfig
-
+                 email_service: EmailService
                  ):
-        self.application_config: ApplicationConfig = application_config
+        self.email_service = email_service
         self.database_session_manager = database_session_manager
         self.data_operation_job_execution_repository: Repository[DataOperationJobExecution] = Repository[
             DataOperationJobExecution](database_session_manager)
+        self.data_operation_job_execution_integration_repository: Repository[DataOperationJobExecutionIntegration] = \
+            Repository[
+                DataOperationJobExecutionIntegration](database_session_manager)
+
         self.status_repository: Repository[Status] = Repository[Status](database_session_manager)
         self.operation_event_repository: Repository[OperationEvent] = Repository[
             OperationEvent](database_session_manager)
 
         self.data_operation_job_execution_event_repository: Repository[DataOperationJobExecutionEvent] = Repository[
             DataOperationJobExecutionEvent](database_session_manager)
+        self.data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[
+            DataIntegrationConnection](database_session_manager)
         self.log_repository: Repository[Log] = Repository[Log](
             database_session_manager)
         self.sql_logger: SqlLogger = sql_logger
-        self.email_provider = email_provider
-        self.config_service = config_service
 
     def create(self, data_operation_job: DataOperationJob = None):
         # not_finished_execution = self.data_operation_job_execution_repository.table \
@@ -93,6 +96,125 @@ class DataOperationJobExecutionService(IScoped):
         self.database_session_manager.commit()
         return data_operation_job_execution_event
 
+    def prepare_execution_table_data(self, data_operation_job_execution_id):
+        data_operation_job_execution = self.data_operation_job_execution_repository.first(
+            Id=data_operation_job_execution_id)
+        columns = [
+            {'value': 'Execution Id'},
+            {'value': 'Name'},
+            {'value': 'Status'},
+            {'value': 'Execution Start Date'},
+            {'value': 'Execution End Date'}
+        ]
+        rows = [
+            {
+                'data':
+                    [
+                        {'value': data_operation_job_execution.Id},
+                        {
+                            'value': f'{data_operation_job_execution.DataOperationJob.DataOperation.Name} ({data_operation_job_execution.DataOperationJob.DataOperation.Id})'},
+                        {'value': data_operation_job_execution.Status.Description},
+                        {'value': data_operation_job_execution.StartDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3],
+                         'class': 'mail-row-nowrap'},
+                        {'value': data_operation_job_execution.EndDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3],
+                         'class': 'mail-row-nowrap'}
+                    ]
+            }
+        ]
+        return {'columns': columns, 'rows': rows}
+
+    def prepare_execution_event_table_data(self, data_operation_job_execution_id):
+        data_operation_job_execution = self.data_operation_job_execution_repository.first(
+            Id=data_operation_job_execution_id)
+        job_execution_events: List[
+            DataOperationJobExecutionEvent] = data_operation_job_execution.DataOperationJobExecutionEvents
+        columns = [
+            {'value': 'Event Description'},
+            {'value': 'Event Date'}
+        ]
+        rows = []
+        for job_execution_event in job_execution_events:
+            execution_operation_event: OperationEvent = job_execution_event.Event
+            row = {
+                "data": [
+                    {'value': execution_operation_event.Description},
+                    {'value': job_execution_event.EventDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3],
+                     'class': 'mail-row-nowrap'}
+                ]
+            }
+            rows.append(row)
+        return {'columns': columns, 'rows': rows}
+
+    def prepare_execution_integration_table_data(self, data_operation_job_execution_id):
+        job_execution_integrations_query = self.database_session_manager.session.query(
+            DataOperationJobExecutionIntegration, DataOperationIntegration
+        ) \
+            .filter(DataOperationJobExecutionIntegration.DataOperationIntegrationId == DataOperationIntegration.Id) \
+            .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data_operation_job_execution_id) \
+            .order_by(DataOperationIntegration.Order)
+        job_execution_integrations = job_execution_integrations_query.all()
+
+        columns = [
+
+            {'value': 'Order'},
+            {'value': 'Code'},
+            {'value': 'Source'},
+            {'value': 'Target'},
+            {'value': 'Status'},
+            {'value': 'Start Date'},
+            # {'value': 'End Date'},
+            {'value': 'Limit'},
+            {'value': 'Process Count'},
+            {'value': 'Source Data Count'},
+            {'value': 'Affected Row Count'},
+            {'value': 'Log'}
+        ]
+        rows = []
+        for job_execution_integration_data in job_execution_integrations:
+            job_execution_integration = job_execution_integration_data.DataOperationJobExecutionIntegration
+            data_integration_id = job_execution_integration.DataOperationIntegration.DataIntegration.Id
+            source_connection = self.data_integration_connection_repository.table \
+                .filter(DataIntegrationConnection.IsDeleted == 0) \
+                .filter(DataIntegrationConnection.DataIntegrationId == data_integration_id) \
+                .filter(DataIntegrationConnection.SourceOrTarget == 0) \
+                .one_or_none()
+            target_connection = self.data_integration_connection_repository.table \
+                .filter(DataIntegrationConnection.IsDeleted == 0) \
+                .filter(DataIntegrationConnection.DataIntegrationId == data_integration_id) \
+                .filter(DataIntegrationConnection.SourceOrTarget == 1) \
+                .one_or_none()
+            source_data_count = 0
+            if job_execution_integration.SourceDataCount is not None and job_execution_integration.SourceDataCount > 0:
+                source_data_count = job_execution_integration.SourceDataCount
+            total_affected_row_count = 0
+            for event in job_execution_integration.DataOperationJobExecutionIntegrationEvents:
+                if event.AffectedRowCount is not None and event.AffectedRowCount > 0:
+                    total_affected_row_count = total_affected_row_count + event.AffectedRowCount
+            source_connection_name = source_connection.Connection.Name if source_connection is not None else ''
+            target_connection_name = target_connection.Connection.Name if target_connection is not None else ''
+
+            row = {
+                "data": [
+                    {'value': job_execution_integration.DataOperationIntegration.Order},
+                    {'value': job_execution_integration.DataOperationIntegration.DataIntegration.Code},
+                    {'value': source_connection_name},
+                    {'value': target_connection_name},
+                    {'value': job_execution_integration.Status.Description},
+                    {'value': job_execution_integration.StartDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3] + '',
+                     'class': 'mail-row-nowrap'
+                     },
+                    # {'value': job_execution_integration.EndDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3],
+                    #  },
+                    {'value': job_execution_integration.Limit},
+                    {'value': job_execution_integration.ProcessCount},
+                    {'value': source_data_count},
+                    {'value': total_affected_row_count},
+                    {'value': job_execution_integration.Log}
+                ]
+            }
+            rows.append(row)
+        return {'columns': columns, 'rows': rows}
+
     def send_data_operation_finish_mail(self, data_operation_job_execution_id):
         data_operation_job_execution = self.data_operation_job_execution_repository.first(
             Id=data_operation_job_execution_id)
@@ -106,81 +228,19 @@ class DataOperationJobExecutionService(IScoped):
             if contact.IsDeleted == 0:
                 operation_contacts.append(contact.Email)
 
-        default_contacts = self.config_service.get_config_by_name("DataOperationDefaultContact")
-        if default_contacts is not None and default_contacts != '':
-            default_contacts_emails = default_contacts.split(",")
-            for default_contact in default_contacts_emails:
-                if default_contact is not None and default_contact != '':
-                    operation_contacts.append(default_contact)
-        if operation_contacts is None:
-            self.sql_logger.info(f'{data_operation_job_execution_id} mail sending contact not found',
-                                 job_id=data_operation_job_execution_id)
-            return
-
         data_operation_name = data_operation_job_execution.DataOperationJob.DataOperation.Name
-        subject = f"Execution completed"
-        if data_operation_job_execution.StatusId == 3:
-            subject = subject + " successfully"
-        elif data_operation_job_execution.StatusId == 4:
-            subject = subject + " with error"
-        subject = subject + f": {self.application_config.environment} » {data_operation_name} » {data_operation_job_execution_id}"
-
-        logs = self.log_repository.filter_by(JobId=data_operation_job_execution_id).order_by("Id").all()
-        log_texts = ""
-        for log in logs:
-            log_time = log.LogDatetime.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-            log_texts = log_texts + f"</br> {log_time} - {log.Content}"
-        body = f'''
-Job started at : {data_operation_job_execution.StartDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}
-</br>
-Job finished at : {data_operation_job_execution.EndDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}
-</br>
-Job Logs:{log_texts}
-'''
-        try:
-
-            self.email_provider.send(operation_contacts, subject, body)
-        except Exception as ex:
-            self.sql_logger.error(f"Error on mail sending. Error:{ex}")
-
-    def send_data_operation_miss_mail(self, data_operation_job, next_run_time: datetime):
-        operation_contacts = []
-        for contact in data_operation_job.DataOperation.Contacts:
-            if contact.IsDeleted == 0:
-                operation_contacts.append(contact.Email)
-
-        default_contacts = self.config_service.get_config_by_name("DataOperationDefaultContact")
-        if default_contacts is not None and default_contacts != '':
-            default_contacts_emails = default_contacts.split(",")
-            for default_contact in default_contacts_emails:
-                if default_contact is not None and default_contact != '':
-                    operation_contacts.append(default_contact)
-        if operation_contacts is None:
-            self.sql_logger.info(f'{data_operation_job.DataOperation.Name} mail sending contact not found')
-            return
-
-        data_operation_name = data_operation_job.DataOperation.Name
-        subject = f"Job Missed"
-        subject = subject + f": {self.application_config.environment} » {data_operation_name}"
-
-        if next_run_time is not None:
-            next_run_time_text = f"{next_run_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}"
-        else:
-            next_run_time_text = ''
-
-        if data_operation_job.StartDate is not None:
-            job_start_time_text = f"{data_operation_job.StartDate.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}"
-        else:
-            job_start_time_text = ''
-
-        body = f'''
-                Scheduled job missed  
-                </br>
-                Job start time : {job_start_time_text}
-                </br>
-                Job next run time : {next_run_time_text}
-                '''
-        try:
-            self.email_provider.send(operation_contacts, subject, body)
-        except Exception as ex:
-            self.sql_logger.error(f"Error on mail sending. Error:{ex}")
+        execution_table_data = self.prepare_execution_table_data(
+            data_operation_job_execution_id=data_operation_job_execution_id)
+        execution_event_table_data = self.prepare_execution_event_table_data(
+            data_operation_job_execution_id=data_operation_job_execution_id)
+        execution_integration_table_data = self.prepare_execution_integration_table_data(
+            data_operation_job_execution_id=data_operation_job_execution_id)
+        self.email_service.send_data_operation_finish_mail(
+            data_operation_job_execution_id=data_operation_job_execution_id,
+            data_operation_job_execution_status_id=data_operation_job_execution.StatusId,
+            data_operation_name=data_operation_name,
+            operation_contacts=operation_contacts,
+            execution_table_data=execution_table_data,
+            execution_event_table_data=execution_event_table_data,
+            execution_integration_table_data=execution_integration_table_data
+        )

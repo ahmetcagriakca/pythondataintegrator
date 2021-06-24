@@ -12,6 +12,7 @@ from infrastructor.dependency.scopes import IScoped
 from apscheduler.events import EVENT_JOB_MISSED
 
 from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructor.utils.Utils import Utils
 from models.dao.aps import ApSchedulerJob, ApSchedulerJobEvent, ApSchedulerEvent
 from models.dao.operation import DataOperationJob
 
@@ -62,7 +63,9 @@ class JobEventHandler(IScoped):
                     args[0].database_session_manager.rollback()
                     args[0].database_session_manager.close()
                     args[0].database_session_manager.connect()
-                    return func(*args, **kwargs)
+                    result = func(*args, **kwargs)
+                    args[0].database_session_manager.commit()
+                    return result
                 except Exception as invalid_ex:
                     print(ex)
                     raise
@@ -73,5 +76,3 @@ class JobEventHandler(IScoped):
     def missed_job(self, job_id):
         ap_scheduler_job = self.ap_scheduler_job_repository.first(JobId=job_id)
         self.data_operation_job_service.send_data_operation_miss_mail(ap_scheduler_job=ap_scheduler_job)
-
-

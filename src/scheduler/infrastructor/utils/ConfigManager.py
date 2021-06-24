@@ -21,6 +21,10 @@ class ConfigManager:
             if config_type is generic_type:
                 return config.get("instance")
 
+    def set(self, generic_type, instance_property, property_value):
+        config_instance=self.get(generic_type=generic_type)
+        setattr(config_instance, instance_property, property_value)
+
     def empty(self) -> bool:
         return not self.items
 
@@ -58,7 +62,6 @@ class ConfigManager:
                         config_value = root_directory
                     else:
                         config_value = None
-
                 else:
                     config_value = None
 

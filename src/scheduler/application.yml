@@ -1,6 +1,6 @@
 APPLICATION:
   ENVIRONMENT: DEVELOPMENT
-  NAME: Pdi Scheduler Rpc Server
+  NAME: Pdi Scheduler Server
   SECRET_KEY: s4GGU7jFnKjgu1LsK7fUdxOp1DUSQ-PVgvr28rBNAHM=
 
 DATABASE:

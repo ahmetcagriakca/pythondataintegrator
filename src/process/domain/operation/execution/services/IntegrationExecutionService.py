@@ -153,12 +153,12 @@ class IntegrationExecutionService(IScoped):
         source_adapter = self.connection_adapter_factory.get_source_adapter(
             data_integration_id=data_integration_id)
         data_count = source_adapter.get_source_data_count(data_integration_id=data_integration_id)
-        self.data_operation_job_execution_integration_service.update_source_data_count(
-            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-            source_data_count=data_count)
         self.data_operation_job_execution_integration_service.create_event(
             data_operation_execution_integration_id=data_operation_job_execution_integration_id,
             event_code=EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, affected_row=data_count)
+        self.data_operation_job_execution_integration_service.update_source_data_count(
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+            source_data_count=data_count)
         return data_count
 
     def execute_query(self,
@@ -168,19 +168,22 @@ class IntegrationExecutionService(IScoped):
             data_integration_id=data_integration_id)
         affected_rowcount = target_adapter.do_target_operation(data_integration_id=data_integration_id)
 
+        self.data_operation_job_execution_integration_service.create_event(
+            data_operation_execution_integration_id=data_operation_job_execution_integration_id,
+            event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, affected_row=affected_rowcount)
         self.data_operation_job_execution_integration_service.update_source_data_count(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
             source_data_count=affected_rowcount)
 
-        self.data_operation_job_execution_integration_service.create_event(
-            data_operation_execution_integration_id=data_operation_job_execution_integration_id,
-            event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, affected_row=affected_rowcount)
         return affected_rowcount
 
     def update_status(self, data_operation_job_execution_id: int, data_operation_job_execution_integration_id, log: str,
                       status: StatusTypes, event_code: int,
                       is_finished: bool = False):
         self.sql_logger.info(log, job_id=data_operation_job_execution_id)
+        self.data_operation_job_execution_integration_service.create_event(
+            data_operation_execution_integration_id=data_operation_job_execution_integration_id,
+            event_code=event_code)
         self.data_operation_job_execution_integration_service.update_status(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
             status_id=status.value, is_finished=is_finished)
@@ -188,6 +191,3 @@ class IntegrationExecutionService(IScoped):
             self.data_operation_job_execution_integration_service.update_log(
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
                 log=log)
-        self.data_operation_job_execution_integration_service.create_event(
-            data_operation_execution_integration_id=data_operation_job_execution_integration_id,
-            event_code=event_code)
