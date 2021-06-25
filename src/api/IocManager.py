@@ -141,4 +141,3 @@ class IocManager:
         logger = ConsoleLogger()
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
         logger.info(f"Application : {application_config.name}")
-        logger.info(IocManager.get_process_info())

@@ -12,8 +12,9 @@ def transaction_handler(func):
             return result
         except Exception as ex:
             database_session_manager.rollback()
-            database_session_manager.close()
             print(ex)
             raise
+        finally:
+            database_session_manager.close()
 
     return inner

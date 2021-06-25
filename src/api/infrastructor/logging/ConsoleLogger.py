@@ -1,4 +1,4 @@
-import logging as log
+import logging
 from datetime import datetime
 from injector import inject
 from infrastructor.dependency.scopes import ISingleton
@@ -7,16 +7,16 @@ from infrastructor.utils.Utils import Utils
 
 class ConsoleLogger(ISingleton):
     @inject
-    def __init__(self):
-        self.log_level = log.DEBUG
+    def __init__(self, log_level=logging.DEBUG):
+        self.log_level = log_level
+        self.logger = logging
         self.log_init()
-        self.log = log
 
     def log_init(self):
         """
         initialization of log file.
         """
-        log.basicConfig(level=self.log_level)
+        logging.basicConfig(level=self.log_level)
 
     @staticmethod
     def prepare_message(message):
@@ -24,18 +24,26 @@ class ConsoleLogger(ISingleton):
         process_info = Utils.get_process_info()
         return f'{log_datetime} - {process_info} - {message} '
 
-    def info(self, message):
+    def log(self, level, message):
         prepared_message = self.prepare_message(message)
-        self.log.info(prepared_message)
+        self.logger.log(level, prepared_message)
+
+    def fatal(self, message):
+        prepared_message = self.prepare_message(message)
+        self.logger.fatal(prepared_message)
 
     def error(self, message):
         prepared_message = self.prepare_message(message)
-        self.log.error(prepared_message)
+        self.logger.error(prepared_message)
 
     def warning(self, message):
         prepared_message = self.prepare_message(message)
-        self.log.warning(prepared_message)
+        self.logger.warning(prepared_message)
+
+    def info(self, message):
+        prepared_message = self.prepare_message(message)
+        self.logger.info(prepared_message)
 
     def debug(self, message):
         prepared_message = self.prepare_message(message)
-        self.log.debug(prepared_message)
+        self.logger.debug(prepared_message)

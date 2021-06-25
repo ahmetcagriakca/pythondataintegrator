@@ -3,11 +3,8 @@ from typing import List
 from apscheduler.job import Job
 
 from IocManager import IocManager
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.logging.SqlLogger import SqlLogger
-from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.aps import ApSchedulerJobEvent
 from models.dao.aps.ApSchedulerEvent import ApSchedulerEvent
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
@@ -83,7 +80,7 @@ class JobSchedulerService:
 
         ap_scheduler_job = ApSchedulerJob(JobId=job.id, NextRunTime=job.next_run_time, FuncRef=job.func_ref)
         self.ap_scheduler_job_repository.insert(ap_scheduler_job)
-        self.database_session_manager.commit()
+        self.ap_scheduler_job_repository.commit()
         job_args = (ap_scheduler_job.Id,) + job.args[1:]
         job.modify(args=job_args)
 

@@ -100,15 +100,15 @@ class JobOperationService(IScoped):
             data_operation_id=data_operation_id).all()
         if data_operation_jobs is None or len(data_operation_jobs) == 0:
             return None
-        founded_cron_job: DataOperationJob = None
+        found_cron_job: DataOperationJob = None
         for data_operation_job in data_operation_jobs:
             if data_operation_job.Cron is not None:
-                founded_cron_job = data_operation_job
+                found_cron_job = data_operation_job
                 break
-        if founded_cron_job is None:
+        if found_cron_job is None:
             return None
         else:
-            return founded_cron_job
+            return found_cron_job
 
     def create_job_with_cron(self, operation_name: str, cron: str, start_date: datetime = None,
                              end_date: datetime = None) -> DataOperationJob:
@@ -190,7 +190,7 @@ class JobOperationService(IScoped):
 
         check = self.check_cron_initialized_jobs(data_operation_id=data_operation.Id)
         if not check:
-            raise OperationalException("Cron Job not founded.")
+            raise OperationalException("Cron Job not found.")
 
         self.delete_existing_cron_jobs(data_operation_id=data_operation.Id)
         self.database_session_manager.commit()

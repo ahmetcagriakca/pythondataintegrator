@@ -101,7 +101,7 @@ class DataIntegrationColumnService(IScoped):
                     DataIntegration=data_integration)
                 self.data_integration_column_repository.insert(data_integration_column)
         for data_integration_column in data_integration.Columns:
-            column_founded = False
+            column_found = False
             source_columns = [source_column for source_column in source_columns_list if
                               source_column == data_integration_column.SourceColumnName]
             source_column_name = None
@@ -110,8 +110,8 @@ class DataIntegrationColumnService(IScoped):
             if source_column_name is not None:
                 target_column_name = target_columns_list[source_columns_list.index(source_column_name)]
                 if target_column_name == data_integration_column.TargetColumnName:
-                    column_founded = True
-            if not column_founded:
+                    column_found = True
+            if not column_found:
                 self.database_session_manager.session.delete(data_integration_column)
         return data_integration
 

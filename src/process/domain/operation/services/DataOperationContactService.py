@@ -50,14 +50,14 @@ class DataOperationContactService(IScoped):
         check_existing_contacts = self.data_operation_contact_repository.filter_by(IsDeleted=0,
                                                                                    DataOperationId=data_operation.Id).all()
         for existing_contact in check_existing_contacts:
-            founded = False
+            found = False
 
             if data_operation_contact_models is not None and len(data_operation_contact_models) > 0:
                 for data_operation_contact_model in data_operation_contact_models:
                     if existing_contact.Email == data_operation_contact_model.Email:
-                        founded = True
+                        found = True
 
-            if not founded:
+            if not found:
                 self.data_operation_contact_repository.delete_by_id(existing_contact.Id)
 
     def delete_by_data_operation_id(self, data_operation_id: int):

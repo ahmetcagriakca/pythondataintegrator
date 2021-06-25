@@ -14,5 +14,7 @@ def transaction_handler(func):
             database_session_manager.rollback()
             print(ex)
             raise
+        finally:
+            database_session_manager.close()
 
     return inner

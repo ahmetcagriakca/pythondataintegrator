@@ -4,16 +4,15 @@ from injector import inject
 
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.common.ConfigParameter import ConfigParameter
 
 
 class ConfigService(IScoped):
     @inject
-    def __init__(self, database_session_manager: DatabaseSessionManager):
-        self.database_session_manager = database_session_manager
-        self.config_repository: Repository[ConfigParameter] = Repository[ConfigParameter](
-            database_session_manager)
+    def __init__(self, repository_provider: RepositoryProvider):
+        self.config_repository = repository_provider.get(ConfigParameter)
 
     @lru_cache()
     def get_config_by_name(self, name):

@@ -87,11 +87,11 @@ class DataOperationIntegrationService(IScoped):
 
         check_existing_integrations = self.get_all_by_data_operation_id(data_operation_id=data_operation.Id).all()
         for existing_integration in check_existing_integrations:
-            founded = False
+            found = False
             for data_operation_integration_model in data_operation_integration_models:
                 if existing_integration.DataIntegration.Code == data_operation_integration_model.Integration.Code and existing_integration.DataIntegration.IsDeleted == 0:
-                    founded = True
-            if not founded:
+                    found = True
+            if not found:
                 self.delete_by_id(existing_integration.Id)
 
     def delete_by_id(self, id: int):

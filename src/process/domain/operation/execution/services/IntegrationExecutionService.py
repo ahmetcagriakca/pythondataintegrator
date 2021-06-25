@@ -64,6 +64,7 @@ class IntegrationExecutionService(IScoped):
     def start_integration(self,
                           data_integration_id: int,
                           limit: int,
+                          data_operation_job_execution_id:int,
                           data_operation_job_execution_integration_id: int):
 
         target_adapter = self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
@@ -79,18 +80,19 @@ class IntegrationExecutionService(IScoped):
                 task_id = paging_modifier.Id
                 start = paging_modifier.Start
                 end = paging_modifier.End
-                self.sql_logger.info(f"0-data readed:{task_id}-{start}-{end} process got a new task")
+                self.sql_logger.info(f"0-data readed:{task_id}-{start}-{end} process got a new task",job_id=data_operation_job_execution_id)
                 prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id,
                                                             source_data=source_data)
                 target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
                 end_time = time()
                 self.sql_logger.info(
-                    f"0-data readed:{task_id}-{start}-{end}  process finished task. time:{end_time - start_time}")
+                    f"0-data readed:{task_id}-{start}-{end}  process finished task. time:{end_time - start_time}",job_id=data_operation_job_execution_id)
         return data_count
 
     def start_integration_temp(self,
                                data_integration_id: int,
                                limit: int,
+                               data_operation_job_execution_id:int,
                                data_operation_job_execution_integration_id: int):
 
         source_adapter = self.connection_adapter_factory.get_source_adapter(data_integration_id=data_integration_id)
@@ -107,17 +109,18 @@ class IntegrationExecutionService(IScoped):
             total_data_count = total_data_count + data_count
             start = total_data_count - data_count
             end = total_data_count
-            self.sql_logger.info(f"0-data readed:{task_id}-{start}-{end} process got a new task")
+            self.sql_logger.info(f"0-data readed:{task_id}-{start}-{end} process got a new task",job_id=data_operation_job_execution_id)
             prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id,
                                                         source_data=source_data)
             target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
             end_time = time()
             self.sql_logger.info(
-                f"0-data readed:{task_id}-{start}-{end}  process finished task. time:{end_time - start_time}")
+                f"0-data readed:{task_id}-{start}-{end}  process finished task. time:{end_time - start_time}",job_id=data_operation_job_execution_id)
         return total_data_count
 
     def start_execute_integration(self,
                                   data_integration_id: int,
+                                  data_operation_job_execution_id:int,
                                   data_operation_job_execution_integration_id: int,
                                   paging_modifier:PagingModifier,
                                   source_data: any):

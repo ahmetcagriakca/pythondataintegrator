@@ -20,7 +20,7 @@ class SqlLogger(IScoped):
         console_logger: ConsoleLogger = IocManager.injector.get(ConsoleLogger)
         log_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
         process_info = Utils.get_process_info()
-        comment = f'{application_config.name}-{application_config.environment}-{process_info}'
+        comment = f'{application_config.name}-{process_info}'
         try:
             log_repository = RepositoryProvider().get(Log)
             log = Log(TypeId=level, Content=log_string[0:4000], LogDatetime=log_datetime,
@@ -28,8 +28,10 @@ class SqlLogger(IScoped):
             log_repository.insert(log)
             log_repository.commit()
         except Exception as ex:
-            console_logger.error(f'Sql logging getting error{ex}')
+            console_logger.error(f'{job_id}-Sql logging getting error. Error:{ex}')
         finally:
+            if job_id is not None:
+                log_string = f"{job_id}-{log_string}"
             console_logger.log(level, f'{log_string}')
 
     #######################################################################################

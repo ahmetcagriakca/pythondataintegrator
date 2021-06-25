@@ -7,8 +7,8 @@ from time import time
 from typing import List
 from IocManager import IocManager
 from infrastructor.logging.SqlLogger import SqlLogger
-from multi_processing.models.ProcessInfo import ProcessInfo
-from multi_processing.models.ProcessTask import ProcessTask
+from infrastructor.multi_processing.models.ProcessInfo import ProcessInfo
+from infrastructor.multi_processing.models.ProcessTask import ProcessTask
 
 
 class ProcessManager:

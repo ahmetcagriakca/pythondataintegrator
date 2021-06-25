@@ -1,4 +1,4 @@
-import logging as log
+import logging
 from datetime import datetime
 from injector import inject
 from infrastructor.dependency.scopes import ISingleton
@@ -7,16 +7,16 @@ from infrastructor.utils.Utils import Utils
 
 class ConsoleLogger(ISingleton):
     @inject
-    def __init__(self):
-        self.log_level = log.DEBUG
+    def __init__(self, log_level=logging.DEBUG):
+        self.log_level = log_level
+        self.logger = logging
         self.log_init()
-        self.logger = log
 
     def log_init(self):
         """
         initialization of log file.
         """
-        log.basicConfig(level=self.log_level)
+        logging.basicConfig(level=self.log_level)
 
     @staticmethod
     def prepare_message(message):

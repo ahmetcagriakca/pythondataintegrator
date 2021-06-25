@@ -19,5 +19,9 @@ class ProcessService(rpyc.Service):
         finally:
             pass
 
-    def exposed_job_start(self, job_id, data_operation_id, *args, **kwargs):
-        return OperationProcess.start_operation_process(data_operation_id=data_operation_id, job_id=job_id)
+    def exposed_job_start(self, data_operation_id=None, job_id=None, data_operation_job_execution_id=None, *args, **kwargs):
+        operation_process=OperationProcess()
+        result=operation_process.start_operation_process(data_operation_id=data_operation_id, job_id=job_id,
+                                                        data_operation_job_execution_id=data_operation_job_execution_id)
+        del operation_process
+        return result

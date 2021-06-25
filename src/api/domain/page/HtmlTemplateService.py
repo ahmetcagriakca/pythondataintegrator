@@ -18,21 +18,13 @@ from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJob
 from models.enums.events import EVENT_EXECUTION_INITIALIZED
 
 
-class EmailService(IScoped):
+class HtmlTemplateService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
-                 sql_logger: SqlLogger,
-                 email_provider: EmailProvider,
-                 config_service: ConfigService,
                  application_config: ApplicationConfig
 
                  ):
         self.application_config: ApplicationConfig = application_config
-        self.database_session_manager = database_session_manager
-        self.sql_logger: SqlLogger = sql_logger
-        self.email_provider = email_provider
-        self.config_service = config_service
 
     @property
     def default_css(self):
@@ -40,31 +32,30 @@ class EmailService(IScoped):
             .wrapper{
                 margin: 0 auto;
                 padding: 20px;
-                max-width: 1000px;
             }    
             .container600 {
                 width: 300px;
                 max-width: 100%;
             }
-            
+
             @media all and (max-width: 600px) {
                 .container600 {
                     width: 100% !important;
                 }
             }
-            
+
             .col49 {
                 width: 49%;
             }
-            
+
             .col2 {
                 width: 2%;
             }
-            
+
             .col50 {
                 width: 50%;
             }
-            
+
             @media all and (max-width: 599px) {
                 .fluid {
                     width: 100% !important;
@@ -103,12 +94,12 @@ class EmailService(IScoped):
               border-collapse: collapse;
               width: 100%;
             }
-            
+
             th, td {
               text-align: left;
               padding: 8px;
             }
-            
+
             tr:nth-child(even) {background-color: #f2f2f2;}
             '''
 
@@ -134,7 +125,7 @@ class EmailService(IScoped):
             return dict[key]
         return ''
 
-    def prepare_table(self, columns: List[str], rows: List[any], width):
+    def render_table(self, columns: List[str], rows: List[any], width):
         headers = ''
         for column in columns:
             column_style = self.get_dict_value(column, 'style')
@@ -164,58 +155,14 @@ class EmailService(IScoped):
             '''
         return table
 
-    def add_default_contacts(self, operation_contacts):
+    def render_html(self,
+                    content,
+                    ):
 
-        default_contacts = self.config_service.get_config_by_name("DataOperationDefaultContact")
-        if default_contacts is not None and default_contacts != '':
-            default_contacts_emails = default_contacts.split(",")
-            for default_contact in default_contacts_emails:
-                if default_contact is not None and default_contact != '':
-                    operation_contacts.append(default_contact)
-
-    def send_data_operation_finish_mail(self,
-                                        data_operation_job_execution_id,
-                                        data_operation_job_execution_status_id,
-                                        data_operation_name,
-                                        operation_contacts,
-                                        execution_table_data,
-                                        execution_event_table_data,
-                                        execution_integration_table_data
-                                        ):
-        self.add_default_contacts(operation_contacts=operation_contacts)
-        if operation_contacts is None:
-            self.sql_logger.info(f'{data_operation_job_execution_id} mail sending contact not found',
-                                 job_id=data_operation_job_execution_id)
-            return
-        subject = f"Execution completed"
-        if data_operation_job_execution_status_id == 3:
-            subject = subject + " successfully"
-        elif data_operation_job_execution_status_id == 4:
-            subject = subject + " with error"
-        subject = subject + f": {self.application_config.environment} » {data_operation_name} » {data_operation_job_execution_id}"
-        execution_table = self.prepare_table(columns=execution_table_data['columns'],
-                                             rows=execution_table_data['rows'],
-                                             width=800)
-        # execution_event_table = self.prepare_table(columns=execution_event_table_data['columns'],
-        #                                            rows=execution_event_table_data['rows'],
-        #                                            width=400)
-        execution_integration_table = self.prepare_table(columns=execution_integration_table_data['columns'],
-                                                         rows=execution_integration_table_data['rows'],
-                                                         width=None)
-
-        # <div style="font-size: 24px;"><b>Data Operation Events</b></div>
-        # {execution_event_table}
         body_content = f'''
                 <div class="wrapper">
-                    <div style="font-size: 24px;"><b>Data Operation </b></div>
-                    {execution_table}
-                    <div style="font-size: 24px;"><b>Data Operation Integrations</b></div>
-                    {execution_integration_table}
+                    {content}
                 </div>
                 '''
         mail_body = self.mail_html_template(body_content)
-
-        try:
-            self.email_provider.send(operation_contacts, subject, mail_body)
-        except Exception as ex:
-            self.sql_logger.error(f"Error on mail sending. Error:{ex}", job_id=data_operation_job_execution_id)
+        return mail_body

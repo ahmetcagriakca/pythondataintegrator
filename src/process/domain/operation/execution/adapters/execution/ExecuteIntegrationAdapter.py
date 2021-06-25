@@ -111,6 +111,7 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
                     job_id=data_operation_job_execution_id)
 
             affected_row_count = self.execute_integration_process.start_integration_execution(
+                data_operation_job_execution_id=data_operation_job_execution_id,
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
                 data_operation_integration_id=data_operation_integration_id)
 
