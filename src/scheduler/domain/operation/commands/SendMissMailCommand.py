@@ -70,5 +70,3 @@ class SendMissMailCommand:
                     self.sql_logger.error(f"Error on mail sending. Error:{ex}")
         except Exception as ex:
             self.sql_logger.error(f"Miss mail sending getting error. Error:{ex}")
-        finally:
-            self.repository_provider.close()

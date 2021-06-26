@@ -20,9 +20,6 @@ class RepositoryProvider(IScoped):
         self.database_config = database_config
         self.database_session_manager = database_session_manager
 
-    def __del__(self):
-        self.close()
-
     def create(self) -> DatabaseSessionManager:
         if self.database_session_manager is None:
             if self.database_config is not None:

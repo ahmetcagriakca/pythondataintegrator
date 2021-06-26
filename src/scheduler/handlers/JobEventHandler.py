@@ -4,7 +4,7 @@ from queue import Queue
 from injector import inject
 
 from IocManager import IocManager
-from domain.operation.command.SendMissMailCommand import SendMissMailCommand
+from domain.operation.commands.SendMissMailCommand import SendMissMailCommand
 from apscheduler.events import EVENT_JOB_MISSED
 
 

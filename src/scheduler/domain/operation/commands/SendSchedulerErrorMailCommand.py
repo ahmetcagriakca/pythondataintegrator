@@ -48,5 +48,3 @@ class SendSchedulerErrorMailCommand:
                 self.sql_logger.error(f"Scheduler  mail sending. Error:{ex}",job_id=data_operation_job_execution_id)
         except Exception as ex:
             self.sql_logger.error(f"Scheduler getting error. Error:{ex}",job_id=data_operation_job_execution_id)
-        finally:
-            self.repository_provider.close()

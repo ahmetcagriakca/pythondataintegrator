@@ -1,6 +1,6 @@
 from IocManager import IocManager
-from domain.operation.command.CreateExecutionCommand import CreateExecutionCommand
-from domain.operation.command.SendSchedulerErrorMailCommand import SendSchedulerErrorMailCommand
+from domain.operation.commands.CreateExecutionCommand import CreateExecutionCommand
+from domain.operation.commands.SendSchedulerErrorMailCommand import SendSchedulerErrorMailCommand
 from infrastructor.data.decorators.TransactionHandler import transaction_handler
 from infrastructor.logging.SqlLogger import SqlLogger
 import time

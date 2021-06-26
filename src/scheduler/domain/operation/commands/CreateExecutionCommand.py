@@ -61,5 +61,4 @@ class CreateExecutionCommand:
         self.repository_provider.get(DataOperationJobExecutionEvent).insert(data_operation_job_execution_event)
         self.repository_provider.get(DataOperationJobExecutionEvent).commit()
         result = data_operation_job_execution.Id
-        self.repository_provider.close()
         return result

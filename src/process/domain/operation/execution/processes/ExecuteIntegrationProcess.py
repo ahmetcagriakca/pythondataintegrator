@@ -6,6 +6,7 @@ from injector import inject
 from pandas import DataFrame, notnull
 import pandas as pd
 
+from infrastructor.data.decorators.TransactionHandler import transaction_handler
 from infrastructor.multi_processing.ProcessManager import ProcessManager
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
 from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
@@ -46,6 +47,7 @@ class ExecuteIntegrationProcess(IScoped):
             data_result_queue=data_result_queue,
         )
 
+    @transaction_handler
     def start_source_data_operation(self, sub_process_id,
                                     data_integration_id: int,
                                     data_operation_job_execution_id: int,
@@ -55,7 +57,7 @@ class ExecuteIntegrationProcess(IScoped):
                                     data_queue: Queue,
                                     data_result_queue: Queue):
         self.sql_logger.info(f"Source Data started on process. SubProcessId: {sub_process_id}",
-                            job_id=data_operation_job_execution_id)
+                             job_id=data_operation_job_execution_id)
         try:
             self.integration_execution_service.start_source_data_operation(
                 data_integration_id=data_integration_id,
@@ -89,6 +91,7 @@ class ExecuteIntegrationProcess(IScoped):
             data_result_queue=data_result_queue,
         )
 
+    @transaction_handler
     def start_execute_data_operation(self,
                                      sub_process_id: int,
                                      data_integration_id: int,
@@ -153,7 +156,7 @@ class ExecuteIntegrationProcess(IScoped):
                     end = time()
                     self.sql_logger.info(
                         f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process finished task. time:{end - start}",
-                            job_id=data_operation_job_execution_id)
+                        job_id=data_operation_job_execution_id)
                     data_task.IsProcessed = True
                     data_result_queue.put(True)
             return total_row_count
