@@ -79,13 +79,13 @@ class EmailProvider(IScoped):
 
         except (gaierror, ConnectionRefusedError)as ex:
             # tell the script to report if your message was sent or which errors need to be fixed
-            print('Failed to connect to the server. Bad connection settings? Error:' + str(ex))
+            self.sql_logger.error('Failed to connect to the server. Bad connection settings? Error:' + str(ex))
         except smtplib.SMTPServerDisconnected as ex:
-            print('Failed to connect to the server. Wrong user/password? Error:' + str(ex))
+            self.sql_logger.error('Failed to connect to the server. Wrong user/password? Error:' + str(ex))
         except smtplib.SMTPException as ex:
-            print('SMTP error occurred: ' + str(ex))
+            self.sql_logger.error('SMTP error occurred: ' + str(ex))
         else:
-            print('Sent')
+            self.sql_logger.info('Email sent successfully')
         finally:
             if smtp is not None:
                 smtp.close()

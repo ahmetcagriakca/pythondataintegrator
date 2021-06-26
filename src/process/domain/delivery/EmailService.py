@@ -217,5 +217,6 @@ class EmailService(IScoped):
 
         try:
             self.email_provider.send(operation_contacts, subject, mail_body)
+            self.sql_logger.error(f"Mail Sent successfully.", job_id=data_operation_job_execution_id)
         except Exception as ex:
             self.sql_logger.error(f"Error on mail sending. Error:{ex}", job_id=data_operation_job_execution_id)

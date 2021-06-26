@@ -92,6 +92,22 @@ class ExecuteIntegrationProcess(IScoped):
         )
 
     @transaction_handler
+    def start_execute_data_operation_on_process(self,
+                                                sub_process_id: int,
+                                                data_integration_id: int,
+                                                data_operation_job_execution_id: int,
+                                                data_operation_job_execution_integration_id: int,
+                                                data_queue: Queue,
+                                                data_result_queue: Queue) -> int:
+        return IocManager.injector.get(ExecuteIntegrationProcess).start_execute_data_operation(
+            sub_process_id=sub_process_id,
+            data_integration_id=data_integration_id,
+            data_operation_job_execution_id=data_operation_job_execution_id,
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+            data_queue=data_queue,
+            data_result_queue=data_result_queue,
+        )
+
     def start_execute_data_operation(self,
                                      sub_process_id: int,
                                      data_integration_id: int,

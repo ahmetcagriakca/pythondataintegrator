@@ -1,4 +1,3 @@
-import pandas as pd
 from unittest import TestCase
 
 import os
@@ -52,7 +51,7 @@ class TestProcess(TestCase):
             return data
 
     def test_dynamic_static_method_call_with_args(self):
-        df = pd.DataFrame([{"a": 1, "b": "2011-10-20T00:00:00.000Z","c":'asd'}])
+        # df = pd.DataFrame([{"a": 1, "b": "2011-10-20T00:00:00.000Z","c":'asd'}])
         df = df.astype(dtype={"a": "int", "b": "datetime64[ns]","c":"str"})
         # test = df.apply(self.check_type )
         #
