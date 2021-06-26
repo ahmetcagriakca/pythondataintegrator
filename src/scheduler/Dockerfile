@@ -1,31 +1,18 @@
-# Python runtime with pyodbc to connect to SQL Server# Python runtime with pyodbc to connect to SQL Server
-FROM  centos:7
+FROM  python:3.6.8
 
-RUN yum update -y
-RUN yum install -y epel-release
-RUN yum install -y python3 python3-pip
+RUN     mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+RUN     pip install  --upgrade pip
+COPY    ./requirements.txt /usr/src/app/requirements.txt
+RUN     pip install  -r requirements.txt 
 
-ARG         PIP_URL_PRIVATE
-RUN         echo "Python repository url: $PIP_URL_PRIVATE"
-RUN         pip3 install --upgrade pip
-COPY       	./requirements.txt /app/requirements.txt
-WORKDIR    	/app
+RUN     pip list
+RUN     python --version
+RUN     date
 
-RUN 		pip3 install -r requirements.txt 
-RUN         pip3 list
-COPY       	. /app
-WORKDIR    	/app
-RUN python3 --version
-RUN date
-
-ADD entrypoint.sh .
-# # openshift set permission to non-root users for /app directory
-RUN chgrp -R 0 /app && \
-    chmod -R g=u /app && \
-    chgrp -R 0 /etc/passwd && \
-    chmod -R g=u /etc/passwd
-
+COPY    . /usr/src/app
 # # openshift set running user 
-USER 1001
-ENTRYPOINT 	["/bin/sh"]
-CMD 	["entrypoint.sh"]
+
+USER    1001
+ENTRYPOINT 	["python"]
+CMD 		["app.py"]
