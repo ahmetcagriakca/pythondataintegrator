@@ -3,7 +3,7 @@ import os
 import sys
 from flask import Flask
 from flask_injector import request, FlaskInjector
-from flask_restplus import Api
+from flask_restx import Api
 from injector import singleton, Injector, threadlocal, Binder
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base

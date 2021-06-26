@@ -13,6 +13,7 @@ from infrastructor.logging.SqlLogger import SqlLogger
 class EmailProvider(IScoped):
     @inject
     def __init__(self, config_service: ConfigService, sql_logger: SqlLogger):
+        super().__init__()
         self.sql_logger = sql_logger
         self.config_service = config_service
 
@@ -37,26 +38,26 @@ class EmailProvider(IScoped):
                 return
 
             # Create the root message and fill in the from, to, and subject headers
-            msgRoot = MIMEMultipart('related')
-            msgRoot[
+            msg_root = MIMEMultipart('related')
+            msg_root[
                 'Subject'] = subject
-            msgRoot['From'] = from_address
+            msg_root['From'] = from_address
             recipients = ""
             if isinstance(to, list):
                 recipients = ", ".join(to)
-            msgRoot['To'] = recipients
-            msgRoot.preamble = 'This is a multi-part message in MIME format.'
+            msg_root['To'] = recipients
+            msg_root.preamble = 'This is a multi-part message in MIME format.'
 
             # Encapsulate the plain and HTML versions of the message body in an
             # 'alternative' part, so message agents can decide which they want to display.
-            msgAlternative = MIMEMultipart('alternative')
-            msgRoot.attach(msgAlternative)
+            msg_alternative = MIMEMultipart('alternative')
+            msg_root.attach(msg_alternative)
             html = body
 
-            # msgText = MIMEText('<b>Some <i>HTML</i> text</b> and an image.<br><img src="cid:image1"><br>Nifty!', 'html')
-            # msgAlternative.attach(msgText)
-            msgText = MIMEText(html, "html")
-            msgAlternative.attach(msgText)
+            # msgText = MIMEText('<b>Some <i>HTML</i> text</b> and an image.<br><img src="cid:image1"><br>Nifty!',
+            # 'html') msgAlternative.attach(msgText)
+            msg_text = MIMEText(html, "html")
+            msg_alternative.attach(msg_text)
 
             # # This example assumes the image is in the current directory
             # file_path_1 = os.path.join(root_directory, 'image1.jpg')
@@ -72,7 +73,7 @@ class EmailProvider(IScoped):
                     smtp.ehlo()
                     smtp.starttls()
                     smtp.login(user, password)
-                smtp.sendmail(smtp_address, to, msgRoot.as_string())
+                smtp.sendmail(smtp_address, to, msg_root.as_string())
             finally:
                 if smtp is not None:
                     smtp.quit()

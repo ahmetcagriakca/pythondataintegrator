@@ -8,9 +8,8 @@ from models.dao.common import Log
 
 class DataOperationJobExecutionLogPage(IScoped):
     @inject
-    def __init__(self,
-                 repository_provider: RepositoryProvider,
-                 html_template_service: HtmlTemplateService):
+    def __init__(self, repository_provider: RepositoryProvider, html_template_service: HtmlTemplateService):
+        super().__init__()
         self.repository_provider = repository_provider
         self.html_template_service = html_template_service
 

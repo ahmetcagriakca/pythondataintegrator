@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import List
 
-from flask_restplus import fields
+from flask_restx import fields
 
 from controllers.common.models.CommonModels import EntityModel, CommonModels
 from controllers.integration.models.DataIntegrationModels import DataIntegrationModels

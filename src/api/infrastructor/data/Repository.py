@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Generic, List, TypeVar
+from typing import Generic, List, TypeVar, Optional
 
 from injector import inject
 from sqlalchemy.orm import Query

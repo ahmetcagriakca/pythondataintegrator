@@ -14,7 +14,6 @@ class ApSchedulerEvent(Entity, IocManager.Base):
     Name = Column(String(255), nullable=False)
     Description = Column(String(1000), nullable=False)
     Class = Column(String(255), nullable=False)
-    jobs = relationship('ApSchedulerJobEvent', backref='ApSchedulerEvent')
     JobEvents: List[ApSchedulerJobEvent] = relationship("ApSchedulerJobEvent", back_populates="ApSchedulerEvent")
 
     def __init__(self,

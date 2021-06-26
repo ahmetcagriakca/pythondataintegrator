@@ -44,11 +44,11 @@ class ErrorHandlers(ISingleton):
         exception_traceback = traceback.format_exc()
         output = self.separator.join(exception.args)
         # replace the body with JSON
-        response = json.dumps({
-            "result": "",
-            "isSuccess": "false",
-            "message": f"Server exception occurred. Exception Message:{output}",
-        })
+        # response = json.dumps({
+        #     "result": "",
+        #     "isSuccess": "false",
+        #     "message": f"Server exception occurred. Exception Message:{output}",
+        # })
         output_message = "empty"
         if output is not None and output != "":
             output_message = output
@@ -56,7 +56,11 @@ class ErrorHandlers(ISingleton):
         if exception_traceback is not None and exception_traceback != "":
             trace_message = exception_traceback
         self.sql_logger.error(f'Messsage:{output_message} - Trace:{trace_message}')
-        return response, 500, {self.mime_type_string: self.default_content_type}
+        return {
+            "result": "",
+            "isSuccess": "false",
+            "message": f"Server exception occurred. Exception Message:{output}",
+        }, 500, {self.mime_type_string: self.default_content_type}
 
     def handle_operational_exception(self, exception):
         """Return JSON instead of HTML for HTTP errors."""
@@ -77,4 +81,8 @@ class ErrorHandlers(ISingleton):
         if exception_traceback is not None and exception_traceback != "":
             trace_message = exception_traceback
         self.sql_logger.error(f'Operational Exception Messsage:{output_message} - Trace:{trace_message}')
-        return response, 500, {self.mime_type_string: self.default_content_type}
+        return  {
+            "result": "",
+            "isSuccess": "false",
+            "message": f"Server exception occurred. Exception Message:{output}",
+        }, 500, {self.mime_type_string: self.default_content_type}

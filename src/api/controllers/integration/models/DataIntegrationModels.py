@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from flask_restplus import fields
+from flask_restx import fields
 
 from controllers.common.models.CommonModels import EntityModel, CommonModels
 from controllers.connection.models.ConnectionModels import ConnectionModels

@@ -5,12 +5,12 @@ from IocManager import IocManager
 
 
 class ApSchedulerJobEvent(Entity, IocManager.Base):
-    # TODO: This feels bad man
     __tablename__ = "ApSchedulerJobEvent"
     __table_args__ = {"schema": "Aps"}
     ApSchedulerJobId = Column(Integer, ForeignKey('Aps.ApSchedulerJob.Id'))
     EventId = Column(Integer, ForeignKey('Aps.ApSchedulerEvent.Id'))
     ApSchedulerJob = relationship("ApSchedulerJob", back_populates="JobEvents")
+    ApSchedulerEvent = relationship("ApSchedulerEvent", back_populates="JobEvents")
     def __init__(self,
                  EventId: int = None,
                  ApSchedulerJobId: str = None,

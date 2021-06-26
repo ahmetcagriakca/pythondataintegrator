@@ -22,7 +22,7 @@ class FlaskAppWrapper:
         self.register_error_handlers()
 
     def register_error_handlers(self):
-        IocManager.app.register_error_handler(OperationalException, self.handlers.handle_operational_exception)
+        # IocManager.app.register_error_handler(OperationalException, self.handlers.handle_operational_exception)
         IocManager.app.register_error_handler(Exception, self.handlers.handle_exception)
         IocManager.app.register_error_handler(HTTPException, self.handlers.handle_http_exception)
         IocManager.app.after_request(RequestHandlers.after_request)
