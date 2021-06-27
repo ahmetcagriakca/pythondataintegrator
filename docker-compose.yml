@@ -15,6 +15,25 @@ services:
     volumes:
       - /var/lib/pdipostgresql/data
   
+  pdi-api:
+    build: 
+      context: src/api/
+      dockerfile: Dockerfile
+    ports:
+      - '7100:7100'
+    environment:
+      - APPLICATION_ENVIRONMENT=TEST
+      - DATABASE_TYPE=POSTGRESQL
+      - DATABASE_HOST=postgresql
+      - DATABASE_DATABASE=pdi
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=123456
+      - DATABASE_PORT=5432
+      - SCHEDULER_RPC_CLIENT_HOST=pdi-scheduler
+      - TZ=Europe/Istanbul
+    depends_on:
+      - postgresql
+
   pdi-process:
     build: 
       context: src/process/
@@ -52,24 +71,4 @@ services:
     depends_on:
       - postgresql
       - pdi-process
-
-  pdi-api:
-    build: 
-      context: src/api/
-      dockerfile: Dockerfile
-    ports:
-      - '7100:7100'
-    environment:
-      - APPLICATION_ENVIRONMENT=TEST
-      - DATABASE_TYPE=POSTGRESQL
-      - DATABASE_HOST=postgresql
-      - DATABASE_DATABASE=pdi
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=123456
-      - DATABASE_PORT=5432
-      - SCHEDULER_RPC_CLIENT_HOST=pdi-scheduler
-      - TZ=Europe/Istanbul
-    depends_on:
-      - postgresql
-      - pdi-scheduler
     

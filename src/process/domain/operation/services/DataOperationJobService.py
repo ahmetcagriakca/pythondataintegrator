@@ -64,12 +64,14 @@ class DataOperationJobService(IScoped):
                 data_operation_job=data_operation_job, next_run_time=ap_scheduler_job.NextRunTime)
 
     def check_removed_job(self, ap_scheduler_job_id):
-        job_detail = self.database_session_manager.session.query(
+        EVENT_JOB_REMOVED = 2 ** 10
+        job_detail_query = self.database_session_manager.session.query(
             ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
         ) \
             .filter(ApSchedulerJobEvent.ApSchedulerJobId == ApSchedulerJob.Id) \
             .filter(ApSchedulerJobEvent.EventId == ApSchedulerEvent.Id) \
-            .filter(ApSchedulerEvent.Code == 2 ** 10) \
-            .filter(ApSchedulerJob.Id == ap_scheduler_job_id).first()
+            .filter(ApSchedulerEvent.Code == EVENT_JOB_REMOVED) \
+            .filter(ApSchedulerJob.Id == ap_scheduler_job_id)
+        job_detail = job_detail_query.first()
         if job_detail is not None:
             self.remove_data_operation_job(ap_scheduler_job_id=job_detail.ApSchedulerJob.Id)

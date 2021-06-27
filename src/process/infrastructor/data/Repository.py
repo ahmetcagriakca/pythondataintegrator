@@ -22,7 +22,8 @@ class Repository(Generic[T]):
 
     def first(self, **kwargs) -> T:
         query: Query = self.table.filter_by(**kwargs)
-        return query.first()
+        query_data=query.first()
+        return query_data
 
     def filter_by(self, **kwargs) -> List[T]:
         return self.table.filter_by(**kwargs)

@@ -17,8 +17,8 @@ from models.dao.operation import DataOperation
 
 
 class OperationProcess:
+    @transaction_handler
     def start(self, data_operation_id: int, job_id: int, data_operation_job_execution_id: int):
-        IocManager.initialize()
         start = time.time()
         start_datetime = datetime.now()
 
@@ -49,9 +49,10 @@ class OperationProcess:
 
     @staticmethod
     def start_process(data_operation_id: int, job_id: int, data_operation_job_execution_id: int):
+        IocManager.initialize()
         operation_process = OperationProcess()
         operation_process.start(data_operation_id=data_operation_id, job_id=job_id,
-                                         data_operation_job_execution_id=data_operation_job_execution_id)
+                                data_operation_job_execution_id=data_operation_job_execution_id)
         del operation_process
 
     @transaction_handler

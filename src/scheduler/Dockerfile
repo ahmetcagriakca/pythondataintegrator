@@ -11,7 +11,6 @@ RUN     python --version
 RUN     date
 
 COPY    . /usr/src/app
-# # openshift set running user 
 
 USER    1001
 ENTRYPOINT 	["python"]

@@ -46,9 +46,7 @@ class ConnectionAdapterFactory(IScoped):
         else:
             raise NotSupportedFeatureException(f"{source_connection.Connection.ConnectionType}")
 
-
     def get_target_adapter(self, data_integration_id) -> ConnectionAdapter:
-
         target_connection = self.data_integration_connection_service.get_target_connection(
             data_integration_id=data_integration_id)
         if target_connection.Connection.ConnectionType.Id == ConnectionTypes.Database.value:

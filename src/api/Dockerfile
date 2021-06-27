@@ -16,5 +16,5 @@ COPY    . /usr/src/app
 USER    1001
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
-ENTRYPOINT 	["python"]
-CMD 		["app.py"]
+ENTRYPOINT 	["/bin/sh"]
+CMD 	["entrypoint.sh"]

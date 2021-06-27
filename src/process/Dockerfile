@@ -32,27 +32,19 @@ RUN echo export PATH=$ORACLE_HOME/bin:$PATH >> /etc/bashrc
 
 RUN pip3 install  cx_Oracle
 
-ARG         PIP_URL_PRIVATE
-RUN         echo "Python repository url: $PIP_URL_PRIVATE"
-RUN         pip3 install --upgrade pip
-COPY       	./requirements.txt /app/requirements.txt
-WORKDIR    	/app
+RUN     mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+RUN     pip3 install  --upgrade pip
+COPY    ./requirements.txt /usr/src/app/requirements.txt
+RUN     pip3 install  -r requirements.txt 
 
-RUN 		pip3 install -r requirements.txt 
-RUN         pip3 list
-COPY       	. /app
-WORKDIR    	/app
-RUN python3 --version
-RUN date
+RUN     pip3 list
+RUN     python3 --version
+RUN     date
 
-ADD entrypoint.sh .
-# # openshift set permission to non-root users for /app directory
-RUN chgrp -R 0 /app && \
-    chmod -R g=u /app && \
-    chgrp -R 0 /etc/passwd && \
-    chmod -R g=u /etc/passwd
+COPY    . /usr/src/app
 
-# # openshift set running user 
-USER 1001
-ENTRYPOINT 	["/bin/sh"]
-CMD 	["entrypoint.sh"]
+USER    1001
+
+ENTRYPOINT 	["python3"]
+CMD 		["app.py"]

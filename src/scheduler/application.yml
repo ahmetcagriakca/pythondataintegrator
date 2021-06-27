@@ -7,7 +7,7 @@ DATABASE:
   #POSTGRESQL local environment
   TYPE: POSTGRESQL
   HOST: localhost
-  PORT: 5433
+  PORT: 5432
   DATABASE: pdi
   USERNAME: postgres
   PASSWORD: 123456
