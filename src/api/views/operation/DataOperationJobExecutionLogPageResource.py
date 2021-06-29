@@ -3,21 +3,19 @@ from injector import inject
 from domain.operation.page.DataOperationJobExecutionLogPage import DataOperationJobExecutionLogPage
 from IocManager import IocManager
 from infrastructor.api.ResourceBase import ResourceBase
-
-ns = IocManager.api.namespace('DataOperation', description='Data Operation endpoints',
-                              path='/DataOperation/Job/Execution/Log')
+from views.operation.PageModels import PageModels
 
 
-@ns.route('/<int:data_operation_job_execution_id>', doc=False)
-class DataOperationJobExecutionLogResource(ResourceBase):
+@PageModels.ns.route('/Job/Execution/Log/<int:data_operation_job_execution_id>')
+class DataOperationJobExecutionLogPageResource(ResourceBase):
     @inject
-    def __init__(self, data_operation_job_execution_log_page: DataOperationJobExecutionLogPage,
+    def __init__(self, page: DataOperationJobExecutionLogPage,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data_operation_job_execution_log_page = data_operation_job_execution_log_page
+        self.page = page
 
     @IocManager.api.representation('text/html')
     def get(self, data_operation_job_execution_id):
-        page = self.data_operation_job_execution_log_page.render(
+        page = self.page.render(
             data_operation_job_execution_id=data_operation_job_execution_id)
         return make_response(page, 200)
