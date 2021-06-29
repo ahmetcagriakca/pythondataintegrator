@@ -1,21 +1,31 @@
-from datetime import datetime
+import json
 from typing import List
 
 from injector import inject
+from sqlalchemy import text
 
-from infrastructor.configuration.ConfigService import ConfigService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
-from infrastructor.delivery.EmailProvider import EmailProvider
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructor.json.JsonConvert import JsonConvert
 from models.configs.ApplicationConfig import ApplicationConfig
-from models.dao.common import OperationEvent
-from models.dao.common.Log import Log
-from models.dao.common.Status import Status
-from models.dao.operation import DataOperationJobExecution, DataOperationJob
-from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
-from models.enums.events import EVENT_EXECUTION_INITIALIZED
+
+
+@JsonConvert.register
+class Pagination:
+
+    def __init__(self,
+                 Filter: str = None,
+                 Page: int = None,
+                 PageUrl: str = None,
+                 Limit: int = None,
+                 TotalPage: int = None,
+                 TotalCount: int = None
+                 ):
+        self.Filter: str = Filter
+        self.Page: int = Page
+        self.PageUrl: str = PageUrl
+        self.Limit: int = Limit
+        self.TotalPage: int = TotalPage
+        self.TotalCount: int = TotalCount
 
 
 class HtmlTemplateService(IScoped):
@@ -28,6 +38,31 @@ class HtmlTemplateService(IScoped):
 
     @property
     def default_css(self):
+        pagination_css = '''
+        
+            .pagination {
+              display: table;
+            margin: 0 auto;
+                padding: 20px;
+            }
+            
+            .pagination a {
+              color: black;
+              float: left;
+              padding: 8px 16px;
+              text-decoration: none;
+              transition: background-color .3s;
+              border: 1px solid #ddd;
+            }
+            
+            .pagination a.active {
+              background-color: #4CAF50;
+              color: white;
+              border: 1px solid #4CAF50;
+            }
+            
+            .pagination a:hover:not(.active) {background-color: #ddd;}
+'''
         return '''
             .wrapper{
                 margin: 0 auto;
@@ -87,7 +122,7 @@ class HtmlTemplateService(IScoped):
                 font-size: 10px; 
                 line-height:10px;
             }
-            .mail-row-nowrap{
+            .row-nowrap{
                 white-space: nowrap;
             }
             table {
@@ -101,7 +136,7 @@ class HtmlTemplateService(IScoped):
             }
 
             tr:nth-child(even) {background-color: #f2f2f2;}
-            '''
+            ''' + pagination_css
 
     def mail_html_template(self, body, mail_css=None):
         css = mail_css if mail_css is not None else self.default_css
@@ -120,21 +155,61 @@ class HtmlTemplateService(IScoped):
         '''
         return template
 
-    def get_dict_value(self, dict, key):
+    def get_nullable_dict_value(self, dict, key):
         if key in dict:
+            return dict[key]
+        return None
+
+    def get_dict_value(self, dict, key):
+        if key in dict and dict[key] is not None:
             return dict[key]
         return ''
 
-    def render_table(self, columns: List[str], rows: List[any], width):
+    def prepare_table_data_dynamic(self, query, headers, prepare_row, sortable=None, pagination: Pagination = None):
+
+        if sortable is not None:
+            query = query.order_by(text(sortable))
+        pagination_json = None
+        if pagination is not None:
+            total_count = query.count()
+            if pagination.Limit is None or pagination.Limit < 1 or pagination.Limit > 200:
+                pagination.Limit = 10
+            total_page = int(total_count / pagination.Limit) + 1
+            if pagination.Page is None or pagination.Page < 1 or total_page < pagination.Page:
+                pagination.Page = 1
+            if pagination.Limit:
+                query = query.limit(pagination.Limit)
+            if pagination.Page:
+                offset = (pagination.Page - 1) * pagination.Limit
+                if offset is None or offset <= 0:
+                    offset = 0
+                query = query.offset(offset)
+            pagination_json = {'PageUrl': pagination.PageUrl, 'Page': pagination.Page, 'Limit': pagination.Limit,
+                               'TotalCount': total_count, 'TotalPage': total_page,'Filter':pagination.Filter}
+        rows = []
+        for data in query:
+            row = prepare_row(data)
+            rows.append(row)
+        return {'columns': headers, 'rows': rows,
+                'pagination': pagination_json}
+
+    def render_table(self, source, width=None):
+        columns: List[str] = self.get_nullable_dict_value(source, 'columns')
+        rows: List[str] = self.get_nullable_dict_value(source, 'rows')
+        pagination_json = self.get_nullable_dict_value(source, 'pagination')
         headers = ''
+        headers = headers + f'<th scope="col"  class="mail-column">#</th>'
         for column in columns:
             column_style = self.get_dict_value(column, 'style')
             column_class = self.get_dict_value(column, 'class')
             column_value = self.get_dict_value(column, 'value')
             headers = headers + f'<th scope="col" style="{column_style}" class="mail-column {column_class}">{column_value}</th>'
         bodies = ''
+        index = 0
         for row in rows:
             bodies = bodies + '<tr>'
+            index = index + 1
+            bodies = bodies + f'<td valign="top" class="mail-row ">{index}</td>'
             for data in row['data']:
                 row_style = self.get_dict_value(data, 'style')
                 row_class = self.get_dict_value(data, 'class')
@@ -142,7 +217,27 @@ class HtmlTemplateService(IScoped):
                 bodies = bodies + f'<td valign="top" style="{row_style}" class="mail-row {row_class}">{row_value}</td>'
             bodies = bodies + '</tr>'
         table_width = width if width is not None else '100%'
+        pagination_html = ''
+        if pagination_json is not None:
+            page_data = ""
+            # JsonConvert.register(Pagination)
+            pagination = JsonConvert.FromJSON(json.dumps(pagination_json))
 
+            # TotalPage = self.get_nullable_dict_value(pagination, 'TotalPage')
+            for page in range(1, pagination.TotalPage + 1):
+                filter=f'{pagination.Filter}' if pagination.Filter is not None and pagination.Filter!='' else ''
+                page_url = pagination.PageUrl.format(f'?Page={page}&Limit={pagination.Limit}&Filter={filter}')
+                if page == pagination.Page:
+                    page_data = f'{page_data}<a href="{page_url}" class="active">{page}</a>'
+
+                else:
+                    page_data = f'{page_data}<a href="{page_url}" >{page}</a>'
+
+            pagination_html = f'''
+            <div class="pagination">
+              {page_data}
+            </div>
+            '''
         table = f'''
         <table width="{table_width}" cellpadding="0" cellspacing="0" style="min-width:100%;">
                 <thead>
@@ -152,6 +247,7 @@ class HtmlTemplateService(IScoped):
                   {bodies}
                 </tbody>
             </table>
+            {pagination_html}
             '''
         return table
 
