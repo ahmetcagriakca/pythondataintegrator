@@ -50,7 +50,7 @@ class DataOperationJobDetailPage(IScoped):
                     {'value': f'<a href="/DataOperation/Job/{data_operation_job.Id}">{data_operation_job.Id}</a>'},
                     {'value': data_operation_job.ApSchedulerJobId},
                     {
-                        'value': f'<a href="/DataOperation/{data_operation_job.DataOperation.Id}">{data_operation_job.DataOperation.Name}</a>'},
+                        'value': f'<a href="/DataOperation/{data_operation_job.DataOperation.Id}">{data_operation_job.DataOperation.Name}({data_operation_job.DataOperation.Id})</a>'},
                     {'value': contact_str},
                     {'value': next_run_time},
                     {'value': data_operation_job.Cron},
@@ -151,7 +151,7 @@ class DataOperationJobDetailPage(IScoped):
                         {
                             'value': f'<a href="/DataOperation/Job/{data.DataOperationJob.Id}">{data.DataOperationJob.Id}</a>'},
                         {
-                            'value': f'<a href="/DataOperation/{data.DataOperationJob.DataOperation.Id}">{data.DataOperationJob.DataOperation.Name}</a>'},
+                            'value': f'<a href="/DataOperation/{data.DataOperationJob.DataOperation.Id}">{data.DataOperationJob.DataOperation.Name}({data.DataOperationJob.DataOperation.Id})</a>'},
                         {
                             'value': f'{data.DataOperationJob.Cron}({data.DataOperationJob.StartDate}-{data.DataOperationJob.EndDate})'},
                         {'value': data.Status.Description},

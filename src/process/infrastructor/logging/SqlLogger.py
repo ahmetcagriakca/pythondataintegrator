@@ -20,7 +20,10 @@ class SqlLogger(IScoped):
         console_logger: ConsoleLogger = IocManager.injector.get(ConsoleLogger)
         log_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
         process_info = Utils.get_process_info()
-        comment = f'{application_config.name}-{process_info}'
+        application_name = application_config.name
+        if application_config.hostname is not None:
+            application_name += f'-{application_config.hostname}'
+        comment = f'{application_name}-{process_info}'
         try:
             log_repository = RepositoryProvider().get(Log)
             log = Log(TypeId=level, Content=log_string[0:4000], LogDatetime=log_datetime,

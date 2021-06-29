@@ -47,7 +47,7 @@ class DataOperationJobPage(IScoped):
                     {'value': f'<a href="/DataOperation/Job/{data_operation_job.Id}">{data_operation_job.Id}</a>'},
                     {'value': data_operation_job.ApSchedulerJobId},
                     {
-                        'value': f'<a href="/DataOperation/{data_operation_job.DataOperation.Id}">{data_operation_job.DataOperation.Name}</a>'},
+                        'value': f'<a href="/DataOperation/{data_operation_job.DataOperation.Id}">{data_operation_job.DataOperation.Name}({data_operation_job.DataOperation.Id})</a>'},
                     {'value': contact_str},
                     {'value': next_run_time},
                     {'value': data_operation_job.Cron},

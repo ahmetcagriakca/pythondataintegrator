@@ -3,6 +3,7 @@ from datetime import datetime
 from injector import inject
 
 from infrastructor.data.RepositoryProvider import RepositoryProvider
+from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.common import Status, OperationEvent
@@ -10,12 +11,14 @@ from models.dao.operation import DataOperationJob, DataOperationJobExecution, Da
     DataOperation
 
 
-class CreateExecutionCommand:
+class CreateExecutionCommand(IScoped):
     @inject
     def __init__(self,
+                 repository_provider: RepositoryProvider,
+                 sql_logger: SqlLogger
                  ):
-        self.repository_provider = RepositoryProvider()
-        self.sql_logger: SqlLogger = SqlLogger()
+        self.repository_provider = repository_provider
+        self.sql_logger: SqlLogger = sql_logger
 
     def get_data_operation_by_id(self, id: int) -> DataOperationJob:
         entity = self.repository_provider.get(DataOperation).first(IsDeleted=0, Id=id)
