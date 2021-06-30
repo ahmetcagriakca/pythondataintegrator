@@ -1,3 +1,4 @@
+from models.base.connection.ConnectorTypeBase import ConnectorTypeBase
 from models.dao.connection.ConnectionQueue import ConnectionQueue
 from typing import List
 
@@ -9,7 +10,7 @@ from models.dao.connection.ConnectionFile import ConnectionFile
 from models.dao.Entity import Entity
 
 
-class ConnectorType(Entity, IocManager.Base):
+class ConnectorType(ConnectorTypeBase,Entity, IocManager.Base):
     __tablename__ = "ConnectorType"
     __table_args__ = {"schema": "Connection"}
     ConnectionTypeId = Column(Integer, ForeignKey('Connection.ConnectionType.Id'))
@@ -18,13 +19,3 @@ class ConnectorType(Entity, IocManager.Base):
     Databases: List[ConnectionDatabase] = relationship("ConnectionDatabase", back_populates="ConnectorType")
     Files: List[ConnectionFile] = relationship("ConnectionFile", back_populates="ConnectorType")
     Queues: List[ConnectionQueue] = relationship("ConnectionQueue", back_populates="ConnectorType")
-
-    def __init__(self,
-                 Name: int = None,
-                 ConnectionTypeId: int = None,
-                 ConnectionType = None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.Name: int = Name
-        self.ConnectionTypeId: int = ConnectionTypeId
-        self.ConnectionType = ConnectionType

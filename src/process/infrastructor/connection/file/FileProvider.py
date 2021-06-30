@@ -32,9 +32,9 @@ class FileProvider(IScoped):
         Creating Connection
         """
         if connection.ConnectionType.Name == ConnectionTypes.File.name:
-            connection_basic_authentication = self.connection_secret_service.get_connection_basic_authentication(
+            connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
                 connection_id=connection.Id)
-            connection_server = self.connection_server_service.get_by_connection_id(
+            connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
                 connection_id=connection.Id)
             connector: FileConnector = None
             if connection.File.ConnectorType.Name == ConnectorTypes.CSV.name:

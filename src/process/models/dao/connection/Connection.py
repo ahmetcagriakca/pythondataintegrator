@@ -1,3 +1,4 @@
+from models.base.connection.ConnectionBase import ConnectionBase
 from models.dao.connection import ConnectionQueue
 from models.dao.connection.ConnectionServer import ConnectionServer
 from models.dao.connection.ConnectionSecret import ConnectionSecret
@@ -11,7 +12,7 @@ from models.dao.Entity import Entity
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 
 
-class Connection(Entity, IocManager.Base):
+class Connection(ConnectionBase,Entity, IocManager.Base):
     __tablename__ = "Connection"
     __table_args__ = {"schema": "Connection"}
     Name = Column(String(100), index=True, unique=False, nullable=False)
@@ -25,13 +26,3 @@ class Connection(Entity, IocManager.Base):
     ConnectionServers: List[ConnectionServer] = relationship("ConnectionServer", back_populates="Connection")
     DataIntegrationConnections: List[DataIntegrationConnection] = relationship("DataIntegrationConnection",
                                                                                back_populates="Connection")
-
-    def __init__(self,
-                 Name: str = None,
-                 ConnectionTypeId: int = None,
-                 ConnectionType=None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.Name: str = Name
-        self.ConnectionTypeId: int = ConnectionTypeId
-        self.ConnectionType = ConnectionType

@@ -6,7 +6,6 @@ from IocManager import IocManager
 from datetime import datetime
 from domain.operation.execution.services.OperationExecution import OperationExecution
 from domain.operation.services.DataOperationJobService import DataOperationJobService
-from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.data.decorators.TransactionHandler import transaction_handler
 from infrastructor.logging.SqlLogger import SqlLogger

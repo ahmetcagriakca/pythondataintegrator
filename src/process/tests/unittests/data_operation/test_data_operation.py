@@ -1,8 +1,11 @@
+import json
 import os
+import datetime
 from time import time
 from unittest import TestCase
 
 from IocManager import IocManager
+from domain.operation.execution.services.OperationExecution import OperationExecution
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.utils.ConfigManager import ConfigManager
@@ -10,6 +13,7 @@ from infrastructor.utils.Utils import Utils
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.operation import DataOperation
+from models.dao.secret import AuthenticationType
 from models.dto.PagingModifier import PagingModifier
 
 
@@ -61,50 +65,50 @@ class TestDataOperation(TestCase):
         for module in module_list:
             print(module)
 
-    def test_limit_data(self):
-        import socket
-        print(socket.gethostname())
-        socket.get
-        data_count = 700000
-        limit = 10000
-        end = limit
-        start = 0
-        paging_modifiers = []
-        while True:
-            if end != limit and end - data_count > limit:
-                break
-            paging_modifier = PagingModifier(End=end, Start=start)
-            paging_modifiers.append(paging_modifier)
-            end += limit
-            start += limit
-        for li in paging_modifiers:
-            print(f"{li.End} - {li.End}")
+    def test_datetime_encode(self):
+        class DateTimeEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, datetime.datetime):
+                    encoded_object = obj.isoformat()
+                else:
+                    encoded_object = json.JSONEncoder.default(self, obj)
+                return encoded_object
+
+        sample = {}
+        sample['title'] = "String"
+        sample['somedate'] = datetime.datetime.now()
+
+
+        print(json.dumps(sample, cls=DateTimeEncoder))
 
     def test_parallel_data_operation(self):
         start = time()
-        from domain.operation.services.DataOperationService import DataOperationService
-        data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
-        result = data_operation_service.start_operation('TEST_OPERATION', 0)
-        print(result)
-        end = time()
-        print(f"EndTime :{end}")
-        print(f"TotalTime :{end - start}")
 
-    def test_data_operation(self):
-        start = time()
+        from domain.operation.execution.services.OperationCacheService import OperationCacheService
+        operation_cache_service: OperationCacheService = IocManager.injector.get(OperationCacheService)
+        operation_cache_service.create(data_operation_id=27)
+        id=operation_cache_service.data_operation.Id
         from domain.operation.services.DataOperationService import DataOperationService
         data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
-        result = data_operation_service.start_operation('LOCAL_LOG', 0)
-        print(result)
+        result = data_operation_service.get_by_id( 27)
+        AuthenticationType()
+        result = data_operation_service.database_session_manager.session.execute(DataOperation.__table__.select())
+        for row in result:
+            print(dict(row))
+        print(dict(result))
         end = time()
         print(f"EndTime :{end}")
         print(f"TotalTime :{end - start}")
 
     def test_start_operation(self):
         start = time()
-        from domain.operation.services.DataOperationService import DataOperationService
-        data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
-        result = data_operation_service.start_operation('LOCAL_LOG', 0)
+        from domain.operation.execution.services.OperationExecution import OperationExecution
+        from domain.operation.commands.CreateExecutionCommand import CreateExecutionCommand
+        execution_id = IocManager.injector.get(CreateExecutionCommand).execute(data_operation_id=205, job_id=680)
+        operation_execution: OperationExecution = IocManager.injector.get(OperationExecution)
+        result = operation_execution.start(data_operation_id=27, job_id=None,
+                                           data_operation_job_execution_id=execution_id)
+
         print(result)
         end = time()
         print(f"EndTime :{end}")

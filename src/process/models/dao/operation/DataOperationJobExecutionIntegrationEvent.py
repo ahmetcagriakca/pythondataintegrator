@@ -3,10 +3,11 @@ from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from IocManager import IocManager
+from models.base.operation.DataOperationJobExecutionIntegrationEventBase import DataOperationJobExecutionIntegrationEventBase
 from models.dao.Entity import Entity
 
 
-class DataOperationJobExecutionIntegrationEvent(Entity, IocManager.Base):
+class DataOperationJobExecutionIntegrationEvent(DataOperationJobExecutionIntegrationEventBase,Entity, IocManager.Base):
     __tablename__ = "DataOperationJobExecutionIntegrationEvent"
     __table_args__ = {"schema": "Operation"}
     DataOperationJobExecutionIntegrationId = Column(Integer,
@@ -17,19 +18,3 @@ class DataOperationJobExecutionIntegrationEvent(Entity, IocManager.Base):
     Event = relationship("OperationEvent", back_populates="DataOperationJobExecutionIntegrationEvents")
     DataOperationJobExecutionIntegration = relationship("DataOperationJobExecutionIntegration",
                                                         back_populates="DataOperationJobExecutionIntegrationEvents")
-
-    def __init__(self,
-                 DataOperationJobExecutionIntegrationId: int = None,
-                 EventId: int = None,
-                 EventDate: datetime = None,
-                 AffectedRowCount:int = None,
-                 Event:any=None,
-                 DataOperationJobExecutionIntegration:any=None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.DataOperationJobExecutionIntegrationId: int = DataOperationJobExecutionIntegrationId
-        self.EventId: int = EventId
-        self.EventDate: datetime = EventDate
-        self.AffectedRowCount: int = AffectedRowCount
-        self.Event = Event
-        self.DataOperationJobExecutionIntegration = DataOperationJobExecutionIntegration

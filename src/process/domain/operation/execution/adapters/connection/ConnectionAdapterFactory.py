@@ -1,8 +1,8 @@
 from injector import inject
 
-from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
 from domain.operation.execution.adapters.connection.FileAdapter import FileAdapter
 from domain.operation.execution.adapters.connection.QueueAdapter import QueueAdapter
+from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
 from domain.operation.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
 from infrastructor.dependency.scopes import IScoped
@@ -14,31 +14,31 @@ from models.enums import ConnectionTypes
 class ConnectionAdapterFactory(IScoped):
     @inject
     def __init__(self,
-                 data_integration_connection_service: DataIntegrationConnectionService,
+                 operation_cache_service: OperationCacheService,
                  database_adapter: DatabaseAdapter,
                  file_adapter: FileAdapter,
                  queue_adapter: QueueAdapter,
                  ):
+        self.operation_cache_service = operation_cache_service
         self.queue_adapter = queue_adapter
         self.file_adapter = file_adapter
-        self.data_integration_connection_service = data_integration_connection_service
         self.database_adapter = database_adapter
 
     def get_source_adapter(self, data_integration_id) -> ConnectionAdapter:
 
-        source_connection = self.data_integration_connection_service.get_source_connection(
+        source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
-        if source_connection.Connection.ConnectionType.Id == ConnectionTypes.Database.value:
+        if source_connection.Connection.ConnectionTypeId == ConnectionTypes.Database.value:
             if isinstance(self.database_adapter, ConnectionAdapter):
                 return self.database_adapter
             else:
                 raise IncompatibleAdapterException(f"{self.database_adapter} is incompatible with ConectionAdapter")
-        elif source_connection.Connection.ConnectionType.Id == ConnectionTypes.File.value:
+        elif source_connection.Connection.ConnectionTypeId == ConnectionTypes.File.value:
             if isinstance(self.file_adapter, ConnectionAdapter):
                 return self.file_adapter
             else:
                 raise IncompatibleAdapterException(f"{self.file_adapter} is incompatible with ConectionAdapter")
-        elif source_connection.Connection.ConnectionType.Id == ConnectionTypes.Queue.value:
+        elif source_connection.Connection.ConnectionTypeId == ConnectionTypes.Queue.value:
             if isinstance(self.queue_adapter, ConnectionAdapter):
                 return self.queue_adapter
             else:
@@ -47,19 +47,19 @@ class ConnectionAdapterFactory(IScoped):
             raise NotSupportedFeatureException(f"{source_connection.Connection.ConnectionType}")
 
     def get_target_adapter(self, data_integration_id) -> ConnectionAdapter:
-        target_connection = self.data_integration_connection_service.get_target_connection(
+        target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
-        if target_connection.Connection.ConnectionType.Id == ConnectionTypes.Database.value:
+        if target_connection.Connection.ConnectionTypeId == ConnectionTypes.Database.value:
             if isinstance(self.database_adapter, ConnectionAdapter):
                 return self.database_adapter
             else:
                 raise IncompatibleAdapterException(f"{self.database_adapter} is incompatible with ConectionAdapter")
-        elif target_connection.Connection.ConnectionType.Id == ConnectionTypes.File.value:
+        elif target_connection.Connection.ConnectionTypeId == ConnectionTypes.File.value:
             if isinstance(self.file_adapter, ConnectionAdapter):
                 return self.file_adapter
             else:
                 raise IncompatibleAdapterException(f"{self.file_adapter} is incompatible with ConectionAdapter")
-        elif target_connection.Connection.ConnectionType.Id == ConnectionTypes.Queue.value:
+        elif target_connection.Connection.ConnectionTypeId == ConnectionTypes.Queue.value:
             if isinstance(self.queue_adapter, ConnectionAdapter):
                 return self.queue_adapter
             else:

@@ -2,10 +2,11 @@ from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 
 from IocManager import IocManager
+from models.base.common.OperationEventBase import OperationEventBase
 from models.dao.Entity import Entity
 
 
-class OperationEvent(Entity,IocManager.Base):
+class OperationEvent(OperationEventBase,Entity,IocManager.Base):
     __tablename__ = "OperationEvent"
     __table_args__ = {"schema": "Common"}
     Code = Column(Integer, index=False, unique=True, nullable=False)
@@ -15,15 +16,3 @@ class OperationEvent(Entity,IocManager.Base):
     
     DataOperationJobExecutionEvents = relationship("DataOperationJobExecutionEvent", back_populates="Event")
     DataOperationJobExecutionIntegrationEvents = relationship("DataOperationJobExecutionIntegrationEvent", back_populates="Event")
-
-    def __init__(self,
-                 Code: int = None,
-                 Name: str = None,
-                 Description: str = None,
-                 Class: str = None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.Code: int = Code
-        self.Name: str = Name
-        self.Description: str = Description
-        self.Class: str = Class

@@ -1,10 +1,9 @@
 from injector import inject
 
-from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
 from domain.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
 from domain.operation.execution.processes.ExecuteIntegrationProcess import ExecuteIntegrationProcess
-from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
+from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
 from infrastructor.dependency.scopes import IScoped
@@ -16,25 +15,23 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
     @inject
     def __init__(self,
                  sql_logger: SqlLogger,
-                 data_operation_integration_service: DataOperationIntegrationService,
+                 operation_cache_service: OperationCacheService,
                  data_operation_job_execution_integration_service: DataOperationJobExecutionIntegrationService,
-                 data_integration_connection_service: DataIntegrationConnectionService,
                  integration_execution_service: IntegrationExecutionService,
                  execute_integration_process: ExecuteIntegrationProcess,
-    ):
+                 ):
+        self.operation_cache_service = operation_cache_service
         self.execute_integration_process = execute_integration_process
         self.integration_execution_service = integration_execution_service
         self.sql_logger = sql_logger
-        self.data_integration_connection_service = data_integration_connection_service
-        self.data_operation_integration_service = data_operation_integration_service
         self.data_operation_job_execution_integration_service = data_operation_job_execution_integration_service
 
     def execute(self,
                 data_operation_integration_id: int,
                 data_operation_job_execution_id: int,
                 data_operation_job_execution_integration_id: int) -> int:
-        data_operation_integration = self.data_operation_integration_service.get_by_id(
-            id=data_operation_integration_id)
+        data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(
+            data_operation_integration_id=data_operation_integration_id)
         data_integration_id = data_operation_integration.DataIntegrationId
         self.integration_execution_service.clear_data(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
@@ -46,8 +43,9 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
         return affected_row_count
 
     def get_start_log(self, data_integration_id: int):
-        target_connection = self.data_integration_connection_service.get_target_connection(
-            data_integration_id=data_integration_id)
+
+        target_connection = self.operation_cache_service.get_target_connection(data_integration_id=data_integration_id)
+
         if target_connection.Database is not None:
             log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute started"
         elif target_connection.File is not None:
@@ -59,8 +57,7 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
         return log
 
     def get_finish_log(self, data_integration_id: int, data_count: int):
-        target_connection = self.data_integration_connection_service.get_target_connection(
-            data_integration_id=data_integration_id)
+        target_connection = self.operation_cache_service.get_target_connection(data_integration_id=data_integration_id)
         if target_connection.Database is not None:
             log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute finished. (Source Data Count:{data_count})"
         elif target_connection.File is not None:
@@ -73,8 +70,7 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
         return log
 
     def get_error_log(self, data_integration_id: int):
-        target_connection = self.data_integration_connection_service.get_target_connection(
-            data_integration_id=data_integration_id)
+        target_connection = self.operation_cache_service.get_target_connection(data_integration_id=data_integration_id)
         if target_connection.Database is not None:
             log = f"{target_connection.Database.Schema}.{target_connection.Database.TableName} integration execute getting error"
         elif target_connection.File is not None:
@@ -92,9 +88,8 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
                             data_operation_job_execution_id: int,
                             data_operation_job_execution_integration_id: int,
                             data_operation_integration_id: int) -> int:
-        data_operation_integration = self.data_operation_integration_service.get_by_id(
-            id=data_operation_integration_id)
 
+        data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(data_operation_integration_id=data_operation_integration_id)
         limit = data_operation_integration.Limit
         process_count = data_operation_integration.ProcessCount
 
@@ -116,6 +111,6 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
                 data_operation_integration_id=data_operation_integration_id)
 
             self.data_operation_job_execution_integration_service.create_event(
-                data_operation_execution_integration_id=data_operation_job_execution_integration_id,
+                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
                 event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION, affected_row=affected_row_count)
         return affected_row_count

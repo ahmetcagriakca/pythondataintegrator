@@ -4,13 +4,14 @@ from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from IocManager import IocManager
+from models.base.integration.DataIntegrationBase import DataIntegrationBase
 from models.dao.Entity import Entity
 from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.dao.operation.DataOperationIntegration import DataOperationIntegration
 
 
-class DataIntegration(Entity, IocManager.Base):
+class DataIntegration(DataIntegrationBase,Entity, IocManager.Base):
     __tablename__ = "DataIntegration"
     __table_args__ = {"schema": "Integration"}
     DefinitionId = Column(Integer, ForeignKey('Operation.Definition.Id'))
@@ -25,16 +26,3 @@ class DataIntegration(Entity, IocManager.Base):
     
     DataOperationIntegrations: List[DataOperationIntegration] = relationship("DataOperationIntegration",
                                                                         back_populates="DataIntegration")
-    def __init__(self,
-                 DefinitionId:int = None,
-                 Code: str = None,
-                 IsTargetTruncate: bool = None,
-                 IsDelta: bool = None,
-                 Definition = None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.DefinitionId: int = DefinitionId
-        self.Code: str = Code
-        self.IsTargetTruncate: bool = IsTargetTruncate
-        self.IsDelta = IsDelta
-        self.Definition = Definition

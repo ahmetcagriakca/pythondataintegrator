@@ -27,9 +27,9 @@ class QueueProvider(IScoped):
         Creating Connection
         """
         if connection.ConnectionType.Name == ConnectionTypes.Queue.name:
-            connection_basic_authentication = self.connection_secret_service.get_connection_basic_authentication(
+            connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
                 connection_id=connection.Id)
-            connection_servers = self.connection_server_service.get_all_by_connection_id(
+            connection_servers = self.operation_cache_service.get_connection_servers_by_connection_id(
                 connection_id=connection.Id)
             connector: QueueConnector = None
             if connection.Queue.ConnectorType.Name == ConnectorTypes.Kafka.name:

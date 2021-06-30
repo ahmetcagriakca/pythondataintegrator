@@ -1,3 +1,4 @@
+from models.base.operation.DataOperationBase import DataOperationBase
 from models.dao.operation.DataOperationContact import DataOperationContact
 from models.dao.operation.DataOperationJob import DataOperationJob
 from typing import List
@@ -8,7 +9,7 @@ from models.dao.Entity import Entity
 from models.dao.operation.DataOperationIntegration import DataOperationIntegration
 
 
-class DataOperation(Entity, IocManager.Base):
+class DataOperation(DataOperationBase,Entity, IocManager.Base):
     __tablename__ = "DataOperation"
     __table_args__ = {"schema": "Operation"}
     DefinitionId = Column(Integer, ForeignKey('Operation.Definition.Id'))
@@ -19,13 +20,3 @@ class DataOperation(Entity, IocManager.Base):
                                                                 back_populates="DataOperation")
     Contacts: List[DataOperationContact] = relationship("DataOperationContact",
                                                         back_populates="DataOperation")
-
-    def __init__(self,
-                 DefinitionId: int = None,
-                 Name: str = None,
-                 Definition=None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.DefinitionId: int = DefinitionId
-        self.Name: str = Name
-        self.Definition = Definition

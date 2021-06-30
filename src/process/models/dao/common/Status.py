@@ -4,12 +4,13 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
 from IocManager import IocManager
+from models.base.common.StatusBase import StatusBase
 from models.dao.Entity import Entity
 from models.dao.operation import DataOperationJobExecution
 from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
-class Status(Entity, IocManager.Base):
+class Status(StatusBase,Entity, IocManager.Base):
     __tablename__ = "Status"
     __table_args__ = {"schema": "Common"}
     Name = Column(String(100), index=False, unique=False, nullable=False)
@@ -19,13 +20,3 @@ class Status(Entity, IocManager.Base):
     DataOperationJobExecutionIntegrations: List[DataOperationJobExecutionIntegration] = relationship(
         "DataOperationJobExecutionIntegration",
         back_populates="Status")
-
-    def __init__(self,
-                 Id: int = None,
-                 Name: str = None,
-                 Description: bool = None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.Id: str = Id
-        self.Name: str = Name
-        self.Description: bool = Description

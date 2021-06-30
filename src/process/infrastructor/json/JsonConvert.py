@@ -22,7 +22,7 @@ class JsonConvert(object):
  
     @classmethod
     def register(clsself, cls):
-        clsself.mappings[frozenset(tuple([attr for attr,val in cls().__dict__.items()]))] = cls
+        clsself.mappings[frozenset(tuple([attr for attr,val in cls().__dict__.items() if not attr.startswith('_')]))] = cls
         return cls
  
     @classmethod

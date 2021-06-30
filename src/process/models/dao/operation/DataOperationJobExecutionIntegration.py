@@ -4,11 +4,12 @@ from typing import List
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, String
 from sqlalchemy.orm import relationship
 from IocManager import IocManager
+from models.base.operation.DataOperationJobExecutionIntegrationBase import DataOperationJobExecutionIntegrationBase
 from models.dao.Entity import Entity
 from models.dao.operation.DataOperationJobExecutionIntegrationEvent import DataOperationJobExecutionIntegrationEvent
 
 
-class DataOperationJobExecutionIntegration(Entity, IocManager.Base):
+class DataOperationJobExecutionIntegration(DataOperationJobExecutionIntegrationBase,Entity, IocManager.Base):
     __tablename__ = "DataOperationJobExecutionIntegration"
     __table_args__ = {"schema": "Operation"}
     DataOperationJobExecutionId = Column(Integer, ForeignKey('Operation.DataOperationJobExecution.Id'))
@@ -28,31 +29,3 @@ class DataOperationJobExecutionIntegration(Entity, IocManager.Base):
     DataOperationJobExecutionIntegrationEvents: List[DataOperationJobExecutionIntegrationEvent] = relationship(
         "DataOperationJobExecutionIntegrationEvent",
         back_populates="DataOperationJobExecutionIntegration")
-
-    def __init__(self,
-                 DataOperationJobExecutionId: int = None,
-                 DataOperationIntegrationId: int = None,
-                 StatusId: int = None,
-                 StartDate: datetime = None,
-                 EndDate: datetime = None,
-                 Limit: int = None,
-                 ProcessCount: int = None,
-                 SourceDataCount: int = None,
-                 Log: str = None,
-                 DataOperationIntegration: any = None,
-                 DataOperationJobExecution: any = None,
-                 Status: any = None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.DataOperationJobExecutionId: int = DataOperationJobExecutionId
-        self.DataOperationIntegrationId: int = DataOperationIntegrationId
-        self.StatusId: int = StatusId
-        self.StartDate: datetime = StartDate
-        self.EndDate: datetime = EndDate
-        self.Limit: int = Limit
-        self.ProcessCount: int = ProcessCount
-        self.SourceDataCount: int = SourceDataCount
-        self.Log: str = Log
-        self.DataOperationIntegration: any = DataOperationIntegration
-        self.DataOperationJobExecution: any = DataOperationJobExecution
-        self.Status: any = Status

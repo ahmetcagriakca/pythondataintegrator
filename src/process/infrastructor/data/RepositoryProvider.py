@@ -36,6 +36,11 @@ class RepositoryProvider(IScoped):
         repository = Repository[repository_type](database_session_manager)
         return repository
 
+    def commit(self):
+        if self.database_session_manager is not None:
+            self.database_session_manager.commit()
+
+
     def close(self):
         if self.database_session_manager is not None:
             self.database_session_manager.close()

@@ -4,62 +4,36 @@ from typing import List
 from injector import inject
 
 from domain.delivery.EmailService import EmailService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
+from infrastructor.data.decorators.TransactionHandler import transaction_handler
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dao.common import OperationEvent
-from models.dao.common.Log import Log
 from models.dao.common.Status import Status
 from models.dao.integration import DataIntegrationConnection
-from models.dao.operation import DataOperationJobExecution, DataOperationJob, DataOperationJobExecutionIntegration, \
+from models.dao.operation import DataOperationJobExecution, DataOperationJobExecutionIntegration, \
     DataOperationIntegration
 from models.dao.operation.DataOperationJobExecutionEvent import DataOperationJobExecutionEvent
-from models.enums.events import EVENT_EXECUTION_INITIALIZED
 
 
 class DataOperationJobExecutionService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  sql_logger: SqlLogger,
                  email_service: EmailService
                  ):
+        self.repository_provider = repository_provider
+        self.data_operation_job_execution_repository = repository_provider.get(DataOperationJobExecution)
+        self.data_operation_job_execution_integration_repository = repository_provider.get(
+            DataOperationJobExecutionIntegration)
+        self.status_repository = repository_provider.get(Status)
+        self.operation_event_repository = repository_provider.get(OperationEvent)
+        self.data_operation_job_execution_event_repository = repository_provider.get(DataOperationJobExecutionEvent)
+        self.data_integration_connection_repository = repository_provider.get(DataIntegrationConnection)
+
         self.email_service = email_service
-        self.database_session_manager = database_session_manager
-        self.data_operation_job_execution_repository: Repository[DataOperationJobExecution] = Repository[
-            DataOperationJobExecution](database_session_manager)
-        self.data_operation_job_execution_integration_repository: Repository[DataOperationJobExecutionIntegration] = \
-            Repository[
-                DataOperationJobExecutionIntegration](database_session_manager)
-
-        self.status_repository: Repository[Status] = Repository[Status](database_session_manager)
-        self.operation_event_repository: Repository[OperationEvent] = Repository[
-            OperationEvent](database_session_manager)
-
-        self.data_operation_job_execution_event_repository: Repository[DataOperationJobExecutionEvent] = Repository[
-            DataOperationJobExecutionEvent](database_session_manager)
-        self.data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[
-            DataIntegrationConnection](database_session_manager)
-        self.log_repository: Repository[Log] = Repository[Log](
-            database_session_manager)
         self.sql_logger: SqlLogger = sql_logger
-
-    def create(self, data_operation_job: DataOperationJob = None):
-        status = self.status_repository.first(Id=1)
-        data_operation_job_execution = DataOperationJobExecution(
-            DataOperationJob=data_operation_job,
-            Status=status,
-            Definition=data_operation_job.DataOperation.Definition)
-        self.data_operation_job_execution_repository.insert(data_operation_job_execution)
-        operation_event = self.operation_event_repository.first(Code=EVENT_EXECUTION_INITIALIZED)
-        data_operation_job_execution_event = DataOperationJobExecutionEvent(
-            EventDate=datetime.now(),
-            DataOperationJobExecution=data_operation_job_execution,
-            Event=operation_event)
-        self.data_operation_job_execution_event_repository.insert(data_operation_job_execution_event)
-        self.database_session_manager.commit()
-        return data_operation_job_execution
 
     def update_status(self, data_operation_job_execution_id: int = None,
                       status_id: int = None, is_finished: bool = False):
@@ -70,7 +44,7 @@ class DataOperationJobExecutionService(IScoped):
             data_operation_job_execution.EndDate = datetime.now()
 
         data_operation_job_execution.Status = status
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job_execution
 
     def create_event(self, data_operation_execution_id,
@@ -83,7 +57,7 @@ class DataOperationJobExecutionService(IScoped):
             DataOperationJobExecution=data_operation_job_execution,
             Event=operation_event)
         self.data_operation_job_execution_event_repository.insert(data_operation_job_execution_event)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job_execution_event
 
     def prepare_execution_table_data(self, data_operation_job_execution_id):
@@ -136,7 +110,7 @@ class DataOperationJobExecutionService(IScoped):
         return {'columns': columns, 'rows': rows}
 
     def prepare_execution_integration_table_data(self, data_operation_job_execution_id):
-        job_execution_integrations_query = self.database_session_manager.session.query(
+        job_execution_integrations_query = self.repository_provider.create().session.query(
             DataOperationJobExecutionIntegration, DataOperationIntegration
         ) \
             .filter(DataOperationJobExecutionIntegration.DataOperationIntegrationId == DataOperationIntegration.Id) \
@@ -205,6 +179,7 @@ class DataOperationJobExecutionService(IScoped):
             rows.append(row)
         return {'columns': columns, 'rows': rows}
 
+    @transaction_handler
     def send_data_operation_finish_mail(self, data_operation_job_execution_id):
         data_operation_job_execution = self.data_operation_job_execution_repository.first(
             Id=data_operation_job_execution_id)

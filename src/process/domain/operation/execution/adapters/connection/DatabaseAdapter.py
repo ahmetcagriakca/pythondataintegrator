@@ -1,11 +1,9 @@
-import json
 from asyncio import Queue
 from typing import List
 from injector import inject
 from pandas import DataFrame
 
-from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
-from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
+from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructor.connection.database.DatabaseProvider import DatabaseProvider
 from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
 from infrastructor.connection.models.DataQueueTask import DataQueueTask
@@ -15,16 +13,14 @@ from models.dto.PagingModifier import PagingModifier
 class DatabaseAdapter(ConnectionAdapter):
     @inject
     def __init__(self,
+                 operation_cache_service: OperationCacheService,
                  database_provider: DatabaseProvider,
-                 data_integration_connection_service: DataIntegrationConnectionService,
-                 data_integration_column_service: DataIntegrationColumnService,
                  ):
-        self.data_integration_column_service = data_integration_column_service
-        self.data_integration_connection_service = data_integration_connection_service
+        self.operation_cache_service = operation_cache_service
         self.database_provider = database_provider
 
     def clear_data(self, data_integration_id) -> int:
-        target_connection = self.data_integration_connection_service.get_target_connection(
+        target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
         target_context = self.database_provider.get_context(connection=target_connection.Connection)
         truncate_affected_rowcount = target_context.truncate_table(schema=target_connection.Database.Schema,
@@ -32,7 +28,7 @@ class DatabaseAdapter(ConnectionAdapter):
         return truncate_affected_rowcount
 
     def get_source_data_count(self, data_integration_id) -> int:
-        source_connection = self.data_integration_connection_service.get_source_connection(
+        source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
 
         source_context = self.database_provider.get_context(
@@ -41,10 +37,10 @@ class DatabaseAdapter(ConnectionAdapter):
         return data_count
 
     def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
-        source_connection = self.data_integration_connection_service.get_source_connection(
+        source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
         source_context = self.database_provider.get_context(connection=source_connection.Connection)
-        first_row = self.data_integration_column_service.get_first_row(data_integration_id=data_integration_id)
+        first_row = self.operation_cache_service.get_first_row(data_integration_id=data_integration_id)
         data = source_context.get_table_data(
             query=source_connection.Database.Query,
             first_row=f'"{first_row.SourceColumnName}"',
@@ -70,13 +66,13 @@ class DatabaseAdapter(ConnectionAdapter):
         return paging_modifiers
 
     def start_source_data_operation_temp(self,
-                                    data_integration_id: int,
-                                    data_operation_job_execution_integration_id: int,
-                                    limit: int,
-                                    process_count: int,
-                                    data_queue: Queue,
-                                    data_result_queue: Queue):
-        source_connection = self.data_integration_connection_service.get_source_connection(
+                                         data_integration_id: int,
+                                         data_operation_job_execution_integration_id: int,
+                                         limit: int,
+                                         process_count: int,
+                                         data_queue: Queue,
+                                         data_result_queue: Queue):
+        source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
         source_context = self.database_provider.get_context(connection=source_connection.Connection)
         source_context.get_unpredicted_data(query=source_connection.Database.Query,
@@ -91,7 +87,7 @@ class DatabaseAdapter(ConnectionAdapter):
                   limit: int,
                   ):
 
-        source_connection = self.data_integration_connection_service.get_source_connection(
+        source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
         source_context = self.database_provider.get_context(connection=source_connection.Connection)
         return source_context.read_data(query=source_connection.Database.Query,
@@ -99,12 +95,12 @@ class DatabaseAdapter(ConnectionAdapter):
                                         limit=limit)
 
     def start_source_data_operation(self,
-                                        data_integration_id: int,
-                                        data_operation_job_execution_integration_id: int,
-                                        limit: int,
-                                        process_count: int,
-                                        data_queue: Queue,
-                                        data_result_queue: Queue):
+                                    data_integration_id: int,
+                                    data_operation_job_execution_integration_id: int,
+                                    limit: int,
+                                    process_count: int,
+                                    data_queue: Queue,
+                                    data_result_queue: Queue):
 
         data_count = self.get_source_data_count(
             data_integration_id=data_integration_id)
@@ -118,7 +114,7 @@ class DatabaseAdapter(ConnectionAdapter):
                 # data = json.loads(df.to_json(orient='records', date_format="iso"))
                 # data_types = dict((c, df[c].dtype.name) for c in df.columns)
                 # dict((c,df[c].dtype.name) for i in df.columns for j in i.items())
-                data_queue_task = DataQueueTask(Id=paging_modifier.Id, Data=None,IsDataFrame=False,
+                data_queue_task = DataQueueTask(Id=paging_modifier.Id, Data=None, IsDataFrame=False,
                                                 Start=paging_modifier.Start,
                                                 End=paging_modifier.End, Limit=limit, IsFinished=False)
                 data_queue.put(data_queue_task)
@@ -139,12 +135,13 @@ class DatabaseAdapter(ConnectionAdapter):
                 row.append(column_data)
             insert_rows.append(tuple(row))
         return insert_rows
+
     def prepare_data(self, data_integration_id: int, source_data: any) -> List[any]:
-        data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
+        data_integration_columns = self.operation_cache_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
 
         source_columns = [(data_integration_column.SourceColumnName) for data_integration_column in
-                              data_integration_columns]
+                          data_integration_columns]
 
         if isinstance(source_data, DataFrame):
             data = source_data[source_columns]
@@ -156,12 +153,12 @@ class DatabaseAdapter(ConnectionAdapter):
         return prepared_data
 
     def prepare_target_query(self, data_integration_id: int) -> str:
-        target_connection = self.data_integration_connection_service.get_target_connection(
+        target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
 
         target_context = self.database_provider.get_context(connection=target_connection.Connection)
 
-        data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
+        data_integration_columns = self.operation_cache_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
 
         column_rows = [(data_integration_column.ResourceType, data_integration_column.SourceColumnName,
@@ -173,7 +170,7 @@ class DatabaseAdapter(ConnectionAdapter):
         return prepared_target_query
 
     def write_target_data(self, data_integration_id: int, prepared_data: List[any], ) -> int:
-        target_connection = self.data_integration_connection_service.get_target_connection(
+        target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
 
         target_context = self.database_provider.get_context(connection=target_connection.Connection)
@@ -184,7 +181,7 @@ class DatabaseAdapter(ConnectionAdapter):
         return affected_row_count
 
     def do_target_operation(self, data_integration_id: int) -> int:
-        target_connection = self.data_integration_connection_service.get_target_connection(
+        target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
         target_context = self.database_provider.get_context(connection=target_connection.Connection)
 

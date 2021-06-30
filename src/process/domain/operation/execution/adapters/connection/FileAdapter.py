@@ -7,8 +7,7 @@ from injector import inject
 import pandas as pd
 from pandas import DataFrame
 
-from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
-from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
+from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
 from infrastructor.connection.file.FileProvider import FileProvider
 from infrastructor.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
@@ -21,20 +20,18 @@ class FileAdapter(ConnectionAdapter):
     def __init__(self,
                  sql_logger: SqlLogger,
                  file_provider: FileProvider,
-                 data_integration_connection_service: DataIntegrationConnectionService,
-                 data_integration_column_service: DataIntegrationColumnService,
+                 operation_cache_service: OperationCacheService,
                  ):
+        self.operation_cache_service = operation_cache_service
         self.sql_logger = sql_logger
         self.file_provider = file_provider
-        self.data_integration_column_service = data_integration_column_service
-        self.data_integration_connection_service = data_integration_connection_service
 
     def clear_data(self, data_integration_id) -> int:
-        target_connection = self.data_integration_connection_service.get_target_connection(
+        target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
         target_context = self.file_provider.get_context(
             connection=target_connection.Connection)
-        data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
+        data_integration_columns = self.operation_cache_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
         file_path = os.path.join(target_connection.File.Folder, target_connection.File.FileName)
         if target_connection.File.Csv.HasHeader:
@@ -63,7 +60,7 @@ class FileAdapter(ConnectionAdapter):
                                     data_queue: Queue,
                                     data_result_queue: Queue):
 
-        source_connection = self.data_integration_connection_service.get_source_connection(
+        source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
 
         source_context = self.file_provider.get_context(connection=source_connection.Connection)
@@ -101,11 +98,11 @@ class FileAdapter(ConnectionAdapter):
                                                     result_queue=data_result_queue)
 
     def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> DataFrame:
-        source_connection = self.data_integration_connection_service.get_source_connection(
+        source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
         source_context = self.file_provider.get_context(connection=source_connection.Connection)
 
-        data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
+        data_integration_columns = self.operation_cache_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
         has_header = None
         if source_connection.File.Csv.HasHeader:
@@ -139,7 +136,7 @@ class FileAdapter(ConnectionAdapter):
 
     def prepare_data(self, data_integration_id: int, source_data: DataFrame) -> List[any]:
 
-        data_integration_columns = self.data_integration_column_service.get_columns_by_integration_id(
+        data_integration_columns = self.operation_cache_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
 
         source_columns = [(data_integration_column.SourceColumnName) for data_integration_column in
@@ -152,7 +149,7 @@ class FileAdapter(ConnectionAdapter):
         return prepared_data
 
     def write_target_data(self, data_integration_id: int, prepared_data: List[any], ) -> int:
-        target_connection = self.data_integration_connection_service.get_target_connection(
+        target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
 
         target_context = self.file_provider.get_context(connection=target_connection.Connection)

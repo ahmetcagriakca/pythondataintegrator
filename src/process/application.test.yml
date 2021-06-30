@@ -8,7 +8,7 @@ DATABASE:
   TYPE: POSTGRESQL
   HOST: localhost
   PORT: 5432
-  DATABASE: test_pdi
+  DATABASE: pdi
   USERNAME: postgres
   PASSWORD: 123456
 

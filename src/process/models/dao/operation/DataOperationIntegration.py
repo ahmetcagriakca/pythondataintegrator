@@ -3,11 +3,12 @@ from typing import List
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from IocManager import IocManager
+from models.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
 from models.dao.Entity import Entity
 from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
-class DataOperationIntegration(Entity, IocManager.Base):
+class DataOperationIntegration(DataOperationIntegrationBase,Entity, IocManager.Base):
     __tablename__ = "DataOperationIntegration"
     __table_args__ = {"schema": "Operation"}
     DataOperationId = Column(Integer, ForeignKey('Operation.DataOperation.Id'))
@@ -21,20 +22,3 @@ class DataOperationIntegration(Entity, IocManager.Base):
         "DataOperationJobExecutionIntegration",
         back_populates="DataOperationIntegration")
 
-    def __init__(self,
-                 DataOperationId: int = None,
-                 DataIntegrationId: int = None,
-                 Order: int = None,
-                 Limit: int = None,
-                 ProcessCount: int = None,
-                 DataOperation=None,
-                 DataIntegration=None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.DataOperationId: int = DataOperationId
-        self.DataIntegrationId: int = DataIntegrationId
-        self.Order: int = Order
-        self.Limit: int = Limit
-        self.ProcessCount: int = ProcessCount
-        self.DataOperation = DataOperation
-        self.DataIntegration = DataIntegration

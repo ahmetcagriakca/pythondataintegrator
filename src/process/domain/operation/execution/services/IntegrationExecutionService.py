@@ -3,10 +3,10 @@ from time import time
 from typing import List
 
 from injector import inject
-from pandas import DataFrame, notnull
+from pandas import notnull
 import pandas as pd
-from domain.integration.services.DataIntegrationService import DataIntegrationService
 from domain.operation.execution.adapters.connection.ConnectionAdapterFactory import ConnectionAdapterFactory
+from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
 from infrastructor.dependency.scopes import IScoped
@@ -21,10 +21,10 @@ class IntegrationExecutionService(IScoped):
     @inject
     def __init__(self,
                  sql_logger: SqlLogger,
-                 data_integration_service: DataIntegrationService,
+                 operation_cache_service: OperationCacheService,
                  data_operation_job_execution_integration_service: DataOperationJobExecutionIntegrationService,
                  connection_adapter_factory: ConnectionAdapterFactory):
-        self.data_integration_service = data_integration_service
+        self.operation_cache_service = operation_cache_service
         self.data_operation_job_execution_integration_service = data_operation_job_execution_integration_service
         self.sql_logger = sql_logger
         self.connection_adapter_factory = connection_adapter_factory
@@ -144,7 +144,8 @@ class IntegrationExecutionService(IScoped):
         return source_data
 
     def clear_data(self, data_operation_job_execution_integration_id: int, data_integration_id: int):
-        is_target_truncate = self.data_integration_service.get_is_target_truncate(id=data_integration_id)
+        is_target_truncate = self.operation_cache_service.get_data_integration_by_id(
+            data_integration_id=data_integration_id).IsTargetTruncate
 
         if is_target_truncate:
             connection_adapter = self.connection_adapter_factory.get_target_adapter(
@@ -152,7 +153,7 @@ class IntegrationExecutionService(IScoped):
             truncate_affected_rowcount = connection_adapter.clear_data(data_integration_id)
 
             self.data_operation_job_execution_integration_service.create_event(
-                data_operation_execution_integration_id=data_operation_job_execution_integration_id,
+                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
                 event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, affected_row=truncate_affected_rowcount)
 
     def get_source_data_count(self,
@@ -162,7 +163,7 @@ class IntegrationExecutionService(IScoped):
             data_integration_id=data_integration_id)
         data_count = source_adapter.get_source_data_count(data_integration_id=data_integration_id)
         self.data_operation_job_execution_integration_service.create_event(
-            data_operation_execution_integration_id=data_operation_job_execution_integration_id,
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
             event_code=EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, affected_row=data_count)
         self.data_operation_job_execution_integration_service.update_source_data_count(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
@@ -177,7 +178,7 @@ class IntegrationExecutionService(IScoped):
         affected_rowcount = target_adapter.do_target_operation(data_integration_id=data_integration_id)
 
         self.data_operation_job_execution_integration_service.create_event(
-            data_operation_execution_integration_id=data_operation_job_execution_integration_id,
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
             event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, affected_row=affected_rowcount)
         self.data_operation_job_execution_integration_service.update_source_data_count(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
@@ -190,7 +191,7 @@ class IntegrationExecutionService(IScoped):
                       is_finished: bool = False):
         self.sql_logger.info(log, job_id=data_operation_job_execution_id)
         self.data_operation_job_execution_integration_service.create_event(
-            data_operation_execution_integration_id=data_operation_job_execution_integration_id,
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
             event_code=event_code)
         self.data_operation_job_execution_integration_service.update_status(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,

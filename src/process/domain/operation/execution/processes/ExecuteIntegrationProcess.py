@@ -6,10 +6,10 @@ from injector import inject
 from pandas import DataFrame, notnull
 import pandas as pd
 
+from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructor.data.decorators.TransactionHandler import transaction_handler
 from infrastructor.multi_processing.ProcessManager import ProcessManager
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
 from IocManager import IocManager
 from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from infrastructor.dependency.scopes import IScoped
@@ -21,9 +21,9 @@ class ExecuteIntegrationProcess(IScoped):
     @inject
     def __init__(self,
                  sql_logger: SqlLogger,
-                 data_operation_integration_service: DataOperationIntegrationService,
+                 operation_cache_service: OperationCacheService,
                  integration_execution_service: IntegrationExecutionService):
-        self.data_operation_integration_service = data_operation_integration_service
+        self.operation_cache_service = operation_cache_service
         self.integration_execution_service = integration_execution_service
         self.sql_logger = sql_logger
 
@@ -56,6 +56,7 @@ class ExecuteIntegrationProcess(IScoped):
                                     process_count: int,
                                     data_queue: Queue,
                                     data_result_queue: Queue):
+        self.operation_cache_service.create_data_integration(data_integration_id=data_integration_id)
         self.sql_logger.info(f"Source Data started on process. SubProcessId: {sub_process_id}",
                              job_id=data_operation_job_execution_id)
         try:
@@ -115,6 +116,8 @@ class ExecuteIntegrationProcess(IScoped):
                                      data_operation_job_execution_integration_id: int,
                                      data_queue: Queue,
                                      data_result_queue: Queue) -> int:
+
+        self.operation_cache_service.create_data_integration(data_integration_id=data_integration_id)
         total_row_count = 0
         try:
             while True:
@@ -237,8 +240,8 @@ class ExecuteIntegrationProcess(IScoped):
                                     data_operation_job_execution_integration_id: int,
                                     data_operation_integration_id: int) -> int:
         try:
-            data_operation_integration = self.data_operation_integration_service.get_by_id(
-                id=data_operation_integration_id)
+            data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(
+                data_operation_integration_id=data_operation_integration_id)
             if data_operation_integration.ProcessCount is not None and data_operation_integration.ProcessCount >= 1:
                 process_count = data_operation_integration.ProcessCount
             else:

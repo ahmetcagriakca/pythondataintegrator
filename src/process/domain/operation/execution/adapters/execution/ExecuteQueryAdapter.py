@@ -2,7 +2,7 @@ from injector import inject
 
 from domain.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
+from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructor.dependency.scopes import IScoped
 
 
@@ -10,15 +10,15 @@ class ExecuteQueryAdapter(ExecuteAdapter, IScoped):
 
     @inject
     def __init__(self,
-                 data_operation_integration_service: DataOperationIntegrationService,
+                 operation_cache_service: OperationCacheService,
                  integration_execution_service: IntegrationExecutionService):
+        self.operation_cache_service = operation_cache_service
         self.integration_execution_service = integration_execution_service
-        self.data_operation_integration_service = data_operation_integration_service
 
     def execute(self, data_operation_integration_id: int, data_operation_job_execution_id: int,
                 data_operation_job_execution_integration_id: int) -> int:
-        data_operation_integration = self.data_operation_integration_service.get_by_id(
-            id=data_operation_integration_id)
+        data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(
+            data_operation_integration_id=data_operation_integration_id)
         data_integration_id = data_operation_integration.DataIntegration.Id
         self.integration_execution_service.clear_data(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
