@@ -23,7 +23,7 @@ class DataOperationJobExecutionPage(IScoped):
             {'value': 'Name'},
             {'value': 'Schedule Info'},
             {'value': 'Status'},
-            {'value': 'Error'},
+            {'value': 'Log'},
             {'value': 'Source Data Count'},
             {'value': 'Affected Row Count'},
             {'value': 'Execution Start Date'},

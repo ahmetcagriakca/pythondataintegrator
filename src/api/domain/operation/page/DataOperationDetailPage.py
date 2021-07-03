@@ -145,7 +145,7 @@ class DataOperationDetailPage(IScoped):
         table_data = self.html_template_service.prepare_table_data_dynamic(query=query,
                                                                            headers=headers,
                                                                            prepare_row=prepare_row,
-
+                                                                           sortable='"Order" asc',
                                                                            pagination=None)
 
         table = self.html_template_service.render_table(source=table_data)
