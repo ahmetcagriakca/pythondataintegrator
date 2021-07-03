@@ -1,0 +1,20 @@
+APPLICATION:
+  ENVIRONMENT: DEVELOPMENT
+  NAME: Pdi Process Server
+  SECRET_KEY: s4GGU7jFnKjgu1LsK7fUdxOp1DUSQ-PVgvr28rBNAHM=
+
+DATABASE:
+  #POSTGRESQL local environment
+  TYPE: POSTGRESQL
+  HOST: localhost
+  PORT: 5432
+  DATABASE: pdi
+  USERNAME: postgres
+  PASSWORD: 123456
+
+
+PROCESS_RPC_SERVER:
+  PROTOCOL_CONFIG:
+    allow_public_attrs: True
+    sync_request_timeout: 120
+  PORT: 7400
