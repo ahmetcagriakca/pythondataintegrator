@@ -1,7 +1,7 @@
 from multiprocessing.process import current_process
 import os
 import sys
-from flask import Flask
+from flask import Flask,redirect
 from flask_injector import request, FlaskInjector
 from flask_restx import Api
 from injector import singleton, Injector, threadlocal, Binder
@@ -15,7 +15,9 @@ from infrastructor.utils.Utils import Utils
 from models.configs.ApiConfig import ApiConfig
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig
+from models.configs.ProcessRpcClientConfig import ProcessRpcClientConfig
 from models.configs.SchedulerRpcClientConfig import SchedulerRpcClientConfig
+
 
 
 class IocManager:
@@ -41,6 +43,11 @@ class IocManager:
 
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
         IocManager.app = Flask(application_config.name)
+
+        @IocManager.app.route('/')
+        def hello():
+            # Redirect from here, replace your custom site url "www.google.com"
+            return redirect("/Home", code=302, Response=None)
         authorizations = {
             'apikey': {
                 'type': 'apiKey',
@@ -58,7 +65,11 @@ class IocManager:
                 }
             }
         }
-        IocManager.api = Api(IocManager.app, security=['apikey', {'oauth2': 'read'}], authorizations=authorizations)
+        IocManager.api = Api(IocManager.app,
+    title='Python Data Integrator API',
+    version='v0.1',
+    doc='/documentation',
+    base_url='/', security=['apikey', {'oauth2': 'read'}], authorizations=authorizations)
         # Flask instantiate
         # IocManager.api = Api(app=IocManager.app,authorizations=authorizations, security='apikey')
 
@@ -67,6 +78,7 @@ class IocManager:
     def configure_startup(root_directory):
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)
+        IocManager.set_database_application_name()
         IocManager.process_info()
 
         IocManager.initialize_flask()
@@ -78,7 +90,6 @@ class IocManager:
 
         IocManager.injector = Injector()
         # Flask injector configuration
-        IocManager.set_database_application_name()
         FlaskInjector(app=IocManager.app, modules=[IocManager.configure], injector=IocManager.injector)
 
     @staticmethod
@@ -87,6 +98,8 @@ class IocManager:
         database_config: DatabaseConfig = IocManager.config_manager.get(DatabaseConfig)
         if database_config.application_name is None:
             process_info = IocManager.get_process_info()
+            hostname = os.getenv('HOSTNAME', '')
+            IocManager.config_manager.set(ApplicationConfig, "hostname", hostname)
             IocManager.config_manager.set(DatabaseConfig, "application_name",
                                           f"{application_config.name}-({process_info})")
 
@@ -140,4 +153,5 @@ class IocManager:
     def process_info():
         logger = ConsoleLogger()
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
-        logger.info(f"Application : {application_config.name}")
+        hostname= f'-{application_config.hostname}' if (application_config.hostname is not None and application_config.hostname!='') else ''
+        logger.info(f"Application : {application_config.name}{hostname}")

@@ -89,7 +89,7 @@ class DataOperationJobDetailPage(IScoped):
                                                                            pagination=pagination)
 
         table = self.html_template_service.render_table(source=table_data)
-        return self.html_template_service.render_html(content=table)
+        return table
 
     def render_job_execution(self, job_id, pagination):
         headers = [

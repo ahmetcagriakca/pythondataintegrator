@@ -136,6 +136,29 @@ class HtmlTemplateService(IScoped):
             }
 
             tr:nth-child(even) {background-color: #f2f2f2;}
+            
+ul.breadcrumb {
+  padding: 10px 16px;
+  list-style: none;
+  background-color: #eee;
+}
+ul.breadcrumb li {
+  display: inline;
+  font-size: 18px;
+}
+ul.breadcrumb li+li:before {
+  padding: 8px;
+  color: black;
+  content: "/\00";
+}
+ul.breadcrumb li a {
+  color: #0275d8;
+  text-decoration: none;
+}
+ul.breadcrumb li a:hover {
+  color: #01447e;
+  text-decoration: underline;
+}
             ''' + pagination_css
 
     def mail_html_template(self, body, mail_css=None):
@@ -149,6 +172,7 @@ class HtmlTemplateService(IScoped):
                 <style>{css}</style>
             </head>
             <body>
+
                 {body}
             </body>
         </html>
@@ -173,7 +197,7 @@ class HtmlTemplateService(IScoped):
         if pagination is not None:
             total_count = query.count()
             if pagination.Limit is None or pagination.Limit < 1 or pagination.Limit > 200:
-                pagination.Limit = 10
+                pagination.Limit = 50
             total_page = int(total_count / pagination.Limit) + 1
             if pagination.Page is None or pagination.Page < 1 or total_page < pagination.Page:
                 pagination.Page = 1
@@ -256,7 +280,19 @@ class HtmlTemplateService(IScoped):
                     ):
 
         body_content = f'''
+        
                 <div class="wrapper">
+                
+                    <div class="crumb">
+                        <ul class="breadcrumb">
+                          <li><a href="/Home">Home</a></li>
+                          <li><a href="/Connection">Connections</a></li>
+                          <li><a href="/DataOperation">DataOperations</a></li>
+                          <li><a href="/DataOperation/Job">Jobs</a></li>
+                          <li><a href="/DataOperation/Job/Execution">Executions</a></li>
+                          <li><a href="/documentation">Documentation (Swagger UI)</a></li>
+                        </ul>
+                    </div>
                     {content}
                 </div>
                 '''

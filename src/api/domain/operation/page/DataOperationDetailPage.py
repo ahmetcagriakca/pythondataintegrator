@@ -22,6 +22,7 @@ class DataOperationDetailPage(IScoped):
         headers = [
             {'value': 'Id'},
             {'value': 'Name'},
+            {'value': 'Contacts'},
             {'value': 'Definition Id'},
             {'value': 'Create Date'},
             {'value': 'Last Update Date'},
@@ -34,7 +35,7 @@ class DataOperationDetailPage(IScoped):
                 last_update_date = data.LastUpdatedDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3]
             definition_url = '-'
             if data.DefinitionId is not None:
-                definition_url = f'<a href="/definition/{data.DefinitionId}">{data.DefinitionId}</a>'
+                definition_url = f'<a href="/DataOperation/Definition/{data.DefinitionId}">{data.DefinitionId}</a>'
             contacts = []
             if data.Contacts is not None and len(data.Contacts) > 0:
                 for contact in data.Contacts:
@@ -98,7 +99,9 @@ class DataOperationDetailPage(IScoped):
                         source_schema_and_table = f' ({source_connection.Database.Schema}.{source_connection.Database.TableName})'
                     connection_url = f'<a href="/Connection/{source_connection.Connection.Id}">{source_connection.Connection.Name}</a>'
                     source_connection_text = f'{connection_url}-{source_connection.Connection.Database.ConnectorType.Name}{source_schema_and_table}'
-                    source_query = source_connection.Database.Query.replace('\n', '<br />').replace('\t',
+                    source_query=''
+                    if source_connection.Database.Query is not None:
+                        source_query = source_connection.Database.Query.replace('\n', '<br />').replace('\t',
                                                                                                     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
             target_connection_text = ''
 
@@ -111,7 +114,9 @@ class DataOperationDetailPage(IScoped):
                         target_schema_and_table = f' ({target_connection.Database.Schema}.{target_connection.Database.TableName})'
                     connection_url = f'<a href="/Connection/{target_connection.Connection.Id}">{target_connection.Connection.Name}</a>'
                     target_connection_text = f'{connection_url}-{target_connection.Connection.Database.ConnectorType.Name}{target_schema_and_table}'
-                    target_query = target_connection.Database.Query.replace('\n', '<br />').replace('\t',
+                    target_query=''
+                    if target_connection.Database.Query is not None:
+                        target_query = target_connection.Database.Query.replace('\n', '<br />').replace('\t',
                                                                                                     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
 
             row = {

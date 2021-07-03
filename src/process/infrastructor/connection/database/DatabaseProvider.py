@@ -1,7 +1,5 @@
 from injector import inject
 
-from domain.connection.services.ConnectionSecretService import ConnectionSecretService
-from domain.connection.services.ConnectionServerService import ConnectionServerService
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructor.connection.database.DatabaseContext import DatabaseContext
 from infrastructor.connection.database.DatabasePolicy import DatabasePolicy
@@ -17,12 +15,8 @@ class DatabaseProvider(IScoped):
     def __init__(self,
                  sql_logger: SqlLogger,
                  operation_cache_service: OperationCacheService,
-                 connection_secret_service: ConnectionSecretService,
-                 connection_server_service: ConnectionServerService
                  ):
         self.operation_cache_service = operation_cache_service
-        self.connection_server_service = connection_server_service
-        self.connection_secret_service = connection_secret_service
         self.sql_logger = sql_logger
 
     def get_context(self, connection: Connection) -> DatabaseContext:

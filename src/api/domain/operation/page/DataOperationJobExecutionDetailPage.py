@@ -24,7 +24,7 @@ class DataOperationJobExecutionDetailPage(IScoped):
             {'value': 'Name'},
             {'value': 'Schedule Info'},
             {'value': 'Status'},
-            {'value': 'Error'},
+            {'value': 'Log'},
             {'value': 'Source Data Count'},
             {'value': 'Affected Row Count'},
             {'value': 'Execution Start Date'},
@@ -103,7 +103,7 @@ class DataOperationJobExecutionDetailPage(IScoped):
                                                                            pagination=pagination)
 
         table = self.html_template_service.render_table(source=table_data)
-        return self.html_template_service.render_html(content=table)
+        return table
 
     def render_job_execution_integration(self, id, pagination=None):
         headers = [
@@ -192,7 +192,7 @@ class DataOperationJobExecutionDetailPage(IScoped):
                                                                            pagination=pagination)
 
         table = self.html_template_service.render_table(source=table_data)
-        return self.html_template_service.render_html(content=table)
+        return table
 
     def render(self, id, pagination: Pagination):
         if pagination is None:

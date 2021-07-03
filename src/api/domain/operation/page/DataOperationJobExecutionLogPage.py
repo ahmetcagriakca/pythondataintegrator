@@ -22,7 +22,7 @@ class DataOperationJobExecutionLogPage(IScoped):
     def prepare_data_operation_row(self, data):
         content=''
 
-        if data is not None and data.Content.Log is not None:
+        if data is not None and data.Content is not None:
             content = data.Content.replace('\n', '<br />').replace('\t',
                                                                               '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
         row = {
@@ -46,4 +46,8 @@ class DataOperationJobExecutionLogPage(IScoped):
 
         table = self.html_template_service.render_table(source=table_data
                                                         )
-        return self.html_template_service.render_html(content=table)
+
+
+        return self.html_template_service.render_html(
+            content=f'''  <div style="font-size: 24px;"><b>Job Execution Logs </b></div>{table}''')
+

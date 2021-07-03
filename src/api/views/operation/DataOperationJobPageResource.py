@@ -10,7 +10,7 @@ from infrastructor.json.JsonConvert import JsonConvert
 from views.operation.PageModels import PageModels
 
 
-@PageModels.ns.route('/Job')
+@PageModels.ns.route('/Job',doc=False)
 class DataOperationJobPageResource(ResourceBase):
     @inject
     def __init__(self, page: DataOperationJobPage,

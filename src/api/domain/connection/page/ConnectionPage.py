@@ -67,9 +67,9 @@ class ConnectionPage(IScoped):
                                                                            pagination=pagination)
 
         table = self.html_template_service.render_table(source=table_data)
-        return self.html_template_service.render_html(content=table)
+        return table
 
     def render(self, pagination: Pagination):
 
         table_connection = self.render_connection(pagination)
-        return self.html_template_service.render_html(content=f'''  <div style="font-size: 24px;"><b>Connection </b></div>{table_connection}''')
+        return self.html_template_service.render_html(content=f'''  <div style="font-size: 24px;"><b>Connections </b></div>{table_connection}''')

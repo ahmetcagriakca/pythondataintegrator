@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 from injector import inject
 
-from domain.job.services.SchedulerRpcClientService import SchedulerRpcClientService
+from rpc.SchedulerRpcClientService import SchedulerRpcClientService
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
@@ -18,8 +18,6 @@ from models.dao.operation.DataOperationJob import DataOperationJob
 
 
 class JobOperationService(IScoped):
-    data_operation_service: DataOperationService = None
-
     @inject
     def __init__(self,
                  database_session_manager: DatabaseSessionManager,

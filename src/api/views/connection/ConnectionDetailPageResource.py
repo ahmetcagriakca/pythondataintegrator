@@ -10,7 +10,7 @@ from infrastructor.json.JsonConvert import JsonConvert
 from views.connection.PageModels import PageModels
 
 
-@PageModels.ns.route('/<int:connection_id>')
+@PageModels.ns.route('/<int:connection_id>',doc=False)
 class ConnectionDetailPageResource(ResourceBase):
     @inject
     def __init__(self, page: ConnectionDetailPage,

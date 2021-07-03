@@ -46,8 +46,8 @@ class IocManager:
 
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)
-        IocManager.process_info()
         IocManager.set_database_application_name()
+        IocManager.process_info()
         IocManager.injector = Injector(IocManager.configure)
 
     @staticmethod
@@ -56,6 +56,8 @@ class IocManager:
         database_config: DatabaseConfig = IocManager.config_manager.get(DatabaseConfig)
         if database_config.application_name is None:
             process_info = IocManager.get_process_info()
+            hostname = os.getenv('HOSTNAME', '')
+            IocManager.config_manager.set(ApplicationConfig, "hostname", hostname)
             IocManager.config_manager.set(DatabaseConfig, "application_name",
                                           f"{application_config.name}-({process_info})")
 
@@ -100,4 +102,5 @@ class IocManager:
     def process_info():
         logger = ConsoleLogger()
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
-        logger.info(f"Application : {application_config.name}")
+        hostname= f'-{application_config.hostname}' if (application_config.hostname is not None and application_config.hostname!='') else ''
+        logger.info(f"Application : {application_config.name}{hostname}")

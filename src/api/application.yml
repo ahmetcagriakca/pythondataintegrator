@@ -19,3 +19,7 @@ API:
 SCHEDULER_RPC_CLIENT:
   HOST: localhost
   PORT: 7300
+
+PROCESS_RPC_CLIENT:
+  HOST: localhost
+  PORT: 7400

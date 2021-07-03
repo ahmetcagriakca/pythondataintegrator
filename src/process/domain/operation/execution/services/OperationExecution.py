@@ -38,12 +38,13 @@ class OperationExecution(IScoped):
 
     @transaction_handler
     def start(self, data_operation_id: int, job_id: int, data_operation_job_execution_id: int):
-        self.operation_cache_service.create(data_operation_id=data_operation_id)
-        if data_operation_job_execution_id is None:
-            data_operation_job_execution_id = self.create_execution_command.execute(data_operation_id=data_operation_id,
-                                                                                    job_id=job_id)
-        data_operation_name = self.operation_cache_service.get_data_operation_name(data_operation_id=data_operation_id)
+        data_operation_name=f'{data_operation_id}'
         try:
+            self.operation_cache_service.create(data_operation_id=data_operation_id)
+            if data_operation_job_execution_id is None:
+                data_operation_job_execution_id = self.create_execution_command.execute(data_operation_id=data_operation_id,
+                                                                                        job_id=job_id)
+            data_operation_name = self.operation_cache_service.get_data_operation_name(data_operation_id=data_operation_id)
 
             self.__event(data_operation_job_execution_id=data_operation_job_execution_id,
                          log=f'{data_operation_name} data operation is begin',

@@ -22,7 +22,7 @@ class SendSchedulerErrorMailCommand:
     def send(self, job_id:int,exception:Exception,data_operation_job_execution_id=None):
         try:
             data_operation_job_repository = self.repository_provider.get(DataOperationJob)
-            data_operation_job = data_operation_job_repository.first(Id=job_id)
+            data_operation_job = data_operation_job_repository.first(JobId=job_id)
             if data_operation_job is None:
                 raise OperationalException("Job definition not found")
                 operation_contacts = []

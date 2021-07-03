@@ -16,5 +16,5 @@ DATABASE:
 PROCESS_RPC_SERVER:
   PROTOCOL_CONFIG:
     allow_public_attrs: True
-    sync_request_timeout: 60
+    sync_request_timeout: 120
   PORT: 7400

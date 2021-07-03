@@ -15,7 +15,7 @@ class ConfigManager:
     def get_all(self):
         return self.configs
 
-    def get(self, generic_type):
+    def get(self, generic_type) -> object:
         for config in self.configs:
             config_type = config.get("type")
             if config_type is generic_type:

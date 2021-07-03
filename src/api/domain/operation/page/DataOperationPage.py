@@ -30,7 +30,7 @@ class DataOperationPage(IScoped):
                 last_update_date = data.LastUpdatedDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3]
             definition_url = '-'
             if data.DefinitionId is not None:
-                definition_url = f'<a href="/definition/{data.DefinitionId}">{data.DefinitionId}</a>'
+                definition_url = f'<a href="/DataOperation/Definition/{data.DefinitionId}">{data.DefinitionId}</a>'
             contacts=[]
             if data.Contacts is not None and len(data.Contacts)>0:
                 for contact in data.Contacts:
@@ -57,16 +57,16 @@ class DataOperationPage(IScoped):
         table_data = self.html_template_service.prepare_table_data_dynamic(query=query,
                                                                            headers=headers,
                                                                            prepare_row=prepare_row,
-                                                                           sortable='"Id" asc',
+                                                                           sortable='"Id" desc',
                                                                            pagination=pagination)
 
         table = self.html_template_service.render_table(source=table_data
                                                         )
-        return self.html_template_service.render_html(content=table)
+        return table
 
     def render(self, pagination: Pagination):
         table_data_operation = self.render_data_operation(pagination)
         return self.html_template_service.render_html(content=f'''
         
-                    <div style="font-size: 24px;"><b>Data Operation </b></div>
+                    <div style="font-size: 24px;"><b>Data Operations </b></div>
 {table_data_operation}''')

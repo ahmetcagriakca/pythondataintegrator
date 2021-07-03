@@ -104,9 +104,11 @@ class TestDataOperation(TestCase):
         start = time()
         from domain.operation.execution.services.OperationExecution import OperationExecution
         from domain.operation.commands.CreateExecutionCommand import CreateExecutionCommand
-        execution_id = IocManager.injector.get(CreateExecutionCommand).execute(data_operation_id=205, job_id=680)
+        data_operation_id=205
+        job_id=680
+        execution_id = IocManager.injector.get(CreateExecutionCommand).execute(data_operation_id=data_operation_id, job_id=job_id)
         operation_execution: OperationExecution = IocManager.injector.get(OperationExecution)
-        result = operation_execution.start(data_operation_id=27, job_id=None,
+        result = operation_execution.start(data_operation_id=data_operation_id, job_id=job_id,
                                            data_operation_job_execution_id=execution_id)
 
         print(result)

@@ -4,8 +4,8 @@ from IocManager import IocManager
 
 
 class PageModels:
-    ns = IocManager.api.namespace('Connection Pages', description='Connection Page endpoints',
-                                  path='/Connection')
+    ns = IocManager.api.namespace('Home Page', description='Home endpoints',
+                                  path='/')
 
     parser: RequestParser = IocManager.api.parser()
     parser.add_argument('Page', type=int, location='args', help='Queried value')

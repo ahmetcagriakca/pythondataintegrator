@@ -11,7 +11,7 @@ from infrastructor.json.JsonConvert import JsonConvert
 from views.operation.PageModels import PageModels
 
 
-@PageModels.ns.route('/<int:data_operation_id>')
+@PageModels.ns.route('/<int:data_operation_id>',doc=False)
 class DataOperationDetailPageResource(ResourceBase):
     @inject
     def __init__(self, page: DataOperationDetailPage,

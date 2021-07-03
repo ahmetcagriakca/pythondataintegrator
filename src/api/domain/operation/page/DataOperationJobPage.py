@@ -1,3 +1,5 @@
+import json
+
 from injector import inject
 
 from domain.page.HtmlTemplateService import HtmlTemplateService, Pagination
@@ -26,7 +28,8 @@ class DataOperationJobPage(IScoped):
             {'value': 'End Date'},
             {'value': 'Creation Date'},
             {'value': 'Last Update Date'},
-            {'value': 'Is Deleted'}
+            {'value': 'Is Deleted'},
+            {'value': 'Definition'}
         ]
 
         def prepare_row(data):
@@ -42,6 +45,17 @@ class DataOperationJobPage(IScoped):
                 for contact in data_operation_job.DataOperation.Contacts:
                     contacts.append(contact.Email)
             contact_str=';'.join(contacts)
+            if data_operation_job.Cron is not None:
+                definition={
+                    "OperationName":data_operation_job.DataOperation.Name,
+                    "Cron":data_operation_job.Cron
+                }
+            else:
+                definition={
+                    "OperationName":data_operation_job.DataOperation.Name,
+                    "RunDate":data_operation_job.StartDate
+                }
+            op_def=json.dumps(definition,indent=4)
             row = {
                 "data": [
                     {'value': f'<a href="/DataOperation/Job/{data_operation_job.Id}">{data_operation_job.Id}</a>'},
@@ -57,6 +71,7 @@ class DataOperationJobPage(IScoped):
                      'class': 'row-nowrap'},
                     {'value': last_update_date, 'class': 'row-nowrap'},
                     {'value': data_operation_job.IsDeleted},
+                    {'value': f'''{op_def}'''},
 
                 ]
             }
@@ -86,7 +101,7 @@ class DataOperationJobPage(IScoped):
                                                                            pagination=pagination)
 
         table = self.html_template_service.render_table(source=table_data)
-        return self.html_template_service.render_html(content=table)
+        return table
 
     def render(self, pagination: Pagination):
         if pagination is None:

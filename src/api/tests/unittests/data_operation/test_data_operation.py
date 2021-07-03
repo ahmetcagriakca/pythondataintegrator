@@ -3,6 +3,7 @@ from time import time
 from unittest import TestCase
 
 from IocManager import IocManager
+from infrastructor.cryptography.CryptoService import CryptoService
 from infrastructor.utils.Utils import Utils
 from models.dto.PagingModifier import PagingModifier
 
@@ -86,3 +87,9 @@ class TestDataOperation(TestCase):
         end = time()
         print(f"EndTime :{end}")
         print(f"TotalTime :{end - start}")
+
+    def test_decrypt(self):
+        crypto_service: CryptoService = IocManager.injector.get(CryptoService)
+
+        text=crypto_service.decrypt_code("gAAAAABgNl2U4gFI97zrN5Svwj287Y7O0EbFL56vKyhyYP_n1dmUOYfzGvPM90_2FFkxqW4QBTIayyRM5Hy-6969dL80ra5SNA==")
+        print(text)

@@ -6,7 +6,7 @@ from infrastructor.api.ResourceBase import ResourceBase
 from views.operation.PageModels import PageModels
 
 
-@PageModels.ns.route('/Job/Execution/Log/<int:data_operation_job_execution_id>')
+@PageModels.ns.route('/Job/Execution/Log/<int:data_operation_job_execution_id>',doc=False)
 class DataOperationJobExecutionLogPageResource(ResourceBase):
     @inject
     def __init__(self, page: DataOperationJobExecutionLogPage,
