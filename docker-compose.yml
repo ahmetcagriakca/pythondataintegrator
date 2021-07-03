@@ -5,7 +5,7 @@ services:
     restart: always
     image: postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       - DEBUG=false
       - POSTGRES_USER=postgres
@@ -14,20 +14,61 @@ services:
       - PG_TRUST_LOCALNET=true
     volumes:
       - /var/lib/pdipostgresql/data
-
-  pdi:
+  
+  pdi-api:
     build: 
-      context: .
+      context: src/api/
       dockerfile: Dockerfile
     ports:
       - '7100:7100'
     environment:
-      - API_ENVIRONMENT=TEST
+      - APPLICATION_ENVIRONMENT=TEST
       - DATABASE_TYPE=POSTGRESQL
       - DATABASE_HOST=postgresql
       - DATABASE_DATABASE=pdi
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=123456
       - DATABASE_PORT=5432
+      - SCHEDULER_RPC_CLIENT_HOST=pdi-scheduler
+      - TZ=Europe/Istanbul
     depends_on:
       - postgresql
+
+  pdi-process:
+    build: 
+      context: src/process/
+      dockerfile: Dockerfile
+    ports:
+      - '7400:7400'
+    environment:
+      - APPLICATION_ENVIRONMENT=TEST
+      - DATABASE_TYPE=POSTGRESQL
+      - DATABASE_HOST=postgresql
+      - DATABASE_DATABASE=pdi
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=123456
+      - DATABASE_PORT=5432
+      - TZ=Europe/Istanbul
+    depends_on:
+      - postgresql
+
+  pdi-scheduler:
+    build: 
+      context: src/scheduler/
+      dockerfile: Dockerfile
+    ports:
+      - '7300:7300'
+    environment:
+      - APPLICATION_ENVIRONMENT=TEST
+      - DATABASE_TYPE=POSTGRESQL
+      - DATABASE_HOST=postgresql
+      - DATABASE_DATABASE=pdi
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=123456
+      - DATABASE_PORT=5432
+      - PROCESS_RPC_CLIENT_HOST=pdi-process
+      - TZ=Europe/Istanbul
+    depends_on:
+      - postgresql
+      - pdi-process
+    
