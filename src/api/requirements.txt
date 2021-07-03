@@ -9,7 +9,7 @@ psycopg2-binary==2.8.6
 pytest==6.1.1
 rpyc==5.0.1
 Flask==1.1.4
-Flask_Cors==3.0.8
+Flask_Cors==3.0.9
 Flask-Ext==0.1
 Flask-Injector==0.12.3
 flask-restx==0.4.0
