@@ -2,8 +2,7 @@ from typing import List
 from injector import inject
 
 from domain.integration.services.DataIntegrationService import DataIntegrationService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.operation import DataOperation, DataOperationIntegration, Definition
 from models.viewmodels.operation.CreateDataOperationIntegrationModel import CreateDataOperationIntegrationModel
@@ -12,13 +11,14 @@ from models.viewmodels.operation.CreateDataOperationIntegrationModel import Crea
 class DataOperationIntegrationService(IScoped):
 
     @inject
-    def __init__(self, database_session_manager: DatabaseSessionManager,
-                 data_integration_service: DataIntegrationService):
+    def __init__(self,
+                 data_integration_service: DataIntegrationService,
+                 repository_provider: RepositoryProvider,
+                 ):
         super().__init__()
+        self.repository_provider = repository_provider
+        self.secret_repository = repository_provider.get(DataOperationIntegration)
         self.data_integration_service = data_integration_service
-        self.database_session_manager = database_session_manager
-        self.data_operation_integration_repository: Repository[DataOperationIntegration] = Repository[
-            DataOperationIntegration](database_session_manager)
 
     def get_all_by_data_operation_id(self, data_operation_id: int) -> List[DataOperationIntegration]:
         entities = self.data_operation_integration_repository.filter_by(

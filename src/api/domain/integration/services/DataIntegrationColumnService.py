@@ -1,8 +1,7 @@
 from typing import List
 
 from injector import inject
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegration import DataIntegration
@@ -12,11 +11,10 @@ from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
 class DataIntegrationColumnService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  ):
-        self.database_session_manager = database_session_manager
-        self.data_integration_column_repository: Repository[DataIntegrationColumn] = Repository[
-            DataIntegrationColumn](database_session_manager)
+        self.repository_provider = repository_provider
+        self.data_integration_column_repository = repository_provider.get(DataIntegrationColumn)
 
     #######################################################################################
 
@@ -112,7 +110,7 @@ class DataIntegrationColumnService(IScoped):
                 if target_column_name == data_integration_column.TargetColumnName:
                     column_found = True
             if not column_found:
-                self.database_session_manager.session.delete(data_integration_column)
+                self.repository_provider.create().session.delete(data_integration_column)
         return data_integration
 
     def delete(self, id: int):

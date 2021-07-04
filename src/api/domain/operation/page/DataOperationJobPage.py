@@ -78,9 +78,8 @@ class DataOperationJobPage(IScoped):
             }
             return row
 
-        data_operation_repository = self.repository_provider.get(DataOperationJob)
 
-        query = data_operation_repository.database_session_manager.session.query(DataOperationJob,
+        query = self.repository_provider.query(DataOperationJob,
                                                                                  DataOperation.Name).join(
             DataOperationJob.DataOperation)
         if pagination.Filter is not None and pagination.Filter != '':

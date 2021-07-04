@@ -4,8 +4,7 @@ from injector import inject
 from domain.operation.services.DataOperationContactService import DataOperationContactService
 from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
 from domain.operation.services.DefinitionService import DefinitionService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
@@ -17,19 +16,19 @@ class DataOperationService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
                  data_operation_integration_service: DataOperationIntegrationService,
                  data_operation_contact_service: DataOperationContactService,
-                 definition_service: DefinitionService
+                 definition_service: DefinitionService,
+                 repository_provider: RepositoryProvider,
                  ):
+        super().__init__()
+        self.repository_provider = repository_provider
+        self.data_operation_repository = repository_provider.get(DataOperation)
         self.definition_service = definition_service
         self.data_operation_contact_service = data_operation_contact_service
         self.data_operation_integration_service = data_operation_integration_service
         self.sql_logger: SqlLogger = sql_logger
-        self.database_session_manager = database_session_manager
-        self.data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
-            database_session_manager)
 
     def get_data_operations(self) -> List[DataOperation]:
         """
@@ -46,7 +45,7 @@ class DataOperationService(IScoped):
         data_operation = self.data_operation_repository.first(Name=name, IsDeleted=0)
         return data_operation
 
-    def get_name(self, id) ->str:
+    def get_name(self, id) -> str:
         data_operation = self.get_by_id(id=id)
         return data_operation.Name
 
@@ -66,7 +65,7 @@ class DataOperationService(IScoped):
         else:
             self.update_data_operation(data_operation_model, definition)
 
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         data_operation = self.get_by_name(name=data_operation_model.Name)
         return data_operation
 
@@ -126,4 +125,4 @@ class DataOperationService(IScoped):
 
         message = f'{data_operation.Name} data operation deleted'
         self.sql_logger.info(message)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()

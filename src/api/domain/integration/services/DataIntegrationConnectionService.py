@@ -7,8 +7,7 @@ from domain.integration.services.DataIntegrationConnectionDatabaseService import
     DataIntegrationConnectionDatabaseService
 from domain.integration.services.DataIntegrationConnectionFileService import DataIntegrationConnectionFileService
 from domain.integration.services.DataIntegrationConnectionQueueService import DataIntegrationConnectionQueueService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
@@ -20,22 +19,20 @@ from models.dao.integration.DataIntegration import DataIntegration
 class DataIntegrationConnectionService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
                  data_integration_column_service: DataIntegrationColumnService,
                  data_integration_connection_database_service: DataIntegrationConnectionDatabaseService,
                  data_integration_connection_file_service: DataIntegrationConnectionFileService,
                  data_integration_connection_queue_service: DataIntegrationConnectionQueueService,
-                 connection_service: ConnectionService
+                 connection_service: ConnectionService,
+                 repository_provider: RepositoryProvider,
                  ):
+        self.repository_provider = repository_provider
+        self.data_integration_connection_repository = repository_provider.get(DataIntegrationConnection)
         self.data_integration_connection_queue_service = data_integration_connection_queue_service
         self.data_integration_connection_file_service = data_integration_connection_file_service
         self.data_integration_connection_database_service = data_integration_connection_database_service
         self.connection_service = connection_service
         self.data_integration_column_service = data_integration_column_service
-        self.database_session_manager = database_session_manager
-        self.data_integration_connection_repository: Repository[DataIntegrationConnection] = Repository[
-            DataIntegrationConnection](
-            database_session_manager)
 
     #######################################################################################
     def get_by_id(self, id: int) -> DataIntegrationConnection:

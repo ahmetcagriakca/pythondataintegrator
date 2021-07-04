@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.data.Repository import Repository
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
@@ -26,14 +26,11 @@ class TestConnectionResource(TestCase):
             assert True == False
         finally:
             # clean data_integration test operations
-            database_session_manager: DatabaseSessionManager = self.test_manager.ioc_manager.injector.get(
-                DatabaseSessionManager)
-            connection_database_repository: Repository[ConnectionDatabase] = Repository[ConnectionDatabase](
-                database_session_manager)
-            connection_repository: Repository[Connection] = Repository[Connection](
-                database_session_manager)
+            repository_provider = self.test_manager.ioc_manager.injector.get(RepositoryProvider)
+            connection_database_repository=repository_provider.get(ConnectionDatabase)
+            connection_repository=repository_provider.get(Connection)
             connection = connection_repository.first(Id=id)
             connection_database = connection_database_repository.first(Connection=connection)
             connection.IsDeleted = 0
             connection_database.IsDeleted = 0
-            database_session_manager.commit()
+            repository_provider.commit()

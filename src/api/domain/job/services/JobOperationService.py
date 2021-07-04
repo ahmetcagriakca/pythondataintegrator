@@ -3,11 +3,10 @@ from datetime import datetime
 from typing import List
 from injector import inject
 
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from rpc.SchedulerRpcClientService import SchedulerRpcClientService
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
@@ -20,20 +19,19 @@ from models.dao.operation.DataOperationJob import DataOperationJob
 class JobOperationService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
                  data_operation_service: DataOperationService,
                  data_operation_job_service: DataOperationJobService,
                  application_config: ApplicationConfig,
-                 scheduler_rpc_client_service: SchedulerRpcClientService
+                 scheduler_rpc_client_service: SchedulerRpcClientService,
+                 repository_provider: RepositoryProvider,
                  ):
+        self.repository_provider = repository_provider
+        self.ap_scheduler_job_repository = repository_provider.get(ApSchedulerJob)
         self.scheduler_rpc_client_service = scheduler_rpc_client_service
         self.application_config = application_config
         self.data_operation_job_service = data_operation_job_service
         self.data_operation_service = data_operation_service
-        self.database_session_manager = database_session_manager
-        self.ap_scheduler_job_repository: Repository[ApSchedulerJob] = Repository[ApSchedulerJob](
-            database_session_manager)
 
         self.sql_logger = sql_logger
 
@@ -140,7 +138,7 @@ class JobOperationService(IScoped):
             data_operation=data_operation,
             cron=cron, start_date=start_date,
             end_date=end_date)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job
 
     def add_job_with_cron(self, cron, start_date=None, end_date=None, args=None,
@@ -178,7 +176,7 @@ class JobOperationService(IScoped):
             data_operation=data_operation,
             cron=None, start_date=start_date,
             end_date=None)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job
 
     def delete_scheduler_cron_job(self, data_operation_name):
@@ -191,7 +189,7 @@ class JobOperationService(IScoped):
             raise OperationalException("Cron Job not found.")
 
         self.delete_existing_cron_jobs(data_operation_id=data_operation.Id)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
 
     def delete_scheduler_date_job(self, data_operation_job_id):
 
@@ -201,4 +199,4 @@ class JobOperationService(IScoped):
 
         self.delete_job(data_operation_job_id=data_operation_job.Id,
                         ap_scheduler_job_id=data_operation_job.ApSchedulerJobId)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()

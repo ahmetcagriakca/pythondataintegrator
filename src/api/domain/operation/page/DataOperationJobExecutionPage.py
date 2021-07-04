@@ -31,7 +31,7 @@ class DataOperationJobExecutionPage(IScoped):
         ]
 
         def prepare_row(data: DataOperationJobExecution):
-            max_id = self.repository_provider.database_session_manager.session.query(
+            max_id = self.repository_provider.query(
                 func.max(DataOperationJobExecutionIntegration.Id)) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id)
             error_integration = self.repository_provider.get(DataOperationJobExecutionIntegration).first(Id=max_id)
@@ -39,13 +39,13 @@ class DataOperationJobExecutionPage(IScoped):
             if error_integration is not None and error_integration.Log is not None:
                 error_log = error_integration.Log.replace('\n', '<br />').replace('\t',
                                                                                                     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
-            total_source_data_count = self.repository_provider.database_session_manager.session.query(
+            total_source_data_count = self.repository_provider.query(
                 func.sum(DataOperationJobExecutionIntegration.SourceDataCount).label("SourceDataCount")) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id).first()[0]
             if total_source_data_count is None or total_source_data_count < 0:
                 total_source_data_count = 0
 
-            total_affected_row = self.repository_provider.database_session_manager.session.query(
+            total_affected_row = self.repository_provider.query(
                 func.sum(DataOperationJobExecutionIntegrationEvent.AffectedRowCount).label("AffectedRowCount")) \
                 .join(DataOperationJobExecutionIntegration.DataOperationJobExecutionIntegrationEvents) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id).first()[0]

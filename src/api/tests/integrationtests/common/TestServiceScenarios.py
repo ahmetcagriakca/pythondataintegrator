@@ -4,6 +4,7 @@ from datetime import datetime
 from IocManager import IocManager
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from models.configs.DatabaseConfig import DatabaseConfig
@@ -29,86 +30,75 @@ class TestServiceScenarios:
         return data_operation
 
     def clear_secret(self, id):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        secret_repository: Repository[Secret] = Repository[Secret](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        secret_repository= repository_provider.get(Secret)
         secret = secret_repository.first(Id=id)
         for secret_source in secret.SecretSources:
             for basic_authentication in secret_source.SecretSourceBasicAuthentications:
-                database_session_manager.session.delete(basic_authentication)
-            database_session_manager.session.delete(secret_source)
-        database_session_manager.session.delete(secret)
+                repository_provider.create().session.delete(basic_authentication)
+            repository_provider.create().session.delete(secret_source)
+        repository_provider.create().session.delete(secret)
 
     def clear_connection(self, name):
-
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        connection_repository: Repository[Connection] = Repository[Connection](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        connection_repository= repository_provider.get(Connection)
         connection = connection_repository.first(Name=name)
         for connection_secret in connection.ConnectionSecrets:
             self.clear_secret(connection_secret.SecretId)
-            database_session_manager.session.delete(connection_secret)
+            repository_provider.create().session.delete(connection_secret)
         if connection.ConnectionServers is not None:
             for connection_server in connection.ConnectionServers:
-                database_session_manager.session.delete(connection_server)
+                repository_provider.create().session.delete(connection_server)
         if connection.Database is not None:
-            database_session_manager.session.delete(connection.Database)
+            repository_provider.create().session.delete(connection.Database)
         if connection.File is not None:
-            database_session_manager.session.delete(connection.File)
-        database_session_manager.session.delete(connection)
-        database_session_manager.commit()
+            repository_provider.create().session.delete(connection.File)
+        repository_provider.create().session.delete(connection)
+        repository_provider.create().commit()
 
     def clear_integration(self, code):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        data_integration_repository: Repository[DataIntegration] = Repository[DataIntegration](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        data_integration_repository= repository_provider.get(DataIntegration)
         data_integration = data_integration_repository.first(Code=code)
 
         for data_integration_column in data_integration.Columns:
-            database_session_manager.session.delete(data_integration_column)
+            repository_provider.create().session.delete(data_integration_column)
         for data_integration_connection in data_integration.Connections:
-            database_session_manager.session.delete(data_integration_connection)
+            repository_provider.create().session.delete(data_integration_connection)
 
-        database_session_manager.session.delete(data_integration)
-        database_session_manager.commit()
+        repository_provider.create().session.delete(data_integration)
+        repository_provider.create().commit()
 
     def clear_operation(self, name):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        data_operation_repository= repository_provider.get(DataOperation)
         data_operation = data_operation_repository.first(Name=name)
         if data_operation is None:
             return
 
         for data_operation_contact in data_operation.Contacts:
-            database_session_manager.session.delete(data_operation_contact)
+            repository_provider.create().session.delete(data_operation_contact)
 
         for data_operation_integration in data_operation.Integrations:
             data_integration = data_operation_integration.DataIntegration
 
             for data_integration_column in data_integration.Columns:
-                database_session_manager.session.delete(data_integration_column)
+                repository_provider.create().session.delete(data_integration_column)
             for data_integration_connection in data_integration.Connections:
-                database_session_manager.session.delete(data_integration_connection)
-            database_session_manager.session.delete(data_integration)
+                repository_provider.create().session.delete(data_integration_connection)
+            repository_provider.create().session.delete(data_integration)
 
-            database_session_manager.session.delete(data_operation_integration)
+            repository_provider.create().session.delete(data_operation_integration)
 
         for data_operation_job in data_operation.DataOperationJobs:
-            database_session_manager.session.delete(data_operation_job)
+            repository_provider.create().session.delete(data_operation_job)
 
-        database_session_manager.session.delete(data_operation)
-        database_session_manager.commit()
+        repository_provider.create().session.delete(data_operation)
+        repository_provider.create().commit()
 
     def clear_data_operation_job(self, data_operation_id):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        data_operation_job_repository: Repository[DataOperationJob] = Repository[DataOperationJob](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        data_operation_job_repository= repository_provider.get(DataOperationJob)
 
         data_operation_job = data_operation_job_repository.first(IsDeleted=0,
                                                                  DataOperationId=data_operation_id)
@@ -116,17 +106,15 @@ class TestServiceScenarios:
             return
         if data_operation_job.DataOperationJobExecutions is not None:
             for data_operation_job_execution in data_operation_job.DataOperationJobExecutions:
-                database_session_manager.session.delete(data_operation_job_execution)
+                repository_provider.create().session.delete(data_operation_job_execution)
 
-        database_session_manager.session.delete(data_operation_job.ApSchedulerJob)
-        database_session_manager.session.delete(data_operation_job)
-        database_session_manager.commit()
+        repository_provider.create().session.delete(data_operation_job.ApSchedulerJob)
+        repository_provider.create().session.delete(data_operation_job)
+        repository_provider.create().commit()
 
     def create_test_connection_database(self, test_data_connection):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        connection_repository: Repository[Connection] = Repository[Connection](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        connection_repository= repository_provider.get(Connection)
 
         connection = connection_repository.first(Name=test_data_connection["Name"])
         if connection is not None:
@@ -134,10 +122,8 @@ class TestServiceScenarios:
         response_data = self.service_endpoints.create_connection_database(test_data_connection)
 
     def create_test_connection_file(self, test_data_connection):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        connection_repository: Repository[Connection] = Repository[Connection](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        connection_repository= repository_provider.get(Connection)
 
         connection = connection_repository.first(Name=test_data_connection["Name"])
         if connection is not None:
@@ -145,10 +131,8 @@ class TestServiceScenarios:
         response_data = self.service_endpoints.create_connection_file(test_data_connection)
 
     def create_test_connection_queue(self, test_data_connection):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        connection_repository: Repository[Connection] = Repository[Connection](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        connection_repository= repository_provider.get(Connection)
 
         connection = connection_repository.first(Name=test_data_connection["Name"])
         if connection is not None:
@@ -156,10 +140,8 @@ class TestServiceScenarios:
         response_data = self.service_endpoints.create_connection_queue(test_data_connection)
 
     def create_test_integration(self, test_data_integration):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        data_integration_repository: Repository[DataIntegration] = Repository[DataIntegration](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        data_integration_repository= repository_provider.get(DataIntegration)
         data_integration = data_integration_repository.first(Code=test_data_integration["Code"])
         if data_integration is not None:
             self.clear_integration(code=test_data_integration["Code"])
@@ -167,10 +149,8 @@ class TestServiceScenarios:
         return response_data
 
     def create_test_operation(self, test_data_operation):
-        database_session_manager: DatabaseSessionManager = self.ioc_manager.injector.get(
-            DatabaseSessionManager)
-        data_operation_repository: Repository[DataOperation] = Repository[DataOperation](
-            database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        data_operation_repository= repository_provider.get(DataOperation)
         data_operation = data_operation_repository.first(Name=test_data_operation["Name"])
         if data_operation is not None:
             self.clear_operation(name=test_data_operation["Name"])
@@ -178,12 +158,8 @@ class TestServiceScenarios:
         return response_data
 
     def get_data_operation_job_execution(self, data_operation_job_id) -> DataOperationJobExecution:
-        database_config: DatabaseSessionManager = self.ioc_manager.config_manager.get(
-            DatabaseConfig)
-        database_session_manager = DatabaseSessionManager(database_config=database_config)
-        database_session_manager.session = database_session_manager.session_factory()
-        data_operation_job_execution_repository: Repository[DataOperationJobExecution] = Repository[
-            DataOperationJobExecution](database_session_manager)
+        repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
+        data_operation_job_execution_repository= repository_provider.get(DataOperationJobExecution)
         data_operation_job_execution = data_operation_job_execution_repository.first(
             DataOperationJobId=data_operation_job_id)
         return data_operation_job_execution
@@ -227,9 +203,9 @@ class TestServiceScenarios:
             data_operation = self.get_data_operation(name=data_operation_name)
             operation_execution = IocManager.injector.get(OperationExecution)
             ap_scheduler_job = ApSchedulerJob(JobId='temp', NextRunTime=None, FuncRef='None')
+            repository_provider = self.ioc_manager.injector.get(RepositoryProvider)
             data_operation_job_service = IocManager.injector.get(DataOperationJobService)
-            database_session_manager = IocManager.injector.get(DatabaseSessionManager)
-            ap_scheduler_job_repository = Repository[ApSchedulerJob](database_session_manager)
+            ap_scheduler_job_repository = IocManager.injector.get(ApSchedulerJob)
             ap_scheduler_job_repository.insert(ap_scheduler_job)
 
             data_operation_job = data_operation_job_service.insert_data_operation_job(
@@ -237,7 +213,7 @@ class TestServiceScenarios:
                 data_operation=data_operation,
                 cron=None, start_date=datetime.now(),
                 end_date=None)
-            database_session_manager.commit()
+            repository_provider.create().commit()
             operation_execution.start(data_operation_id=data_operation.Id,
                                       job_id=ap_scheduler_job.Id)
         except Exception as ex:
