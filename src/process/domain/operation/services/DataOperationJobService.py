@@ -64,7 +64,7 @@ class DataOperationJobService(IScoped):
 
     def check_removed_job(self, ap_scheduler_job_id):
         EVENT_JOB_REMOVED = 2 ** 10
-        job_detail_query = self.database_session_manager.session.query(
+        job_detail_query = self.repository_provider.query(
             ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
         ) \
             .filter(ApSchedulerJobEvent.ApSchedulerJobId == ApSchedulerJob.Id) \
