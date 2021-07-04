@@ -1,9 +1,7 @@
 from injector import inject
 
 from domain.connection.services.ConnectorTypeService import ConnectorTypeService
-from infrastructor.cryptography.CryptoService import CryptoService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection import ConnectionQueue
@@ -15,15 +13,12 @@ class ConnectionQueueService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
-                 crypto_service: CryptoService,
-                 connector_type_service: ConnectorTypeService
+                 connector_type_service: ConnectorTypeService,
+                 repository_provider: RepositoryProvider,
                  ):
+        self.repository_provider = repository_provider
+        self.connection_queue_repository = repository_provider.get(ConnectionQueue)
         self.connector_type_service = connector_type_service
-        self.crypto_service = crypto_service
-        self.database_session_manager = database_session_manager
-        self.connection_queue_repository: Repository[ConnectionQueue] = Repository[ConnectionQueue](
-            database_session_manager)
 
     def create(self, connection: Connection, model: CreateConnectionQueueModel) -> ConnectionQueue:
         """

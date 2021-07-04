@@ -81,25 +81,6 @@ class TestDataOperation(TestCase):
 
         print(json.dumps(sample, cls=DateTimeEncoder))
 
-    def test_parallel_data_operation(self):
-        start = time()
-
-        from domain.operation.execution.services.OperationCacheService import OperationCacheService
-        operation_cache_service: OperationCacheService = IocManager.injector.get(OperationCacheService)
-        operation_cache_service.create(data_operation_id=27)
-        id=operation_cache_service.data_operation.Id
-        from domain.operation.services.DataOperationService import DataOperationService
-        data_operation_service: DataOperationService = IocManager.injector.get(DataOperationService)
-        result = data_operation_service.get_by_id( 27)
-        AuthenticationType()
-        result = data_operation_service.database_session_manager.session.execute(DataOperation.__table__.select())
-        for row in result:
-            print(dict(row))
-        print(dict(result))
-        end = time()
-        print(f"EndTime :{end}")
-        print(f"TotalTime :{end - start}")
-
     def test_start_operation(self):
         start = time()
         from domain.operation.execution.services.OperationExecution import OperationExecution

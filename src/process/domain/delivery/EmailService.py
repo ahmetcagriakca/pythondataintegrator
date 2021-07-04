@@ -4,7 +4,6 @@ from typing import List
 from injector import inject
 
 from infrastructor.configuration.ConfigService import ConfigService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
 from infrastructor.delivery.EmailProvider import EmailProvider
 from infrastructor.dependency.scopes import IScoped
@@ -21,7 +20,6 @@ from models.enums.events import EVENT_EXECUTION_INITIALIZED
 class EmailService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
                  sql_logger: SqlLogger,
                  email_provider: EmailProvider,
                  config_service: ConfigService,
@@ -29,7 +27,6 @@ class EmailService(IScoped):
 
                  ):
         self.application_config: ApplicationConfig = application_config
-        self.database_session_manager = database_session_manager
         self.sql_logger: SqlLogger = sql_logger
         self.email_provider = email_provider
         self.config_service = config_service

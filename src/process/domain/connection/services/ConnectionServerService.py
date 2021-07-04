@@ -2,23 +2,20 @@ from typing import List
 
 from injector import inject
 
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.connection import ConnectionServer
 from models.dao.connection.Connection import Connection
-from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 
 
 class ConnectionServerService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  ):
-        self.database_session_manager = database_session_manager
-        self.connection_server_repository: Repository[ConnectionServer] = Repository[ConnectionServer](
-            database_session_manager)
+        self.repository_provider = repository_provider
+        self.connection_server_repository = repository_provider.get(ConnectionServer)
 
     def get_by_id(self, id: int) -> ConnectionServer:
         entities = self.connection_server_repository.filter_by(IsDeleted=0, Id=id)

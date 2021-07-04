@@ -27,15 +27,14 @@ class JobSchedulerService:
         def inner(*args, **kwargs):
             try:
                 result = func(*args, **kwargs)
-                args[0].repository_provider.database_session_manager.commit()
+                args[0].repository_provider.commit()
                 return result
             except Exception as ex:
                 try:
-                    args[0].repository_provider.database_session_manager.rollback()
-                    args[0].repository_provider.database_session_manager.close()
-                    args[0].repository_provider.database_session_manager.connect()
+                    args[0].repository_provider.rollback()
+                    args[0].repository_provider.reconnect()
                     result = func(*args, **kwargs)
-                    args[0].repository_provider.database_session_manager.commit()
+                    args[0].repository_provider.commit()
                     return result
                 except Exception as invalid_ex:
                     print(ex)

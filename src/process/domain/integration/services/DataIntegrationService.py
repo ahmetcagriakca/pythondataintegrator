@@ -4,8 +4,7 @@ from injector import inject
 
 from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.operation import Definition
@@ -16,16 +15,14 @@ from models.dao.integration.DataIntegration import DataIntegration
 class DataIntegrationService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  data_integration_column_service: DataIntegrationColumnService,
                  data_integration_connection_service: DataIntegrationConnectionService,
-
                  ):
+        self.repository_provider = repository_provider
+        self.data_integration_repository = repository_provider.get(DataIntegration)
         self.data_integration_connection_service = data_integration_connection_service
         self.data_integration_column_service = data_integration_column_service
-        self.database_session_manager = database_session_manager
-        self.data_integration_repository: Repository[DataIntegration] = Repository[DataIntegration](
-            database_session_manager)
 
     #######################################################################################
 

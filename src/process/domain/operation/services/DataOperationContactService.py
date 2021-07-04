@@ -1,8 +1,7 @@
 from typing import List
 from injector import inject
 
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.operation import DataOperation
 from models.dao.operation.DataOperationContact import DataOperationContact
@@ -13,11 +12,10 @@ class DataOperationContactService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager
+                 repository_provider: RepositoryProvider,
                  ):
-        self.database_session_manager = database_session_manager
-        self.data_operation_contact_repository: Repository[DataOperationContact] = Repository[
-            DataOperationContact](database_session_manager)
+        self.repository_provider = repository_provider
+        self.secret_repository = repository_provider.get(DataOperationContact)
 
     def insert(self,
                data_operation: DataOperation,

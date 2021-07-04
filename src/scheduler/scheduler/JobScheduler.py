@@ -1,3 +1,4 @@
+from api.infrastructor.data.RepositoryProvider import RepositoryProvider
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.events import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN, EVENT_SCHEDULER_PAUSED, \
     EVENT_SCHEDULER_RESUMED, EVENT_EXECUTOR_ADDED, EVENT_EXECUTOR_REMOVED, EVENT_JOBSTORE_ADDED, EVENT_JOBSTORE_REMOVED, \
@@ -27,12 +28,12 @@ class JobScheduler(ISingleton):
         print("job_process started")
 
     def run_scheduler(self):
-        database_session_manager: DatabaseSessionManager = IocManager.injector.get(DatabaseSessionManager)
+        repository_provider: DatabaseSessionManager = IocManager.injector.get(RepositoryProvider)
         database_config: DatabaseConfig = IocManager.injector.get(DatabaseConfig)
         aps_config: ApsConfig = IocManager.injector.get(ApsConfig)
         jobstores = {
             'default': SQLAlchemyJobStore(url=database_config.connection_string, tablename='ApSchedulerJobsTable',
-                                          engine=database_session_manager.engine,
+                                          engine=repository_provider.create().engine,
                                           metadata=IocManager.Base.metadata,
                                           tableschema='Aps')
         }

@@ -1,7 +1,6 @@
 from typing import List
 from injector import inject
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection.ConnectorType import ConnectorType
@@ -11,11 +10,10 @@ class ConnectorTypeService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager
+                 repository_provider: RepositoryProvider,
                  ):
-        self.database_session_manager = database_session_manager
-        self.connector_type_repository: Repository[ConnectorType] = Repository[ConnectorType](
-            database_session_manager)
+        self.repository_provider = repository_provider
+        self.connector_type_repository = repository_provider.get(ConnectorType)
 
     def get(self) -> List[ConnectorType]:
         """

@@ -5,7 +5,7 @@ from apscheduler.events import EVENT_JOB_REMOVED
 
 from IocManager import IocManager
 from infrastructor.connection.queue.QueueProvider import QueueProvider
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 
 from models.dao.aps import ApSchedulerJobEvent, ApSchedulerEvent, ApSchedulerJob
 from models.dao.operation import DataOperationJob
@@ -58,21 +58,8 @@ class TestTimeout(TestCase):
         assert len(data) <= 100
 
     def test_sqlalchemy(self):
-        database_session_manager = IocManager.injector.get(DatabaseSessionManager)
-        # test_repo: Repository[ConfigParameter] = Repository[ConfigParameter](database_session_manager)
-        # data = test_repo.table \
-        #     .filter(ConfigParameter.Name.contains('EMAIL_HOST'))
-        # for d in data:
-        #     print(d)
-        #
-        # log_repo: Repository[Log] = Repository[Log](database_session_manager)
-        # data = log_repo.table \
-        #     .filter(Log.JobId == 356) \
-        #     .filter(Log.Content.contains("CrmCustomerOperation")).all()
-        #
-        # for d in data:
-        #     print(d)
-        result = database_session_manager.session.query(
+        repository_provider = IocManager.injector.get(RepositoryProvider)
+        result = repository_provider.query(
             DataOperationJob,ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
         ) \
             .filter(ApSchedulerJobEvent.ApSchedulerJobId == ApSchedulerJob.Id) \
@@ -83,7 +70,7 @@ class TestTimeout(TestCase):
         all_result = result.one_or_none()
         if all_result is not None:
             print(all_result.ApSchedulerEvent.Name)
-        result = database_session_manager.session.query(
+        result = repository_provider.query(
             ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
         ) \
             .filter(ApSchedulerJobEvent.ApSchedulerJobId == ApSchedulerJob.Id) \

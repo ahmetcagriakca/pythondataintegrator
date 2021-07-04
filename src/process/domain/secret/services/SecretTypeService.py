@@ -2,6 +2,7 @@ from injector import inject
 
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.secret import SecretType
 
@@ -10,11 +11,10 @@ class SecretTypeService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  ):
-        self.database_session_manager = database_session_manager
-        self.secret_type_repository: Repository[SecretType] = Repository[SecretType](
-            database_session_manager)
+        self.repository_provider = repository_provider
+        self.secret_type_repository = repository_provider.get(SecretType)
 
     def get_by_name(self, name) -> SecretType:
         """
