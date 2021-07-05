@@ -11,7 +11,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from injector import inject
 
 from IocManager import IocManager
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
 from infrastructor.dependency.scopes import ISingleton
 from scheduler.JobSchedulerEvent import JobSchedulerEvent
 from models.configs.ApsConfig import ApsConfig
@@ -28,7 +27,7 @@ class JobScheduler(ISingleton):
         print("job_process started")
 
     def run_scheduler(self):
-        repository_provider: DatabaseSessionManager = IocManager.injector.get(RepositoryProvider)
+        repository_provider = IocManager.injector.get(RepositoryProvider)
         database_config: DatabaseConfig = IocManager.injector.get(DatabaseConfig)
         aps_config: ApsConfig = IocManager.injector.get(ApsConfig)
         jobstores = {

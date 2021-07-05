@@ -5,9 +5,6 @@ from IocManager import IocManager
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
 from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
-from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.aps import ApSchedulerJob
 from models.dao.connection.Connection import Connection
 from models.dao.integration.DataIntegration import DataIntegration

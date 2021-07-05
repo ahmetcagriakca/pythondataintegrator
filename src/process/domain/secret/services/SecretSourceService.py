@@ -2,8 +2,6 @@ from injector import inject
 
 from domain.secret.services.AuthenticationTypeService import AuthenticationTypeService
 from domain.secret.services.SecretSourceBasicAuthenticationService import SecretSourceBasicAuthenticationService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
