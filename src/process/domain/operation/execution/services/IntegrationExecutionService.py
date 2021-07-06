@@ -2,6 +2,7 @@ from queue import Queue
 from time import time
 from typing import List
 
+from func_timeout import func_set_timeout
 from injector import inject
 from pandas import notnull
 import pandas as pd
@@ -123,6 +124,7 @@ class IntegrationExecutionService(IScoped):
                 job_id=data_operation_job_execution_id)
         return total_data_count
 
+    @func_set_timeout(1800)
     def start_execute_integration(self,
                                   data_integration_id: int,
                                   data_operation_job_execution_id: int,

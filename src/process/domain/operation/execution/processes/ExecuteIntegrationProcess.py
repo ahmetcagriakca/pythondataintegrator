@@ -74,13 +74,14 @@ class ExecuteIntegrationProcess(IScoped):
             self.sql_logger.info(f"Source data operation finished successfully. SubProcessId: {sub_process_id}",
                                  job_id=data_operation_job_execution_id)
         except Exception as ex:
+            exception_traceback = traceback.format_exc()
             for i in range(process_count):
-                data_queue_error_task = DataQueueTask(IsFinished=True, Traceback=traceback.format_exc(), Exception=ex)
+                data_queue_error_task = DataQueueTask(IsFinished=True, Traceback=exception_traceback, Exception=ex)
                 data_queue.put(data_queue_error_task)
-            self.sql_logger.info(f"Source data operation finished successfully. SubProcessId: {sub_process_id}",
-                                 job_id=data_operation_job_execution_id)
+            self.sql_logger.info(
+                f"Source data operation finished with error. SubProcessId: {sub_process_id}. Error:{ex} traceback:{exception_traceback}",
+                job_id=data_operation_job_execution_id)
             raise
-
 
     @staticmethod
     def start_execute_data_process(sub_process_id,

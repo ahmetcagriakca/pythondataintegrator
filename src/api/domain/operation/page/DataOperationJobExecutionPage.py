@@ -8,6 +8,8 @@ from models.dao.operation import DataOperationJobExecution, \
     DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent
 
 
+
+
 class DataOperationJobExecutionPage(IScoped):
 
     @inject
@@ -38,7 +40,7 @@ class DataOperationJobExecutionPage(IScoped):
             error_log = ''
             if error_integration is not None and error_integration.Log is not None:
                 error_log = error_integration.Log.replace('\n', '<br />').replace('\t',
-                                                                                                    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+                                                                                  '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
             total_source_data_count = self.repository_provider.query(
                 func.sum(DataOperationJobExecutionIntegration.SourceDataCount).label("SourceDataCount")) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id).first()[0]
@@ -58,7 +60,8 @@ class DataOperationJobExecutionPage(IScoped):
             row = {
                 'data':
                     [
-                        {'value': f'<a href="/DataOperation/Job/Execution/{data.Id}">{data.Id}</a>-<a href="/DataOperation/Job/Execution/Log/{data.Id}">log</a>'},
+                        {
+                            'value': f'<a href="/DataOperation/Job/Execution/{data.Id}">{data.Id}</a>-<a href="/DataOperation/Job/Execution/Log/{data.Id}">log</a>'},
                         {
                             'value': f'<a href="/DataOperation/Job/{data.DataOperationJob.Id}">{data.DataOperationJob.Id}</a>'},
                         {
@@ -80,6 +83,13 @@ class DataOperationJobExecutionPage(IScoped):
         data_operation_job_execution_repository = self.repository_provider.get(DataOperationJobExecution)
 
         query = data_operation_job_execution_repository.table
+
+        if pagination.Filter is not None and pagination.Filter != '':
+            if pagination.Filter == '0':
+                query = query.filter(DataOperationJobExecution.StatusId != 3)
+            elif pagination.Filter in ['1', '2', '3', '4']:
+                status_id = int(pagination.Filter)
+                query = query.filter(DataOperationJobExecution.StatusId == status_id)
         pagination.PageUrl = '/DataOperation/Job/Execution{}'
         table_data = self.html_template_service.prepare_table_data_dynamic(query=query,
                                                                            headers=headers,
