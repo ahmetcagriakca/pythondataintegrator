@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Generic, List, TypeVar
+from typing import Generic, List, TypeVar, Optional, Type
 
 from injector import inject
 from sqlalchemy.orm import Query
@@ -12,9 +12,9 @@ T = TypeVar('T', bound=Entity)
 
 class Repository(Generic[T]):
     @inject
-    def __init__(self, database_session_manager: DatabaseSessionManager):
+    def __init__(self, repository_type: Type[T], database_session_manager: DatabaseSessionManager):
         self.database_session_manager: DatabaseSessionManager = database_session_manager
-        self.type = self.__orig_class__.__args__[0]
+        self.type = repository_type
 
     @property
     def table(self):
@@ -22,8 +22,7 @@ class Repository(Generic[T]):
 
     def first(self, **kwargs) -> T:
         query: Query = self.table.filter_by(**kwargs)
-        query_data=query.first()
-        return query_data
+        return query.first()
 
     def filter_by(self, **kwargs) -> List[T]:
         return self.table.filter_by(**kwargs)

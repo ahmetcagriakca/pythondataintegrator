@@ -15,6 +15,17 @@ DATABASE:
 API:
   IS_DEBUG: False
   PORT: 7100
+  AUTHORIZATIONS:
+    oauth2:
+      type: oauth2
+      flow: password
+      tokenUrl: https://localhost:7500/connect/token
+      authorizationUrl: https://localhost:7500/connect/authorize
+      scopes:
+        pdi.api: Api grant
+        offline_access: Grant read-only access
+  SECURITY:
+    oauth2: pdi.api
 
 SCHEDULER_RPC_CLIENT:
   HOST: localhost

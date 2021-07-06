@@ -1,4 +1,4 @@
-from api.infrastructor.data.RepositoryProvider import RepositoryProvider
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.events import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN, EVENT_SCHEDULER_PAUSED, \
     EVENT_SCHEDULER_RESUMED, EVENT_EXECUTOR_ADDED, EVENT_EXECUTOR_REMOVED, EVENT_JOBSTORE_ADDED, EVENT_JOBSTORE_REMOVED, \

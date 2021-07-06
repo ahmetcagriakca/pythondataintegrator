@@ -5,7 +5,6 @@ from typing import List
 from flask_restx import fields
 
 from controllers.common.models.CommonModels import EntityModel, CommonModels
-from controllers.job.models.JobModels import JobModels
 from controllers.operation.models.DataOperationModels import DataOperationModels
 from IocManager import IocManager
 from models.dao.operation import DataOperationJob
@@ -77,8 +76,6 @@ class JobSchedulerModels:
         result_model = json.loads(json.dumps(entity_model.__dict__, default=CommonModels.date_converter))
         result_model['DataOperation'] = DataOperationModels.get_data_operation_result_model(
             data_operation_job.DataOperation)
-        result_model['ApSchedulerJob'] = JobModels.get_ap_scheduler_job_model(
-            data_operation_job.ApSchedulerJob)
         return result_model
 
     @staticmethod

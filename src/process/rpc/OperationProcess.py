@@ -76,6 +76,17 @@ class OperationProcess:
         operation_process = Process(target=OperationProcess.start_process,
                                     args=(data_operation_id, job_id, data_operation_job_execution_id))
         operation_process.start()
+        #check process start
+        time.sleep(1)
+        while True:
+            operation_process.join(timeout=1)
+            if operation_process.is_alive():
+                sql_logger.info(f"{data_operation_id}-{job_id}-{data_operation.Name} Execution running on {operation_process.pid}",
+                        job_id=data_operation_job_execution_id)
+                break
+            
+            time.sleep(1)
+
         end_datetime = datetime.now()
         end = time.time()
         sql_logger.info(

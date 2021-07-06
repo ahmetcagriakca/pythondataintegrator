@@ -42,34 +42,18 @@ class IocManager:
     def initialize_flask():
 
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
+        api_config: ApiConfig = IocManager.config_manager.get(ApiConfig)
         IocManager.app = Flask(application_config.name)
 
         @IocManager.app.route('/')
-        def hello():
+        def home_redirect():
             # Redirect from here, replace your custom site url "www.google.com"
             return redirect("/Home", code=302, Response=None)
-        authorizations = {
-            'apikey': {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'X-API'
-            },
-            'oauth2': {
-                'type': 'oauth2',
-                'flow': 'accessCode',
-                'tokenUrl': 'https://somewhere.com/token',
-                'authorizationUrl': 'https://somewhere.com/auth',
-                'scopes': {
-                    'read': 'Grant read-only access',
-                    'write': 'Grant read-write access',
-                }
-            }
-        }
         IocManager.api = Api(IocManager.app,
-    title='Python Data Integrator API',
-    version='v0.1',
-    doc='/documentation',
-    base_url='/', security=['apikey', {'oauth2': 'read'}], authorizations=authorizations)
+            title='Python Data Integrator API',
+            version='v0.1',
+            doc='/documentation',
+            base_url='/', security=[api_config.security], authorizations=api_config.authorizations)
         # Flask instantiate
         # IocManager.api = Api(app=IocManager.app,authorizations=authorizations, security='apikey')
 
