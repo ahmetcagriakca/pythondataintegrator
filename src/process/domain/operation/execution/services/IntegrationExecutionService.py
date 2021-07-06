@@ -180,9 +180,9 @@ class IntegrationExecutionService(IScoped):
         self.data_operation_job_execution_integration_service.create_event(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
             event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, affected_row=affected_rowcount)
-        self.data_operation_job_execution_integration_service.update_source_data_count(
-            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-            source_data_count=affected_rowcount)
+        # self.data_operation_job_execution_integration_service.update_source_data_count(
+        #     data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+        #     source_data_count=affected_rowcount)
 
         return affected_rowcount
 

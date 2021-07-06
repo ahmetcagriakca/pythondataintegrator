@@ -1,10 +1,10 @@
 from injector import inject
 from sqlalchemy import func
 
-from domain.page.HtmlTemplateService import HtmlTemplateService, Pagination
+from infrastructor.html.HtmlTemplateService import HtmlTemplateService, Pagination
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
-from models.dao.operation import DataOperationJob, DataOperationJobExecution, \
+from models.dao.operation import DataOperationJobExecution, \
     DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent
 
 
@@ -70,9 +70,9 @@ class DataOperationJobExecutionPage(IScoped):
                         {'value': total_source_data_count},
                         {'value': total_affected_row},
                         {'value': data.StartDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3],
-                         'class': 'mail-row-nowrap'},
+                         'class': 'column-nowrap'},
                         {'value': end_date,
-                         'class': 'mail-row-nowrap'}
+                         'class': 'column-nowrap'}
                     ]
             }
             return row

@@ -57,7 +57,7 @@ class ExecuteIntegrationProcess(IScoped):
                                     data_queue: Queue,
                                     data_result_queue: Queue):
         self.operation_cache_service.create_data_integration(data_integration_id=data_integration_id)
-        self.sql_logger.info(f"Source Data started on process. SubProcessId: {sub_process_id}",
+        self.sql_logger.info(f"Source data operation started on process. SubProcessId: {sub_process_id}",
                              job_id=data_operation_job_execution_id)
         try:
             self.integration_execution_service.start_source_data_operation(
@@ -70,11 +70,17 @@ class ExecuteIntegrationProcess(IScoped):
             for i in range(process_count):
                 data_queue_finish_task = DataQueueTask(IsFinished=True)
                 data_queue.put(data_queue_finish_task)
+
+            self.sql_logger.info(f"Source data operation finished successfully. SubProcessId: {sub_process_id}",
+                                 job_id=data_operation_job_execution_id)
         except Exception as ex:
             for i in range(process_count):
                 data_queue_error_task = DataQueueTask(IsFinished=True, Traceback=traceback.format_exc(), Exception=ex)
                 data_queue.put(data_queue_error_task)
+            self.sql_logger.info(f"Source data operation finished successfully. SubProcessId: {sub_process_id}",
+                                 job_id=data_operation_job_execution_id)
             raise
+
 
     @staticmethod
     def start_execute_data_process(sub_process_id,

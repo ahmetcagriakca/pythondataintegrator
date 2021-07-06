@@ -59,4 +59,3 @@ class RepositoryProvider(IScoped):
     def close(self):
         if self.database_session_manager is not None:
             self.database_session_manager.close()
-            self.database_session_manager = None
