@@ -128,7 +128,7 @@ class ExecuteIntegrationProcess(IScoped):
         total_row_count = 0
         try:
             while True:
-                data_task: DataQueueTask = data_queue.get()
+                data_task: DataQueueTask = data_queue.get(timeout=600)
                 if data_task.IsFinished:
                     if data_task.Exception is not None:
                         exc = Exception(data_task.Traceback + '\n' + str(data_task.Exception))
@@ -147,7 +147,7 @@ class ExecuteIntegrationProcess(IScoped):
                     data_count = 0
                     if data is None:
                         self.sql_logger.info(
-                            f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task",
+                            f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task without data",
                             job_id=data_operation_job_execution_id)
                         data_count = self.integration_execution_service.start_execute_integration(
                             data_integration_id=data_integration_id,
@@ -185,6 +185,7 @@ class ExecuteIntegrationProcess(IScoped):
                         job_id=data_operation_job_execution_id)
                     data_task.IsProcessed = True
                     data_result_queue.put(True)
+                data_queue.task_done()
             return total_row_count
         except Exception as ex:
             data_result_queue.put(False)
