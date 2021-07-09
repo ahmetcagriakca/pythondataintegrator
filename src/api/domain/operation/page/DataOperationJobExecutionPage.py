@@ -8,8 +8,6 @@ from models.dao.operation import DataOperationJobExecution, \
     DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent
 
 
-
-
 class DataOperationJobExecutionPage(IScoped):
 
     @inject

@@ -15,7 +15,7 @@ from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
-
+from func_timeout import FunctionTimedOut
 
 class ExecuteIntegrationProcess(IScoped):
     @inject
@@ -187,6 +187,13 @@ class ExecuteIntegrationProcess(IScoped):
                     data_result_queue.put(True)
                 data_queue.task_done()
             return total_row_count
+        except FunctionTimedOut as fto:
+            data_result_queue.put(False)
+            end = time()
+            self.sql_logger.info(
+                f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process getting error. time:{end - start} - Error {fto.getMsg()}",
+                job_id=data_operation_job_execution_id)
+            raise Exception(f'Execution Operation timed out after {fto.timedOutAfter} seconds.')
         except Exception as ex:
             data_result_queue.put(False)
             raise
