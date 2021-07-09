@@ -1,9 +1,8 @@
 from injector import inject
 
-from domain.page.HtmlTemplateService import HtmlTemplateService, Pagination
+from infrastructor.html.HtmlTemplateService import HtmlTemplateService, Pagination
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
-from models.dao.connection import Connection, ConnectionDatabase
 
 
 class HomePage(IScoped):

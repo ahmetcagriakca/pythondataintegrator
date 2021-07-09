@@ -1,7 +1,6 @@
 from injector import inject
 from domain.secret.services.SecretService import SecretService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection import ConnectionSecret
@@ -13,13 +12,12 @@ class ConnectionSecretService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
-                 secret_service: SecretService
+                 secret_service: SecretService,
+                 repository_provider: RepositoryProvider,
                  ):
+        self.repository_provider = repository_provider
+        self.connection_secret_repository = repository_provider.get(ConnectionSecret)
         self.secret_service = secret_service
-        self.database_session_manager = database_session_manager
-        self.connection_secret_repository: Repository[ConnectionSecret] = Repository[ConnectionSecret](
-            database_session_manager)
 
     def get_connection_basic_authentication(self, connection_id: int) -> ConnectionBasicAuthentication:
         connection_secret = self.connection_secret_repository.first(IsDeleted=0, ConnectionId=connection_id)

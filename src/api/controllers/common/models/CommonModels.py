@@ -5,7 +5,7 @@ from datetime import datetime
 from flask_restx import fields
 
 from IocManager import IocManager
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 
@@ -16,7 +16,7 @@ def handle_operational_exception(exception):
     default_content_type = "application/json"
     mime_type_string = "mimetype"
     """Return JSON instead of HTML for HTTP errors."""
-    IocManager.injector.get(DatabaseSessionManager).rollback()
+    IocManager.injector.get(RepositoryProvider).rollback()
     # start with the correct headers and status code from the error
     exception_traceback = traceback.format_exc()
     output = separator.join(exception.args)

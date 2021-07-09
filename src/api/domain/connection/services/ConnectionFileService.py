@@ -1,9 +1,7 @@
 from typing import List
 from injector import inject
 from domain.connection.services.ConnectorTypeService import ConnectorTypeService
-from infrastructor.cryptography.CryptoService import CryptoService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.connection.Connection import Connection
@@ -15,13 +13,12 @@ class ConnectionFileService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  connector_type_service: ConnectorTypeService
                  ):
+        self.repository_provider = repository_provider
         self.connector_type_service = connector_type_service
-        self.database_session_manager = database_session_manager
-        self.connection_file_repository: Repository[ConnectionFile] = Repository[ConnectionFile](
-            database_session_manager)
+        self.connection_file_repository = repository_provider.get(ConnectionFile)
 
     def get_connection_files(self, ) -> List[ConnectionFile]:
         """

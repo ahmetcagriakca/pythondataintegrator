@@ -108,14 +108,14 @@ class HtmlTemplateService(IScoped):
                     max-width:0;
                 }
             }
-            .mail-column{
+            .pdi-column{
                 text-align: left;
                 padding:4px; 
                 font-family: Arial,sans-serif; 
                 font-size: 12px; 
                 line-height:10px;
             }
-            .mail-row{
+            .pdi-row{
                 text-align: left;
                 padding:4px; 
                 font-family: Arial,sans-serif; 
@@ -222,23 +222,23 @@ ul.breadcrumb li a:hover {
         rows: List[str] = self.get_nullable_dict_value(source, 'rows')
         pagination_json = self.get_nullable_dict_value(source, 'pagination')
         headers = ''
-        headers = headers + f'<th scope="col"  class="mail-column">#</th>'
+        headers = headers + f'<th scope="col"  class="pdi-column">#</th>'
         for column in columns:
             column_style = self.get_dict_value(column, 'style')
             column_class = self.get_dict_value(column, 'class')
             column_value = self.get_dict_value(column, 'value')
-            headers = headers + f'<th scope="col" style="{column_style}" class="mail-column {column_class}">{column_value}</th>'
+            headers = headers + f'<th scope="col" style="{column_style}" class="pdi-column {column_class}">{column_value}</th>'
         bodies = ''
         index = 0
         for row in rows:
             bodies = bodies + '<tr>'
             index = index + 1
-            bodies = bodies + f'<td valign="top" class="mail-row ">{index}</td>'
+            bodies = bodies + f'<td valign="top" class="pdi-row ">{index}</td>'
             for data in row['data']:
                 row_style = self.get_dict_value(data, 'style')
                 row_class = self.get_dict_value(data, 'class')
                 row_value = self.get_dict_value(data, 'value')
-                bodies = bodies + f'<td valign="top" style="{row_style}" class="mail-row {row_class}">{row_value}</td>'
+                bodies = bodies + f'<td valign="top" style="{row_style}" class="pdi-row {row_class}">{row_value}</td>'
             bodies = bodies + '</tr>'
         table_width = width if width is not None else '100%'
         pagination_html = ''
@@ -280,19 +280,7 @@ ul.breadcrumb li a:hover {
                     ):
 
         body_content = f'''
-        
                 <div class="wrapper">
-                
-                    <div class="crumb">
-                        <ul class="breadcrumb">
-                          <li><a href="/Home">Home</a></li>
-                          <li><a href="/Connection">Connections</a></li>
-                          <li><a href="/DataOperation">DataOperations</a></li>
-                          <li><a href="/DataOperation/Job">Jobs</a></li>
-                          <li><a href="/DataOperation/Job/Execution">Executions</a></li>
-                          <li><a href="/documentation">Documentation (Swagger UI)</a></li>
-                        </ul>
-                    </div>
                     {content}
                 </div>
                 '''

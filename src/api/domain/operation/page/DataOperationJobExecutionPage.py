@@ -1,10 +1,10 @@
 from injector import inject
 from sqlalchemy import func
 
-from domain.page.HtmlTemplateService import HtmlTemplateService, Pagination
+from infrastructor.html.HtmlTemplateService import HtmlTemplateService, Pagination
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
-from models.dao.operation import DataOperationJob, DataOperationJobExecution, \
+from models.dao.operation import DataOperationJobExecution, \
     DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent
 
 
@@ -31,21 +31,21 @@ class DataOperationJobExecutionPage(IScoped):
         ]
 
         def prepare_row(data: DataOperationJobExecution):
-            max_id = self.repository_provider.database_session_manager.session.query(
+            max_id = self.repository_provider.query(
                 func.max(DataOperationJobExecutionIntegration.Id)) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id)
             error_integration = self.repository_provider.get(DataOperationJobExecutionIntegration).first(Id=max_id)
             error_log = ''
             if error_integration is not None and error_integration.Log is not None:
                 error_log = error_integration.Log.replace('\n', '<br />').replace('\t',
-                                                                                                    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
-            total_source_data_count = self.repository_provider.database_session_manager.session.query(
+                                                                                  '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+            total_source_data_count = self.repository_provider.query(
                 func.sum(DataOperationJobExecutionIntegration.SourceDataCount).label("SourceDataCount")) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id).first()[0]
             if total_source_data_count is None or total_source_data_count < 0:
                 total_source_data_count = 0
 
-            total_affected_row = self.repository_provider.database_session_manager.session.query(
+            total_affected_row = self.repository_provider.query(
                 func.sum(DataOperationJobExecutionIntegrationEvent.AffectedRowCount).label("AffectedRowCount")) \
                 .join(DataOperationJobExecutionIntegration.DataOperationJobExecutionIntegrationEvents) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id).first()[0]
@@ -58,7 +58,8 @@ class DataOperationJobExecutionPage(IScoped):
             row = {
                 'data':
                     [
-                        {'value': f'<a href="/DataOperation/Job/Execution/{data.Id}">{data.Id}</a>-<a href="/DataOperation/Job/Execution/Log/{data.Id}">log</a>'},
+                        {
+                            'value': f'<a href="/DataOperation/Job/Execution/{data.Id}">{data.Id}</a>-<a href="/DataOperation/Job/Execution/Log/{data.Id}">log</a>'},
                         {
                             'value': f'<a href="/DataOperation/Job/{data.DataOperationJob.Id}">{data.DataOperationJob.Id}</a>'},
                         {
@@ -70,9 +71,9 @@ class DataOperationJobExecutionPage(IScoped):
                         {'value': total_source_data_count},
                         {'value': total_affected_row},
                         {'value': data.StartDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3],
-                         'class': 'mail-row-nowrap'},
+                         'class': 'column-nowrap'},
                         {'value': end_date,
-                         'class': 'mail-row-nowrap'}
+                         'class': 'column-nowrap'}
                     ]
             }
             return row
@@ -80,6 +81,13 @@ class DataOperationJobExecutionPage(IScoped):
         data_operation_job_execution_repository = self.repository_provider.get(DataOperationJobExecution)
 
         query = data_operation_job_execution_repository.table
+
+        if pagination.Filter is not None and pagination.Filter != '':
+            if pagination.Filter == '0':
+                query = query.filter(DataOperationJobExecution.StatusId != 3)
+            elif pagination.Filter in ['1', '2', '3', '4']:
+                status_id = int(pagination.Filter)
+                query = query.filter(DataOperationJobExecution.StatusId == status_id)
         pagination.PageUrl = '/DataOperation/Job/Execution{}'
         table_data = self.html_template_service.prepare_table_data_dynamic(query=query,
                                                                            headers=headers,

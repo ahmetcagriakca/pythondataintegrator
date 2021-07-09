@@ -1,7 +1,7 @@
 from injector import inject
 from sqlalchemy import func
 
-from domain.page.HtmlTemplateService import HtmlTemplateService, Pagination
+from infrastructor.html.HtmlTemplateService import HtmlTemplateService, Pagination
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.operation import DataOperationJob, DataOperation, DataOperationJobExecution, \
@@ -65,9 +65,7 @@ class DataOperationJobDetailPage(IScoped):
             }
             return row
 
-        data_operation_repository = self.repository_provider.get(DataOperationJob)
-
-        query = data_operation_repository.database_session_manager.session.query(DataOperationJob,
+        query = self.repository_provider.query(DataOperationJob,
                                                                                  DataOperation.Name).join(
             DataOperationJob.DataOperation).filter(DataOperationJob.Id == id)
         # if pagination.Filter is not None and pagination.Filter != '':
@@ -119,7 +117,7 @@ class DataOperationJobDetailPage(IScoped):
             #     for contact in data_operation_job.DataOperation.Contacts:
             #         contacts.append(contact.Email)
             # contact_str = ';'.join(contacts)
-            max_id = self.repository_provider.database_session_manager.session.query(
+            max_id = self.repository_provider.query(
                 func.max(DataOperationJobExecutionIntegration.Id)) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id)
             error_integration = self.repository_provider.get(DataOperationJobExecutionIntegration).first(Id=max_id)
@@ -127,13 +125,13 @@ class DataOperationJobDetailPage(IScoped):
             if error_integration is not None and error_integration.Log is not None:
                 error_log = error_integration.Log.replace('\n', '<br />').replace('\t',
                                                                                                     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
-            total_source_data_count = self.repository_provider.database_session_manager.session.query(
+            total_source_data_count = self.repository_provider.query(
                 func.sum(DataOperationJobExecutionIntegration.SourceDataCount).label("SourceDataCount")) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id).first()[0]
             if total_source_data_count is None or total_source_data_count < 0:
                 total_source_data_count = 0
 
-            total_affected_row = self.repository_provider.database_session_manager.session.query(
+            total_affected_row = self.repository_provider.query(
                 func.sum(DataOperationJobExecutionIntegrationEvent.AffectedRowCount).label("AffectedRowCount")) \
                 .join(DataOperationJobExecutionIntegration.DataOperationJobExecutionIntegrationEvents) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id).first()[0]
@@ -159,9 +157,9 @@ class DataOperationJobDetailPage(IScoped):
                         {'value': total_source_data_count},
                         {'value': total_affected_row},
                         {'value': data.StartDate.strftime('%d.%m.%Y-%H:%M:%S.%f')[:-3],
-                         'class': 'mail-row-nowrap'},
+                         'class': 'column-nowrap'},
                         {'value': end_date,
-                         'class': 'mail-row-nowrap'}
+                         'class': 'column-nowrap'}
                     ]
             }
             return row

@@ -1,13 +1,12 @@
 from injector import inject
 
 from domain.operation.commands.CreateExecutionCommand import CreateExecutionCommand
+from domain.operation.commands.SendDataOperationFinishMailCommand import SendDataOperationFinishMailCommand
 from domain.operation.execution.services.IntegrationExecution import IntegrationExecution
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
-from domain.operation.services.DataOperationJobService import DataOperationJobService
 from infrastructor.data.decorators.TransactionHandler import transaction_handler
 from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.enums.StatusTypes import StatusTypes
 from models.enums.events import EVENT_EXECUTION_STARTED, EVENT_EXECUTION_FINISHED
@@ -20,7 +19,10 @@ class OperationExecution(IScoped):
                  operation_cache_service: OperationCacheService,
                  create_execution_command: CreateExecutionCommand,
                  data_operation_job_execution_service: DataOperationJobExecutionService,
-                 integration_execution: IntegrationExecution):
+                 integration_execution: IntegrationExecution,
+                 send_data_operation_finish_mail_command:SendDataOperationFinishMailCommand,
+                 ):
+        self.send_data_operation_finish_mail_command = send_data_operation_finish_mail_command
         self.create_execution_command = create_execution_command
         self.operation_cache_service = operation_cache_service
         self.integration_execution = integration_execution
@@ -79,4 +81,4 @@ class OperationExecution(IScoped):
             data_operation_job_execution_id=data_operation_job_execution_id,
             status_id=status.value, is_finished=is_finished)
         if is_finished:
-            self.data_operation_job_execution_service.send_data_operation_finish_mail(data_operation_job_execution_id)
+            self.send_data_operation_finish_mail_command.execute(data_operation_job_execution_id)

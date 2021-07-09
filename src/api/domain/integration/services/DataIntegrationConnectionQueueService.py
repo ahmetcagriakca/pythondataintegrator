@@ -1,6 +1,5 @@
 from injector import inject
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.integration import DataIntegrationConnectionQueue
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
@@ -11,11 +10,10 @@ from models.viewmodels.integration.CreateDataIntegrationConnectionQueueModel imp
 class DataIntegrationConnectionQueueService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  ):
-        self.database_session_manager = database_session_manager
-        self.data_integration_connection_queue_repository: Repository[DataIntegrationConnectionQueue] = \
-            Repository[DataIntegrationConnectionQueue](database_session_manager)
+        self.repository_provider = repository_provider
+        self.data_integration_connection_queue_repository = repository_provider.get(DataIntegrationConnectionQueue)
 
     #######################################################################################
     def get_by_id(self, id: int) -> DataIntegrationConnectionQueue:

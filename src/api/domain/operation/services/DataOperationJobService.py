@@ -3,8 +3,7 @@ from datetime import datetime
 from injector import inject
 
 from domain.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.aps import ApSchedulerJob
 from models.dao.operation import DataOperationJob, DataOperation
@@ -14,12 +13,12 @@ class DataOperationJobService(IScoped):
     @inject
     def __init__(self,
                  data_operation_job_execution_service: DataOperationJobExecutionService,
-                 database_session_manager: DatabaseSessionManager
+                 repository_provider: RepositoryProvider,
                  ):
+        super().__init__()
+        self.repository_provider = repository_provider
+        self.data_operation_job_repository = repository_provider.get(DataOperationJob)
         self.data_operation_job_execution_service = data_operation_job_execution_service
-        self.database_session_manager = database_session_manager
-        self.data_operation_job_repository: Repository[DataOperationJob] = Repository[DataOperationJob](
-            database_session_manager)
 
     def get_by_id(self, id: int) -> DataOperationJob:
         entity = self.data_operation_job_repository.first(IsDeleted=0, Id=id)

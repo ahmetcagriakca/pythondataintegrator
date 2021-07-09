@@ -1,8 +1,7 @@
 from injector import inject
 
 from domain.integration.services.DataIntegrationConnectionFileCsvService import DataIntegrationConnectionFileCsvService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.integration import DataIntegrationConnectionFile
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
@@ -13,14 +12,12 @@ from models.viewmodels.integration.CreateDataIntegrationConnectionFileModel impo
 class DataIntegrationConnectionFileService(IScoped):
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  data_integration_connection_file_csv_service: DataIntegrationConnectionFileCsvService,
-
                  ):
+        self.repository_provider = repository_provider
+        self.data_integration_connection_file_repository = repository_provider.get(DataIntegrationConnectionFile)
         self.data_integration_connection_file_csv_service = data_integration_connection_file_csv_service
-        self.database_session_manager = database_session_manager
-        self.data_integration_connection_file_repository: Repository[DataIntegrationConnectionFile] = \
-            Repository[DataIntegrationConnectionFile](database_session_manager)
 
     #######################################################################################
     def get_by_id(self, id: int) -> DataIntegrationConnectionFile:

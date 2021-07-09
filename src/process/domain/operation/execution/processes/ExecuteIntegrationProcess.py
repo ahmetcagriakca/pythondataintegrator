@@ -15,7 +15,7 @@ from infrastructor.connection.models.DataQueueTask import DataQueueTask
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
-
+from func_timeout import FunctionTimedOut
 
 class ExecuteIntegrationProcess(IScoped):
     @inject
@@ -57,7 +57,7 @@ class ExecuteIntegrationProcess(IScoped):
                                     data_queue: Queue,
                                     data_result_queue: Queue):
         self.operation_cache_service.create_data_integration(data_integration_id=data_integration_id)
-        self.sql_logger.info(f"Source Data started on process. SubProcessId: {sub_process_id}",
+        self.sql_logger.info(f"Source data operation started on process. SubProcessId: {sub_process_id}",
                              job_id=data_operation_job_execution_id)
         try:
             self.integration_execution_service.start_source_data_operation(
@@ -70,10 +70,17 @@ class ExecuteIntegrationProcess(IScoped):
             for i in range(process_count):
                 data_queue_finish_task = DataQueueTask(IsFinished=True)
                 data_queue.put(data_queue_finish_task)
+
+            self.sql_logger.info(f"Source data operation finished successfully. SubProcessId: {sub_process_id}",
+                                 job_id=data_operation_job_execution_id)
         except Exception as ex:
+            exception_traceback = traceback.format_exc()
             for i in range(process_count):
-                data_queue_error_task = DataQueueTask(IsFinished=True, Traceback=traceback.format_exc(), Exception=ex)
+                data_queue_error_task = DataQueueTask(IsFinished=True, Traceback=exception_traceback, Exception=ex)
                 data_queue.put(data_queue_error_task)
+            self.sql_logger.info(
+                f"Source data operation finished with error. SubProcessId: {sub_process_id}. Error:{ex} traceback:{exception_traceback}",
+                job_id=data_operation_job_execution_id)
             raise
 
     @staticmethod
@@ -121,7 +128,7 @@ class ExecuteIntegrationProcess(IScoped):
         total_row_count = 0
         try:
             while True:
-                data_task: DataQueueTask = data_queue.get()
+                data_task: DataQueueTask = data_queue.get(timeout=600)
                 if data_task.IsFinished:
                     if data_task.Exception is not None:
                         exc = Exception(data_task.Traceback + '\n' + str(data_task.Exception))
@@ -140,7 +147,7 @@ class ExecuteIntegrationProcess(IScoped):
                     data_count = 0
                     if data is None:
                         self.sql_logger.info(
-                            f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task",
+                            f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task without data",
                             job_id=data_operation_job_execution_id)
                         data_count = self.integration_execution_service.start_execute_integration(
                             data_integration_id=data_integration_id,
@@ -178,7 +185,15 @@ class ExecuteIntegrationProcess(IScoped):
                         job_id=data_operation_job_execution_id)
                     data_task.IsProcessed = True
                     data_result_queue.put(True)
+                data_queue.task_done()
             return total_row_count
+        except FunctionTimedOut as fto:
+            data_result_queue.put(False)
+            end = time()
+            self.sql_logger.info(
+                f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process getting error. time:{end - start} - Error {fto.getMsg()}",
+                job_id=data_operation_job_execution_id)
+            raise Exception(f'Execution Operation timed out after {fto.timedOutAfter} seconds.')
         except Exception as ex:
             data_result_queue.put(False)
             raise

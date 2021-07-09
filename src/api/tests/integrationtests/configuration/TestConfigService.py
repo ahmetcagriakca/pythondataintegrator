@@ -27,20 +27,20 @@ class TestConfigService(TestCase):
         # inserted new config value
         config_parameter = config_service.config_reposiotry.first(Name="NewConfig")
         if config_parameter is not None:
-            config_service.database_session_manager.session.delete(config_parameter)
+            config_service.repository_provider.create().session.delete(config_parameter)
         config_parameter = config_service.config_reposiotry.first(Name="TestNotCached")
         if config_parameter is not None:
-            config_service.database_session_manager.session.delete(config_parameter)
+            config_service.repository_provider.create().session.delete(config_parameter)
         config_parameter = ConfigParameter(Name="NewConfig", Type="str", Value="test", Description="Test config")
         config_service.config_reposiotry.insert(config_parameter)
-        config_service.database_session_manager.commit()
+        config_service.repository_provider.create().commit()
         # config value getted from cached method
         value = config_service.get_config_by_name("NewConfig")
         assert value == "test"
 
         config_parameter = config_service.config_reposiotry.first(Name="NewConfig")
         config_parameter.Value = "testty"
-        config_service.database_session_manager.commit()
+        config_service.repository_provider.create().commit()
 
         # inserted new config value for cache test
         config_parameter = ConfigParameter(Name="TestNotCached", Type="str", Value="test not cached value",

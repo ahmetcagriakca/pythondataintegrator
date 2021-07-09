@@ -2,8 +2,6 @@ from functools import lru_cache
 
 from injector import inject
 
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.common.ConfigParameter import ConfigParameter

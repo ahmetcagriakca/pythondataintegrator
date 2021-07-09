@@ -2,8 +2,7 @@ from typing import List
 from injector import inject
 
 from domain.integration.services.DataIntegrationService import DataIntegrationService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.operation import DataOperation, DataOperationIntegration, Definition
 from models.viewmodels.operation.CreateDataOperationIntegrationModel import CreateDataOperationIntegrationModel
@@ -13,18 +12,18 @@ class DataOperationIntegrationService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
                  data_integration_service: DataIntegrationService,
+                 repository_provider: RepositoryProvider,
                  ):
+        super().__init__()
+        self.repository_provider = repository_provider
+        self.secret_repository = repository_provider.get(DataOperationIntegration)
         self.data_integration_service = data_integration_service
-        self.database_session_manager = database_session_manager
-        self.data_operation_integration_repository: Repository[DataOperationIntegration] = Repository[
-            DataOperationIntegration](database_session_manager)
 
     def get_all_by_data_operation_id(self, data_operation_id: int) -> List[DataOperationIntegration]:
-        entitites = self.data_operation_integration_repository.filter_by(
+        entities = self.data_operation_integration_repository.filter_by(
             IsDeleted=0, DataOperationId=data_operation_id)
-        return entitites
+        return entities
 
     def get_by_id(self, id: int) -> DataOperationIntegration:
         data_operation_integration = self.data_operation_integration_repository.first(IsDeleted=0, Id=id)
@@ -43,11 +42,12 @@ class DataOperationIntegrationService(IScoped):
             data_integration = self.data_integration_service.create_data_integration(
                 data=data_operation_integration_model.Integration, definition=definition)
 
-            data_operation_integration = DataOperationIntegration(Order=order,
-                                                                  Limit=data_operation_integration_model.Limit,
-                                                                  ProcessCount=data_operation_integration_model.ProcessCount,
-                                                                  DataIntegration=data_integration,
-                                                                  DataOperation=data_operation)
+            data_operation_integration = DataOperationIntegration(
+                Order=order,
+                Limit=data_operation_integration_model.Limit,
+                ProcessCount=data_operation_integration_model.ProcessCount,
+                DataIntegration=data_integration,
+                DataOperation=data_operation)
             self.data_operation_integration_repository.insert(data_operation_integration)
 
     def update(self,
@@ -72,11 +72,12 @@ class DataOperationIntegrationService(IScoped):
                 DataOperationId=data_operation.Id,
                 DataIntegrationId=data_integration.Id)
             if data_operation_integration is None:
-                new_data_operation_integration = DataOperationIntegration(Order=order,
-                                                                          Limit=data_operation_integration_model.Limit,
-                                                                          ProcessCount=data_operation_integration_model.ProcessCount,
-                                                                          DataIntegration=data_integration,
-                                                                          DataOperation=data_operation)
+                new_data_operation_integration = DataOperationIntegration(
+                    Order=order,
+                    Limit=data_operation_integration_model.Limit,
+                    ProcessCount=data_operation_integration_model.ProcessCount,
+                    DataIntegration=data_integration,
+                    DataOperation=data_operation)
                 self.data_operation_integration_repository.insert(new_data_operation_integration)
             else:
                 data_operation_integration.DataIntegration = data_integration
@@ -89,7 +90,8 @@ class DataOperationIntegrationService(IScoped):
         for existing_integration in check_existing_integrations:
             found = False
             for data_operation_integration_model in data_operation_integration_models:
-                if existing_integration.DataIntegration.Code == data_operation_integration_model.Integration.Code and existing_integration.DataIntegration.IsDeleted == 0:
+                if existing_integration.DataIntegration.Code == data_operation_integration_model.Integration.Code and \
+                        existing_integration.DataIntegration.IsDeleted == 0:
                     found = True
             if not found:
                 self.delete_by_id(existing_integration.Id)
@@ -103,7 +105,8 @@ class DataOperationIntegrationService(IScoped):
         """
         Delete Data operation integration
         """
-        check_existing_integrations = self.data_operation_integration_repository.filter_by(IsDeleted=0,
-                                                                                           DataOperationId=data_operation_id)
+        check_existing_integrations = self.data_operation_integration_repository.filter_by(
+            IsDeleted=0,
+            DataOperationId=data_operation_id)
         for existing_integration in check_existing_integrations:
             self.delete_by_id(existing_integration.Id)

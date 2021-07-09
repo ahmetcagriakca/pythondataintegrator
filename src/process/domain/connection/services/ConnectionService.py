@@ -7,9 +7,7 @@ from domain.connection.services.ConnectionQueueService import ConnectionQueueSer
 from domain.connection.services.ConnectionSecretService import ConnectionSecretService
 from domain.connection.services.ConnectionServerService import ConnectionServerService
 from domain.connection.services.ConnectionTypeService import ConnectionTypeService
-from infrastructor.connection.database.DatabaseProvider import DatabaseProvider
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from infrastructor.logging.SqlLogger import SqlLogger
@@ -24,9 +22,8 @@ class ConnectionService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  sql_logger: SqlLogger,
-                 database_provider: DatabaseProvider,
                  connection_type_service: ConnectionTypeService,
                  connection_database_service: ConnectionDatabaseService,
                  connection_file_service: ConnectionFileService,
@@ -34,17 +31,15 @@ class ConnectionService(IScoped):
                  connection_secret_service: ConnectionSecretService,
                  connection_server_service: ConnectionServerService
                  ):
+        self.repository_provider = repository_provider
         self.connection_queue_service = connection_queue_service
         self.connection_server_service = connection_server_service
         self.connection_secret_service = connection_secret_service
         self.connection_type_service = connection_type_service
         self.sql_logger: SqlLogger = sql_logger
-        self.database_provider = database_provider
         self.connection_file_service = connection_file_service
         self.connection_database_service = connection_database_service
-        self.database_session_manager = database_session_manager
-        self.connection_repository: Repository[Connection] = Repository[Connection](
-            database_session_manager)
+        self.connection_repository = repository_provider.get(Connection)
 
     def get_connections(self) -> List[Connection]:
         """
@@ -86,7 +81,7 @@ class ConnectionService(IScoped):
             self.connection_server_service.update(connection=connection, host=model.Host, port=model.Port)
             self.connection_database_service.update(connection, model)
         self.connection_repository.insert(connection)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         connection = self.connection_repository.first(Id=connection.Id)
         return connection
 
@@ -111,7 +106,7 @@ class ConnectionService(IScoped):
             self.connection_file_service.update(connection=connection, model=model)
 
         self.connection_repository.insert(connection)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         connection = self.connection_repository.first(Id=connection.Id)
         return connection
 
@@ -152,7 +147,7 @@ class ConnectionService(IScoped):
 
             self.connection_queue_service.update(connection, model)
         self.connection_repository.insert(connection)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         connection = self.connection_repository.first(Id=connection.Id)
         return connection
 
@@ -178,4 +173,4 @@ class ConnectionService(IScoped):
                 self.connection_secret_service.delete(id=connection_secret.Id)
         message = f'{connection.Name} connection deleted'
         self.sql_logger.info(message)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()

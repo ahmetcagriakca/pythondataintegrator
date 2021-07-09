@@ -1,23 +1,39 @@
 from injector import inject
 from sqlalchemy import func
 
+from infrastructor.configuration.ConfigService import ConfigService
+from infrastructor.data.decorators.TransactionHandler import transaction_handler
+from infrastructor.delivery.EmailProvider import EmailProvider
 from infrastructor.html.HtmlTemplateService import HtmlTemplateService, Pagination
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
+from infrastructor.logging.SqlLogger import SqlLogger
+from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.integration import DataIntegrationConnection
 from models.dao.operation import DataOperationJobExecution, \
     DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent, DataOperationIntegration
 
 
-class DataOperationJobExecutionDetailPage(IScoped):
+class SendDataOperationFinishMailCommand(IScoped):
 
     @inject
-    def __init__(self, repository_provider: RepositoryProvider, html_template_service: HtmlTemplateService):
+    def __init__(self,
+                 repository_provider: RepositoryProvider,
+                 html_template_service: HtmlTemplateService,
+                 config_service: ConfigService,
+                 email_provider: EmailProvider,
+                 application_config: ApplicationConfig,
+                 sql_logger: SqlLogger
+                 ):
         super().__init__()
+        self.sql_logger = sql_logger
+        self.application_config: ApplicationConfig = application_config
+        self.email_provider = email_provider
+        self.config_service = config_service
         self.repository_provider = repository_provider
         self.html_template_service = html_template_service
 
-    def render_job_execution(self, id, pagination=None):
+    def _render_job_execution(self, id):
         headers = [
             {'value': 'Execution Id'},
             {'value': 'Job Id'},
@@ -52,7 +68,7 @@ class DataOperationJobExecutionDetailPage(IScoped):
             error_log = ''
             if error_integration is not None and error_integration.Log is not None:
                 error_log = error_integration.Log.replace('\n', '<br />').replace('\t',
-                                                                                                    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+                                                                                  '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
             total_source_data_count = self.repository_provider.query(
                 func.sum(DataOperationJobExecutionIntegration.SourceDataCount).label("SourceDataCount")) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id).first()[0]
@@ -73,11 +89,11 @@ class DataOperationJobExecutionDetailPage(IScoped):
                 'data':
                     [
                         {
-                            'value': f'<a href="/DataOperation/Job/Execution/{data.Id}">{data.Id}</a>-<a href="/DataOperation/Job/Execution/Log/{data.Id}">log</a>'},
+                            'value': f'{data.Id}'},
                         {
-                            'value': f'<a href="/DataOperation/Job/{data.DataOperationJob.Id}">{data.DataOperationJob.Id}</a>'},
+                            'value': f'{data.DataOperationJob.Id}'},
                         {
-                            'value': f'<a href="/DataOperation/{data.DataOperationJob.DataOperation.Id}">{data.DataOperationJob.DataOperation.Name}({data.DataOperationJob.DataOperation.Id})</a>'},
+                            'value': f'{data.DataOperationJob.DataOperation.Name}({data.DataOperationJob.DataOperation.Id})'},
                         {
                             'value': f'{data.DataOperationJob.Cron}({data.DataOperationJob.StartDate}-{data.DataOperationJob.EndDate})'},
                         {'value': data.Status.Description},
@@ -99,13 +115,12 @@ class DataOperationJobExecutionDetailPage(IScoped):
         table_data = self.html_template_service.prepare_table_data_dynamic(query=query,
                                                                            headers=headers,
                                                                            prepare_row=prepare_row,
-                                                                           sortable='"Id" desc',
-                                                                           pagination=pagination)
+                                                                           sortable='"Id" desc')
 
         table = self.html_template_service.render_table(source=table_data)
         return table
 
-    def render_job_execution_integration(self, id, pagination=None):
+    def _render_job_execution_integration(self, id):
         headers = [
             {'value': 'Order'},
             {'value': 'Code'},
@@ -188,22 +203,60 @@ class DataOperationJobExecutionDetailPage(IScoped):
         table_data = self.html_template_service.prepare_table_data_dynamic(query=query,
                                                                            headers=headers,
                                                                            prepare_row=prepare_row,
-                                                                           sortable='"DataOperationJobExecutionIntegration"."Id" desc',
-                                                                           pagination=pagination)
+                                                                           sortable='"DataOperationJobExecutionIntegration"."Id" desc')
 
         table = self.html_template_service.render_table(source=table_data)
         return table
 
-    def render(self, id, pagination: Pagination):
-        if pagination is None:
-            pagination = Pagination(Limit=50)
-        elif pagination.Limit is None:
-            pagination.Limit = 50
-        table_job_execution = self.render_job_execution(id)
-        table_job_execution_integration = self.render_job_execution_integration(id)
+    def _render(self, id):
+        table_job_execution = self._render_job_execution(id)
+        table_job_execution_integration = self._render_job_execution_integration(id)
         return self.html_template_service.render_html(
             content=f'''  
             <div style="font-size: 24px;"><b>Job Execution </b></div>
             {table_job_execution}
             <div style="font-size: 24px;"><b>Job Execution Integrations </b></div>
             {table_job_execution_integration}''')
+
+    def _add_default_contacts(self, operation_contacts):
+
+        default_contacts = self.config_service.get_config_by_name("DataOperationDefaultContact")
+        if default_contacts is not None and default_contacts != '':
+            default_contacts_emails = default_contacts.split(",")
+            for default_contact in default_contacts_emails:
+                if default_contact is not None and default_contact != '':
+                    operation_contacts.append(default_contact)
+
+    @transaction_handler
+    def execute(self, data_operation_job_execution_id):
+
+        data_operation_job_execution = self.repository_provider.get(DataOperationJobExecution).first(
+            Id=data_operation_job_execution_id)
+        if data_operation_job_execution is None:
+            self.sql_logger.info(f'{data_operation_job_execution_id} mail sending execution not found',
+                                 job_id=data_operation_job_execution_id)
+            return
+
+        operation_contacts = []
+        for contact in data_operation_job_execution.DataOperationJob.DataOperation.Contacts:
+            if contact.IsDeleted == 0:
+                operation_contacts.append(contact.Email)
+        self._add_default_contacts(operation_contacts=operation_contacts)
+        if operation_contacts is None:
+            self.sql_logger.error(f'{data_operation_job_execution_id} mail sending contact not found',
+                                  job_id=data_operation_job_execution_id)
+            return
+        data_operation_name = data_operation_job_execution.DataOperationJob.DataOperation.Name
+        subject = f"Execution completed"
+        if data_operation_job_execution.StatusId == 3:
+            subject = subject + " successfully"
+        elif data_operation_job_execution.StatusId == 4:
+            subject = subject + " with error"
+        subject = subject + f": {self.application_config.environment} » {data_operation_name} » {data_operation_job_execution_id}"
+        mail_body = self._render(data_operation_job_execution_id)
+
+        try:
+            self.email_provider.send(operation_contacts, subject, mail_body)
+            self.sql_logger.info(f"Mail Sent successfully.", job_id=data_operation_job_execution_id)
+        except Exception as ex:
+            self.sql_logger.error(f"Error on mail sending. Error:{ex}", job_id=data_operation_job_execution_id)

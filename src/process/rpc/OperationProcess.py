@@ -1,5 +1,9 @@
+import multiprocessing
+import os
 import time
 import traceback
+from multiprocessing import current_process
+from queue import Queue
 
 from IocManager import IocManager
 
@@ -17,7 +21,8 @@ from models.dao.operation import DataOperation
 
 class OperationProcess:
     @transaction_handler
-    def start(self, data_operation_id: int, job_id: int, data_operation_job_execution_id: int):
+    def start(self, data_operation_id: int, job_id: int, data_operation_job_execution_id: int, process_queue: Queue):
+        process_queue.put(f'{os.getppid()} initialized {current_process().name}({os.getpid()}) process')
         start = time.time()
         start_datetime = datetime.now()
 
@@ -47,11 +52,12 @@ class OperationProcess:
         del sql_logger
 
     @staticmethod
-    def start_process(data_operation_id: int, job_id: int, data_operation_job_execution_id: int):
+    def start_process(data_operation_id: int, job_id: int, data_operation_job_execution_id: int, process_queue: Queue):
         IocManager.initialize()
         operation_process = OperationProcess()
         operation_process.start(data_operation_id=data_operation_id, job_id=job_id,
-                                data_operation_job_execution_id=data_operation_job_execution_id)
+                                data_operation_job_execution_id=data_operation_job_execution_id,
+                                process_queue=process_queue)
         del operation_process
 
     @transaction_handler
@@ -61,25 +67,49 @@ class OperationProcess:
         :param data_operation_id: Data Operation Id
         :return:
         """
-        start = time.time()
-        start_datetime = datetime.now()
+        try:
+            start = time.time()
+            start_datetime = datetime.now()
 
-        sql_logger = SqlLogger()
-        data_operation_query = IocManager.injector.get(RepositoryProvider).get(DataOperation).filter_by(
-            Id=data_operation_id)
-        data_operation = data_operation_query.first()
-        if data_operation is None:
-            raise Exception('Operation Not Found')
+            sql_logger = SqlLogger()
+            data_operation_query = IocManager.injector.get(RepositoryProvider).get(DataOperation).filter_by(
+                Id=data_operation_id)
+            data_operation = data_operation_query.first()
+            if data_operation is None:
+                raise Exception('Operation Not Found')
 
-        sql_logger.info(f"{data_operation_id}-{job_id}-{data_operation.Name} Execution Create started",
+            sql_logger.info(f"{data_operation_id}-{job_id}-{data_operation.Name} Execution Create started",
+                            job_id=data_operation_job_execution_id)
+
+            manager = multiprocessing.Manager()
+            process_queue = manager.Queue()
+            operation_process = Process(target=OperationProcess.start_process,
+                                        args=(
+                                            data_operation_id, job_id, data_operation_job_execution_id, process_queue))
+            operation_process.start()
+            while True:
+                operation_process.join(timeout=1)
+                if operation_process.is_alive():
+                    result = process_queue.get(timeout=60)
+                    sql_logger.info(
+                        f"{data_operation_id}-{job_id}-{data_operation.Name} Execution running on {operation_process.pid}. Process Message:{result}",
                         job_id=data_operation_job_execution_id)
-        operation_process = Process(target=OperationProcess.start_process,
-                                    args=(data_operation_id, job_id, data_operation_job_execution_id))
-        operation_process.start()
-        end_datetime = datetime.now()
-        end = time.time()
-        sql_logger.info(
-            f"{data_operation_id}-{job_id}-{data_operation.Name} Execution Create finished. Start :{start_datetime} - End :{end_datetime} - ElapsedTime :{end - start}",
-            job_id=data_operation_job_execution_id)
-        IocManager.injector.get(RepositoryProvider).close()
-        return
+                    process_queue.task_done()
+                    break
+
+            end_datetime = datetime.now()
+            end = time.time()
+            sql_logger.info(
+                f"{data_operation_id}-{job_id}-{data_operation.Name} Execution Create finished. Start :{start_datetime} - End :{end_datetime} - ElapsedTime :{end - start}",
+                job_id=data_operation_job_execution_id)
+            IocManager.injector.get(RepositoryProvider).close()
+        except Exception as ex:
+            sql_logger = SqlLogger()
+            exception_traceback = traceback.format_exc()
+            sql_logger.info(
+                f"{data_operation_id}-{job_id} Execution Create getting error. Error:{ex} traceback:{exception_traceback}",
+                job_id=data_operation_job_execution_id)
+            raise
+        finally:
+            if manager is not None:
+                manager.shutdown()

@@ -2,8 +2,7 @@ from injector import inject
 
 from domain.secret.services.AuthenticationTypeService import AuthenticationTypeService
 from domain.secret.services.SecretSourceBasicAuthenticationService import SecretSourceBasicAuthenticationService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.secret import Secret, SecretSource
@@ -15,15 +14,14 @@ class SecretSourceService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
                  authentication_type_service: AuthenticationTypeService,
-                 secret_source_basic_authentication_service: SecretSourceBasicAuthenticationService
+                 secret_source_basic_authentication_service: SecretSourceBasicAuthenticationService,
+                 repository_provider: RepositoryProvider,
                  ):
+        self.repository_provider = repository_provider
+        self.secret_source_repository = repository_provider.get(SecretSource)
         self.secret_source_basic_authentication_service = secret_source_basic_authentication_service
         self.authentication_type_service = authentication_type_service
-        self.database_session_manager = database_session_manager
-        self.secret_source_repository: Repository[SecretSource] = Repository[SecretSource](
-            database_session_manager)
 
     def create_secret_source(self, secret: Secret, authentication_type_name):
         authentication_type = self.authentication_type_service.get_by_name(

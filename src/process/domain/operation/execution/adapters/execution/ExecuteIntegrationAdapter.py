@@ -110,6 +110,9 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
                 data_operation_integration_id=data_operation_integration_id)
 
+            self.data_operation_job_execution_integration_service.update_source_data_count(
+                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+                source_data_count=affected_row_count)
             self.data_operation_job_execution_integration_service.create_event(
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
                 event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION, affected_row=affected_row_count)

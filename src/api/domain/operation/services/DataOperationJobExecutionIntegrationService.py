@@ -1,8 +1,7 @@
 from datetime import datetime
 from injector import inject
 
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from models.dao.common import OperationEvent
 from models.dao.common.Status import Status
@@ -15,21 +14,17 @@ class DataOperationJobExecutionIntegrationService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
+                 repository_provider: RepositoryProvider,
                  ):
-        self.database_session_manager = database_session_manager
-        self.data_operation_job_execution_repository: Repository[DataOperationJobExecution] = Repository[
-            DataOperationJobExecution](database_session_manager)
-        self.status_repository: Repository[Status] = Repository[Status](database_session_manager)
-        self.operation_event_repository: Repository[OperationEvent] = Repository[
-            OperationEvent](database_session_manager)
-
-        self.data_operation_job_execution_integration_repository: Repository[DataOperationJobExecutionIntegration] = \
-            Repository[
-                DataOperationJobExecutionIntegration](database_session_manager)
-        self.data_operation_job_execution_integration_event_repository: Repository[
-            DataOperationJobExecutionIntegrationEvent] = Repository[
-            DataOperationJobExecutionIntegrationEvent](database_session_manager)
+        super().__init__()
+        self.repository_provider = repository_provider
+        self.data_operation_job_execution_repository = repository_provider.get(DataOperationJobExecution)
+        self.status_repository = repository_provider.get(Status)
+        self.operation_event_repository = repository_provider.get(OperationEvent)
+        self.data_operation_job_execution_integration_repository = repository_provider.get(
+            DataOperationJobExecutionIntegration)
+        self.data_operation_job_execution_integration_event_repository = repository_provider.get(
+            DataOperationJobExecutionIntegrationEvent)
 
     def create(self, data_operation_job_execution_id,
                data_operation_integration: DataOperationIntegration):
@@ -51,7 +46,7 @@ class DataOperationJobExecutionIntegrationService(IScoped):
             Event=operation_event)
         self.data_operation_job_execution_integration_event_repository.insert(
             data_operation_job_execution_integration_event)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job_execution_integration
 
     def update_status(self,
@@ -64,7 +59,7 @@ class DataOperationJobExecutionIntegrationService(IScoped):
             data_operation_job_execution_integration.EndDate = datetime.now()
 
         data_operation_job_execution_integration.Status = status
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job_execution_integration
 
     def update_source_data_count(self,
@@ -74,7 +69,7 @@ class DataOperationJobExecutionIntegrationService(IScoped):
             Id=data_operation_job_execution_integration_id)
 
         data_operation_job_execution_integration.SourceDataCount = source_data_count
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job_execution_integration
 
     def update_log(self,
@@ -84,7 +79,7 @@ class DataOperationJobExecutionIntegrationService(IScoped):
             Id=data_operation_job_execution_integration_id)
 
         data_operation_job_execution_integration.Log = log[0:1000]
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job_execution_integration
 
     def create_event(self, data_operation_execution_integration_id,
@@ -100,5 +95,5 @@ class DataOperationJobExecutionIntegrationService(IScoped):
             Event=operation_event)
         self.data_operation_job_execution_integration_event_repository.insert(
             data_operation_job_execution_integration_event)
-        self.database_session_manager.commit()
+        self.repository_provider.commit()
         return data_operation_job_execution_integration

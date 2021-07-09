@@ -1,8 +1,7 @@
 from injector import inject
 
 from infrastructor.cryptography.CryptoService import CryptoService
-from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
-from infrastructor.data.Repository import Repository
+from infrastructor.data.RepositoryProvider import RepositoryProvider
 from infrastructor.dependency.scopes import IScoped
 from infrastructor.exceptions.OperationalException import OperationalException
 from models.dao.secret import SecretSource, SecretSourceBasicAuthentication
@@ -13,13 +12,12 @@ class SecretSourceBasicAuthenticationService(IScoped):
 
     @inject
     def __init__(self,
-                 database_session_manager: DatabaseSessionManager,
-                 crypto_service: CryptoService
+                 crypto_service: CryptoService,
+                 repository_provider: RepositoryProvider,
                  ):
+        self.repository_provider = repository_provider
+        self.secret_source_basic_authentication_repository = repository_provider.get(SecretSourceBasicAuthentication)
         self.crypto_service = crypto_service
-        self.database_session_manager = database_session_manager
-        self.secret_source_basic_authentication_repository: Repository[SecretSourceBasicAuthentication] = Repository[
-            SecretSourceBasicAuthentication](database_session_manager)
 
     def get_by_secret_source(self, secret_source: SecretSource) -> ConnectionBasicAuthentication:
         secret_source_basic_authentication = self.secret_source_basic_authentication_repository.first(
