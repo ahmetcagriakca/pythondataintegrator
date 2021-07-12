@@ -30,6 +30,24 @@ const navigationConfig = [
 				url: '/connections'
 			}
 		]
+	},
+	
+	{
+		id: 'dataoperations',
+		title: 'DataOperations',
+		type: 'group',
+		icon: 'dataoperations',
+		translate: 'DATAOPERATIONS',
+		children: [
+			{
+				id: 'data-operation-list',
+				title: 'Data Operation List',
+				type: 'item',
+				icon: 'format_list_bulleted',
+				translate: 'DATAOPERATION_LIST',
+				url: '/dataoperations'
+			}
+		]
 	}
 ];
 

@@ -8,8 +8,8 @@ from domain.connection.services.ConnectionLookupService import ConnectionLookupS
 from infrastructor.api.ResourceBase import ResourceBase
 
 
-@LookupModels.ns.route("/ConnectorType")
-class ConnectorTypeResource(ResourceBase):
+@LookupModels.ns.route("/ConnectorTypeName")
+class ConnectorTypeNameResource(ResourceBase):
     @inject
     def __init__(self,
                  service: ConnectionLookupService,

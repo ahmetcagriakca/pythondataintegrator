@@ -10,7 +10,7 @@ import { matchRoutes } from 'react-router-config';
 import { useLocation } from 'react-router-dom';
 import * as Velocity from 'velocity-animate';
 import { defaults as Chartjs2Defaults } from 'react-chartjs-2';
-import { fade } from '@material-ui/core/styles/colorManipulator';
+import { alpha } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(theme => ({
 	'@global': {
@@ -35,12 +35,12 @@ const useStyles = makeStyles(theme => ({
 			}
 		},
 		'a.link, a:not([role=button])[target=_blank]': {
-			background: fade(theme.palette.secondary.main, 0.2),
+			background: alpha (theme.palette.secondary.main, 0.2),
 			color: 'inherit',
 			borderBottom: `1px solid ${theme.palette.divider}`,
 			textDecoration: 'none',
 			'&:hover': {
-				background: fade(theme.palette.secondary.main, 0.3),
+				background: alpha (theme.palette.secondary.main, 0.3),
 				textDecoration: 'none'
 			}
 		},

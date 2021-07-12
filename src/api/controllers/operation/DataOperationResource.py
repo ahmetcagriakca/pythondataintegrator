@@ -1,4 +1,10 @@
 import json
+
+from flask import request
+
+from domain.operation.GetDataOperationList.DataOperationListQuery import DataOperationListQuery
+from domain.operation.GetDataOperationList.DataOperationListQueryHandler import DataOperationListQueryHandler
+from domain.operation.GetDataOperationList.DataOperationListRequest import DataOperationListRequest
 from infrastructor.json.JsonConvert import JsonConvert
 
 from injector import inject
@@ -13,18 +19,26 @@ from models.viewmodels.operation.CreateDataOperationModel import CreateDataOpera
 @DataOperationModels.ns.route("")
 class DataOperationResource(ResourceBase):
     @inject
-    def __init__(self, data_operation_service: DataOperationService,
+    def __init__(self,
+                 data_operation_service: DataOperationService,
+                 data_operation_list_query_handler: DataOperationListQueryHandler,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.data_operation_list_query_handler = data_operation_list_query_handler
         self.data_operation_service = data_operation_service
 
+    @DataOperationModels.ns.expect(DataOperationModels.get_data_operations_parser, validate=True)
     @DataOperationModels.ns.marshal_with(CommonModels.SuccessModel)
     def get(self):
         """
         Get All Data Operations
         """
-        entities = self.data_operation_service.get_data_operations()
-        result = DataOperationModels.get_data_operation_result_models(entities)
+
+        data = DataOperationModels.get_data_operations_parser.parse_args(request)
+        req: DataOperationListRequest = JsonConvert.FromJSON(json.dumps(data))
+        query = DataOperationListQuery(request=req)
+        res = self.data_operation_list_query_handler.handle(query=query)
+        result = json.loads(json.dumps(res.to_dict(), default=CommonModels.date_converter))
         return CommonModels.get_response(result=result)
 
     @DataOperationModels.ns.expect(DataOperationModels.create_data_operation_model, validate=True)

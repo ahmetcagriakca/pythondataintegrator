@@ -6,11 +6,11 @@ APPLICATION:
 DATABASE:
   #POSTGRESQL local environment
   TYPE: POSTGRESQL
-  HOST: localhost
+  HOST: 10.220.13.77
   PORT: 5432
   DATABASE: pdi
-  USERNAME: postgres
-  PASSWORD: 123456
+  USERNAME: pdi_user
+  PASSWORD: PWD_011
 
 API:
   IS_DEBUG: False
@@ -19,13 +19,17 @@ API:
     oauth2:
       type: oauth2
       flow: password
-      tokenUrl: https://localhost:7500/connect/token
-      authorizationUrl: https://localhost:7500/connect/authorize
+      tokenUrl: https://tokenmicroservicetst.turkcell.com.tr/connect/token
+      authorizationUrl: https://tokenmicroservicetst.turkcell.com.tr/connect/authorize
       scopes:
         pdi.api: Api grant
         offline_access: Grant read-only access
   SECURITY:
     oauth2: pdi.api
+  AUTHORITY: 'https://tokenmicroservicetst.turkcell.com.tr'
+  AUDIENCE: 'LocationShare.WebApi'
+  SCOPES:
+    - 'LocationShare.WebApi'
 
 SCHEDULER_RPC_CLIENT:
   HOST: localhost

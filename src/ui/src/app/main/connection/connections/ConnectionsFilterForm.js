@@ -230,7 +230,7 @@ function ConnectionsFilterFom() {
 			<Grid container spacing={3}>
 				<Grid item xs>
 				</Grid>
-				<Grid item xs={0.5}>
+				<Grid item xs={1}>
 					<Button
 						variant="contained"
 						color="secondary"
@@ -242,7 +242,7 @@ function ConnectionsFilterFom() {
 						Clear
 					</Button>
 				</Grid>
-				<Grid item xs={0.5}>
+				<Grid item xs={1}>
 					<Button
 						variant="contained"
 						color="secondary"

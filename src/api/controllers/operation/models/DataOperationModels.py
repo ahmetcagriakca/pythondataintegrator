@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List
 
 from flask_restx import fields
+from flask_restx.reqparse import RequestParser
 
 from controllers.common.models.CommonModels import EntityModel, CommonModels
 from controllers.integration.models.DataIntegrationModels import DataIntegrationModels
@@ -65,6 +66,14 @@ class DataIntegrationLogModel():
 class DataOperationModels:
     ns = IocManager.api.namespace('DataOperation', description='Data Operation endpoints',
                                   path='/api/DataOperation')
+
+    get_data_operations_parser: RequestParser = IocManager.api.parser()
+
+    get_data_operations_parser.add_argument('PageNumber', type=int, location='args', help='Queried value')
+    get_data_operations_parser.add_argument('PageSize', type=int, location='args', help='Queried value')
+    get_data_operations_parser.add_argument('OrderBy', type=str, location='args', help='Queried value')
+    get_data_operations_parser.add_argument('Order', type=str, location='args', help='Queried value')
+    get_data_operations_parser.add_argument('Id', type=int, location='args', help='Queried value')
 
     operation_contact = IocManager.api.model('Data Operation Contact', {
         'Email': fields.String(description='Operation contact email', required=False),

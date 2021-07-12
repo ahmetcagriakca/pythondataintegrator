@@ -2,4 +2,4 @@ from IocManager import IocManager
 
 
 class LookupModels:
-    ns = IocManager.api.namespace('Lookup', description='Connection endpoints', path='/api/Lookup')
+    ns = IocManager.api.namespace('Lookup', description='Lookup endpoints', path='/api/Lookup')

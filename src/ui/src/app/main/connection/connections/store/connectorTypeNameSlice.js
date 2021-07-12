@@ -3,7 +3,7 @@ import axios from './axios';
 
 export const getConnectorTypeName = createAsyncThunk('connectionsApp/connectorTypeName/getConnectorTypeName', async params => {
 	// GetConnection
-	const response = await axios.get('/api/Lookup/ConnectorType', {
+	const response = await axios.get('/api/Lookup/ConnectorTypeName', {
 	});
 	const data = await response.data;
 	return data.result;

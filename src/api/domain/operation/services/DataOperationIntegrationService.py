@@ -82,7 +82,7 @@ class DataOperationIntegrationService(IScoped):
             else:
                 data_operation_integration.DataIntegration = data_integration
                 data_operation_integration.Order = order
-                data_operation_integration.Limit = data_operation_integration_model.Limit
+                data_operation_integration.PageSize = data_operation_integration_model.Limit
                 data_operation_integration.ProcessCount = data_operation_integration_model.ProcessCount
                 data_operation_integration.IsDeleted = 0
 

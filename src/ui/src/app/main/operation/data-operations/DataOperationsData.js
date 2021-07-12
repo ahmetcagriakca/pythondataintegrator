@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { withRouter, useParams } from 'react-router-dom';
-import { getConnections, selectConnections } from './store/connectionsSlice';
+import { getDataOperations, selectDataOperations } from './store/dataOperationsSlice';
 import CustomPagination from '../../common/components/CustomPagination';
 import EnhancedTableHead from '../../common/components/EnhancedTableHead';
 
@@ -90,36 +90,31 @@ function stableSort(source, comparator) {
 }
 
 const headCells = [
-	{ id: 'connectionId', orderBy: 'Connection.Id', connectionId: 'connectionId', numeric: true, disablePadding: true, label: 'Id' },
-	{ id: 'connectionName', orderBy: 'Connection.Name', name: 'connectionName', numeric: false, disablePadding: true, label: 'Name' },
-	{ id: 'connectionTypeName', orderBy: 'ConnectionType.Name', connectionTypeName: 'connectionTypeName', numeric: false, disablePadding: true, label: 'Connection Type' },
-	{ id: 'connectorTypeName', orderBy: 'ConnectorType.Name', connectorTypeName: 'connectorTypeName', numeric: false, disablePadding: true, label: 'Connector Type' },
-	{ id: 'host', orderBy: 'ConnectionServer.Host', host: 'host', numeric: false, disablePadding: true, label: 'Host' },
-	{ id: 'port', orderBy: 'ConnectionServer.Host', port: 'port', numeric: true, disablePadding: true, label: 'Port' },
-	{ id: 'sid', orderBy: 'ConnectionDatabase.Sid', sid: 'sid', numeric: false, disablePadding: true, label: 'Sid' },
-	{ id: 'serviceName', orderBy: 'ConnectionDatabase.ServiceName', serviceName: 'serviceName', numeric: false, disablePadding: true, label: 'Service Name' },
-	{ id: 'databaseName', orderBy: 'ConnectionDatabase.DatabaseName', databaseName: 'databaseName', numeric: false, disablePadding: true, label: 'DatabaseName' },
-	{ id: 'creationDate', orderBy: 'Connection.CreationDate', creationDate: 'creationDate', numeric: false, disablePadding: true, label: 'CreationDate' },
-	{ id: 'action', Action: 'Action', numeric: false }
+	{ id: 'id', orderBy: 'DataOperation.Id', numeric: true, disablePadding: true, label: 'Id' },
+	{ id: 'name', orderBy: 'DataOperation.Name', numeric: false, disablePadding: true, label: 'Name' },
+	{ id: 'contacts', orderBy: null, numeric: false, disablePadding: true, sortable: false,label: 'Contacts' },
+	{ id: 'definitionId', orderBy: 'Definition.Id', numeric: false, disablePadding: true, label: 'Definition Id' },
+	{ id: 'creationDate', orderBy: 'DataOperation.CreationDate', numeric: false, disablePadding: true, label: 'Creation Date' },
+	{ id: 'lastUpdatedDate', orderBy: 'DataOperation.LastUpdatedDate', numeric: false, disablePadding: true, label: 'Last Updated Date' },
 ];
-function ConnectionsData() {
+function DataOperationsData() {
 	const dispatch = useDispatch();
 	const classes = useStyles();
 	const [order, setOrder] = React.useState('asc');
-	const [orderBy, setOrderBy] = React.useState('Connection.Id');
+	const [orderBy, setOrderBy] = React.useState('DataOperation.Id');
 	const [selected] = React.useState([]);
 	const [page, setPage] = React.useState(1);
 	const [rowsPerPage, setRowsPerPage] = React.useState(10);
-	const connectionsList = useSelector(selectConnections);
+	const dataOperationsList = useSelector(selectDataOperations);
 
-	const totalCount = useSelector(({ connectionsApp }) => connectionsApp.connections.count);
-	const PageNumber = useSelector(({ connectionsApp }) => {
-		if (page !== connectionsApp.connections.pageNumber) {
-			setPage(connectionsApp.connections.pageNumber)
+	const totalCount = useSelector(({ dataOperationsApp }) => dataOperationsApp.dataOperations.count);
+	const PageNumber = useSelector(({ dataOperationsApp }) => {
+		if (page !== dataOperationsApp.dataOperations.pageNumber) {
+			setPage(dataOperationsApp.dataOperations.pageNumber)
 		}
-		return connectionsApp.connections.pageNumber
+		return dataOperationsApp.dataOperations.pageNumber
 	});
-	const PageSize = useSelector(({ connectionsApp }) => connectionsApp.connections.pageSize);
+	const PageSize = useSelector(({ dataOperationsApp }) => dataOperationsApp.dataOperations.pageSize);
 
 	const routeParams = useParams();
 	routeParams.PageNumber = PageNumber;
@@ -128,7 +123,7 @@ function ConnectionsData() {
 	routeParams.Order = order;
 
 	useEffect(() => {
-		dispatch(getConnections(routeParams));
+		dispatch(getDataOperations(routeParams));
 	}, [dispatch,routeParams]);
 
 	const handleRequestSort = (event, orderByValue) => {
@@ -141,18 +136,18 @@ function ConnectionsData() {
 		routeParams.PageNumber = page;
 		routeParams.OrderBy = orderByValue;
 		routeParams.Order = orderValue;
-		dispatch(getConnections(routeParams));
+		dispatch(getDataOperations(routeParams));
 	};
 
-	const handleClick = (event, connectionName) => {
-		const message = connectionName.concat(' isimli connection git');
+	const handleClick = (event, dataOperationName) => {
+		const message = dataOperationName.concat(' isimli dataOperation git');
 		alert(message);
 	};
 
 	const handleChangePage = (event, newPage) => {
 		routeParams.PageSize = rowsPerPage;
 		routeParams.PageNumber = newPage;
-		dispatch(getConnections(routeParams));
+		dispatch(getDataOperations(routeParams));
 		setPage(newPage);
 	};
 
@@ -160,11 +155,11 @@ function ConnectionsData() {
 		routeParams.PageSize = event.target.value;
 		routeParams.PageNumber = page;
 
-		dispatch(getConnections(routeParams));
+		dispatch(getDataOperations(routeParams));
 		setRowsPerPage(event.target.value);
 	};
 	const isSelected = name => selected.indexOf(name) !== -1;
-
+	
 	return (
 		<div
 			className={clsx('flex flex-col flex-1 max-w-2x2 w-full mx-auto px-8 sm:px-32')}
@@ -175,27 +170,39 @@ function ConnectionsData() {
 					<Table stickyHeader aria-label="sticky table" size="small">
 						<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells}/>
 						<TableBody>
-							{stableSort(connectionsList, getComparator(order, orderBy)).map((connection, index) => {
-								const isItemSelected = isSelected(connection.id);
+							{stableSort(dataOperationsList, getComparator(order, orderBy)).map((dataOperation, index) => {
+								const isItemSelected = isSelected(dataOperation.id);
 								return (
 									<StyledTableRow
 										hover
 										aria-checked={isItemSelected}
 										tabIndex={-1}
-										key={connection.id}
+										key={dataOperation.id}
 										selected={isItemSelected}
-										onDoubleClick={event => handleClick(event, connection.name)}
+										onDoubleClick={event => handleClick(event, dataOperation.name)}
 									>
-										<TableCell align="left">{connection.id}</TableCell>
-										<TableCell align="left">{connection.name}</TableCell>
-										<TableCell align="left">{connection.connectionTypeName}</TableCell>
-										<TableCell align="left">{connection.connectorTypeName}</TableCell>
-										<TableCell align="left">{connection.host}</TableCell>
-										<TableCell align="left">{connection.port}</TableCell>
-										<TableCell align="left">{connection.sid}</TableCell>
-										<TableCell align="left">{connection.serviceName}</TableCell>
-										<TableCell align="left">{connection.databaseName}</TableCell>
-										<TableCell align="left">{connection.creationDate}</TableCell>
+										
+										<TableCell align="left">{dataOperation.id}</TableCell>
+										<TableCell align="left">{dataOperation.name}</TableCell>
+										<TableCell align="left">
+											{
+												dataOperation.contacts!==null?(
+													<Table size="small" >
+														<TableBody>
+															{dataOperation.contacts.map((contactRow) => (
+																<TableRow key={contactRow.id}>
+																	<TableCell>{contactRow.email}</TableCell>
+																</TableRow>
+															))}
+														</TableBody>
+													</Table>
+												):
+												("")
+											}
+										</TableCell>
+										<TableCell align="left">{dataOperation.definitionId}</TableCell>
+										<TableCell align="left">{dataOperation.creationDate}</TableCell>
+										<TableCell align="left">{dataOperation.lastUpdatedDate}</TableCell>
 									</StyledTableRow>
 								);
 							})}
@@ -214,4 +221,4 @@ function ConnectionsData() {
 	);
 }
 
-export default withRouter(ConnectionsData);
+export default withRouter(DataOperationsData);
