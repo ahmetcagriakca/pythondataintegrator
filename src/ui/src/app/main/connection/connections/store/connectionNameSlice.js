@@ -1,30 +1,31 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
 
-export const getConnectionName = createAsyncThunk('connectionApp/connectionName/getConnectionName', async params => {
-	const response = await axios.get('api/Lookup/GetConnectionName', {
-		params: {
-			PageNumber: 1,
-			PageSize: 20,
-			Name: params.Name
-		}
+export const getConnectionName = createAsyncThunk('connectionsApp/connectionName/getConnectionName', async params => {
+	// GetConnection
+	const response = await axios.get('/api/Lookup/Connection', {
 	});
 	const data = await response.data;
-	return data;
+	return data.result;
 });
 
-const connectionNameAdapter = createEntityAdapter({});
+export const connectionNameAdapter = createEntityAdapter({});
 
 export const { selectAll: selectConnectionName, selectById: selectConnectionNameById } = connectionNameAdapter.getSelectors(
-	state => state.connectionApp.connectionName
+	state => state.connectionsApp.connectionName
 );
 
 const connectionNameSlice = createSlice({
-	name: 'connectionApp/connectionName',
+	name: 'connectionsApp/connectionName',
 	initialState: connectionNameAdapter.getInitialState({}),
-	reducers: {},
+	reducers: {
+		
+	},
+	
 	extraReducers: {
-		[getConnectionName.fulfilled]: connectionNameAdapter.setAll
+		[getConnectionName.fulfilled]: (state, action) => {
+			connectionNameAdapter.setAll(state,action.payload);
+		}
 	}
 });
 

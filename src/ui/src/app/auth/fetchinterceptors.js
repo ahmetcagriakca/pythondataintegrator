@@ -1,5 +1,6 @@
 import oidcService from 'app/services/oidcService';
 import history from '@history';
+import { camelizeKeys } from 'humps';
 
 export const addAuthInterceptors = async (axios) =>{
     try{
@@ -21,6 +22,12 @@ export const addAuthInterceptors = async (axios) =>{
 
     axios.interceptors.response.use(
       (response) => {
+        if (
+          response.data &&
+          response.headers['content-type'] === 'application/json'
+        ) {
+          response.data = camelizeKeys(response.data);
+        }
         return response;
       },
       (error) => {

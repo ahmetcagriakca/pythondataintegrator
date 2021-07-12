@@ -1,6 +1,8 @@
 import json
- 
- 
+
+from infrastructor.json.DateTimeEncoder import DateTimeEncoder
+
+
 class JsonConvert(object):
     mappings = {}
      
@@ -27,7 +29,7 @@ class JsonConvert(object):
  
     @classmethod
     def ToJSON(clsself, obj):
-        return json.dumps(obj.__dict__, default=clsself.complex_handler, indent=4)
+        return json.dumps(dict(obj), cls=DateTimeEncoder, indent=4)
  
     @classmethod
     def FromJSON(clsself, json_str):

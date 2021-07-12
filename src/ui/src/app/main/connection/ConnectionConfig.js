@@ -9,7 +9,7 @@ const ConnectionConfig = {
 	routes: [
 		{
 			path: '/connections',
-			component: React.lazy(() => import('./connections/Connection'))
+			component: React.lazy(() => import('./connections/Connections'))
 		}
 	]
 };

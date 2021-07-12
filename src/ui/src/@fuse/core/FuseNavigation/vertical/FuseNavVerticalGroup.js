@@ -10,7 +10,6 @@ import { withRouter } from 'react-router-dom';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { navbarCloseMobile } from 'app/store/fuse/navbarSlice';
 import FuseNavItem from '../FuseNavItem';
-import _ from '@lodash';
 
 const useStyles = makeStyles(theme => ({
 	item: props => ({

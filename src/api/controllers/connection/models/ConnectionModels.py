@@ -2,6 +2,7 @@ import json
 from typing import List
 
 from flask_restx import fields
+from flask_restx.reqparse import RequestParser
 
 from controllers.common.models.CommonModels import EntityModel, CommonModels
 from IocManager import IocManager
@@ -124,6 +125,16 @@ class ConnectionQueueModel(EntityModel):
 
 class ConnectionModels:
     ns = IocManager.api.namespace('Connection', description='Connection endpoints', path='/api/Connection')
+
+    get_connections_parser: RequestParser = IocManager.api.parser()
+
+    get_connections_parser.add_argument('PageNumber', type=int, location='args', help='Queried value')
+    get_connections_parser.add_argument('PageSize', type=int, location='args', help='Queried value')
+    get_connections_parser.add_argument('OrderBy', type=str, location='args', help='Queried value')
+    get_connections_parser.add_argument('Order', type=str, location='args', help='Queried value')
+    get_connections_parser.add_argument('Id', type=int, location='args', help='Queried value')
+    get_connections_parser.add_argument('ConnectorTypeId', type=int, location='args', help='Queried value')
+    get_connections_parser.add_argument('ConnectionTypeId', type=int, location='args', help='Queried value')
 
     create_connection_database_model = IocManager.api.model('ConnectionDatabaseModel', {
         'Name': fields.String(description='Operation code value', required=True),

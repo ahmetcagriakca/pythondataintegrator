@@ -15,23 +15,6 @@ const navigationConfig = [
 		url: '/'
 	},
 	{
-		id: 'sorting',
-		title: 'Sorting',
-		type: 'group',
-		icon: 'Sorting',
-		translate: 'SORTING',
-		children: [
-			{
-				id: 'sorting-list',
-				title: 'Sorting List',
-				type: 'item',
-				icon: 'format_list_bulleted',
-				translate: 'Sorting_LIST',
-				url: '/sorting'
-			}
-		]
-	},
-	{
 		id: 'connections',
 		title: 'Connections',
 		type: 'group',

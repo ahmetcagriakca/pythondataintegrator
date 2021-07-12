@@ -1,23 +1,23 @@
 import React from 'react';
 import withReducer from 'app/store/withReducer';
 
-import ConnectionHeader from './ConnectionHeader';
-import ConnectionData from './ConnectionData';
+import ConnectionsData from './ConnectionsData';
+import ConnectionsFilterForm from './ConnectionsFilterForm';
 import CommonHeader from '../../common/CommonHeader';
 import reducer from './store';
 
-function Connection() {
+function Connections() {
 	const icon = 'microwave';
 	const title = 'Connections';
 	return (
 		<div style={{ position: 'relative' }}>
 			<CommonHeader icon={icon} title={title} />
 
-			{/* <ConnectionFilterForm /> */}
+			<ConnectionsFilterForm />
 
-			<ConnectionData />
+			<ConnectionsData />
 		</div>
 	);
 }
 
-export default withReducer('connectionApp', reducer)(Connection);
+export default withReducer('connectionsApp', reducer)(Connections);
