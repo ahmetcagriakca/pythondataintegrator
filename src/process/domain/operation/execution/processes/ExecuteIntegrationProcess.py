@@ -128,7 +128,7 @@ class ExecuteIntegrationProcess(IScoped):
         total_row_count = 0
         try:
             while True:
-                data_task: DataQueueTask = data_queue.get(timeout=600)
+                data_task: DataQueueTask = data_queue.get()
                 if data_task.IsFinished:
                     if data_task.Exception is not None:
                         exc = Exception(data_task.Traceback + '\n' + str(data_task.Exception))
