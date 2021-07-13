@@ -1,110 +1,36 @@
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { withRouter, useParams } from 'react-router-dom';
 import { getConnections, selectConnections } from './store/connectionsSlice';
 import CustomPagination from '../../common/components/CustomPagination';
 import EnhancedTableHead from '../../common/components/EnhancedTableHead';
+import StyledTableRow from '../../common/components/StyledTableRow';
+import { stableSort, getComparator } from '../../common/utils/TableUtils';
+import { tableStyles } from '../../common/styles/TableStyles';
 
 
-const useStyles = makeStyles(themex => ({
-	root: {
-		flexGrow: 1
-	},
-	header: {
-		background: `linear-gradient(to left, ${themex.palette.primary.dark} 0%, ${themex.palette.primary.main} 100%)`,
-		color: themex.palette.getContrastText(themex.palette.primary.main)
-	},
-	headerIcon: {
-		position: 'absolute',
-		top: -64,
-		left: 0,
-		opacity: 0.04,
-		fontSize: 512,
-		width: 512,
-		height: 512,
-		pointerEvents: 'none'
-	},
-	table: {
-		minWidth: 650
-	},
-	tableRowHeader: {
-		height: 70
-	},
-	tableCell: {
-		padding: '0px 16px',
-		// backgroundColor: 'gainsboro',
-		backgroundColor: '#006565',
-		color: 'white',
-		// '&:hover': {
-		// 	backgroundColor: 'blue !important'
-		// }
-		hover: {
-			'&:hover': {
-				backgroundColor: 'green !important'
-			}
-		}
-	}
-}));
-
-// table row
-const StyledTableRow = withStyles(theme => ({
-	root: {
-		height: 57
-	}
-}))(TableRow);
-
-
-function descendingComparator(a, b, orderBy) {
-	if (b[orderBy] < a[orderBy]) {
-		return -1;
-	}
-	if (b[orderBy] > a[orderBy]) {
-		return 1;
-	}
-	return 0;
-}
-
-function getComparator(order, orderBy) {
-	return order === 'desc'
-		? (a, b) => descendingComparator(a, b, orderBy)
-		: (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(source, comparator) {
-	const stabilizedThis = source.map((el, index) => [el, index]);
-
-	stabilizedThis.sort((a, b) => {
-		const order = comparator(a[0], b[0]);
-		if (order !== 0) return order;
-		return a[1] - b[1];
-	});
-	return stabilizedThis.map(el => el[0]);
-}
-
-const headCells = [
-	{ id: 'connectionId', orderBy: 'Connection.Id', connectionId: 'connectionId', numeric: true, disablePadding: true, label: 'Id' },
-	{ id: 'connectionName', orderBy: 'Connection.Name', name: 'connectionName', numeric: false, disablePadding: true, label: 'Name' },
-	{ id: 'connectionTypeName', orderBy: 'ConnectionType.Name', connectionTypeName: 'connectionTypeName', numeric: false, disablePadding: true, label: 'Connection Type' },
-	{ id: 'connectorTypeName', orderBy: 'ConnectorType.Name', connectorTypeName: 'connectorTypeName', numeric: false, disablePadding: true, label: 'Connector Type' },
-	{ id: 'host', orderBy: 'ConnectionServer.Host', host: 'host', numeric: false, disablePadding: true, label: 'Host' },
-	{ id: 'port', orderBy: 'ConnectionServer.Host', port: 'port', numeric: true, disablePadding: true, label: 'Port' },
-	{ id: 'sid', orderBy: 'ConnectionDatabase.Sid', sid: 'sid', numeric: false, disablePadding: true, label: 'Sid' },
-	{ id: 'serviceName', orderBy: 'ConnectionDatabase.ServiceName', serviceName: 'serviceName', numeric: false, disablePadding: true, label: 'Service Name' },
-	{ id: 'databaseName', orderBy: 'ConnectionDatabase.DatabaseName', databaseName: 'databaseName', numeric: false, disablePadding: true, label: 'DatabaseName' },
-	{ id: 'creationDate', orderBy: 'Connection.CreationDate', creationDate: 'creationDate', numeric: false, disablePadding: true, label: 'CreationDate' },
-	{ id: 'action', Action: 'Action', numeric: false }
-];
 function ConnectionsData() {
 	const dispatch = useDispatch();
-	const classes = useStyles();
+	const classes = tableStyles();
+	const headCells = [
+		{ id: 'connectionId', orderBy: 'Connection.Id', connectionId: 'connectionId', numeric: true, disablePadding: true, label: 'Id' },
+		{ id: 'connectionName', orderBy: 'Connection.Name', name: 'connectionName', numeric: false, disablePadding: true, label: 'Name' },
+		{ id: 'connectionTypeName', orderBy: 'ConnectionType.Name', connectionTypeName: 'connectionTypeName', numeric: false, disablePadding: true, label: 'Connection Type' },
+		{ id: 'connectorTypeName', orderBy: 'ConnectorType.Name', connectorTypeName: 'connectorTypeName', numeric: false, disablePadding: true, label: 'Connector Type' },
+		{ id: 'host', orderBy: 'ConnectionServer.Host', host: 'host', numeric: false, disablePadding: true, label: 'Host' },
+		{ id: 'port', orderBy: 'ConnectionServer.Host', port: 'port', numeric: true, disablePadding: true, label: 'Port' },
+		{ id: 'sid', orderBy: 'ConnectionDatabase.Sid', sid: 'sid', numeric: false, disablePadding: true, label: 'Sid' },
+		{ id: 'serviceName', orderBy: 'ConnectionDatabase.ServiceName', serviceName: 'serviceName', numeric: false, disablePadding: true, label: 'Service Name' },
+		{ id: 'databaseName', orderBy: 'ConnectionDatabase.DatabaseName', databaseName: 'databaseName', numeric: false, disablePadding: true, label: 'DatabaseName' },
+		{ id: 'creationDate', orderBy: 'Connection.CreationDate', creationDate: 'creationDate', numeric: false, disablePadding: true, label: 'CreationDate' },
+		{ id: 'action', Action: 'Action', numeric: false }
+	];
 	const [order, setOrder] = React.useState('asc');
 	const [orderBy, setOrderBy] = React.useState('Connection.Id');
 	const [selected] = React.useState([]);
@@ -129,7 +55,7 @@ function ConnectionsData() {
 
 	useEffect(() => {
 		dispatch(getConnections(routeParams));
-	}, [dispatch,routeParams]);
+	}, [dispatch, routeParams]);
 
 	const handleRequestSort = (event, orderByValue) => {
 		const isAsc = orderBy === orderByValue && order === 'asc';
@@ -173,7 +99,7 @@ function ConnectionsData() {
 			<Paper style={{ borderTopLeftRadius: 30 }} className={classes.paper}>
 				<TableContainer className={classes.container} style={{ maxHeight: 650, borderTopLeftRadius: 30 }}>
 					<Table stickyHeader aria-label="sticky table" size="small">
-						<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells}/>
+						<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells} />
 						<TableBody>
 							{stableSort(connectionsList, getComparator(order, orderBy)).map((connection, index) => {
 								const isItemSelected = isSelected(connection.id);

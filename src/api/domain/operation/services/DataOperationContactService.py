@@ -15,7 +15,7 @@ class DataOperationContactService(IScoped):
                  repository_provider: RepositoryProvider,
                  ):
         self.repository_provider = repository_provider
-        self.secret_repository = repository_provider.get(DataOperationContact)
+        self.data_operation_contact_repository = repository_provider.get(DataOperationContact)
 
     def insert(self,
                data_operation: DataOperation,

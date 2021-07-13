@@ -7,9 +7,10 @@ export const getDataOperations = createAsyncThunk('dataOperationsApp/dataOperati
 		params: {
 			PageNumber: params.PageNumber,
 			PageSize: params.PageSize,
-			Id: params.DataOperationId,
 			OrderBy: params.OrderBy,
-			Order: params.Order
+			Order: params.Order,
+			Name: params.DataOperationName,
+			OnlyUndeleted: params.OnlyUndeleted,
 		}
 	});
 	const data = await response.data;
@@ -34,7 +35,7 @@ const dataOperationSlice = createSlice({
 	reducers: {},
 	extraReducers: {
 		[getDataOperations.fulfilled]: (state, action) => {
-			dataOperationsAdapter.setAll(state, action.payload.result.dataOperations);
+			dataOperationsAdapter.setAll(state, action.payload.result.pageData);
 			state.pageNumber = action.payload.result.pageNumber;
 			state.pageSize = action.payload.result.pageSize;
 			state.count = action.payload.result.count;

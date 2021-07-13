@@ -7,99 +7,27 @@ import TableContainer from '@material-ui/core/TableContainer';
 import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
 import { withRouter, useParams } from 'react-router-dom';
 import { getDataOperations, selectDataOperations } from './store/dataOperationsSlice';
 import CustomPagination from '../../common/components/CustomPagination';
 import EnhancedTableHead from '../../common/components/EnhancedTableHead';
+import StyledTableRow from '../../common/components/StyledTableRow';
+import { stableSort, getComparator } from '../../common/utils/TableUtils';
+import { tableStyles } from '../../common/styles/TableStyles';
 
 
-const useStyles = makeStyles(themex => ({
-	root: {
-		flexGrow: 1
-	},
-	header: {
-		background: `linear-gradient(to left, ${themex.palette.primary.dark} 0%, ${themex.palette.primary.main} 100%)`,
-		color: themex.palette.getContrastText(themex.palette.primary.main)
-	},
-	headerIcon: {
-		position: 'absolute',
-		top: -64,
-		left: 0,
-		opacity: 0.04,
-		fontSize: 512,
-		width: 512,
-		height: 512,
-		pointerEvents: 'none'
-	},
-	table: {
-		minWidth: 650
-	},
-	tableRowHeader: {
-		height: 70
-	},
-	tableCell: {
-		padding: '0px 16px',
-		// backgroundColor: 'gainsboro',
-		backgroundColor: '#006565',
-		color: 'white',
-		// '&:hover': {
-		// 	backgroundColor: 'blue !important'
-		// }
-		hover: {
-			'&:hover': {
-				backgroundColor: 'green !important'
-			}
-		}
-	}
-}));
-
-// table row
-const StyledTableRow = withStyles(theme => ({
-	root: {
-		height: 57
-	}
-}))(TableRow);
-
-
-function descendingComparator(a, b, orderBy) {
-	if (b[orderBy] < a[orderBy]) {
-		return -1;
-	}
-	if (b[orderBy] > a[orderBy]) {
-		return 1;
-	}
-	return 0;
-}
-
-function getComparator(order, orderBy) {
-	return order === 'desc'
-		? (a, b) => descendingComparator(a, b, orderBy)
-		: (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(source, comparator) {
-	const stabilizedThis = source.map((el, index) => [el, index]);
-
-	stabilizedThis.sort((a, b) => {
-		const order = comparator(a[0], b[0]);
-		if (order !== 0) return order;
-		return a[1] - b[1];
-	});
-	return stabilizedThis.map(el => el[0]);
-}
-
-const headCells = [
-	{ id: 'id', orderBy: 'DataOperation.Id', numeric: true, disablePadding: true, label: 'Id' },
-	{ id: 'name', orderBy: 'DataOperation.Name', numeric: false, disablePadding: true, label: 'Name' },
-	{ id: 'contacts', orderBy: null, numeric: false, disablePadding: true, sortable: false,label: 'Contacts' },
-	{ id: 'definitionId', orderBy: 'Definition.Id', numeric: false, disablePadding: true, label: 'Definition Id' },
-	{ id: 'creationDate', orderBy: 'DataOperation.CreationDate', numeric: false, disablePadding: true, label: 'Creation Date' },
-	{ id: 'lastUpdatedDate', orderBy: 'DataOperation.LastUpdatedDate', numeric: false, disablePadding: true, label: 'Last Updated Date' },
-];
 function DataOperationsData() {
 	const dispatch = useDispatch();
-	const classes = useStyles();
+	const classes = tableStyles();
+	const headCells = [
+		{ id: 'id', orderBy: 'DataOperation.Id', numeric: true, disablePadding: true, label: 'Id' },
+		{ id: 'name', orderBy: 'DataOperation.Name', numeric: false, disablePadding: true, label: 'Name' },
+		{ id: 'contacts', orderBy: null, numeric: false, disablePadding: true, sortable: false, label: 'Contacts' },
+		{ id: 'definitionId', orderBy: 'Definition.Id', numeric: false, disablePadding: true, label: 'Definition Id' },
+		{ id: 'creationDate', orderBy: 'DataOperation.CreationDate', numeric: false, disablePadding: true, label: 'Creation Date' },
+		{ id: 'lastUpdatedDate', orderBy: 'DataOperation.LastUpdatedDate', numeric: false, disablePadding: true, label: 'Last Updated Date' },
+		{ id: 'isDeleted', orderBy: 'DataOperation.IsDeleted', numeric: false, disablePadding: true, label: 'Is Deleted' },
+	];
 	const [order, setOrder] = React.useState('asc');
 	const [orderBy, setOrderBy] = React.useState('DataOperation.Id');
 	const [selected] = React.useState([]);
@@ -124,7 +52,7 @@ function DataOperationsData() {
 
 	useEffect(() => {
 		dispatch(getDataOperations(routeParams));
-	}, [dispatch,routeParams]);
+	}, [dispatch, routeParams]);
 
 	const handleRequestSort = (event, orderByValue) => {
 		const isAsc = orderBy === orderByValue && order === 'asc';
@@ -159,7 +87,7 @@ function DataOperationsData() {
 		setRowsPerPage(event.target.value);
 	};
 	const isSelected = name => selected.indexOf(name) !== -1;
-	
+
 	return (
 		<div
 			className={clsx('flex flex-col flex-1 max-w-2x2 w-full mx-auto px-8 sm:px-32')}
@@ -168,7 +96,7 @@ function DataOperationsData() {
 			<Paper style={{ borderTopLeftRadius: 30 }} className={classes.paper}>
 				<TableContainer className={classes.container} style={{ maxHeight: 650, borderTopLeftRadius: 30 }}>
 					<Table stickyHeader aria-label="sticky table" size="small">
-						<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells}/>
+						<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells} />
 						<TableBody>
 							{stableSort(dataOperationsList, getComparator(order, orderBy)).map((dataOperation, index) => {
 								const isItemSelected = isSelected(dataOperation.id);
@@ -181,12 +109,12 @@ function DataOperationsData() {
 										selected={isItemSelected}
 										onDoubleClick={event => handleClick(event, dataOperation.name)}
 									>
-										
+
 										<TableCell align="left">{dataOperation.id}</TableCell>
 										<TableCell align="left">{dataOperation.name}</TableCell>
 										<TableCell align="left">
 											{
-												dataOperation.contacts!==null?(
+												dataOperation.contacts !== null ? (
 													<Table size="small" >
 														<TableBody>
 															{dataOperation.contacts.map((contactRow) => (
@@ -196,13 +124,14 @@ function DataOperationsData() {
 															))}
 														</TableBody>
 													</Table>
-												):
-												("")
+												) :
+													("")
 											}
 										</TableCell>
 										<TableCell align="left">{dataOperation.definitionId}</TableCell>
 										<TableCell align="left">{dataOperation.creationDate}</TableCell>
 										<TableCell align="left">{dataOperation.lastUpdatedDate}</TableCell>
+										<TableCell align="left">{dataOperation.isDeleted}</TableCell>
 									</StyledTableRow>
 								);
 							})}

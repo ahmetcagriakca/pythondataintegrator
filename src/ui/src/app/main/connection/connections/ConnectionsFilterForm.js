@@ -3,53 +3,24 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
 import { getConnectionName, selectConnectionName } from './store/connectionNameSlice';
 import { getConnectionTypeName, selectConnectionTypeName } from './store/connectionTypeNameSlice';
 import { getConnectorTypeName, selectConnectorTypeName } from './store/connectorTypeNameSlice';
 import { getConnections } from './store/connectionsSlice';
 import Button from '@material-ui/core/Button';
-
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
-const filterOptions = createFilterOptions({
-	matchFrom: 'start',
-	stringify: option => {
-		return option.name
-	},
-});
+import { filterFormStyles } from '../../common/styles/FilterFormStyles';
 
-const useStyles = makeStyles(theme => ({
-	root: {
-		flexGrow: 1,
-	},
-	paper: {
-		padding: theme.spacing(2),
-		textAlign: 'center',
-		color: theme.palette.text.secondary,
-	},
-	margin: {
-		margin: theme.spacing(1)
-	},
-	extendedIcon: {
-		marginRight: theme.spacing(1)
-	},
-	filterFormClass: {
-		background: `linear-gradient(to left, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-		color: theme.palette.getContrastText(theme.palette.primary.main)
-	},
-	autocompleteStyle: {
-		borderColor: 'red',
-		color: 'red'
-	},
-	button: {
-		margin: theme.spacing(1),
-	},
-}));
 
 function ConnectionsFilterFom() {
-	const classes = useStyles();
-
 	const dispatch = useDispatch();
+	const classes = filterFormStyles();
+	const filterOptions = createFilterOptions({
+		matchFrom: 'start',
+		stringify: option => {
+			return option.name
+		},
+	});
 
 	const [connection, setConnection] = React.useState(null);
 	const [connectionType, setConnectionType] = React.useState(null);
@@ -63,13 +34,13 @@ function ConnectionsFilterFom() {
 
 	useEffect(() => {
 		dispatch(getConnectionName(routeParams));
-	}, [dispatch,routeParams]);
+	}, [dispatch, routeParams]);
 	useEffect(() => {
 		dispatch(getConnectionTypeName(routeParams));
-	}, [dispatch,routeParams]);
+	}, [dispatch, routeParams]);
 	useEffect(() => {
 		dispatch(getConnectorTypeName(routeParams));
-	}, [dispatch,routeParams]);
+	}, [dispatch, routeParams]);
 
 
 	const clear = event => {

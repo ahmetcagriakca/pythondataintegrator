@@ -19,12 +19,12 @@ const connectionNameSlice = createSlice({
 	name: 'connectionsApp/connectionName',
 	initialState: connectionNameAdapter.getInitialState({}),
 	reducers: {
-		
+
 	},
-	
+
 	extraReducers: {
 		[getConnectionName.fulfilled]: (state, action) => {
-			connectionNameAdapter.setAll(state,action.payload);
+			connectionNameAdapter.setAll(state, action.payload);
 		}
 	}
 });

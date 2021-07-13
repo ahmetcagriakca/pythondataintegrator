@@ -28,5 +28,5 @@ class ConnectionListQueryHandler:
         result.PageNumber = query.ConnectionListRequest.PageNumber
         result.PageSize = query.ConnectionListRequest.PageSize
 
-        result.Connections = ConnectionListMapping.to_dtos(data_query)
+        result.PageData = ConnectionListMapping.to_dtos(data_query)
         return result

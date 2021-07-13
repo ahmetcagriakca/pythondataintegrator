@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from typing import List
 
-from domain.operation.GetDataOperationList.DataOperationListDto import DataOperationListDto
+from domain.operation.GetDataOperationJobList.DataOperationJobListDto import DataOperationJobListDto
 from infrastructor.json.JsonConvert import JsonConvert
 
 
 @JsonConvert.register
 @dataclass
-class DataOperationListResponse:
-    PageData: List[DataOperationListDto] = None
+class DataOperationJobListResponse:
+    PageData: List[DataOperationJobListDto] = None
     PageNumber: int = None
     PageSize: int = None
     Count: int = None

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
 
-export const getDataOperationName = createAsyncThunk('dataOperationsApp/dataOperationName/getDataOperationName', async params => {
+export const getDataOperationName = createAsyncThunk('dataOperationJobsApp/dataOperationName/getDataOperationName', async params => {
 	// GetDataOperation
 	const response = await axios.get('/api/Lookup/DataOperationName', {
 	});
@@ -12,11 +12,11 @@ export const getDataOperationName = createAsyncThunk('dataOperationsApp/dataOper
 export const dataOperationNameAdapter = createEntityAdapter({});
 
 export const { selectAll: selectDataOperationName, selectById: selectDataOperationNameById } = dataOperationNameAdapter.getSelectors(
-	state => state.dataOperationsApp.dataOperationName
+	state => state.dataOperationJobsApp.dataOperationName
 );
 
 const dataOperationNameSlice = createSlice({
-	name: 'dataOperationsApp/dataOperationName',
+	name: 'dataOperationJobsApp/dataOperationName',
 	initialState: dataOperationNameAdapter.getInitialState({}),
 	reducers: {
 

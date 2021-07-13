@@ -31,7 +31,6 @@ const navigationConfig = [
 			}
 		]
 	},
-	
 	{
 		id: 'dataoperations',
 		title: 'DataOperations',
@@ -46,6 +45,24 @@ const navigationConfig = [
 				icon: 'format_list_bulleted',
 				translate: 'DATAOPERATION_LIST',
 				url: '/dataoperations'
+			}
+		]
+	},
+	
+	{
+		id: 'dataoperationjobs',
+		title: 'DataOperationJobs',
+		type: 'group',
+		icon: 'dataoperationjobs',
+		translate: 'DATAOPERATIONJOBS',
+		children: [
+			{
+				id: 'data-operation--job-list',
+				title: 'Data Operation Job List',
+				type: 'item',
+				icon: 'format_list_bulleted',
+				translate: 'DATAOPERATION_JOB_LIST',
+				url: '/jobs'
 			}
 		]
 	}

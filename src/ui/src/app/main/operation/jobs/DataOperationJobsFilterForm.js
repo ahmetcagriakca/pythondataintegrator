@@ -4,7 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getDataOperationName, selectDataOperationName } from './store/dataOperationNameSlice';
-import { getDataOperations } from './store/dataOperationsSlice';
+import { getDataOperationJobs } from './store/dataOperationJobsSlice';
 import Button from '@material-ui/core/Button';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import { filterFormStyles } from '../../common/styles/FilterFormStyles';
@@ -13,9 +13,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 
 
-
-
-function DataOperationsFilterForm() {
+function DataOperationJobsFilterForm() {
 	const dispatch = useDispatch();
 	const classes = filterFormStyles();
 	const filterOptions = createFilterOptions({
@@ -24,8 +22,8 @@ function DataOperationsFilterForm() {
 			return option.name
 		},
 	});
-	const routeParams = useParams();
 
+	const routeParams = useParams();
 	useEffect(() => {
 		dispatch(getDataOperationName(routeParams));
 	}, [dispatch, routeParams]);
@@ -34,40 +32,44 @@ function DataOperationsFilterForm() {
 	const [dataOperation, setDataOperation] = React.useState(null);
 	const selectDataOperationNames = useSelector(selectDataOperationName);
 
-
+	const [onlyCron, setOnlyCron] = React.useState(true);
+	const handleOnlyCronChange = (event) => {
+		setOnlyCron(event.target.checked);
+	  };
+	  
 	const [onlyUndeleted, setOnlyUndeleted] = React.useState(true);
 	const handleOnlyUndeletedChange = (event) => {
 		setOnlyUndeleted(event.target.checked);
 	  };
 	
-
 	const clear = event => {
 		setDataOperation(null);
+		setOnlyCron(true);
 		setOnlyUndeleted(true);
 
-		routeParams.DataOperationId = null;
-		routeParams.OrderBy = "DataOperation.Id";
+		routeParams.OrderBy = "DataOperationJob.Id";
 		routeParams.PageNumber = 1;
 		routeParams.Order = null;
+		routeParams.DataOperationName = null;
+		routeParams.OnlyCron = true;
 		routeParams.OnlyUndeleted = true;
-		dispatch(getDataOperations(routeParams));
+		dispatch(getDataOperationJobs(routeParams));
 	};
 
 	const filter = event => {
-
 		let dataOperationName = null;
 		if (dataOperation != null) {
 			dataOperationName = dataOperation.name;
 		}
 		routeParams.DataOperationName = dataOperationName;
-
-		routeParams.PageNumber = 1;
+		
+		routeParams.OnlyCron = onlyCron;
 		routeParams.OnlyUndeleted = onlyUndeleted;
-		dispatch(getDataOperations(routeParams));
+
+		
+		routeParams.PageNumber = 1;
+		dispatch(getDataOperationJobs(routeParams));
 	};
-
-
-
 
 	return (
 
@@ -98,7 +100,7 @@ function DataOperationsFilterForm() {
 						renderInput={(params) => (
 							<TextField
 								{...params}
-								label="Choose a dataOperation "
+								label="Choose a Data Operation "
 								variant="outlined"
 								inputProps={{
 									...params.inputProps,
@@ -112,6 +114,15 @@ function DataOperationsFilterForm() {
 					/>
 				</Grid>
 				<Grid item xs>
+					
+					<FormGroup row>
+						<FormControlLabel
+							control={<Checkbox checked={onlyCron} onChange={handleOnlyCronChange} name="onlyCron" />}
+							label="Only Cron"
+						/>
+					</FormGroup>
+				</Grid>
+				<Grid item xs>
 					<FormGroup row>
 						<FormControlLabel
 							control={<Checkbox checked={onlyUndeleted} onChange={handleOnlyUndeletedChange} name="onlyUndeleted" />}
@@ -119,10 +130,8 @@ function DataOperationsFilterForm() {
 						/>
 					</FormGroup>
 				</Grid>
-				<Grid item xs>
-				</Grid>
-				<Grid item xs>
-				</Grid>
+				<Grid item xs></Grid>
+
 			</Grid>
 
 			<Grid container spacing={3}>
@@ -156,4 +165,4 @@ function DataOperationsFilterForm() {
 		</div>
 	);
 }
-export default DataOperationsFilterForm;
+export default DataOperationJobsFilterForm;

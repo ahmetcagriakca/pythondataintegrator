@@ -8,15 +8,12 @@ from infrastructor.json.JsonConvert import JsonConvert
 @JsonConvert.register
 @dataclass
 class ConnectionListResponse:
-    Connections: List[ConnectionListDto] = None
+    PageData: List[ConnectionListDto] = None
     PageNumber: int = None
     PageSize: int = None
     Count: int = None
 
     def to_dict(self):
-        return {
-            "Connections": [connection.__dict__ for connection in self.Connections],
-            "PageNumber": self.PageNumber,
-            "PageSize": self.PageSize,
-            "Count": self.Count
-        }
+        dic = self.__dict__
+        dic["PageData"] = [entity.to_dict() for entity in self.PageData]
+        return dic

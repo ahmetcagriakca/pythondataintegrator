@@ -16,6 +16,7 @@ class DataOperationListMapping:
 
         dto.Contacts = [DataOperationContactDto(Id=contact.Id, Email=contact.Email) for contact in entity.Contacts if
                         contact.IsDeleted == 0]
+        dto.IsDeleted = entity.IsDeleted
         return dto
 
     @staticmethod

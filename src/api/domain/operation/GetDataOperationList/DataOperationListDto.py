@@ -24,6 +24,7 @@ class DataOperationListDto:
     DefinitionId: int = None
     CreationDate: datetime.datetime = None
     LastUpdatedDate: datetime.datetime = None
+    IsDeleted: int = None
 
     def to_dict(self):
         dic = self.__dict__

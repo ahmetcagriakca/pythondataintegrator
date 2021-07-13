@@ -8,6 +8,7 @@ from infrastructor.json.JsonConvert import JsonConvert
 
 @JsonConvert.register
 @dataclass
-class DataOperationListRequest(PagingParameter, OrderByParameter):
-    DataOperationName: Optional[int] = None
+class DataOperationJobListRequest(PagingParameter, OrderByParameter):
+    DataOperationName: Optional[str] = None
+    OnlyCron: Optional[bool] = None
     OnlyUndeleted: Optional[bool] = None

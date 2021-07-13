@@ -17,7 +17,7 @@ class DataOperationIntegrationService(IScoped):
                  ):
         super().__init__()
         self.repository_provider = repository_provider
-        self.secret_repository = repository_provider.get(DataOperationIntegration)
+        self.data_operation_integration_repository = repository_provider.get(DataOperationIntegration)
         self.data_integration_service = data_integration_service
 
     def get_all_by_data_operation_id(self, data_operation_id: int) -> List[DataOperationIntegration]:

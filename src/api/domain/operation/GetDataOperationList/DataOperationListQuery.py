@@ -5,4 +5,4 @@ from domain.operation.GetDataOperationList.DataOperationListRequest import DataO
 
 @dataclass
 class DataOperationListQuery:
-    request: DataOperationListRequest= None
+    request: DataOperationListRequest = None

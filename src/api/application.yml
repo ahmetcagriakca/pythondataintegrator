@@ -6,11 +6,11 @@ APPLICATION:
 DATABASE:
   #POSTGRESQL local environment
   TYPE: POSTGRESQL
-  HOST: 10.220.13.77
+  HOST: localhost
   PORT: 5432
   DATABASE: pdi
-  USERNAME: pdi_user
-  PASSWORD: PWD_011
+  USERNAME: postgres
+  PASSWORD: 123456
 
 API:
   IS_DEBUG: False

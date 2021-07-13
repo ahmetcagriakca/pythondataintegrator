@@ -19,7 +19,6 @@ class DataOperationListQueryHandler:
         result = DataOperationListResponse()
         repository = self.repository_provider.get(DataOperation)
         data_query = repository.table \
-            .filter(DataOperation.IsDeleted == 0)
 
         result.Count = self.data_operation_list_specification.count(query=query, data_query=data_query)
 
@@ -28,5 +27,5 @@ class DataOperationListQueryHandler:
         result.PageNumber = query.request.PageNumber
         result.PageSize = query.request.PageSize
 
-        result.DataOperations = DataOperationListMapping.to_dtos(data_query)
+        result.PageData = DataOperationListMapping.to_dtos(data_query)
         return result

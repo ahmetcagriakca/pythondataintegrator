@@ -21,7 +21,7 @@ const connectionTypeName = createSlice({
 	reducers: {},
 	extraReducers: {
 		[getConnectionTypeName.fulfilled]: (state, action) => {
-			connectionTypeNameAdapter.setAll(state,action.payload);
+			connectionTypeNameAdapter.setAll(state, action.payload);
 		}
 	}
 });
