@@ -25,7 +25,7 @@ class IocManager:
     api: Api = None
     binder: Binder = None
     app_wrapper = None
-    config_manager = None
+    config_manager:ConfigManager = None
     injector: Injector = None
     Base = declarative_base(metadata=MetaData(schema='Common'))
 

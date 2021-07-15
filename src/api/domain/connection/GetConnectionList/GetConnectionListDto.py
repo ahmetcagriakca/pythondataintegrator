@@ -1,14 +1,11 @@
 import datetime
-from dataclasses import dataclass
-
-from infrastructor.json.JsonConvert import JsonConvert
+from domain.common.decorators.dtoclass import dtoclass
 
 
-@JsonConvert.register
-@dataclass
-class ConnectionListDto:
+@dtoclass
+class GetConnectionListDto:
     Id: int = None
-    Name: int = None
+    Name: str = None
     ConnectorTypeId: int = None
     ConnectorTypeName: str = None
     ConnectionTypeId: int = None
@@ -20,6 +17,3 @@ class ConnectionListDto:
     DatabaseName: str = None
     CreationDate: datetime.datetime = None
 
-    def to_dict(self):
-        dic = self.__dict__
-        return dic

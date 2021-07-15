@@ -1,12 +1,13 @@
 import os
 import re
 import sys
+from typing import Type, TypeVar
 
 import yaml
 from infrastructor.utils.Utils import Utils
 from models.configs.BaseConfig import BaseConfig
 
-
+T = TypeVar('T')
 class ConfigManager:
     def __init__(self, root_directory: str) -> None:
         # Create an empty list with items of type T
@@ -15,7 +16,7 @@ class ConfigManager:
     def get_all(self):
         return self.configs
 
-    def get(self, generic_type):
+    def get(self, generic_type:Type[T])->T:
         for config in self.configs:
             config_type = config.get("type")
             if config_type is generic_type:

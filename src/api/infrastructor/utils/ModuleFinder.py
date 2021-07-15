@@ -5,6 +5,7 @@ import os
 from injector import inject
 
 from infrastructor.dependency.scopes import ISingleton
+from infrastructor.utils.Utils import Utils
 from models.configs.ApplicationConfig import ApplicationConfig
 
 
@@ -20,9 +21,7 @@ class ModuleFinder(ISingleton):
         self.find_all_modules(self.root_directory)
 
     def get_file_name(self, file):
-        file_splits = file.split('/')
-        if len(file_splits) == 1:
-            file_splits = file.split('\\')
+        file_splits = Utils.path_split(file)
         file_name = file_splits[len(file_splits) - 1]
         file_name_without_extension = file_name[0:(len(file_name) - 3)]
         return file_name_without_extension

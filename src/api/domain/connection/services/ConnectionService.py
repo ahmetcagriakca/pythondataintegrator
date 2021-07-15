@@ -174,3 +174,4 @@ class ConnectionService(IScoped):
         message = f'{connection.Name} connection deleted'
         self.sql_logger.info(message)
         self.repository_provider.commit()
+        return message

@@ -1,15 +1,13 @@
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Optional, List
+from typing import List
 
-from domain.connection.GetConnectionList.ConnectionListDto import ConnectionListDto
+from domain.connection.GetConnectionList.GetConnectionListDto import GetConnectionListDto
 from models.dao.connection import Connection
 
 
-class ConnectionListMapping:
+class GetConnectionListMapping:
     @staticmethod
-    def to_dto(entity: Connection) -> ConnectionListDto:
-        dto = ConnectionListDto()
+    def to_dto(entity: Connection) -> GetConnectionListDto:
+        dto = GetConnectionListDto()
         dto.Id = entity.Id
         dto.Name = entity.Name
         dto.ConnectorTypeId = entity.Database.ConnectorType.Id
@@ -25,9 +23,9 @@ class ConnectionListMapping:
         return dto
 
     @staticmethod
-    def to_dtos(entities: List[Connection]) -> List[ConnectionListDto]:
-        result: List[ConnectionListDto]=[]
+    def to_dtos(entities: List[Connection]) -> List[GetConnectionListDto]:
+        result: List[GetConnectionListDto]=[]
         for entity in entities:
-            dto = ConnectionListMapping.to_dto(entity=entity)
+            dto = GetConnectionListMapping.to_dto(entity=entity)
             result.append(dto)
         return result
