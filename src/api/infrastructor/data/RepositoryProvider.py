@@ -1,6 +1,7 @@
 from typing import Type, TypeVar
 
 from injector import inject
+from sqlalchemy.orm import Query
 
 from IocManager import IocManager
 from infrastructor.data.DatabaseSessionManager import DatabaseSessionManager
@@ -39,7 +40,7 @@ class RepositoryProvider(IScoped):
         repository = Repository[repository_type](repository_type, database_session_manager)
         return repository
 
-    def query(self, *entities, **kwargs) -> Repository[T]:
+    def query(self, *entities, **kwargs) -> Query:
         database_session_manager = self.create()
         return database_session_manager.session.query(*entities, **kwargs)
 

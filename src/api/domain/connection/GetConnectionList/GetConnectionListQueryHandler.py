@@ -3,11 +3,12 @@ from domain.connection.GetConnectionList.GetConnectionListMapping import GetConn
 from domain.connection.GetConnectionList.GetConnectionListQuery import GetConnectionListQuery
 from domain.connection.GetConnectionList.GetConnectionListResponse import GetConnectionListResponse
 from domain.connection.GetConnectionList.GetConnectionListSpecifications import GetConnectionListSpecifications
+from infrastructor.cqrs.IQueryHandler import IQueryHandler
 from infrastructor.data.RepositoryProvider import RepositoryProvider
 from models.dao.connection import Connection
 
 
-class GetConnectionListQueryHandler:
+class GetConnectionListQueryHandler(IQueryHandler[GetConnectionListQuery]):
     @inject
     def __init__(self,
                  repository_provider: RepositoryProvider,
