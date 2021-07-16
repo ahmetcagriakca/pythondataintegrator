@@ -5,8 +5,8 @@ from injector import inject
 
 from domain.connection.page.ConnectionPage import ConnectionPage
 from IocManager import IocManager
-from infrastructor.api.ResourceBase import ResourceBase
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.api.ResourceBase import ResourceBase
+from infrastructure.json.JsonConvert import JsonConvert
 from views.connection.PageModels import PageModels
 
 

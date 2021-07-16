@@ -3,13 +3,13 @@ from datetime import datetime
 from typing import List
 from injector import inject
 
-from infrastructor.data.RepositoryProvider import RepositoryProvider
+from infrastructure.data.RepositoryProvider import RepositoryProvider
 from rpc.SchedulerRpcClientService import SchedulerRpcClientService
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 from models.dao.operation import DataOperation

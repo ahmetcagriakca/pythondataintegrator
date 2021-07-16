@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.data.Repository import Repository
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.data.Repository import Repository
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from tests.integrationtests.common.TestManager import TestManager

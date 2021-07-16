@@ -1,4 +1,4 @@
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.json.JsonConvert import JsonConvert
 from models.viewmodels.integration import CreateDataIntegrationConnectionFileCsvModel
 
 

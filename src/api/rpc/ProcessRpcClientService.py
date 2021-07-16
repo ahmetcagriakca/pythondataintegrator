@@ -1,6 +1,6 @@
 import rpyc
 from injector import inject
-from infrastructor.dependency.scopes import IScoped
+from infrastructure.dependency.scopes import IScoped
 from models.configs.ProcessRpcClientConfig import ProcessRpcClientConfig
 
 

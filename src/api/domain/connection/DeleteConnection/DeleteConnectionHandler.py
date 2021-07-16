@@ -2,7 +2,7 @@ from injector import inject
 
 from domain.connection.DeleteConnection.DeleteConnectionCommand import DeleteConnectionCommand
 from domain.connection.services.ConnectionService import ConnectionService
-from infrastructor.cqrs.ICommandHandler import ICommandHandler
+from infrastructure.cqrs.ICommandHandler import ICommandHandler
 
 
 class DeleteConnectionHandler(ICommandHandler[DeleteConnectionCommand]):

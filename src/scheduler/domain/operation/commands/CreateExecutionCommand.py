@@ -2,9 +2,9 @@ from datetime import datetime
 
 from injector import inject
 
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.exceptions.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.exceptions.OperationalException import OperationalException
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.common import Status, OperationEvent
 from models.dao.operation import DataOperationJob, DataOperationJobExecution, DataOperationJobExecutionEvent, \
     DataOperation

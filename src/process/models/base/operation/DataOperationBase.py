@@ -3,7 +3,7 @@ from models.base.EntityBase import EntityBase
 from models.base.operation.DataOperationContactBase import DataOperationContactBase
 from models.base.operation.DataOperationJobBase import DataOperationJobBase
 from models.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
-from infrastructor.json.BaseConverter import BaseConverter
+from infrastructure.json.BaseConverter import BaseConverter
 
 
 @BaseConverter.register

@@ -2,9 +2,9 @@ from domain.connection.DeleteConnection.DeleteConnectionCommand import DeleteCon
 from domain.connection.GetConnectionList.GetConnectionListQuery import GetConnectionListQuery
 from domain.connection.GetConnectionList.GetConnectionListRequest import GetConnectionListRequest
 from domain.connection.GetConnectionList.GetConnectionListResponse import GetConnectionListResponse
-from infrastructor.cqrs.Dispatcher import Dispatcher
-from infrastructor.api.ResourceBase import ResourceBase
-from infrastructor.api.decorators.Controller import controller
+from infrastructure.cqrs.Dispatcher import Dispatcher
+from infrastructure.api.ResourceBase import ResourceBase
+from infrastructure.api.decorators.Controller import controller
 from injector import inject
 
 @controller()

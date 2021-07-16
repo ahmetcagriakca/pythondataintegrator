@@ -10,10 +10,10 @@ from flask_restx.reqparse import RequestParser, Argument
 from IocManager import IocManager
 from domain.common.request_parameter.OrderByParameter import OrderByParameter
 from domain.common.request_parameter.PagingParameter import PagingParameter
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.exceptions.OperationalException import OperationalException
-from infrastructor.json.JsonConvert import JsonConvert
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.exceptions.OperationalException import OperationalException
+from infrastructure.json.JsonConvert import JsonConvert
+from infrastructure.logging.SqlLogger import SqlLogger
 
 # python 3.7
 if hasattr(typing, '_GenericAlias'):

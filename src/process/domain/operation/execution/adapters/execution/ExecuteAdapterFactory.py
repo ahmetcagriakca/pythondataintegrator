@@ -4,8 +4,8 @@ from domain.operation.execution.adapters.execution.ExecuteAdapter import Execute
 from domain.operation.execution.adapters.execution.ExecuteIntegrationAdapter import ExecuteIntegrationAdapter
 from domain.operation.execution.adapters.execution.ExecuteQueryAdapter import ExecuteQueryAdapter
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.IncompatibleAdapterException import IncompatibleAdapterException
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.IncompatibleAdapterException import IncompatibleAdapterException
 
 
 class ExecuteAdapterFactory(IScoped):

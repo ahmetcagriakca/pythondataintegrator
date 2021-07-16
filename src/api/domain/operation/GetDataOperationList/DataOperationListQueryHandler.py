@@ -3,7 +3,7 @@ from domain.operation.GetDataOperationList.DataOperationListMapping import DataO
 from domain.operation.GetDataOperationList.DataOperationListQuery import DataOperationListQuery
 from domain.operation.GetDataOperationList.DataOperationListResponse import DataOperationListResponse
 from domain.operation.GetDataOperationList.DataOperationListSpecifications import DataOperationListSpecifications
-from infrastructor.data.RepositoryProvider import RepositoryProvider
+from infrastructure.data.RepositoryProvider import RepositoryProvider
 from models.dao.operation import DataOperation
 
 

@@ -1,9 +1,9 @@
 from IocManager import IocManager
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructor.connection.database.DatabaseProvider import DatabaseProvider
-from infrastructor.cryptography.CryptoService import CryptoService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.connection.database.DatabaseProvider import DatabaseProvider
+from infrastructure.cryptography.CryptoService import CryptoService
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.connection import Connection
 

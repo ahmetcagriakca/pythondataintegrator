@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from models.base.connection.ConnectionDatabaseBase import ConnectionDatabaseBase
 from models.base.connection.ConnectionFileBase import ConnectionFileBase
 from models.base.EntityBase import EntityBase
-from infrastructor.json.BaseConverter import BaseConverter
+from infrastructure.json.BaseConverter import BaseConverter
 
 
 @BaseConverter.register

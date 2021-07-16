@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 from domain.operation.GetDataOperationList.DataOperationListDto import DataOperationListDto
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.json.JsonConvert import JsonConvert
 
 
 @JsonConvert.register

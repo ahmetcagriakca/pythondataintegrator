@@ -1,10 +1,10 @@
 from injector import inject
 
 from IocManager import IocManager
-from infrastructor.configuration.ConfigService import ConfigService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.delivery.EmailProvider import EmailProvider
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.configuration.ConfigService import ConfigService
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.delivery.EmailProvider import EmailProvider
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.aps import ApSchedulerJob
 from models.dao.operation import DataOperationJob

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from infrastructor.cqrs.ICommand import ICommand
+from infrastructure.cqrs.ICommand import ICommand
 
 @dataclass
 class DeleteConnectionCommand(ICommand):

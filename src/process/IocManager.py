@@ -5,10 +5,10 @@ from multiprocessing.process import current_process
 from injector import singleton, Injector, threadlocal, Binder
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
-from infrastructor.dependency.scopes import ISingleton, IScoped
-from infrastructor.logging.ConsoleLogger import ConsoleLogger
-from infrastructor.utils.ConfigManager import ConfigManager
-from infrastructor.utils.Utils import Utils
+from infrastructure.dependency.scopes import ISingleton, IScoped
+from infrastructure.logging.ConsoleLogger import ConsoleLogger
+from infrastructure.utils.ConfigManager import ConfigManager
+from infrastructure.utils.Utils import Utils
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.configs.ProcessRpcServerConfig import ProcessRpcServerConfig

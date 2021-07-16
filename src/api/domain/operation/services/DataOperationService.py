@@ -4,10 +4,10 @@ from injector import inject
 from domain.operation.services.DataOperationContactService import DataOperationContactService
 from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
 from domain.operation.services.DefinitionService import DefinitionService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.operation import DataOperation, Definition
 from models.viewmodels.operation import CreateDataOperationModel
 

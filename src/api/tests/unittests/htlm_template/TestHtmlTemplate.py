@@ -3,8 +3,8 @@ from time import time
 from unittest import TestCase
 
 from IocManager import IocManager
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.utils.Utils import Utils
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.utils.Utils import Utils
 from models.dao.operation import DataOperation
 from models.dto.PagingModifier import PagingModifier
 
@@ -14,7 +14,7 @@ class TestHtmlTemplate(TestCase):
     def __init__(self, methodName='RunDataOperation'):
         super(TestHtmlTemplate, self).__init__(methodName)
 
-        from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
+        from infrastructure.api.FlaskAppWrapper import FlaskAppWrapper
         os.environ["PYTHON_ENVIRONMENT"] = 'test'
         IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper)
         IocManager.initialize()

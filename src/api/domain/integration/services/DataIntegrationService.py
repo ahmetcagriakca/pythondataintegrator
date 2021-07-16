@@ -4,9 +4,9 @@ from injector import inject
 
 from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.operation import Definition
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration

@@ -5,12 +5,12 @@ from flask import request
 from domain.operation.GetDataOperationJobList.DataOperationJobListQuery import DataOperationJobListQuery
 from domain.operation.GetDataOperationJobList.DataOperationJobListQueryHandler import DataOperationJobListQueryHandler
 from domain.operation.GetDataOperationJobList.DataOperationJobListRequest import DataOperationJobListRequest
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.json.JsonConvert import JsonConvert
 
 from injector import inject
 from controllers.common.models.CommonModels import CommonModels
 from controllers.operation.models.DataOperationModels import DataOperationModels
-from infrastructor.api.ResourceBase import ResourceBase
+from infrastructure.api.ResourceBase import ResourceBase
 
 
 @DataOperationModels.ns.route("/Job")

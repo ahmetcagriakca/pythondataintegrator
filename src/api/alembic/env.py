@@ -14,10 +14,10 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from infrastructor.utils.Utils import Utils
+from infrastructure.utils.Utils import Utils
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig
-from infrastructor.utils.ConfigManager import ConfigManager
+from infrastructure.utils.ConfigManager import ConfigManager
 
 root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 

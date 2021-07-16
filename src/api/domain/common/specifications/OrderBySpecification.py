@@ -1,8 +1,8 @@
 from injector import inject
 from sqlalchemy import desc
 from domain.common.request_parameter.OrderByParameter import OrderByParameter
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.utils.ModuleFinder import ModuleFinder
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.utils.ModuleFinder import ModuleFinder
 
 
 class OrderBySpecification(IScoped):

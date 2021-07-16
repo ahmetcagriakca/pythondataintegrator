@@ -2,7 +2,7 @@ from flask import make_response
 from injector import inject
 from domain.operation.page.DataOperationJobExecutionLogPage import DataOperationJobExecutionLogPage
 from IocManager import IocManager
-from infrastructor.api.ResourceBase import ResourceBase
+from infrastructure.api.ResourceBase import ResourceBase
 from views.operation.PageModels import PageModels
 
 

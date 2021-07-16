@@ -3,9 +3,9 @@ import uuid
 from unittest import TestCase
 
 from IocManager import IocManager
-from infrastructor.connection.file.FileContext import FileContext
-from infrastructor.connection.file.FileProvider import FileProvider
-from infrastructor.connection.file.connectors.FileConnector import FileConnector
+from infrastructure.connection.file.FileContext import FileContext
+from infrastructure.connection.file.FileProvider import FileProvider
+from infrastructure.connection.file.connectors.FileConnector import FileConnector
 from models.configs.ApplicationConfig import ApplicationConfig
 
 

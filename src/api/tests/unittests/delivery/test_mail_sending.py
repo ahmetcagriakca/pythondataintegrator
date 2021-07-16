@@ -1,13 +1,13 @@
 from unittest import TestCase
 from IocManager import IocManager
-from infrastructor.delivery.EmailProvider import EmailProvider
+from infrastructure.delivery.EmailProvider import EmailProvider
 
 
 class TestMailSending(TestCase):
     def __init__(self, method_name='TestMailSending'):
         super(TestMailSending, self).__init__(method_name)
 
-        from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
+        from infrastructure.api.FlaskAppWrapper import FlaskAppWrapper
         os.environ["PYTHON_ENVIRONMENT"] = 'test'
         IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper)
         IocManager.initialize()

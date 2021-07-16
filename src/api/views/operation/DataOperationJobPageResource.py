@@ -5,8 +5,8 @@ from injector import inject
 
 from IocManager import IocManager
 from domain.operation.page.DataOperationJobPage import DataOperationJobPage
-from infrastructor.api.ResourceBase import ResourceBase
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.api.ResourceBase import ResourceBase
+from infrastructure.json.JsonConvert import JsonConvert
 from views.operation.PageModels import PageModels
 
 

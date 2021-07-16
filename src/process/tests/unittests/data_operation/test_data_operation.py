@@ -8,9 +8,9 @@ from IocManager import IocManager
 from domain.operation.commands.SendDataOperationFinishMailCommand import SendDataOperationFinishMailCommand
 from domain.operation.execution.services.OperationExecution import OperationExecution
 from domain.operation.services.DataOperationService import DataOperationService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.utils.ConfigManager import ConfigManager
-from infrastructor.utils.Utils import Utils
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.utils.ConfigManager import ConfigManager
+from infrastructure.utils.Utils import Utils
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.dao.operation import DataOperation

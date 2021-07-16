@@ -4,7 +4,7 @@ from domain.operation.GetDataOperationJobList.DataOperationJobListQuery import D
 from domain.operation.GetDataOperationJobList.DataOperationJobListResponse import DataOperationJobListResponse
 from domain.operation.GetDataOperationJobList.DataOperationJobListSpecifications import \
     DataOperationJobListSpecifications
-from infrastructor.data.RepositoryProvider import RepositoryProvider
+from infrastructure.data.RepositoryProvider import RepositoryProvider
 from models.dao.operation import DataOperationJob
 
 

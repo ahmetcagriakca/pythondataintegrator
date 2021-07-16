@@ -1,8 +1,8 @@
 from IocManager import IocManager
 from domain.operation.commands.CreateExecutionCommand import CreateExecutionCommand
 from domain.operation.commands.SendSchedulerErrorMailCommand import SendSchedulerErrorMailCommand
-from infrastructor.data.decorators.TransactionHandler import transaction_handler
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.decorators.TransactionHandler import transaction_handler
+from infrastructure.logging.SqlLogger import SqlLogger
 import time
 from datetime import datetime
 from rpc.ProcessRpcClientService import ProcessRpcClientService

@@ -4,7 +4,7 @@ from controllers.operation.models.JobSchedulerModels import JobSchedulerModels
 from domain.operation.services.DataOperationService import DataOperationService
 from domain.job.services.JobOperationService import JobOperationService
 from IocManager import IocManager
-from infrastructor.api.ResourceBase import ResourceBase
+from infrastructure.api.ResourceBase import ResourceBase
 
 
 @JobSchedulerModels.ns.route("/ScheduleJobWithCron")

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from domain.common.decorators.cls_to_dict import cls_to_dict
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.json.JsonConvert import JsonConvert
 
 
 def dtoclass(_cls=None):

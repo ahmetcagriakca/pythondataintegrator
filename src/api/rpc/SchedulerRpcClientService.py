@@ -2,8 +2,8 @@ from datetime import datetime
 
 import rpyc
 from injector import inject
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.configs.SchedulerRpcClientConfig import SchedulerRpcClientConfig
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob
 

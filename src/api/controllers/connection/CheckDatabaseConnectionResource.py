@@ -3,7 +3,7 @@ from controllers.common.models.CommonModels import CommonModels
 from controllers.connection.models.ConnectionModels import ConnectionModels
 from domain.connection.services.ConnectionService import ConnectionService
 from IocManager import IocManager
-from infrastructor.api.ResourceBase import ResourceBase
+from infrastructure.api.ResourceBase import ResourceBase
 from rpc.ProcessRpcClientService import ProcessRpcClientService
 
 

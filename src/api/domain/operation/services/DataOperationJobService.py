@@ -3,8 +3,8 @@ from datetime import datetime
 from injector import inject
 
 from domain.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.aps import ApSchedulerJob
 from models.dao.operation import DataOperationJob, DataOperation
 

@@ -7,8 +7,8 @@ from domain.operation.page.DataOperationDetailPage import DataOperationDetailPag
 from domain.operation.page.DataOperationPage import DataOperationPage
 from IocManager import IocManager
 from domain.operation.page.DefinitionPage import DefinitionPage
-from infrastructor.api.ResourceBase import ResourceBase
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.api.ResourceBase import ResourceBase
+from infrastructure.json.JsonConvert import JsonConvert
 from views.operation.PageModels import PageModels
 
 

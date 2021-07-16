@@ -2,7 +2,7 @@ import datetime
 from dataclasses import dataclass
 from typing import List
 
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.json.JsonConvert import JsonConvert
 
 
 @dataclass

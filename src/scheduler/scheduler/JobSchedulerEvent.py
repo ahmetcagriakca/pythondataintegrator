@@ -3,7 +3,7 @@ from queue import Queue
 import jsonpickle
 
 from handlers.JobEventHandler import JobEventHandler
-from infrastructor.multi_processing.ProcessManager import ProcessManager
+from infrastructure.multi_processing.ProcessManager import ProcessManager
 from scheduler.JobSchedulerService import JobSchedulerService
 
 

@@ -4,7 +4,7 @@ from controllers.common.models.CommonModels import CommonModels
 from controllers.lookup.models.LookupModels import LookupModels
 from domain.connection.services.ConnectionLookupService import ConnectionLookupService
 from domain.operation.services.DataOperationLookupService import DataOperationLookupService
-from infrastructor.api.ResourceBase import ResourceBase
+from infrastructure.api.ResourceBase import ResourceBase
 
 
 @LookupModels.ns.route("/DataOperationName")

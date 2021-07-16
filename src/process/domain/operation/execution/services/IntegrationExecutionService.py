@@ -10,8 +10,8 @@ from domain.operation.execution.adapters.connection.ConnectionAdapterFactory imp
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
 from models.enums.StatusTypes import StatusTypes
 from models.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \

@@ -7,13 +7,13 @@ from pandas import DataFrame, notnull
 import pandas as pd
 
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructor.data.decorators.TransactionHandler import transaction_handler
-from infrastructor.multi_processing.ProcessManager import ProcessManager
+from infrastructure.data.decorators.TransactionHandler import transaction_handler
+from infrastructure.multi_processing.ProcessManager import ProcessManager
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
 from IocManager import IocManager
-from infrastructor.connection.models.DataQueueTask import DataQueueTask
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.connection.models.DataQueueTask import DataQueueTask
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
 from func_timeout import FunctionTimedOut
 

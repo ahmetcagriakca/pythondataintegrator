@@ -5,8 +5,8 @@ from controllers.common.models.CommonModels import CommonModels
 from controllers.connection.models.ConnectionModels import ConnectionModels
 from domain.connection.services.ConnectionService import ConnectionService
 from IocManager import IocManager
-from infrastructor.api.ResourceBase import ResourceBase
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.api.ResourceBase import ResourceBase
+from infrastructure.json.JsonConvert import JsonConvert
 from models.viewmodels.connection.CreateConnectionQueueModel import CreateConnectionQueueModel
 
 

@@ -7,11 +7,11 @@ from flask_restx import Api
 from injector import singleton, Injector, threadlocal, Binder
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
-from infrastructor.api.ResourceBase import ResourceBase
-from infrastructor.dependency.scopes import ISingleton, IScoped
-from infrastructor.logging.ConsoleLogger import ConsoleLogger
-from infrastructor.utils.ConfigManager import ConfigManager
-from infrastructor.utils.Utils import Utils
+from infrastructure.api.ResourceBase import ResourceBase
+from infrastructure.dependency.scopes import ISingleton, IScoped
+from infrastructure.logging.ConsoleLogger import ConsoleLogger
+from infrastructure.utils.ConfigManager import ConfigManager
+from infrastructure.utils.Utils import Utils
 from models.configs.ApiConfig import ApiConfig
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig

@@ -6,7 +6,7 @@ from tests.integrationtests.common.TestServiceScenarios import TestServiceScenar
 
 class TestManager:
     def __init__(self):
-        from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
+        from infrastructure.api.FlaskAppWrapper import FlaskAppWrapper
         IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper)
         IocManager.initialize()
         self.client = IocManager.app.test_client()

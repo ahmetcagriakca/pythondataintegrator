@@ -6,14 +6,14 @@ from domain.operation.GetDataOperationList.DataOperationListQuery import DataOpe
 from domain.operation.GetDataOperationList.DataOperationListQueryHandler import DataOperationListQueryHandler
 from domain.operation.GetDataOperationList.DataOperationListRequest import DataOperationListRequest
 from domain.operation.GetDataOperationList.DataOperationListResponse import DataOperationListResponse
-from infrastructor.json.JsonConvert import JsonConvert
+from infrastructure.json.JsonConvert import JsonConvert
 
 from injector import inject
 from controllers.common.models.CommonModels import CommonModels
 from controllers.operation.models.DataOperationModels import DataOperationModels
 from domain.operation.services.DataOperationService import DataOperationService
 from IocManager import IocManager
-from infrastructor.api.ResourceBase import ResourceBase
+from infrastructure.api.ResourceBase import ResourceBase
 from models.viewmodels.operation.CreateDataOperationModel import CreateDataOperationModel
 
 

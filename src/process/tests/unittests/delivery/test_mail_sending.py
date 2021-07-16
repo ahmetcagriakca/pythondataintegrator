@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 from IocManager import IocManager
-from infrastructor.delivery.EmailProvider import EmailProvider
+from infrastructure.delivery.EmailProvider import EmailProvider
 
 
 class TestMailSending(TestCase):

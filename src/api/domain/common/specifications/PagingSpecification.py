@@ -1,6 +1,6 @@
 from injector import inject
 from domain.common.request_parameter.PagingParameter import PagingParameter
-from infrastructor.dependency.scopes import IScoped
+from infrastructure.dependency.scopes import IScoped
 
 
 class PagingSpecification(IScoped):

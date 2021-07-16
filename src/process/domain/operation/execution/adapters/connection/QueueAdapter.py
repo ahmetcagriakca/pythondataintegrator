@@ -6,9 +6,9 @@ import pandas as pd
 from pandas import DataFrame
 
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
-from infrastructor.connection.queue.QueueProvider import QueueProvider
-from infrastructor.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
+from infrastructure.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructure.connection.queue.QueueProvider import QueueProvider
+from infrastructure.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
 from models.dto.PagingModifier import PagingModifier
 
 
