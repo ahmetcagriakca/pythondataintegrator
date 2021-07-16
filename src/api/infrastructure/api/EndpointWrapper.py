@@ -41,54 +41,61 @@ class EndpointWrapper:
         return {"IsSuccess": False, 'Message': message}
 
     @staticmethod
-    def api_model(model_type: typing.Type[T]) -> RequestParser:
+    def annotation_resolver(annotations):
+        generic_type_checker = TypeChecker()
+        definition = {}
+        for key in annotations:
+            value = annotations[key]
+            specified_value = None
+            if value == int:
+                specified_value = fields.Integer(description=f'{key}', default=None)
+            elif value == str:
+                specified_value = fields.String(description=f'{key}', default=None)
+            elif value == bool:
+                specified_value = fields.Boolean(description=f'{key}', default=None)
+            elif value == datetime:
+                specified_value = fields.DateTime(description=f'{key}', default=None,
+                                                  example=(datetime.now().isoformat()))
+                pass
+            elif value == float:
+                specified_value = fields.Float(description=f'{key}', default=None)
+                pass
+            else:
+
+                if generic_type_checker.is_generic(value):
+                    nested_annotations = value.__args__[0]().__annotations__
+                    nested_model_definition = EndpointWrapper.annotation_resolver(nested_annotations)
+                    nested_model = IocManager.api.model(value.__args__[0].__name__, nested_model_definition)
+                    specified_value = fields.List(fields.Nested(nested_model), description=f'')
+                elif generic_type_checker.is_base_generic(value):
+                    #TODO:Base generic class
+                    print('value type should be a structure of', value.__args__[0])
+                elif inspect.isclass(value):
+                    nested_annotations = value().__annotations__
+                    nested_model_definition = EndpointWrapper.annotation_resolver(nested_annotations)
+                    nested_model = IocManager.api.model(value.__name__, nested_model_definition)
+                    specified_value = fields.Nested(nested_model, description=f'')
+                else:
+                    print('Type not know', value)
+            if specified_value is not None:
+                definition[key] = specified_value
+        return definition
+
+    @staticmethod
+    def request_model(model_type: typing.Type[T]) -> RequestParser:
         instance = model_type()
         annotations = instance.__annotations__
-        generic_type_checker = TypeChecker()
 
-        def annotation_resolver(annotations):
-            definition = {}
-            for key in annotations:
-                value = annotations[key]
-                specified_value = None
-                if value == int:
-                    specified_value = fields.Integer(description=f'{key}', default=None)
-                elif value == str:
-                    specified_value = fields.String(description=f'{key}', default=None)
-                elif value == bool:
-                    specified_value = fields.Boolean(description=f'{key}', default=None)
-                elif value == datetime:
-                    specified_value = fields.DateTime(description=f'{key}', default=None,
-                                                      example=(datetime.now().isoformat()))
-                    pass
-                elif value == float:
-                    specified_value = fields.Float(description=f'{key}', default=None)
-                    pass
-                elif value == float:
-                    specified_value = fields.Float(description=f'{key}', default=None)
-                    pass
-                else:
+        model_definition = EndpointWrapper.annotation_resolver(annotations)
+        model = IocManager.api.model(model_type.__name__, model_definition)
+        return model
 
-                    if generic_type_checker.is_generic(value):
-                        nested_annotations = value.__args__[0]().__annotations__
-                        nested_model_definition = annotation_resolver(nested_annotations)
-                        nested_model = IocManager.api.model(value.__args__[0].__name__, nested_model_definition)
-                        specified_value = fields.List(fields.Nested(nested_model), description=f'')
-                    elif generic_type_checker.is_base_generic(value):
-                        #TODO:Base generic class 
-                        print('value type should be a structure of', value.__args__[0])
-                    elif inspect.isclass(value):
-                        nested_annotations = value().__annotations__
-                        nested_model_definition = annotation_resolver(nested_annotations)
-                        nested_model = IocManager.api.model(value.__name__, nested_model_definition)
-                        specified_value = fields.Nested(nested_model, description=f'')
-                    else:
-                        print('Type not know', value)
-                if specified_value is not None:
-                    definition[key] = specified_value
-            return definition
+    @staticmethod
+    def response_model(model_type: typing.Type[T]) -> RequestParser:
+        instance = model_type()
+        annotations = instance.__annotations__
 
-        model_definition = annotation_resolver(annotations)
+        model_definition = EndpointWrapper.annotation_resolver(annotations)
         model = IocManager.api.model(model_type.__name__, model_definition)
         success_model = IocManager.api.model(model_type.__name__ + 'Base', {
             'IsSuccess': fields.Boolean(description='Is Success', default=True),

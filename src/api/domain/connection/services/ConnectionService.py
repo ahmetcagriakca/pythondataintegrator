@@ -65,9 +65,7 @@ class ConnectionService(IScoped):
         """
         Create File connection
         """
-
         connection = self.connection_repository.first(IsDeleted=0, Name=model.Name)
-
         if connection is None:
             connection = self.create_connection(name=model.Name,
                                                 connection_type_name=ConnectionTypes.Database.name)
@@ -89,14 +87,12 @@ class ConnectionService(IScoped):
         """
         Create File connection
         """
-
         connection = self.get_by_name(name=model.Name)
         if connection is None:
             connection = self.create_connection(name=model.Name,
                                                 connection_type_name=ConnectionTypes.File.name)
             self.connection_secret_service.create(connection=connection, user=model.User,
                                                   password=model.Password)
-
             self.connection_server_service.create(connection=connection, host=model.Host, port=model.Port)
             self.connection_file_service.create(connection=connection, model=model)
         else:

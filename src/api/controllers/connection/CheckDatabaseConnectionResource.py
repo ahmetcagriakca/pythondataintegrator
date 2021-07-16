@@ -1,31 +1,23 @@
 from injector import inject
-from controllers.common.models.CommonModels import CommonModels
-from controllers.connection.models.ConnectionModels import ConnectionModels
-from domain.connection.services.ConnectionService import ConnectionService
-from IocManager import IocManager
+from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
 from infrastructure.api.ResourceBase import ResourceBase
-from rpc.ProcessRpcClientService import ProcessRpcClientService
+from infrastructure.api.decorators.Controller import controller
+from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@ConnectionModels.ns.route("/CheckConnectionDatabase")
+@controller()
 class CheckConnectionDatabaseResource(ResourceBase):
     @inject
-    def __init__(self, process_rpc_client_service: ProcessRpcClientService,
+    def __init__(self,
+                 dispatcher: Dispatcher,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.process_rpc_client_service = process_rpc_client_service
+        self.dispatcher = dispatcher
 
-    @ConnectionModels.ns.expect(ConnectionModels.check_connection_database_model, validate=True)
-    @ConnectionModels.ns.marshal_with(CommonModels.SuccessModel)
-    def post(self):
+    def post(self, ConnectionName: str):
         """
         Check Database Connection
         """
-        data = IocManager.api.payload
-        name = data.get('Name')  #
-        schema = data.get('Schema')  #
-        table = data.get('Table')  #
-        result = self.process_rpc_client_service.call_check_database_connection(connection_name=name, schema=schema,
-                                                                                table=table)
-
-        return CommonModels.get_response(result=result)
+        command = CheckDatabaseConnectionCommand(ConnectionName=ConnectionName)
+        self.dispatcher.dispatch(command)
+        return "Connected Successfully"

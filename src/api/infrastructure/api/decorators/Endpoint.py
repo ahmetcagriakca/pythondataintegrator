@@ -74,7 +74,7 @@ class _Endpoint:
             if self.function.__name__ == 'get':
                 expect_model = self.endpoint_wrapper.request_parser(input_type)
             else:
-                expect_model = self.endpoint_wrapper.api_model(input_type)
+                expect_model = self.endpoint_wrapper.request_model(input_type)
         else:
 
             expect_model = self.endpoint_wrapper.create_parser(input_name, input_type)
@@ -85,7 +85,7 @@ class _Endpoint:
         if self.return_type() is None:
             fields = self.endpoint_wrapper.BaseModel
         else:
-            fields = self.endpoint_wrapper.api_model(self.return_type())
+            fields = self.endpoint_wrapper.response_model(self.return_type())
         return fields
 
 

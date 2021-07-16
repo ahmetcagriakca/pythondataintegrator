@@ -5,10 +5,11 @@ from domain.connection.GetConnectionList.GetConnectionListResponse import GetCon
 from domain.connection.GetConnectionList.GetConnectionListSpecifications import GetConnectionListSpecifications
 from infrastructure.cqrs.IQueryHandler import IQueryHandler
 from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.connection import Connection
 
 
-class GetConnectionListQueryHandler(IQueryHandler[GetConnectionListQuery]):
+class GetConnectionListQueryHandler(IQueryHandler[GetConnectionListQuery],IScoped):
     @inject
     def __init__(self,
                  repository_provider: RepositoryProvider,
