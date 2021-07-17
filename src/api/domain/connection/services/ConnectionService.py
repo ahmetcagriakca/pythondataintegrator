@@ -16,7 +16,6 @@ from infrastructure.exceptions.OperationalException import OperationalException
 from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.connection.Connection import Connection
 from models.enums.ConnectionTypes import ConnectionTypes
-from models.viewmodels.connection.CreateConnectionQueueModel import CreateConnectionQueueModel
 
 
 class ConnectionService(IScoped):
@@ -73,12 +72,18 @@ class ConnectionService(IScoped):
             self.connection_secret_service.create(connection=connection, user=request.User,
                                                   password=request.Password)
             self.connection_server_service.create(connection=connection, host=request.Host, port=request.Port)
-            self.connection_database_service.create(connection, request)
+            self.connection_database_service.create(connection=connection,
+                                                    connector_type_name=request.ConnectorTypeName, sid=request.Sid,
+                                                    service_name=request.ServiceName,
+                                                    database_name=request.DatabaseName)
         else:
             self.connection_secret_service.update(connection=connection, user=request.User,
                                                   password=request.Password)
             self.connection_server_service.update(connection=connection, host=request.Host, port=request.Port)
-            self.connection_database_service.update(connection, request)
+            self.connection_database_service.update(connection=connection,
+                                                    connector_type_name=request.ConnectorTypeName, sid=request.Sid,
+                                                    service_name=request.ServiceName,
+                                                    database_name=request.DatabaseName)
         self.connection_repository.insert(connection)
         self.repository_provider.commit()
         connection = self.connection_repository.first(Id=connection.Id)

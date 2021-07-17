@@ -6,7 +6,6 @@ from infrastructure.dependency.scopes import IScoped
 from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectionFile import ConnectionFile
-from models.viewmodels.connection.CreateConnectionFileModel import CreateConnectionFileModel
 
 
 class ConnectionFileService(IScoped):

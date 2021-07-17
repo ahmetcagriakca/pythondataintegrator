@@ -6,7 +6,6 @@ from infrastructure.dependency.scopes import IScoped
 from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.connection import ConnectionQueue
 from models.dao.connection.Connection import Connection
-from models.viewmodels.connection.CreateConnectionQueueModel import CreateConnectionQueueModel
 
 
 class ConnectionQueueService(IScoped):
