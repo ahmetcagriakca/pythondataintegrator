@@ -125,4 +125,4 @@ generate_command = GenerateCommand(application_config=application_config, module
 # IocManager.initialize()
 # IocManager.injector.get(GenerateCommand).generate('connection', 'CreateConnectionFile')
 
-generate_command.generate('connection', 'CreateConnectionQueue', has_request=True)
+generate_command.generate('operation', 'DeleteDataOperation', has_request=False)
