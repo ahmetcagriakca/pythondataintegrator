@@ -27,34 +27,34 @@ class ConnectionFileService(IScoped):
         entities = self.connection_file_repository.filter_by(IsDeleted=0).all()
         return entities
 
-    def create(self, connection: Connection, model: CreateConnectionFileModel) -> ConnectionFile:
+    def create(self, connection: Connection, connector_type_name: str) -> ConnectionFile:
         """
         Create File connection
         """
 
-        connector_type = self.connector_type_service.get_by_name(name=model.ConnectorTypeName)
+        connector_type = self.connector_type_service.get_by_name(name=connector_type_name)
 
         if connector_type is None:
-            raise OperationalException(f"{model.ConnectorTypeName} not found")
+            raise OperationalException(f"{connector_type_name} not found")
         if connector_type.ConnectionTypeId != connection.ConnectionTypeId:
-            raise OperationalException(f"{model.ConnectorTypeName} incompatible with {connection.ConnectionType.Name}")
+            raise OperationalException(f"{connector_type_name} incompatible with {connection.ConnectionType.Name}")
         connection_file = ConnectionFile(Connection=connection,
                                          ConnectorType=connector_type)
 
         self.connection_file_repository.insert(connection_file)
         return ConnectionFile
 
-    def update(self, connection: Connection, model: CreateConnectionFileModel) -> ConnectionFile:
+    def update(self, connection: Connection, connector_type_name: str) -> ConnectionFile:
         """
         Update File connection
         """
 
         connection_file = self.connection_file_repository.first(ConnectionId=connection.Id)
-        connector_type = self.connector_type_service.get_by_name(name=model.ConnectorTypeName)
+        connector_type = self.connector_type_service.get_by_name(name=connector_type_name)
         if connector_type is None:
-            raise OperationalException(f"{model.ConnectorTypeName} not found")
+            raise OperationalException(f"{connector_type_name} not found")
         if connector_type.ConnectionTypeId != connection.ConnectionTypeId:
-            raise OperationalException(f"{model.ConnectorTypeName} incompatible with {connection.ConnectionType.Name}")
+            raise OperationalException(f"{connector_type_name} incompatible with {connection.ConnectionType.Name}")
         connection_file.ConnectorType = connector_type
 
         return connection_file

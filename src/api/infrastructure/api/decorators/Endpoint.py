@@ -13,7 +13,7 @@ class _Endpoint:
         self.endpoint_wrapper = EndpointWrapper()
 
     def __call__(self, *args, **kwargs):
-        input_type,input_name = self.find_input_type()
+        input_type, input_name = self.find_input_type()
 
         if TypeChecker().is_class(input_type):
             if self.function.__name__ == 'get':
@@ -26,17 +26,13 @@ class _Endpoint:
 
         res = self.function(args[0], req, **kwargs)
 
-        if TypeChecker().is_class(input_type):
+        if self.return_type() is not None:
             result = json.loads(json.dumps(res.to_dict(), default=self.endpoint_wrapper.date_converter))
             return self.endpoint_wrapper.get_response(result=result)
         else:
 
             return self.endpoint_wrapper.get_response(message=res)
 
-
-    # @wraps(fun)
-    # @self.namespace.expect(expect_inputs(), validate=True)
-    # @namespace.marshal_with(marshal_with_fields())
     def input_type_names(self):
         self.function.__annotations__.keys()
         return self.function.__annotations__.keys().remove("return")

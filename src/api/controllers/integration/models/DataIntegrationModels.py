@@ -4,7 +4,6 @@ from typing import List
 from flask_restx import fields
 
 from controllers.common.models.CommonModels import EntityModel, CommonModels
-from controllers.connection.models.ConnectionModels import ConnectionModels
 from IocManager import IocManager
 from models.dao.integration.DataIntegration import DataIntegration
 
@@ -206,7 +205,6 @@ class DataIntegrationModels:
                 )
                 source_queue = json.loads(json.dumps(entity_source_queue.__dict__, default=CommonModels.date_converter))
                 source['Queue'] = source_queue
-            source['Connection'] = ConnectionModels.get_connection_result_model(source_connection.Connection)
 
         target_connection = [x for x in data_integration.Connections if x.SourceOrTarget == 1][0]
         entity_target = DataIntegrationConnectionModel(
@@ -250,7 +248,6 @@ class DataIntegrationModels:
             )
             target_queue = json.loads(json.dumps(entity_source_queue.__dict__, default=CommonModels.date_converter))
             target['Queue'] = target_queue
-        target['Connection'] = ConnectionModels.get_connection_result_model(target_connection.Connection)
         columns = []
         for col in data_integration.Columns:
             entity_column = DataIntegrationColumnModel(

@@ -1,30 +1,24 @@
-import json
-
 from injector import inject
-from controllers.common.models.CommonModels import CommonModels
-from controllers.connection.models.ConnectionModels import ConnectionModels
-from domain.connection.services.ConnectionService import ConnectionService
-from IocManager import IocManager
+from domain.connection.CreateConnectionQueue.CreateConnectionQueueCommand import CreateConnectionQueueCommand
+from domain.connection.CreateConnectionQueue.CreateConnectionQueueRequest import CreateConnectionQueueRequest
 from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.json.JsonConvert import JsonConvert
-from models.viewmodels.connection.CreateConnectionQueueModel import CreateConnectionQueueModel
+from infrastructure.api.decorators.Controller import controller
+from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@ConnectionModels.ns.route("/ConnectionQueue")
+@controller()
 class ConnectionQueueResource(ResourceBase):
     @inject
-    def __init__(self, connection_service: ConnectionService,
+    def __init__(self,
+                 dispatcher: Dispatcher,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.connection_service = connection_service
+        self.dispatcher = dispatcher
 
-    @ConnectionModels.ns.expect(ConnectionModels.create_connection_queue_model, validate=True)
-    @ConnectionModels.ns.marshal_with(CommonModels.SuccessModel)
-    def post(self):
+    def post(self, req: CreateConnectionQueueRequest):
         """
         Create New Queue Connection
         """
-        data: CreateConnectionQueueModel = JsonConvert.FromJSON(json.dumps(IocManager.api.payload))
-        creation_result = self.connection_service.create_connection_queue(data)
-        result = ConnectionModels.get_connection_result_model(creation_result)
-        return CommonModels.get_response(result=result)
+        command = CreateConnectionQueueCommand(request=req)
+        self.dispatcher.dispatch(command)
+        return "Connected created"
