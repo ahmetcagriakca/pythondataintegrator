@@ -7,12 +7,12 @@ from domain.integration.services.DataIntegrationConnectionDatabaseService import
     DataIntegrationConnectionDatabaseService
 from domain.integration.services.DataIntegrationConnectionFileService import DataIntegrationConnectionFileService
 from domain.integration.services.DataIntegrationConnectionQueueService import DataIntegrationConnectionQueueService
+from domain.operation.CreateDataOperation.CreateDataIntegrationRequest import CreateDataIntegrationRequest
 from infrastructure.data.RepositoryProvider import RepositoryProvider
 from infrastructure.dependency.scopes import IScoped
 from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.enums import ConnectionTypes
-from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
 
 
@@ -58,7 +58,7 @@ class DataIntegrationConnectionService(IScoped):
 
     def insert(self,
                data_integration: DataIntegration,
-               data: CreateDataIntegrationModel):
+               data: CreateDataIntegrationRequest):
 
         source_connection = None
         if data.SourceConnections is not None and data.SourceConnections.ConnectionName is not None and data.SourceConnections.ConnectionName != '':
@@ -116,7 +116,7 @@ class DataIntegrationConnectionService(IScoped):
 
     def update(self,
                data_integration: DataIntegration,
-               data: CreateDataIntegrationModel):
+               data: CreateDataIntegrationRequest):
 
         source_connection = None
         if data.SourceConnections is not None and data.SourceConnections.ConnectionName is not None and data.SourceConnections.ConnectionName != '':

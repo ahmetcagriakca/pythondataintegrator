@@ -1,6 +1,7 @@
 from typing import List
 from injector import inject
 
+from domain.operation.CreateDataOperation.CreateDataOperationRequest import CreateDataOperationRequest
 from domain.operation.services.DataOperationContactService import DataOperationContactService
 from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
 from domain.operation.services.DefinitionService import DefinitionService
@@ -9,7 +10,6 @@ from infrastructure.dependency.scopes import IScoped
 from infrastructure.exceptions.OperationalException import OperationalException
 from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.operation import DataOperation, Definition
-from models.viewmodels.operation import CreateDataOperationModel
 
 
 class DataOperationService(IScoped):
@@ -53,7 +53,7 @@ class DataOperationService(IScoped):
         data_operation = self.get_by_name(name=name)
         return data_operation is not None
 
-    def post_data_operation(self, data_operation_model: CreateDataOperationModel,
+    def post_data_operation(self, data_operation_model: CreateDataOperationRequest,
                             definition_json: str) -> DataOperation:
         """
         Create Data Operation
@@ -69,7 +69,7 @@ class DataOperationService(IScoped):
         data_operation = self.get_by_name(name=data_operation_model.Name)
         return data_operation
 
-    def insert_data_operation(self, data_operation_model: CreateDataOperationModel,
+    def insert_data_operation(self, data_operation_model: CreateDataOperationRequest,
                               definition: Definition) -> DataOperation:
         """
         Create Data Operation
@@ -89,7 +89,7 @@ class DataOperationService(IScoped):
         return data_operation
 
     def update_data_operation(self,
-                              data_operation_model: CreateDataOperationModel,
+                              data_operation_model: CreateDataOperationRequest,
                               definition: Definition) -> DataOperation:
         """
         Update Data Operation

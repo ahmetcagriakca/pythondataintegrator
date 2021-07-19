@@ -63,18 +63,22 @@ class EndpointWrapper:
             else:
 
                 if generic_type_checker.is_generic(value):
-                    nested_annotations = value.__args__[0]().__annotations__
-                    nested_model_definition = EndpointWrapper.annotation_resolver(nested_annotations)
-                    nested_model = IocManager.api.model(value.__args__[0].__name__, nested_model_definition)
-                    specified_value = fields.List(fields.Nested(nested_model), description=f'')
+                    instance = value.__args__[0]()
+                    nested_annotations = EndpointWrapper.get_annotations(instance)
+                    if nested_annotations is not None:
+                        nested_model_definition = EndpointWrapper.annotation_resolver(nested_annotations)
+                        nested_model = IocManager.api.model(value.__args__[0].__name__, nested_model_definition)
+                        specified_value = fields.List(fields.Nested(nested_model), description=f'')
                 elif generic_type_checker.is_base_generic(value):
-                    #TODO:Base generic class
+                    # TODO:Base generic class
                     print('value type should be a structure of', value.__args__[0])
                 elif inspect.isclass(value):
-                    nested_annotations = value().__annotations__
-                    nested_model_definition = EndpointWrapper.annotation_resolver(nested_annotations)
-                    nested_model = IocManager.api.model(value.__name__, nested_model_definition)
-                    specified_value = fields.Nested(nested_model, description=f'')
+                    instance = value()
+                    nested_annotations = EndpointWrapper.get_annotations(instance)
+                    if nested_annotations is not None:
+                        nested_model_definition = EndpointWrapper.annotation_resolver(nested_annotations)
+                        nested_model = IocManager.api.model(value.__name__, nested_model_definition)
+                        specified_value = fields.Nested(nested_model, description=f'')
                 else:
                     print('Type not know', value)
             if specified_value is not None:
@@ -84,25 +88,25 @@ class EndpointWrapper:
     @staticmethod
     def request_model(model_type: typing.Type[T]) -> RequestParser:
         instance = model_type()
-        annotations = instance.__annotations__
-
-        model_definition = EndpointWrapper.annotation_resolver(annotations)
-        model = IocManager.api.model(model_type.__name__, model_definition)
-        return model
+        annotations = EndpointWrapper.get_annotations(instance)
+        if annotations is not None:
+            model_definition = EndpointWrapper.annotation_resolver(annotations)
+            model = IocManager.api.model(model_type.__name__, model_definition)
+            return model
 
     @staticmethod
     def response_model(model_type: typing.Type[T]) -> RequestParser:
         instance = model_type()
-        annotations = instance.__annotations__
-
-        model_definition = EndpointWrapper.annotation_resolver(annotations)
-        model = IocManager.api.model(model_type.__name__, model_definition)
-        success_model = IocManager.api.model(model_type.__name__ + 'Base', {
-            'IsSuccess': fields.Boolean(description='Is Success', default=True),
-            'Message': fields.String(description='Message', default="Operation Completed"),
-            'Result': fields.Nested(model, description='Result'),
-        })
-        return success_model
+        annotations = EndpointWrapper.get_annotations(instance)
+        if annotations is not None:
+            model_definition = EndpointWrapper.annotation_resolver(annotations)
+            model = IocManager.api.model(model_type.__name__, model_definition)
+            success_model = IocManager.api.model(model_type.__name__ + 'Base', {
+                'IsSuccess': fields.Boolean(description='Is Success', default=True),
+                'Message': fields.String(description='Message', default="Operation Completed"),
+                'Result': fields.Nested(model, description='Result'),
+            })
+            return success_model
 
     @staticmethod
     def create_parser(name, input_type: typing.Type[T]) -> RequestParser:
@@ -111,8 +115,8 @@ class EndpointWrapper:
         return parser
 
     @staticmethod
-    def get_request_from_parser_for_primitive(name,input_type: typing.Type[T]) -> T:
-        parser = EndpointWrapper.create_parser(name=name,input_type=input_type)
+    def get_request_from_parser_for_primitive(name, input_type: typing.Type[T]) -> T:
+        parser = EndpointWrapper.create_parser(name=name, input_type=input_type)
         data = parser.parse_args(request)
         # req: T = JsonConvert.FromJSON(json.dumps(data))
         return data[name]
@@ -126,6 +130,14 @@ class EndpointWrapper:
         return argument
 
     @staticmethod
+    def get_annotations(obj):
+        if hasattr(obj, '__annotations__'):
+            annotations = obj.__annotations__
+            return annotations
+        else:
+            return None
+
+    @staticmethod
     def request_parser(parser_type: typing.Type[T]) -> RequestParser:
         parser: RequestParser = IocManager.api.parser()
         instance = parser_type()
@@ -135,13 +147,12 @@ class EndpointWrapper:
         if isinstance(instance, OrderByParameter):
             parser.add_argument('OrderBy', type=str, location='args', help='Order By')
             parser.add_argument('Order', type=str, location='args', help='Order')
-        annotations = instance.__annotations__
-
-        for name in annotations:
-            value = annotations[name]
-            parser.add_argument(EndpointWrapper.create_argument(name=name, type=value, location='args', help=name))
+        annotations = EndpointWrapper.get_annotations(instance)
+        if annotations is not None:
+            for name in annotations:
+                value = annotations[name]
+                parser.add_argument(EndpointWrapper.create_argument(name=name, type=value, location='args', help=name))
         return parser
-
 
     @staticmethod
     def get_request_from_parser(parser_type: typing.Type[T]) -> T:

@@ -1,7 +1,5 @@
 from injector import inject
 import os
-
-from IocManager import IocManager
 from infrastructure.dependency.scopes import IScoped
 from infrastructure.utils.ModuleFinder import ModuleFinder
 from models.configs.ApplicationConfig import ApplicationConfig
@@ -16,7 +14,7 @@ class GenerateCommand(IScoped):
         self.module_finder = module_finder
 
     def check_path_exist(self, folder, file):
-        path= os.path.join(self.application_config.root_directory, folder, file)
+        path = os.path.join(self.application_config.root_directory, folder, file)
         return os.path.exists(path)
 
     def create_folder_if_not_exist(self, folder):
@@ -39,7 +37,7 @@ class GenerateCommand(IScoped):
             self.create_old_file(file_path=file_path, old_file_path=old_file_path)
 
         with open(file_path, "w") as outfile:
-            outfile.write(content.strip()+'\n')
+            outfile.write(content.strip() + '\n')
 
     def create_command_file(self, command_name: str, command_folder_path: str, has_request):
         command_file_name = f"{command_name}Command"
@@ -51,7 +49,7 @@ class GenerateCommand(IScoped):
             request_namespace = f'from {command_namespace}.{command_name}Request import {command_name}Request'
             request_attr = f'request: {command_name}Request = None'
         command_content = \
-f'''
+            f'''
 from dataclasses import dataclass
 from infrastructure.cqrs.ICommand import ICommand
 {request_namespace}
@@ -69,7 +67,7 @@ class {command_name}Command(ICommand):
         command_handler_file_name = f"{command_name}CommandHandler"
         command_namespace = command_folder_path.replace('/', '.')
         command_handler_content = \
-f'''
+            f'''
 from injector import inject
 from {command_namespace}.{command_name}Command import {command_name}Command
 from infrastructure.cqrs.ICommandHandler import ICommandHandler
@@ -125,4 +123,4 @@ generate_command = GenerateCommand(application_config=application_config, module
 # IocManager.initialize()
 # IocManager.injector.get(GenerateCommand).generate('connection', 'CreateConnectionFile')
 
-generate_command.generate('operation', 'DeleteDataOperation', has_request=False)
+generate_command.generate('schedule', 'DeleteCronJob', has_request=True)

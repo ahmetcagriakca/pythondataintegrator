@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from injector import inject
 
 from domain.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService

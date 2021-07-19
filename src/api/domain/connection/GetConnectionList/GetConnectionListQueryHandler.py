@@ -13,8 +13,8 @@ class GetConnectionListQueryHandler(IQueryHandler[GetConnectionListQuery],IScope
     @inject
     def __init__(self,
                  repository_provider: RepositoryProvider,
-                 get_connection_list_specifications: GetConnectionListSpecifications):
-        self.get_connection_list_specifications = get_connection_list_specifications
+                 specifications: GetConnectionListSpecifications):
+        self.specifications = specifications
         self.repository_provider = repository_provider
 
     def handle(self, query: GetConnectionListQuery) -> GetConnectionListResponse:
@@ -23,12 +23,12 @@ class GetConnectionListQueryHandler(IQueryHandler[GetConnectionListQuery],IScope
         data_query = connection_repository.table \
             .filter(Connection.IsDeleted == 0)
 
-        result.Count = self.get_connection_list_specifications.count(query=query, data_query=data_query)
-
-        data_query = self.get_connection_list_specifications.specify(query=query, data_query=data_query)
+        result.Count = self.specifications.count(query=query, data_query=data_query)
 
         result.PageNumber = query.request.PageNumber
         result.PageSize = query.request.PageSize
 
-        result.PageData = GetConnectionListMapping.to_dtos(data_query)
+        data_query = self.specifications.specify(query=query, data_query=data_query)
+
+        result.Data = GetConnectionListMapping.to_dtos(data_query)
         return result

@@ -4,11 +4,11 @@ from injector import inject
 
 from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
 from domain.integration.services.DataIntegrationConnectionService import DataIntegrationConnectionService
+from domain.operation.CreateDataOperation.CreateDataIntegrationRequest import CreateDataIntegrationRequest
 from infrastructure.data.RepositoryProvider import RepositoryProvider
 from infrastructure.dependency.scopes import IScoped
 from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.operation import Definition
-from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
 
 
@@ -45,7 +45,7 @@ class DataIntegrationService(IScoped):
         return entity.IsTargetTruncate
 
     def check_and_update_data_integration(self,
-                                          data: CreateDataIntegrationModel,
+                                          data: CreateDataIntegrationRequest,
                                           definition: Definition,
                                           old_definition: Definition
                                           ) -> DataIntegration:
@@ -71,7 +71,7 @@ class DataIntegrationService(IScoped):
         return data_integration
 
     def create_data_integration(self,
-                                data: CreateDataIntegrationModel,
+                                data: CreateDataIntegrationRequest,
                                 definition: Definition):
         """
 
@@ -99,7 +99,7 @@ class DataIntegrationService(IScoped):
         return data_integration_result
 
     def insert_data_integration(self,
-                                data: CreateDataIntegrationModel,
+                                data: CreateDataIntegrationRequest,
                                 definition: Definition) -> DataIntegration:
 
         data_integration = DataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
@@ -117,7 +117,7 @@ class DataIntegrationService(IScoped):
 
     def update_data_integration(self,
                                 data_integration: DataIntegration,
-                                data: CreateDataIntegrationModel,
+                                data: CreateDataIntegrationRequest,
                                 definition: Definition) -> DataIntegration:
         data_integration.IsTargetTruncate = data.IsTargetTruncate
         data_integration.IsDelta = data.IsDelta

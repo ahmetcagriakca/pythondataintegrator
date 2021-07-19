@@ -4,8 +4,6 @@ from domain.common.lookup.LookupDto import LookupDto
 from domain.common.lookup.LookupResponse import LookupResponse
 from infrastructure.data.RepositoryProvider import RepositoryProvider
 from infrastructure.dependency.scopes import IScoped
-from models.dao.connection import ConnectionType, ConnectorType
-from models.dao.connection.Connection import Connection
 from models.dao.operation import DataOperation
 
 

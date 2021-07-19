@@ -1,10 +1,11 @@
 from injector import inject
+
+from domain.operation.CreateDataOperation.CreateDataIntegrationConnectionQueueRequest import \
+    CreateDataIntegrationConnectionQueueRequest
 from infrastructure.data.RepositoryProvider import RepositoryProvider
 from infrastructure.dependency.scopes import IScoped
 from models.dao.integration import DataIntegrationConnectionQueue
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.viewmodels.integration.CreateDataIntegrationConnectionQueueModel import \
-    CreateDataIntegrationConnectionQueueModel
 
 
 class DataIntegrationConnectionQueueService(IScoped):
@@ -31,7 +32,7 @@ class DataIntegrationConnectionQueueService(IScoped):
 
     def insert(self,
                data_integration_connection: DataIntegrationConnection,
-               data: CreateDataIntegrationConnectionQueueModel) -> DataIntegrationConnectionQueue:
+               data: CreateDataIntegrationConnectionQueueRequest) -> DataIntegrationConnectionQueue:
         data_integration_connection_queue = DataIntegrationConnectionQueue(TopicName=data.TopicName,
                                                                               DataIntegrationConnection=data_integration_connection)
         self.data_integration_connection_queue_repository.insert(data_integration_connection_queue)
@@ -39,7 +40,7 @@ class DataIntegrationConnectionQueueService(IScoped):
 
     def update(self,
                data_integration_connection: DataIntegrationConnection,
-               data: CreateDataIntegrationConnectionQueueModel) -> DataIntegrationConnectionQueue:
+               data: CreateDataIntegrationConnectionQueueRequest) -> DataIntegrationConnectionQueue:
         data_integration_connection_queue = self.get_by_data_integration_connection_id(
             data_integration_connection_id=data_integration_connection.Id,
         )
