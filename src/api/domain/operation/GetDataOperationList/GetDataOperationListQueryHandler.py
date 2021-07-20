@@ -3,11 +3,13 @@ from domain.operation.GetDataOperationList.GetDataOperationListMapping import Ge
 from domain.operation.GetDataOperationList.GetDataOperationListQuery import GetDataOperationListQuery
 from domain.operation.GetDataOperationList.GetDataOperationListResponse import GetDataOperationListResponse
 from domain.operation.GetDataOperationList.GetDataOperationListSpecifications import GetDataOperationListSpecifications
+from infrastructure.cqrs.IQueryHandler import IQueryHandler
 from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.operation import DataOperation
 
 
-class GetDataOperationListQueryHandler:
+class GetDataOperationListQueryHandler(IQueryHandler[GetDataOperationListQuery], IScoped):
     @inject
     def __init__(self,
                  repository_provider: RepositoryProvider,

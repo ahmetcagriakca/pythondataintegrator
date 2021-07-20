@@ -1,5 +1,5 @@
 from injector import inject
-from sqlalchemy import desc
+from sqlalchemy import desc, text
 from domain.common.request_parameter.OrderByParameter import OrderByParameter
 from infrastructure.dependency.scopes import IScoped
 from infrastructure.utils.ModuleFinder import ModuleFinder
@@ -21,6 +21,8 @@ class OrderBySpecification(IScoped):
             else:
                 order = order_by_parameter.Order
             split = order_by_parameter.OrderBy.split(".")
+            if len(split) == 1:
+                return text(f'"{order_by_parameter.OrderBy}" {order_by_parameter.Order}')
             if len(split) == 2:
                 class_name, attr_name = split
                 module = self.module_finder.get_module(class_name)

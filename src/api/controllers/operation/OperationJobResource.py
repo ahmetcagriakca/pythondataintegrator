@@ -1,3 +1,4 @@
+from domain.operation.GetDataOperationJobList.GetDataOperationJobListQuery import GetDataOperationJobListQuery
 from domain.operation.GetDataOperationJobList.GetDataOperationJobListRequest import GetDataOperationJobListRequest
 from domain.operation.GetDataOperationJobList.GetDataOperationJobListResponse import GetDataOperationJobListResponse
 from infrastructure.api.decorators.Controller import controller
@@ -20,7 +21,7 @@ class OperationJobResource(ResourceBase):
         """
         Get All Data Operation Jobs
         """
-        query = GetDataOperationJobListRequest(request=req)
+        query = GetDataOperationJobListQuery(request=req)
         result = self.dispatcher.dispatch(query)
         return result
 

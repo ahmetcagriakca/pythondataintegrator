@@ -3,13 +3,13 @@ import axios from './axios';
 
 export const getDataOperations = createAsyncThunk('dataOperationsApp/dataOperations/getDataOperations', async params => {
 	// GetDataOperation
-	const response = await axios.get('/api/DataOperation', {
+	const response = await axios.get('/api/Operation', {
 		params: {
 			PageNumber: params.PageNumber,
 			PageSize: params.PageSize,
 			OrderBy: params.OrderBy,
 			Order: params.Order,
-			Name: params.DataOperationName,
+			DataOperationName: params.DataOperationName,
 			OnlyUndeleted: params.OnlyUndeleted,
 		}
 	});
@@ -35,7 +35,7 @@ const dataOperationSlice = createSlice({
 	reducers: {},
 	extraReducers: {
 		[getDataOperations.fulfilled]: (state, action) => {
-			dataOperationsAdapter.setAll(state, action.payload.result.pageData);
+			dataOperationsAdapter.setAll(state, action.payload.result.data);
 			state.pageNumber = action.payload.result.pageNumber;
 			state.pageSize = action.payload.result.pageSize;
 			state.count = action.payload.result.count;

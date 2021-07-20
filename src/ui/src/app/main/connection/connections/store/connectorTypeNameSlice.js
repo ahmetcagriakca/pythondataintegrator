@@ -3,10 +3,10 @@ import axios from './axios';
 
 export const getConnectorTypeName = createAsyncThunk('connectionsApp/connectorTypeName/getConnectorTypeName', async params => {
 	// GetConnection
-	const response = await axios.get('/api/Lookup/ConnectorTypeName', {
+	const response = await axios.get('/api/Lookup/ConnectorType', {
 	});
 	const data = await response.data;
-	return data.result;
+	return data.result.data;
 });
 
 export const connectorTypeNameAdapter = createEntityAdapter({});

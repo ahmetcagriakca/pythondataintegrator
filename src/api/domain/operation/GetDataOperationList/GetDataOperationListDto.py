@@ -13,7 +13,7 @@ class DataOperationContactDto:
 @dtoclass
 class GetDataOperationListDto:
     Id: int = None
-    Name: int = None
+    Name: str = None
     Contacts: List[DataOperationContactDto] = None
     DefinitionId: int = None
     CreationDate: datetime.datetime = None

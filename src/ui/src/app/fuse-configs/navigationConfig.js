@@ -65,6 +65,24 @@ const navigationConfig = [
 				url: '/jobs'
 			}
 		]
+	},
+	
+	{
+		id: 'dataoperationjobexecutions',
+		title: 'DataOperationJobExecutions',
+		type: 'group',
+		icon: 'dataoperationjobexecutions',
+		translate: 'DATAOPERATIONJOBEXECUTIONS',
+		children: [
+			{
+				id: 'data-operation--job-execution-list',
+				title: 'Data Operation Job Execution List',
+				type: 'item',
+				icon: 'format_list_bulleted',
+				translate: 'DATAOPERATION_JOB_EXECUTION_LIST',
+				url: '/job/executions'
+			}
+		]
 	}
 ];
 

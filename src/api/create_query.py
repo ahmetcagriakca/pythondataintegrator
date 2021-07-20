@@ -260,7 +260,7 @@ class {query_name}QueryHandler(IQueryHandler[{query_name}Query], IScoped):
         result.Count = self.specifications.count(query=query, data_query=data_query)
 
         result.PageNumber = query.request.PageNumber
-        result.PageSize = query.request.PageSize'''
+        result.PageSize = query.request.PageSize\n'''
 
         content += \
             f'''        data_query = self.specifications.specify(query=query, data_query=data_query)\n'''
@@ -308,5 +308,5 @@ generate_query = GenerateQuery(application_config=application_config, module_fin
 # IocManager.initialize()
 # IocManager.injector.get(GenerateQuery).generate('connection', 'CreateConnectionFile')
 
-generate_query.generate('operation', 'LookupDataOperation', is_list=True, has_paging=False, dao={'Name': 'DataOperation',
-                                                                                               'Namespace': 'from models.dao.connection.DataOperation import DataOperation'})
+generate_query.generate('common', 'LookupStatus', is_list=True, has_paging=False, dao={'Name': 'Status',
+                                                                                               'Namespace': 'from models.dao.common.Status import Status'})

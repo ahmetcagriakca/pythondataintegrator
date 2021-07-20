@@ -3,7 +3,7 @@ import axios from './axios';
 
 export const getDataOperationJobs = createAsyncThunk('dataOperationJobsApp/dataOperationJobs/getDataOperationJobs', async params => {
 	// GetDataOperationJob
-	const response = await axios.get('/api/DataOperation/Job', {
+	const response = await axios.get('/api/Operation/Job', {
 		params: {
 			PageNumber: params.PageNumber,
 			PageSize: params.PageSize,
@@ -36,7 +36,7 @@ const dataOperationJobSlice = createSlice({
 	reducers: {},
 	extraReducers: {
 		[getDataOperationJobs.fulfilled]: (state, action) => {
-			dataOperationJobsAdapter.setAll(state, action.payload.result.pageData);
+			dataOperationJobsAdapter.setAll(state, action.payload.result.data);
 			state.pageNumber = action.payload.result.pageNumber;
 			state.pageSize = action.payload.result.pageSize;
 			state.count = action.payload.result.count;

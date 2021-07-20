@@ -5,7 +5,6 @@ from unittest import TestCase
 from IocManager import IocManager
 from infrastructure.cryptography.CryptoService import CryptoService
 from infrastructure.utils.Utils import Utils
-from models.dto.PagingModifier import PagingModifier
 
 
 class TestDataOperation(TestCase):
@@ -38,25 +37,6 @@ class TestDataOperation(TestCase):
         module_list, module_attr_list = Utils.get_modules(folders)
         for module in module_list:
             print(module)
-
-    def test_limit_data(self):
-        import socket
-        print(socket.gethostname())
-        socket.get
-        data_count = 700000
-        limit = 10000
-        end = limit
-        start = 0
-        paging_modifiers = []
-        while True:
-            if end != limit and end - data_count > limit:
-                break
-            paging_modifier = PagingModifier(End=end, Start=start)
-            paging_modifiers.append(paging_modifier)
-            end += limit
-            start += limit
-        for li in paging_modifiers:
-            print(f"{li.End} - {li.End}")
 
     def test_parallel_data_operation(self):
         start = time()

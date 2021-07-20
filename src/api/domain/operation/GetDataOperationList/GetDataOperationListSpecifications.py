@@ -32,7 +32,7 @@ class GetDataOperationListSpecifications:
 
     def __specified_query(self, query: GetDataOperationListQuery, data_query: Query) -> Query:
         specified_query = data_query \
-            .join(Definition)
+            .join(Definition, isouter=True)
 
         if query.request.DataOperationName is not None and query.request.DataOperationName != '':
             specified_query = specified_query.filter(DataOperation.Name == query.request.DataOperationName)

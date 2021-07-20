@@ -32,7 +32,6 @@ class JobOperationService(IScoped):
         self.application_config = application_config
         self.data_operation_job_service = data_operation_job_service
         self.data_operation_service = data_operation_service
-
         self.sql_logger = sql_logger
 
     def get_ap_scheduler_with_retry(self, job_id, retry: int = 0) -> ApSchedulerJob:

@@ -6,7 +6,6 @@ from IocManager import IocManager
 from infrastructure.data.RepositoryProvider import RepositoryProvider
 from infrastructure.utils.Utils import Utils
 from models.dao.operation import DataOperation
-from models.dto.PagingModifier import PagingModifier
 
 
 class TestHtmlTemplate(TestCase):

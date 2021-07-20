@@ -124,7 +124,10 @@ class EndpointWrapper:
     @staticmethod
     def create_argument(name, type, location, help) -> Argument:
         specified_type = type
-        if type == bool:
+        if(TypeChecker().is_generic(type) == True):
+            specified_type =type.__args__[0]
+
+        if specified_type == bool:
             specified_type = inputs.boolean
         argument = Argument(name, type=specified_type, location=location, help=help)
         return argument

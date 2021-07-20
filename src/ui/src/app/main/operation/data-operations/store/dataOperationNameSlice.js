@@ -3,10 +3,10 @@ import axios from './axios';
 
 export const getDataOperationName = createAsyncThunk('dataOperationsApp/dataOperationName/getDataOperationName', async params => {
 	// GetDataOperation
-	const response = await axios.get('/api/Lookup/DataOperationName', {
+	const response = await axios.get('/api/Lookup/DataOperation', {
 	});
 	const data = await response.data;
-	return data.result;
+	return data.result.data;
 });
 
 export const dataOperationNameAdapter = createEntityAdapter({});

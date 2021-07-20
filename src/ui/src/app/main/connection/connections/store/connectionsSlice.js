@@ -36,7 +36,7 @@ const connectionSlice = createSlice({
 	reducers: {},
 	extraReducers: {
 		[getConnections.fulfilled]: (state, action) => {
-			connectionsAdapter.setAll(state, action.payload.result.pageData);
+			connectionsAdapter.setAll(state, action.payload.result.data);
 			state.pageNumber = action.payload.result.pageNumber;
 			state.pageSize = action.payload.result.pageSize;
 			state.count = action.payload.result.count;

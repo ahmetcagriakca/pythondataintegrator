@@ -30,6 +30,8 @@ class Dispatcher(IScoped):
             handler_type = IQueryHandler
         elif isinstance(cq, ICommand):
             handler_type = ICommandHandler
+        else:
+            raise Exception("Command or query not found")
         handler = self.find_handler(cq.__class__, handler_type)
         if handler is None:
             raise Exception("Handler not founded")
