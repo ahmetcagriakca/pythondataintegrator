@@ -72,8 +72,6 @@ function DataOperationJobsData() {
 	};
 
 	const handleClick = (event, row) => {
-		const message = row.id + ' isimli dataOperationJob git';
-		alert(message);
 	};
 
 	const handleChangePage = (event, newPage) => {

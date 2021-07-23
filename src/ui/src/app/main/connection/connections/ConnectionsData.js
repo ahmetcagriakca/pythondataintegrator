@@ -13,11 +13,13 @@ import EnhancedTableHead from '../../common/components/EnhancedTableHead';
 import StyledTableRow from '../../common/components/StyledTableRow';
 import { stableSort, getComparator } from '../../common/utils/TableUtils';
 import { tableStyles } from '../../common/styles/TableStyles';
+import { useHistory } from 'react-router-dom';
 
 
 function ConnectionsData() {
 	const dispatch = useDispatch();
 	const classes = tableStyles();
+	const history = useHistory();
 	const headCells = [
 		{ id: 'connectionId', orderBy: 'Connection.Id', connectionId: 'connectionId', numeric: true, disablePadding: true, label: 'Id' },
 		{ id: 'connectionName', orderBy: 'Connection.Name', name: 'connectionName', numeric: false, disablePadding: true, label: 'Name' },
@@ -70,9 +72,11 @@ function ConnectionsData() {
 		dispatch(getConnections(routeParams));
 	};
 
-	const handleClick = (event, connectionName) => {
-		const message = connectionName.concat(' isimli connection git');
-		alert(message);
+	function GotoComponent(path) {
+		history.push('/'.concat(path));
+	}
+	const handleClick = (event, connection) => {
+		GotoComponent('connection/'+connection.id)
 	};
 
 	const handleChangePage = (event, newPage) => {
@@ -110,7 +114,7 @@ function ConnectionsData() {
 										tabIndex={-1}
 										key={connection.id}
 										selected={isItemSelected}
-										onDoubleClick={event => handleClick(event, connection.name)}
+										onDoubleClick={event => handleClick(event, connection)}
 									>
 										<TableCell align="left">{connection.id}</TableCell>
 										<TableCell align="left">{connection.name}</TableCell>

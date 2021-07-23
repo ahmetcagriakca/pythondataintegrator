@@ -10,6 +10,10 @@ const ConnectionConfig = {
 		{
 			path: '/connections',
 			component: React.lazy(() => import('./connections/Connections'))
+		},
+		{
+			path: '/connection/:id',
+			component: React.lazy(() => import('./connection/Connection'))
 		}
 	]
 };

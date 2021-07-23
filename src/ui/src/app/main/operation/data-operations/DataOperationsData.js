@@ -68,8 +68,6 @@ function DataOperationsData() {
 	};
 
 	const handleClick = (event, dataOperationName) => {
-		const message = dataOperationName.concat(' isimli dataOperation git');
-		alert(message);
 	};
 
 	const handleChangePage = (event, newPage) => {

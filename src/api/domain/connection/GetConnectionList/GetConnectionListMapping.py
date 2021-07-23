@@ -1,6 +1,7 @@
 from typing import List
 
-from domain.connection.GetConnectionList.GetConnectionListDto import GetConnectionListDto
+from domain.connection.GetConnectionList.GetConnectionListDto import GetConnectionListDto, GetConnectorTypeDto, \
+    GetConnectionTypeDto
 from models.dao.connection import Connection
 
 
@@ -10,10 +11,9 @@ class GetConnectionListMapping:
         dto = GetConnectionListDto()
         dto.Id = entity.Id
         dto.Name = entity.Name
-        dto.ConnectorTypeId = entity.Database.ConnectorType.Id
-        dto.ConnectorTypeName = entity.Database.ConnectorType.Name
-        dto.ConnectionTypeId = entity.ConnectionType.Id
-        dto.ConnectionTypeName = entity.ConnectionType.Name
+        dto.ConnectionType = GetConnectionTypeDto(Id=entity.ConnectionType.Id, Name=entity.ConnectionType.Name)
+        dto.ConnectorType = GetConnectorTypeDto(Id=entity.Database.ConnectorType.Id,
+                                                Name=entity.Database.ConnectorType.Name)
         dto.Host = entity.ConnectionServers[0].Host
         dto.Port = entity.ConnectionServers[0].Port
         dto.Sid = entity.Database.Sid
@@ -24,7 +24,7 @@ class GetConnectionListMapping:
 
     @staticmethod
     def to_dtos(entities: List[Connection]) -> List[GetConnectionListDto]:
-        result: List[GetConnectionListDto]=[]
+        result: List[GetConnectionListDto] = []
         for entity in entities:
             dto = GetConnectionListMapping.to_dto(entity=entity)
             result.append(dto)
