@@ -16,6 +16,8 @@ import AppContext from './AppContext';
 import { Auth } from './auth';
 import routes from './fuse-configs/routesConfig';
 import store from './store';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const jss = create({
 	...jssPreset(),
@@ -24,7 +26,7 @@ const jss = create({
 });
 
 const generateClassName = createGenerateClassName();
-
+toast.configure()
 const App = () => {
 	return (
 		<AppContext.Provider

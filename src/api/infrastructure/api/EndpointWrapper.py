@@ -103,7 +103,7 @@ class EndpointWrapper:
             model = IocManager.api.model(model_type.__name__, model_definition)
             success_model = IocManager.api.model(model_type.__name__ + 'Base', {
                 'IsSuccess': fields.Boolean(description='Is Success', default=True),
-                'Message': fields.String(description='Message', default="Operation Completed"),
+                'Message': fields.String(description='Message', default=None),
                 'Result': fields.Nested(model, description='Result'),
             })
             return success_model
