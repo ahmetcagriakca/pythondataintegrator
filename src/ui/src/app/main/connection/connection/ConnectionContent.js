@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getConnection,  updateConnection,checkConnection } from './store/connectionSlice';
+import { getConnection, updateConnection, checkConnection } from './store/connectionSlice';
 import { getConnectionTypeName, selectConnectionTypeName } from './store/connectionTypeNameSlice';
 import { getConnectorTypeName, selectConnectorTypeName } from './store/connectorTypeNameSlice';
 import Button from '@material-ui/core/Button';
@@ -63,12 +63,12 @@ function ConnectionContent() {
 	const save = event => {
 		dispatch(updateConnection(values));
 	};
-	
+
 	const check = event => {
 		routeParams.name = values.name
 		dispatch(checkConnection(routeParams));
 	};
-	
+
 	return (
 
 		<div className={classes.root}
@@ -171,7 +171,8 @@ function ConnectionContent() {
 						<TextField id="standard-name" label="User" value={values.user} onChange={handleChange('user')} />
 					</Grid>
 					<Grid item xs>
-						<TextField id="standard-name" label="Password" value={values.password} onChange={handleChange('password')} />
+						<TextField id="standard-name" label="Password" value={values.password}
+							type="password" onChange={handleChange('password')} />
 					</Grid>
 					<Grid item xs>
 					</Grid>

@@ -8,8 +8,9 @@ class JsonConvert(object):
      
     @classmethod
     def class_mapper(clsself, d):
+        dataFrozenset=frozenset(tuple([attr for attr, val in d.items()]))
         for keys, cls in clsself.mappings.items():
-            if keys.issuperset(d.keys()):   # are all required arguments present?
+            if keys.issuperset(d.keys()) and dataFrozenset.issuperset(keys):   # are all required arguments present?
                 return cls(**d)
         else:
             # Raise exception instead of silently returning None

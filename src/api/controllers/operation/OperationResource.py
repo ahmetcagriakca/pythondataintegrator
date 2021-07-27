@@ -1,4 +1,8 @@
 from injector import inject
+
+from domain.operation.GetDataOperation.GetDataOperationQuery import GetDataOperationQuery
+from domain.operation.GetDataOperation.GetDataOperationRequest import GetDataOperationRequest
+from domain.operation.GetDataOperation.GetDataOperationResponse import GetDataOperationResponse
 from infrastructure.api.ResourceBase import ResourceBase
 from domain.operation.CreateDataOperation.CreateDataOperationCommand import CreateDataOperationCommand
 from domain.operation.CreateDataOperation.CreateDataOperationRequest import CreateDataOperationRequest
@@ -8,6 +12,24 @@ from domain.operation.GetDataOperationList.GetDataOperationListRequest import Ge
 from domain.operation.GetDataOperationList.GetDataOperationListResponse import GetDataOperationListResponse
 from infrastructure.api.decorators.Controller import controller
 from infrastructure.cqrs.Dispatcher import Dispatcher
+
+
+@controller()
+class OperationByIdResource(ResourceBase):
+    @inject
+    def __init__(self,
+                 dispatcher: Dispatcher,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dispatcher = dispatcher
+
+    def get(self, req: GetDataOperationRequest) -> GetDataOperationResponse:
+        """
+        Get All Data Operations
+        """
+        query = GetDataOperationQuery(request=req)
+        result = self.dispatcher.dispatch(query)
+        return result
 
 
 @controller()

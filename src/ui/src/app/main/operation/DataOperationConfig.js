@@ -8,8 +8,12 @@ const DataOperationConfig = {
 	},
 	routes: [
 		{
-			path: '/dataoperations',
-			component: React.lazy(() => import('./data-operations/DataOperations'))
+			path: '/operations',
+			component: React.lazy(() => import('./operations/DataOperations'))
+		},
+		{
+			path: '/operation/:id',
+			component: React.lazy(() => import('./operation/DataOperation'))
 		},
 		{
 			path: '/jobs',

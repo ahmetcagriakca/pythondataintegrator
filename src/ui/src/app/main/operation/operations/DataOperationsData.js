@@ -14,11 +14,13 @@ import EnhancedTableHead from '../../common/components/EnhancedTableHead';
 import StyledTableRow from '../../common/components/StyledTableRow';
 import { stableSort, getComparator } from '../../common/utils/TableUtils';
 import { tableStyles } from '../../common/styles/TableStyles';
+import { useHistory } from 'react-router-dom';
 
 
 function DataOperationsData() {
 	const dispatch = useDispatch();
 	const classes = tableStyles();
+	const history = useHistory();
 	const headCells = [
 		{ id: 'id', orderBy: 'DataOperation.Id', numeric: true, disablePadding: true, label: 'Id' },
 		{ id: 'name', orderBy: 'DataOperation.Name', numeric: false, disablePadding: true, label: 'Name' },
@@ -67,7 +69,11 @@ function DataOperationsData() {
 		dispatch(getDataOperations(routeParams));
 	};
 
-	const handleClick = (event, dataOperationName) => {
+	function GotoComponent(path) {
+		history.push('/'.concat(path));
+	}
+	const handleClick = (event, row) => {
+		GotoComponent('operation/'+row.id)
 	};
 
 	const handleChangePage = (event, newPage) => {
@@ -105,7 +111,7 @@ function DataOperationsData() {
 										tabIndex={-1}
 										key={dataOperation.id}
 										selected={isItemSelected}
-										onDoubleClick={event => handleClick(event, dataOperation.name)}
+										onDoubleClick={event => handleClick(event, dataOperation)}
 									>
 
 										<TableCell align="left">{dataOperation.id}</TableCell>

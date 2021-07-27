@@ -44,7 +44,7 @@ const navigationConfig = [
 				type: 'item',
 				icon: 'format_list_bulleted',
 				translate: 'DATAOPERATION_LIST',
-				url: '/dataoperations'
+				url: '/operations'
 			}
 		]
 	},

@@ -308,5 +308,5 @@ generate_query = GenerateQuery(application_config=application_config, module_fin
 # IocManager.initialize()
 # IocManager.injector.get(GenerateQuery).generate('connection', 'CreateConnectionFile')
 
-generate_query.generate('connection', 'GetConnection', is_list=False, has_paging=False, dao={'Name': 'Connection',
-                                                                                               'Namespace': 'from models.dao.connection.Connection import Connection'})
+generate_query.generate('operation', 'GetDataOperation', is_list=False, has_paging=False, dao={'Name': 'DataOperation',
+                                                                                               'Namespace': 'from models.dao.operation.DataOperation import DataOperation'})

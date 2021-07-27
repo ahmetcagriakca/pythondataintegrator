@@ -38,7 +38,7 @@ export const addAuthInterceptors = async (axios) => {
     },
     (error) => {
       if (error.response) {
-        if (error.response && error.response.status === 401) {
+        if (error.response.status === 401) {
           history.push({
             pathname: window.location.href
           });
@@ -46,6 +46,13 @@ export const addAuthInterceptors = async (axios) => {
         }
         else {
           toast.error(error.response.data.message, { position: toast.POSITION.BOTTOM_RIGHT })
+          if (error.response.data.errors) {
+            let keys = Object.keys(error.response.data.errors)
+
+            for (var i = 0; i < keys.length; i++) {
+              toast.error(keys[i] + '-' + error.response.data.errors[keys[i]], { position: toast.POSITION.BOTTOM_RIGHT })
+            }
+          }
           return Promise.reject(error);
         }
       } else {

@@ -1,6 +1,4 @@
 import json
-import traceback
-from abc import ABC
 from datetime import datetime
 import inspect
 import typing
@@ -11,11 +9,9 @@ from flask_restx.reqparse import RequestParser, Argument
 from IocManager import IocManager
 from domain.common.request_parameter.OrderByParameter import OrderByParameter
 from domain.common.request_parameter.PagingParameter import PagingParameter
+from infrastructure.api.RequestConverter import RequestConverter
 from infrastructure.api.utils.TypeChecker import TypeChecker
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.exceptions.OperationalException import OperationalException
 from infrastructure.json.JsonConvert import JsonConvert
-from infrastructure.logging.SqlLogger import SqlLogger
 
 T = typing.TypeVar('T')
 
@@ -48,17 +44,17 @@ class EndpointWrapper:
             value = annotations[key]
             specified_value = None
             if value == int:
-                specified_value = fields.Integer(description=f'{key}', default=None)
+                specified_value = fields.Integer(description=f'{key}')
             elif value == str:
-                specified_value = fields.String(description=f'{key}', default=None)
+                specified_value = fields.String(description=f'{key}')
             elif value == bool:
-                specified_value = fields.Boolean(description=f'{key}', default=None)
+                specified_value = fields.Boolean(description=f'{key}')
             elif value == datetime:
-                specified_value = fields.DateTime(description=f'{key}', default=None,
+                specified_value = fields.DateTime(description=f'{key}',
                                                   example=(datetime.now().isoformat()))
                 pass
             elif value == float:
-                specified_value = fields.Float(description=f'{key}', default=None)
+                specified_value = fields.Float(description=f'{key}')
                 pass
             else:
 
@@ -163,8 +159,13 @@ class EndpointWrapper:
         req: T = JsonConvert.FromJSON(json.dumps(data))
         return req
 
+
     @staticmethod
     def get_request_from_body(parser_type: typing.Type[T]) -> T:
+
+        request_converter =RequestConverter()
+        request_converter.register(parser_type)
         data = IocManager.api.payload
-        req: T = JsonConvert.FromJSON(json.dumps(data))
+        req: T = request_converter.FromJSON(json.dumps(data))
         return req
+

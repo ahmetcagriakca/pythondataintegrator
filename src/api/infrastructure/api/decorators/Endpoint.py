@@ -28,10 +28,10 @@ class _Endpoint:
 
         if self.return_type() is not None:
             result = json.loads(json.dumps(res.to_dict(), default=self.endpoint_wrapper.date_converter))
-            endpoint_response=self.endpoint_wrapper.get_response(result=result)
+            endpoint_response = self.endpoint_wrapper.get_response(result=result)
             return endpoint_response
         else:
-            endpoint_response=self.endpoint_wrapper.get_response(message=res)
+            endpoint_response = self.endpoint_wrapper.get_response(message=res)
             return endpoint_response
 
     def input_type_names(self):

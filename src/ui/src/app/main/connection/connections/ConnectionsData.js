@@ -75,8 +75,8 @@ function ConnectionsData() {
 	function GotoComponent(path) {
 		history.push('/'.concat(path));
 	}
-	const handleClick = (event, connection) => {
-		GotoComponent('connection/'+connection.id)
+	const handleClick = (event, row) => {
+		GotoComponent('connection/'+row.id)
 	};
 
 	const handleChangePage = (event, newPage) => {
