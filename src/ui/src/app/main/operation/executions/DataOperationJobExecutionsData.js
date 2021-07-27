@@ -13,10 +13,13 @@ import EnhancedTableHead from '../../common/components/EnhancedTableHead';
 import StyledTableRow from '../../common/components/StyledTableRow';
 import { stableSort, getComparator } from '../../common/utils/TableUtils';
 import { tableStyles } from '../../common/styles/TableStyles';
+import { useHistory } from 'react-router-dom';
 
-function DataOperationJobExecutionsData() {
+
+function DataOperationJobExecutionsData(props) {
 	const dispatch = useDispatch();
 	const classes = tableStyles();
+	const history = useHistory();
 	const headCells = [
 		{ id: 'id', orderBy: 'DataOperationJobExecution.Id', numeric: true, disablePadding: true, label: 'Id' },
 		{ id: 'jobId', orderBy: 'DataOperationJob.Id', numeric: true, disablePadding: true, label: 'Job Id' },
@@ -45,16 +48,18 @@ function DataOperationJobExecutionsData() {
 	});
 	const PageSize = useSelector(({ dataOperationJobExecutionsApp }) => dataOperationJobExecutionsApp.dataOperationJobExecutions.pageSize);
 
+	const isDataOperation = () => (props.DataOperationId && props.DataOperationId !== null && props.DataOperationId !== 0)
 	const routeParams = useParams();
 	routeParams.PageNumber = PageNumber;
 	routeParams.PageSize = PageSize === 0 ? 10 : PageSize;
 	routeParams.OrderBy = orderBy;
 	routeParams.Order = order;
+	routeParams.DataOperationId = isDataOperation() ? props.DataOperationId : null;
 
 
 	useEffect(() => {
 		dispatch(getDataOperationJobExecutions(routeParams));
-	}, [dispatch, routeParams]);
+	}, [dispatch, routeParams, props]);
 
 	const handleRequestSort = (event, orderByValue) => {
 		const isAsc = orderBy === orderByValue && order === 'asc';
@@ -66,11 +71,16 @@ function DataOperationJobExecutionsData() {
 		routeParams.PageNumber = page;
 		routeParams.OrderBy = orderByValue;
 		routeParams.Order = orderValue;
-		
+
 		dispatch(getDataOperationJobExecutions(routeParams));
 	};
 
+	function GotoComponent(path) {
+		history.push('/'.concat(path));
+	}
+
 	const handleClick = (event, row) => {
+		GotoComponent('operationjobexecution/' + row.id)
 	};
 
 	const handleChangePage = (event, newPage) => {

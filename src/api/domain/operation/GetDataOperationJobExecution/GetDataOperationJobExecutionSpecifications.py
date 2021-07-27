@@ -4,16 +4,16 @@ from sqlalchemy.orm import Query
 
 from infrastructure.data.RepositoryProvider import RepositoryProvider
 from infrastructure.dependency.scopes import IScoped
-from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListQuery import \
-    GetDataOperationJobExecutionListQuery
 from domain.common.specifications.OrderBySpecification import OrderBySpecification
 from domain.common.specifications.PagingSpecification import PagingSpecification
 from models.dao.common import Status
 from models.dao.operation import DataOperationJob, DataOperation, DataOperationJobExecutionIntegration, \
     DataOperationJobExecution, DataOperationJobExecutionIntegrationEvent
+from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionQuery import \
+    GetDataOperationJobExecutionQuery
 
 
-class GetDataOperationJobExecutionListSpecifications(IScoped):
+class GetDataOperationJobExecutionSpecifications(IScoped):
     @inject
     def __init__(self,
                  repository_provider: RepositoryProvider,
@@ -24,8 +24,7 @@ class GetDataOperationJobExecutionListSpecifications(IScoped):
         self.paging_specification = paging_specification
         self.order_by_specification = order_by_specification
 
-    def __specified_query(self, query: GetDataOperationJobExecutionListQuery, data_query: Query) -> Query:
-
+    def __specified_query(self, query: GetDataOperationJobExecutionQuery, data_query: Query) -> Query:
         max_integration_query = self.repository_provider.query(
             DataOperationJobExecutionIntegration.DataOperationJobExecutionId,
             func.max(DataOperationJobExecutionIntegration.Id).label('DataOperationJobExecutionIntegrationId')).group_by(
@@ -68,33 +67,13 @@ class GetDataOperationJobExecutionListSpecifications(IScoped):
             .join(total_affected_row_subquery,
                   total_affected_row_subquery.c.DataOperationJobExecutionId == DataOperationJobExecution.Id)
 
-        if query.request.DataOperationId is not None and query.request.DataOperationId != '':
-            specified_query = specified_query.filter(DataOperation.Id == query.request.DataOperationId)
-
-        if query.request.DataOperationName is not None and query.request.DataOperationName != '':
-            specified_query = specified_query.filter(DataOperation.Name == query.request.DataOperationName)
-
-        if query.request.OnlyCron is not None and query.request.OnlyCron:
-            specified_query = specified_query.filter(DataOperationJob.Cron != None)
-
-        if query.request.StatusId is not None:
-            specified_query = specified_query.filter(DataOperationJobExecution.StatusId == query.request.StatusId)
+        specified_query = specified_query.filter(DataOperationJobExecution.Id == query.request.Id)
 
         return specified_query
 
-    def specify(self, data_query: Query, query: GetDataOperationJobExecutionListQuery) -> Query:
+    def specify(self, data_query: Query, query: GetDataOperationJobExecutionQuery) -> Query:
         data_query = self.__specified_query(query=query, data_query=data_query)
-
-        order_by = self.order_by_specification.specify(order_by_parameter=query.request)
-        if order_by is not None:
-            data_query = data_query.order_by(order_by)
-
-        page_size, offset = self.paging_specification.specify(paging_parameter=query.request)
-        if page_size is not None:
-            data_query = data_query.limit(page_size)
-        if offset is not None:
-            data_query = data_query.offset(offset)
         return data_query
 
-    def count(self, query: GetDataOperationJobExecutionListQuery, data_query: Query) -> Query:
+    def count(self, query: GetDataOperationJobExecutionQuery, data_query: Query) -> Query:
         return self.__specified_query(query=query, data_query=data_query).count()

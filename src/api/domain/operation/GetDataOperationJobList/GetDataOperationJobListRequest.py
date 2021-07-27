@@ -7,6 +7,7 @@ from domain.common.request_parameter.PagingParameter import PagingParameter
 
 @requestclass
 class GetDataOperationJobListRequest(PagingParameter, OrderByParameter):
+    DataOperationId: Optional[int] = None
     DataOperationName: Optional[str] = None
     OnlyCron: Optional[bool] = None
     OnlyUndeleted: Optional[bool] = None

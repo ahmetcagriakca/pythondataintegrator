@@ -29,18 +29,12 @@ export const { selectAll: selectDataOperations, selectById: selectDataOperationB
 const dataOperationSlice = createSlice({
 	name: 'dataOperationApp/dataOperation',
 	initialState: dataOperationAdapter.getInitialState({
-		count: 0,
 		dataOperation: {},
-		pageNumber: 1,
-		pageSize: 0
 	}),
 	reducers: {},
 	extraReducers: {
 		[getDataOperation.fulfilled]: (state, action) => {
 			dataOperationAdapter.setAll(state, [action.payload.result.data]);
-			state.pageNumber = action.payload.result.pageNumber;
-			state.pageSize = action.payload.result.pageSize;
-			state.count = action.payload.result.count;
 		}
 	}
 });

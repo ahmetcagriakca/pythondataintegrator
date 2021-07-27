@@ -6,16 +6,23 @@ import DataOperationJobsFilterForm from './DataOperationJobsFilterForm';
 import CommonHeader from '../../common/CommonHeader';
 import reducer from './store';
 
-function DataOperationJobs() {
+function DataOperationJobs(props) {
 	const icon = 'microwave';
 	const title = 'DataOperationJobs';
+
+
+	const hasHeader = () => (props.HasHeader === undefined || props.HasHeader === null || props.HasHeader === true)
+
 	return (
 		<div style={{ position: 'relative' }}>
-			<CommonHeader icon={icon} title={title} />
+			{
+				hasHeader() ? (
+					<CommonHeader icon={icon} title={title} />
+				) : ("")
+			}
 
-			<DataOperationJobsFilterForm />
-
-			<DataOperationJobsData />
+			<DataOperationJobsFilterForm DataOperationId={props.DataOperationId} />
+			<DataOperationJobsData DataOperationId={props.DataOperationId} />
 		</div>
 	);
 }

@@ -1,0 +1,7 @@
+from domain.common.decorators.responseclass import responseclass
+from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionDto import GetDataOperationJobExecutionDto
+
+
+@responseclass
+class GetDataOperationJobExecutionResponse:
+	Data: GetDataOperationJobExecutionDto = None

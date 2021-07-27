@@ -1,9 +1,10 @@
 from datetime import datetime
+
 from domain.common.decorators.dtoclass import dtoclass
 
 
 @dtoclass
-class GetDataOperationJobListDto:
+class GetDataOperationJobDto:
     Id: int = None
     JobId: int = None
     DataOperationId: str = None

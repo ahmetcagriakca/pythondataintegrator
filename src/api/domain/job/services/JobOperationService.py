@@ -163,10 +163,7 @@ class JobOperationService(IScoped):
         data_operation = self.data_operation_service.get_by_name(name=operation_name)
         if data_operation is None:
             raise OperationalException("Data operation not found")
-        if run_date is not None and run_date != '':
-            start_date = datetime.strptime(run_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
-        else:
-            start_date = datetime.now().astimezone()
+        start_date = datetime.now().astimezone()
         ap_scheduler_job = self.add_job_with_date(
             run_date=start_date, args=(None, data_operation.Id,))
 

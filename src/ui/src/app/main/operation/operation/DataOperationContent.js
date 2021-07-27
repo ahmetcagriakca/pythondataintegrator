@@ -26,6 +26,10 @@ import Tab from '@material-ui/core/Tab';
 import TabContext from '@material-ui/lab/TabContext';
 import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
+
+import DataOperationJobExecutions from '../executions/DataOperationJobExecutions';
+import DataOperationJobs from '../jobs/DataOperationJobs';
+
 const useRowStyles = makeStyles({
 	root: {
 		'& > *': {
@@ -128,7 +132,7 @@ function DataOperationContent() {
 	const [values, setValues] = React.useState({
 		name: '',
 		definitionId: 0,
-		creationDate: '',
+		creationDate: new Date(),
 		isDeleted: 0,
 		contacts: [],
 		integrations: [],
@@ -172,7 +176,7 @@ function DataOperationContent() {
 			return v.toString(16);
 		});
 	}
-	const valueChecker = value => value ? value : ''
+	const checkValue = value => value ? value : ''
 
 	const handleContactChange = (event, contact, index, prop) => {
 		let newSetData = [...values.contacts];
@@ -451,8 +455,6 @@ function DataOperationContent() {
 							variant="contained"
 							color="secondary"
 							size="large"
-							className={classes.button}
-							// startIcon={<SearchIcon />}
 							onClick={clear}
 						>
 							Clear
@@ -463,8 +465,6 @@ function DataOperationContent() {
 							variant="contained"
 							color="secondary"
 							size="large"
-							className={classes.button}
-							// startIcon={<SearchIcon />}
 							onClick={save}
 						>
 							Save
@@ -477,9 +477,9 @@ function DataOperationContent() {
 				<AppBar position="static">
 					<TabList onChange={handleTabChange} aria-label="simple tabs example" >
 						<Tab label="Definition" value="1" />
-						{/* <Tab label="Definitions" value="2" />
+						{/* <Tab label="Definitions" value="2" />*/}
 						<Tab label="Jobs" value="3" />
-						<Tab label="Executions" value="4" /> */}
+						<Tab label="Executions" value="4" />
 					</TabList>
 				</AppBar>
 				<TabPanel value="1">
@@ -569,8 +569,8 @@ function DataOperationContent() {
 													<StyledTableCell key={'bodyCellIntegrationCode' + integrationRow.id} component="th" scope="row">{integrationRow.integration.code}</StyledTableCell>
 													<StyledTableCell key={'bodyCellIntegrationLimit' + integrationRow.id} align="left">{integrationRow.limit}</StyledTableCell>
 													<StyledTableCell key={'bodyCellIntegrationProcessCount' + integrationRow.id} align="left">{integrationRow.processCount}</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationSourceConnectionName' + integrationRow.id} align="left">{valueChecker(integrationRow.integration.sourceConnection.connection.name) + '-' + valueChecker(integrationRow.integration.sourceConnection.connection.database.connectorType.name)}</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationTargetConnectionName' + integrationRow.id} align="left">{valueChecker(integrationRow.integration.targetConnection.connection.name) + '-' + valueChecker(integrationRow.integration.targetConnection.connection.database.connectorType.name)}</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationSourceConnectionName' + integrationRow.id} align="left">{checkValue(integrationRow.integration.sourceConnection.connection.name) + '-' + checkValue(integrationRow.integration.sourceConnection.connection.database.connectorType.name)}</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationTargetConnectionName' + integrationRow.id} align="left">{checkValue(integrationRow.integration.targetConnection.connection.name) + '-' + checkValue(integrationRow.integration.targetConnection.connection.database.connectorType.name)}</StyledTableCell>
 													<StyledTableCell key={'bodyCellIntegrationIsTargetTruncate' + integrationRow.id} align="left">{integrationRow.integration.isTargetTruncate ? 'true' : 'false'}</StyledTableCell>
 													<StyledTableCell key={'bodyCellIntegrationComments' + integrationRow.id} align="left">{integrationRow.integration.comments}</StyledTableCell>
 
@@ -591,11 +591,11 @@ function DataOperationContent() {
 																</Typography>
 																<Grid container spacing={3}>
 																	<Grid item xs>
-																		<TextField id="standard-name" label="Limit" value={valueChecker(integrationRow.limit)}
+																		<TextField id="standard-name" label="Limit" value={checkValue(integrationRow.limit)}
 																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'limit')} />
 																	</Grid>
 																	<Grid item xs>
-																		<TextField id="standard-name" label="Process Count" value={valueChecker(integrationRow.processCount)}
+																		<TextField id="standard-name" label="Process Count" value={checkValue(integrationRow.processCount)}
 																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'processCount')} />
 																	</Grid>
 																	<Grid item xs>
@@ -605,15 +605,15 @@ function DataOperationContent() {
 																</Grid>
 																<Grid container spacing={3}>
 																	<Grid item xs>
-																		<TextField id="standard-name" label="Code" value={valueChecker(integrationRow.integration.code)}
+																		<TextField id="standard-name" label="Code" value={checkValue(integrationRow.integration.code)}
 																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.code')} />
 																	</Grid>
 																	<Grid item xs>
-																		<TextField id="standard-name" label="Is Target Truncate" value={valueChecker(integrationRow.integration.isTargetTruncate)}
+																		<TextField id="standard-name" label="Is Target Truncate" value={checkValue(integrationRow.integration.isTargetTruncate)}
 																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.isTargetTruncate')} />
 																	</Grid>
 																	<Grid item xs>
-																		<TextField id="standard-name" label="Comments" value={valueChecker(integrationRow.integration.comments)}
+																		<TextField id="standard-name" label="Comments" value={checkValue(integrationRow.integration.comments)}
 																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.comments')} />
 																	</Grid>
 																	<Grid item xs>
@@ -630,19 +630,19 @@ function DataOperationContent() {
 
 																			<Grid container spacing={1}>
 																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="ConnectionName" value={valueChecker(integrationRow.integration.sourceConnection.connection.name)}
+																					<TextField id="standard-name" label="ConnectionName" value={checkValue(integrationRow.integration.sourceConnection.connection.name)}
 																						fullWidth={true}
 																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.connection.name')} />
 																				</Grid>
 																				<Grid item xs={6}>
 																				</Grid>
 																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="Schema" value={valueChecker(integrationRow.integration.sourceConnection.database.schema)}
+																					<TextField id="standard-name" label="Schema" value={checkValue(integrationRow.integration.sourceConnection.database.schema)}
 																						fullWidth={true}
 																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.schema')} />
 																				</Grid>
 																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="Table" value={valueChecker(integrationRow.integration.sourceConnection.database.tableName)}
+																					<TextField id="standard-name" label="Table" value={checkValue(integrationRow.integration.sourceConnection.database.tableName)}
 																						fullWidth={true}
 																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.tableName')} />
 																				</Grid>
@@ -650,7 +650,7 @@ function DataOperationContent() {
 
 																					<TextField
 																						id="outlined-textarea"
-																						label="Query" value={valueChecker(integrationRow.integration.sourceConnection.database.query)}
+																						label="Query" value={checkValue(integrationRow.integration.sourceConnection.database.query)}
 																						placeholder="Source Connection Query"
 																						multiline
 																						minrows={4}
@@ -672,19 +672,19 @@ function DataOperationContent() {
 																			<Grid container spacing={1}>
 
 																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="ConnectionName" value={valueChecker(integrationRow.integration.targetConnection.connection.name)}
+																					<TextField id="standard-name" label="ConnectionName" value={checkValue(integrationRow.integration.targetConnection.connection.name)}
 																						fullWidth={true}
 																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.connection.name')} />
 																				</Grid>
 																				<Grid item xs={6}>
 																				</Grid>
 																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="Schema" value={valueChecker(integrationRow.integration.targetConnection.database.schema)}
+																					<TextField id="standard-name" label="Schema" value={checkValue(integrationRow.integration.targetConnection.database.schema)}
 																						fullWidth={true}
 																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.schema')} />
 																				</Grid>
 																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="Table" value={valueChecker(integrationRow.integration.targetConnection.database.tableName)}
+																					<TextField id="standard-name" label="Table" value={checkValue(integrationRow.integration.targetConnection.database.tableName)}
 																						fullWidth={true}
 																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.tableName')} />
 																				</Grid>
@@ -692,7 +692,7 @@ function DataOperationContent() {
 
 																					<TextField
 																						id="outlined-textarea"
-																						label="Query" value={valueChecker(integrationRow.integration.targetConnection.database.query)}
+																						label="Query" value={checkValue(integrationRow.integration.targetConnection.database.query)}
 																						placeholder="Target Connection Query"
 																						multiline
 																						minrows={4}
@@ -819,6 +819,22 @@ function DataOperationContent() {
 						}
 					</Box>
 
+				</TabPanel>
+				<TabPanel value="3">
+					{
+						values.id && values.id !== null && values.id !== 0 ? (
+							<DataOperationJobs HasHeader={false} DataOperationId={values.id} />
+						) :
+							("")
+					}
+				</TabPanel>
+				<TabPanel value="4">
+					{
+						values.id && values.id !== null && values.id !== 0 ? (
+							<DataOperationJobExecutions HasHeader={false} DataOperationId={values.id} />
+						) :
+							("")
+					}
 				</TabPanel>
 			</TabContext>
 		</div>

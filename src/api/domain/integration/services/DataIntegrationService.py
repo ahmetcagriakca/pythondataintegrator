@@ -103,7 +103,7 @@ class DataIntegrationService(IScoped):
                                 definition: Definition) -> DataIntegration:
 
         data_integration = DataIntegration(Code=data.Code, IsTargetTruncate=data.IsTargetTruncate,
-                                           IsDelta=data.IsDelta, Definition=definition)
+                                           IsDelta=data.IsDelta, Definition=definition, Comments=data.Comments)
         self.data_integration_repository.insert(data_integration)
         if data.SourceConnections is not None and data.SourceConnections.Columns is not None and data.SourceConnections != '':
             self.data_integration_column_service.insert(
@@ -122,6 +122,7 @@ class DataIntegrationService(IScoped):
         data_integration.IsTargetTruncate = data.IsTargetTruncate
         data_integration.IsDelta = data.IsDelta
         data_integration.Definition = definition
+        data_integration.Comments = data.Comments
 
         if data.SourceConnections is not None and data.SourceConnections.Columns is not None and data.SourceConnections != '':
             source_columns = data.SourceConnections.Columns

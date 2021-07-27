@@ -36,11 +36,16 @@ class GetDataOperationJobListSpecifications:
         specified_query = data_query \
             .join(DataOperation) \
             .join(ApSchedulerJob)
-        if query.request.DataOperationName is not None and query.request.DataOperationName!='':
+
+        if query.request.DataOperationId is not None and query.request.DataOperationId != '':
+            specified_query = specified_query.filter(DataOperation.Id == query.request.DataOperationId)
+
+        if query.request.DataOperationName is not None and query.request.DataOperationName != '':
             specified_query = specified_query.filter(DataOperation.Name == query.request.DataOperationName)
 
         if query.request.OnlyCron is not None and query.request.OnlyCron:
             specified_query = specified_query.filter(DataOperationJob.Cron != None)
+
         if query.request.OnlyUndeleted is not None and query.request.OnlyUndeleted:
             specified_query = specified_query.filter(DataOperationJob.IsDeleted == 0)
         return specified_query

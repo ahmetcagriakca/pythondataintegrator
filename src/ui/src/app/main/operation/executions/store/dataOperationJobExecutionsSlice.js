@@ -9,6 +9,7 @@ export const getDataOperationJobExecutions = createAsyncThunk('dataOperationJobE
 			PageSize: params.PageSize,
 			OrderBy: params.OrderBy,
 			Order: params.Order,
+			DataOperationId: params.DataOperationId,
 			DataOperationName: params.DataOperationName,
 			OnlyCron: params.OnlyCron,
 			StatusId: params.StatusId,

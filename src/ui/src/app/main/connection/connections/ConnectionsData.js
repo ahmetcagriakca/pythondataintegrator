@@ -31,7 +31,6 @@ function ConnectionsData() {
 		{ id: 'serviceName', orderBy: 'ConnectionDatabase.ServiceName', serviceName: 'serviceName', numeric: false, disablePadding: true, label: 'Service Name' },
 		{ id: 'databaseName', orderBy: 'ConnectionDatabase.DatabaseName', databaseName: 'databaseName', numeric: false, disablePadding: true, label: 'DatabaseName' },
 		{ id: 'creationDate', orderBy: 'Connection.CreationDate', creationDate: 'creationDate', numeric: false, disablePadding: true, label: 'CreationDate' },
-		{ id: 'action', Action: 'Action', numeric: false }
 	];
 	const [order, setOrder] = React.useState('asc');
 	const [orderBy, setOrderBy] = React.useState('Connection.Id');

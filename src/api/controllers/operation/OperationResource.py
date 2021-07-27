@@ -25,7 +25,7 @@ class OperationByIdResource(ResourceBase):
 
     def get(self, req: GetDataOperationRequest) -> GetDataOperationResponse:
         """
-        Get All Data Operations
+        Get Data Operation By Id
         """
         query = GetDataOperationQuery(request=req)
         result = self.dispatcher.dispatch(query)

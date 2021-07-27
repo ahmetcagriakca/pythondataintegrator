@@ -13,10 +13,13 @@ import EnhancedTableHead from '../../common/components/EnhancedTableHead';
 import StyledTableRow from '../../common/components/StyledTableRow';
 import { stableSort, getComparator } from '../../common/utils/TableUtils';
 import { tableStyles } from '../../common/styles/TableStyles';
+import { useHistory } from 'react-router-dom';
 
-function DataOperationJobsData() {
+
+function DataOperationJobsData(props) {
 	const dispatch = useDispatch();
 	const classes = tableStyles();
+	const history = useHistory();
 	const headCells = [
 		{ id: 'id', orderBy: 'DataOperationJob.Id', numeric: true, disablePadding: true, label: 'Id' },
 		{ id: 'jobId', orderBy: 'ApSchedulerJob.Id', numeric: true, disablePadding: true, label: 'Job Id' },
@@ -44,18 +47,19 @@ function DataOperationJobsData() {
 	});
 	const PageSize = useSelector(({ dataOperationJobsApp }) => dataOperationJobsApp.dataOperationJobs.pageSize);
 
+	const isDataOperation = (props.DataOperationId && props.DataOperationId !== null && props.DataOperationId !== 0)
 	const routeParams = useParams();
 	routeParams.PageNumber = PageNumber;
 	routeParams.PageSize = PageSize === 0 ? 10 : PageSize;
 	routeParams.OrderBy = orderBy;
 	routeParams.Order = order;
-
+	routeParams.DataOperationId = isDataOperation ? props.DataOperationId : null;
 
 	useEffect(() => {
-		routeParams.OnlyCron = true;
-		routeParams.OnlyUndeleted = true;
+		routeParams.OnlyCron = isDataOperation ? false : true;
+		routeParams.OnlyUndeleted = isDataOperation ? false : true;
 		dispatch(getDataOperationJobs(routeParams));
-	}, [dispatch, routeParams]);
+	}, [dispatch, routeParams, isDataOperation]);
 
 	const handleRequestSort = (event, orderByValue) => {
 		const isAsc = orderBy === orderByValue && order === 'asc';
@@ -67,11 +71,15 @@ function DataOperationJobsData() {
 		routeParams.PageNumber = page;
 		routeParams.OrderBy = orderByValue;
 		routeParams.Order = orderValue;
-		
+
 		dispatch(getDataOperationJobs(routeParams));
 	};
 
+	function GotoComponent(path) {
+		history.push('/'.concat(path));
+	}
 	const handleClick = (event, row) => {
+		GotoComponent('operationjob/' + row.id)
 	};
 
 	const handleChangePage = (event, newPage) => {

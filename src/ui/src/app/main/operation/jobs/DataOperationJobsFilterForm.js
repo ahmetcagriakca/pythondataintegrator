@@ -13,7 +13,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 
 
-function DataOperationJobsFilterForm() {
+function DataOperationJobsFilterForm(props) {
 	const dispatch = useDispatch();
 	const classes = filterFormStyles();
 	const filterOptions = createFilterOptions({
@@ -23,7 +23,9 @@ function DataOperationJobsFilterForm() {
 		},
 	});
 
+	const isDataOperation = () => (props.DataOperationId && props.DataOperationId !== null && props.DataOperationId !== 0)
 	const routeParams = useParams();
+	routeParams.DataOperationId = isDataOperation() ? props.DataOperationId : null;
 	useEffect(() => {
 		dispatch(getDataOperationName(routeParams));
 	}, [dispatch, routeParams]);
@@ -32,27 +34,27 @@ function DataOperationJobsFilterForm() {
 	const [dataOperation, setDataOperation] = React.useState(null);
 	const selectDataOperationNames = useSelector(selectDataOperationName);
 
-	const [onlyCron, setOnlyCron] = React.useState(true);
+	const [onlyCron, setOnlyCron] = React.useState(isDataOperation() ? false :true);
 	const handleOnlyCronChange = (event) => {
 		setOnlyCron(event.target.checked);
-	  };
-	  
-	const [onlyUndeleted, setOnlyUndeleted] = React.useState(true);
+	};
+
+	const [onlyUndeleted, setOnlyUndeleted] = React.useState(isDataOperation() ? false :true);
 	const handleOnlyUndeletedChange = (event) => {
 		setOnlyUndeleted(event.target.checked);
-	  };
-	
+	};
+
 	const clear = event => {
 		setDataOperation(null);
-		setOnlyCron(true);
-		setOnlyUndeleted(true);
+		setOnlyCron(isDataOperation() ? false : true);
+		setOnlyUndeleted(isDataOperation() ? false : true);
 
 		routeParams.OrderBy = "DataOperationJob.Id";
 		routeParams.PageNumber = 1;
 		routeParams.Order = null;
 		routeParams.DataOperationName = null;
-		routeParams.OnlyCron = true;
-		routeParams.OnlyUndeleted = true;
+		routeParams.OnlyCron = isDataOperation() ? false : true;
+		routeParams.OnlyUndeleted = isDataOperation() ? false : true;
 		dispatch(getDataOperationJobs(routeParams));
 	};
 
@@ -62,11 +64,11 @@ function DataOperationJobsFilterForm() {
 			dataOperationName = dataOperation.name;
 		}
 		routeParams.DataOperationName = dataOperationName;
-		
+
 		routeParams.OnlyCron = onlyCron;
 		routeParams.OnlyUndeleted = onlyUndeleted;
 
-		
+
 		routeParams.PageNumber = 1;
 		dispatch(getDataOperationJobs(routeParams));
 	};
@@ -78,43 +80,48 @@ function DataOperationJobsFilterForm() {
 		>
 			<div className="flex flex-col flex-shrink-0 sm:flex-row items-center justify-between py-10"></div>
 			<Grid container spacing={3}>
+				{
+					!isDataOperation() ?
+						(
+							<Grid item xs>
+								<Autocomplete
+									id="country-select-demo"
+									style={{ width: 300 }}
+									value={dataOperation}
+									onChange={(event, newValue) => {
+										setDataOperation(newValue);
+									}}
+									options={selectDataOperationNames}
+									classes={{
+										option: classes.option,
+									}}
+									filterOptions={filterOptions}
+									getOptionLabel={(option) => option.name}
+									renderOption={(option) => (
+										<React.Fragment>
+											<span>{option.name}</span>
+										</React.Fragment>
+									)}
+									renderInput={(params) => (
+										<TextField
+											{...params}
+											label="Choose a Data Operation "
+											variant="outlined"
+											inputProps={{
+												...params.inputProps,
+												autoComplete: 'new-password', // disable autocomplete and autofill
+											}}
+										/>
+									)}
+									autoHighlight
+									clearOnEscape
+									openOnFocus
+								/>
+							</Grid>
+						) : ("")
+				}
 				<Grid item xs>
-					<Autocomplete
-						id="country-select-demo"
-						style={{ width: 300 }}
-						value={dataOperation}
-						onChange={(event, newValue) => {
-							setDataOperation(newValue);
-						}}
-						options={selectDataOperationNames}
-						classes={{
-							option: classes.option,
-						}}
-						filterOptions={filterOptions}
-						getOptionLabel={(option) => option.name}
-						renderOption={(option) => (
-							<React.Fragment>
-								<span>{option.name}</span>
-							</React.Fragment>
-						)}
-						renderInput={(params) => (
-							<TextField
-								{...params}
-								label="Choose a Data Operation "
-								variant="outlined"
-								inputProps={{
-									...params.inputProps,
-									autoComplete: 'new-password', // disable autocomplete and autofill
-								}}
-							/>
-						)}
-						autoHighlight
-						clearOnEscape
-						openOnFocus
-					/>
-				</Grid>
-				<Grid item xs>
-					
+
 					<FormGroup row>
 						<FormControlLabel
 							control={<Checkbox checked={onlyCron} onChange={handleOnlyCronChange} name="onlyCron" />}
