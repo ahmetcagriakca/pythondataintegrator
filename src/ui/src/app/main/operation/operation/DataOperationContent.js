@@ -21,6 +21,11 @@ import Typography from '@material-ui/core/Typography';
 import { DateTimePicker } from "@material-ui/pickers";
 import Button from '@material-ui/core/Button';
 
+import AppBar from '@material-ui/core/AppBar';
+import Tab from '@material-ui/core/Tab';
+import TabContext from '@material-ui/lab/TabContext';
+import TabList from '@material-ui/lab/TabList';
+import TabPanel from '@material-ui/lab/TabPanel';
 const useRowStyles = makeStyles({
 	root: {
 		'& > *': {
@@ -332,7 +337,7 @@ function DataOperationContent() {
 	}
 	const save = event => {
 		let contacts = []
-		for (var i= 0; i < values.contacts.length; i++) {
+		for (var i = 0; i < values.contacts.length; i++) {
 			contacts = contacts.concat({ Email: values.contacts[i].email })
 		}
 
@@ -351,7 +356,7 @@ function DataOperationContent() {
 					Code: values.integrations[j].integration.code,
 					IsTargetTruncate: values.integrations[j].integration.isTargetTruncate,
 					IsDelta: false,
-					Comments: (values.integrations[j].integration.comments && values.integrations[j].integration.comments!==null)?values.integrations[j].integration.comments:'',
+					Comments: (values.integrations[j].integration.comments && values.integrations[j].integration.comments !== null) ? values.integrations[j].integration.comments : '',
 					SourceConnections: {
 						ConnectionName: values.integrations[j].integration.sourceConnection.connection.name,
 						Database: {
@@ -359,7 +364,7 @@ function DataOperationContent() {
 							TableName: values.integrations[j].integration.sourceConnection.database.tableName,
 							Query: values.integrations[j].integration.sourceConnection.database.query,
 						},
-						Columns:sourceColumns.join()
+						Columns: sourceColumns.join()
 					},
 					TargetConnections: {
 						ConnectionName: values.integrations[j].integration.targetConnection.connection.name,
@@ -368,7 +373,7 @@ function DataOperationContent() {
 							TableName: values.integrations[j].integration.targetConnection.database.tableName,
 							Query: values.integrations[j].integration.targetConnection.database.query,
 						},
-						Columns:targetColumns.join()
+						Columns: targetColumns.join()
 					}
 				}
 			})
@@ -387,6 +392,11 @@ function DataOperationContent() {
 		}
 	};
 
+	const [tabValue, setTabValue] = React.useState('1');
+	const handleTabChange = (event, newValue) => {
+
+		setTabValue(newValue);
+	};
 	return (
 
 		<div className={formClasses.root}
@@ -394,7 +404,7 @@ function DataOperationContent() {
 		>
 			<div className="flex flex-col flex-shrink-0 sm:flex-row items-center justify-between py-10"></div>
 
-			<form className={classes.root} noValidate autoComplete="off">
+			<form className={classes.root} noValidate autoComplete="off" style={{ padding: ' 0 0 15px 0' }}>
 				<Grid container spacing={3}>
 					<Grid item xs>
 						<TextField id="name" label="Name" value={values.name}
@@ -462,344 +472,355 @@ function DataOperationContent() {
 					</Grid>
 				</Grid>
 			</form>
-			<Box >
-				<Typography variant="h4" gutterBottom component="div">
-					Contacts
-				</Typography>
-				{
-					values.contacts && values.contacts !== null ? (
-						<Table size="small" >
-							<caption>
 
-								<IconButton aria-label="expand row" key={'cellContactAddAction'} size="small" onClick={event => addContact(event)}>
-									<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
-										add_circle
-									</Icon>
-								</IconButton>
-							</caption>
-							<TableHead>
-								<TableRow key={'headRowContact'} className={classes.tableRowHeader}>
-									<StyledTableCell key={'headCellContactEmail'} align={'left'} padding={'normal'} className={classes.tableCell}> Email </StyledTableCell>
-									<StyledTableCell key={'headCellContactAction'} align={'left'} padding={'normal'} className={classes.tableHeadCellAction}> Action </StyledTableCell>
-								</TableRow>
-							</TableHead>
-							<TableBody>
-								{values.contacts.map((contactRow, i) => (
-									<StyledTableRow key={'bodyRowContact' + contactRow.id}>
-										<StyledTableCell key={'bodyCellContactEmail' + contactRow.id} >
+			<TabContext value={tabValue}>
+				<AppBar position="static">
+					<TabList onChange={handleTabChange} aria-label="simple tabs example" >
+						<Tab label="Definition" value="1" />
+						{/* <Tab label="Definitions" value="2" />
+						<Tab label="Jobs" value="3" />
+						<Tab label="Executions" value="4" /> */}
+					</TabList>
+				</AppBar>
+				<TabPanel value="1">
+					<Box >
+						{
+							values.contacts && values.contacts !== null ? (
+								<Table size="small" >
+									<caption>
 
-											<TextField id="name" label="" value={contactRow.email} InputLabelProps={{ shrink: false }} fullWidth={true} onChange={event =>
-												handleContactChange(event, contactRow, i, 'email')} />
-										</StyledTableCell>
-										<StyledTableCell key={'bodyCellContactDeleteAction' + contactRow.id} className={classes.tableBodyCellAction}>
-
-											<IconButton aria-label="expand row" key={'cellContactDeleteAction' + contactRow.id} size="small"
-												onClick={event => deleteContact(event, contactRow, i)}>
-												<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
-													remove_circle
-												</Icon>
-											</IconButton>
-										</StyledTableCell>
-									</StyledTableRow>
-								))}
-							</TableBody>
-						</Table>
-					) :
-						("")
-				}
-			</Box>
-
-			<Box >
-				<Typography variant="h4" gutterBottom component="div">
-					Integrations
-				</Typography>
-				{
-					values.integrations && values.integrations !== null ? (
-						<Table size="small" >
-							<caption>
-
-								<IconButton aria-label="expand row" key={'cellIntegrationAddAction'} size="small" onClick={event => addIntegration(event)}>
-									<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
-										add_circle
-									</Icon>
-								</IconButton>
-							</caption>
-							<TableHead>
-								<TableRow key={'headRowIntegration'} className={classes.tableRowHeader}>
-									<StyledTableCell key={'headRowIntegrationCollapse'} align={'left'} padding={'normal'} className={classes.tableCell}>  </StyledTableCell>
-									<StyledTableCell key={'headRowIntegrationCode'} align={'left'} padding={'normal'} className={classes.tableCell}> Code </StyledTableCell>
-									<StyledTableCell key={'headRowIntegrationLimit'} align={'left'} padding={'normal'} className={classes.tableCell}> Limit </StyledTableCell>
-									<StyledTableCell key={'headRowIntegrationProcessCount'} align={'left'} padding={'normal'} className={classes.tableCell}> Process Count </StyledTableCell>
-									<StyledTableCell key={'headRowIntegrationSourceConnectionName'} align={'left'} padding={'normal'} className={classes.tableCell}> Source Connection  </StyledTableCell>
-									<StyledTableCell key={'headRowIntegrationTargetConnectionName'} align={'left'} padding={'normal'} className={classes.tableCell}> Target Connection  </StyledTableCell>
-									<StyledTableCell key={'headRowIntegrationIsTargetTruncate'} align={'left'} padding={'normal'} className={classes.tableCell}> Is Target Truncate </StyledTableCell>
-									<StyledTableCell key={'headRowIntegrationComments'} align={'left'} padding={'normal'} className={classes.tableCell}> Comments </StyledTableCell>
-									<StyledTableCell key={'headRowIntegrationAction'} align={'left'} padding={'normal'} className={classes.tableCell}> Action </StyledTableCell>
-								</TableRow>
-							</TableHead>
-							<TableBody>
-								{values.integrations.map((integrationRow, integrationIndex) => (
-									<React.Fragment>
-										<StyledTableRow4n key={'bodyRowIntegration' + integrationRow.id} className={rowClasses.root}>
-											<StyledTableCell key={'bodyCellIntegrationCollapse' + integrationRow.id} >
-												<IconButton aria-label="expand row" size="small" onClick={() => changeOpen(integrationRow, integrationIndex)}>
-													<Icon className="text-16 arrow-icon" color="inherit">
-														{integrationRow.open ? 'expand_less' : 'expand_more'}
-													</Icon>
-												</IconButton>
-											</StyledTableCell>
-											<StyledTableCell key={'bodyCellIntegrationCode' + integrationRow.id} component="th" scope="row">{integrationRow.integration.code}</StyledTableCell>
-											<StyledTableCell key={'bodyCellIntegrationLimit' + integrationRow.id} align="left">{integrationRow.limit}</StyledTableCell>
-											<StyledTableCell key={'bodyCellIntegrationProcessCount' + integrationRow.id} align="left">{integrationRow.processCount}</StyledTableCell>
-											<StyledTableCell key={'bodyCellIntegrationSourceConnectionName' + integrationRow.id} align="left">{valueChecker(integrationRow.integration.sourceConnection.connection.name) + '-' + valueChecker(integrationRow.integration.sourceConnection.connection.database.connectorType.name)}</StyledTableCell>
-											<StyledTableCell key={'bodyCellIntegrationTargetConnectionName' + integrationRow.id} align="left">{valueChecker(integrationRow.integration.targetConnection.connection.name) + '-' + valueChecker(integrationRow.integration.targetConnection.connection.database.connectorType.name)}</StyledTableCell>
-											<StyledTableCell key={'bodyCellIntegrationIsTargetTruncate' + integrationRow.id} align="left">{integrationRow.integration.isTargetTruncate ? 'true' : 'false'}</StyledTableCell>
-											<StyledTableCell key={'bodyCellIntegrationComments' + integrationRow.id} align="left">{integrationRow.integration.comments}</StyledTableCell>
-
-											<StyledTableCell key={'bodyCellIntegrationDeleteAction' + integrationRow.id}>
-												<IconButton aria-label="expand row" key={'cellIntegrationDeleteAction' + integrationRow.id} size="small" onClick={event => deleteIntegration(event, integrationRow, integrationIndex)}>
-													<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
-														remove_circle
-													</Icon>
-												</IconButton>
-											</StyledTableCell>
-										</StyledTableRow4n>
-										<TableRow key={'bodyRowIntegrationBox' + integrationRow.id}>
-											<TableCell key={'bodyCellIntegrationBox' + integrationRow.id} style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
-												<Collapse key={'integrationBoxCollapse' + integrationRow.id} in={integrationRow.open} timeout="auto" unmountOnExit>
-													<Box key={'integrationBox' + integrationRow.id}>
-														<Typography key={'integrationBoxTypography' + integrationRow.id} variant="h6" gutterBottom component="div">
-															Integration
-														</Typography>
-														<Grid container spacing={3}>
-															<Grid item xs>
-																<TextField id="standard-name" label="Limit" value={valueChecker(integrationRow.limit)}
-																	fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'limit')} />
-															</Grid>
-															<Grid item xs>
-																<TextField id="standard-name" label="Process Count" value={valueChecker(integrationRow.processCount)}
-																	fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'processCount')} />
-															</Grid>
-															<Grid item xs>
-															</Grid>
-															<Grid item xs>
-															</Grid>
-														</Grid>
-														<Grid container spacing={3}>
-															<Grid item xs>
-																<TextField id="standard-name" label="Code" value={valueChecker(integrationRow.integration.code)}
-																	fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.code')} />
-															</Grid>
-															<Grid item xs>
-																<TextField id="standard-name" label="Is Target Truncate" value={valueChecker(integrationRow.integration.isTargetTruncate)}
-																	fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.isTargetTruncate')} />
-															</Grid>
-															<Grid item xs>
-																<TextField id="standard-name" label="Comments" value={valueChecker(integrationRow.integration.comments)}
-																	fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.comments')} />
-															</Grid>
-															<Grid item xs>
-															</Grid>
-														</Grid>
-														<Divider className={classes.divider} />
-														<Grid container spacing={3}>
-
-															<Grid item xs={6} >
-																<Box margin={1}>
-																	<Typography variant="h6" gutterBottom component="div">
-																		Source Connection
-																	</Typography>
-
-																	<Grid container spacing={1}>
-																		<Grid item xs={6}>
-																			<TextField id="standard-name" label="ConnectionName" value={valueChecker(integrationRow.integration.sourceConnection.connection.name)}
-																				fullWidth={true}
-																				onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.connection.name')} />
-																		</Grid>
-																		<Grid item xs={6}>
-																		</Grid>
-																		<Grid item xs={6}>
-																			<TextField id="standard-name" label="Schema" value={valueChecker(integrationRow.integration.sourceConnection.database.schema)}
-																				fullWidth={true}
-																				onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.schema')} />
-																		</Grid>
-																		<Grid item xs={6}>
-																			<TextField id="standard-name" label="Table" value={valueChecker(integrationRow.integration.sourceConnection.database.tableName)}
-																				fullWidth={true}
-																				onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.tableName')} />
-																		</Grid>
-																		<Grid item xs={12}>
-
-																			<TextField
-																				id="outlined-textarea"
-																				label="Query" value={valueChecker(integrationRow.integration.sourceConnection.database.query)}
-																				placeholder="Source Connection Query"
-																				multiline
-																				minrows={4}
-																				maxrows={4}
-																				fullWidth={true}
-																				variant="outlined"
-																				inputProps={{ className: classes.textarea }}
-																				onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.query')}
-																			/>
-																		</Grid>
-																	</Grid>
-																</Box>
-															</Grid>
-															<Grid item style={{ margin: "0 0 0 5" }} xs={6} >
-																<Box margin={1}>
-																	<Typography variant="h6" gutterBottom component="div">
-																		Target Connection
-																	</Typography>
-																	<Grid container spacing={1}>
-
-																		<Grid item xs={6}>
-																			<TextField id="standard-name" label="ConnectionName" value={valueChecker(integrationRow.integration.targetConnection.connection.name)}
-																				fullWidth={true}
-																				onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.connection.name')} />
-																		</Grid>
-																		<Grid item xs={6}>
-																		</Grid>
-																		<Grid item xs={6}>
-																			<TextField id="standard-name" label="Schema" value={valueChecker(integrationRow.integration.targetConnection.database.schema)}
-																				fullWidth={true}
-																				onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.schema')} />
-																		</Grid>
-																		<Grid item xs={6}>
-																			<TextField id="standard-name" label="Table" value={valueChecker(integrationRow.integration.targetConnection.database.tableName)}
-																				fullWidth={true}
-																				onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.tableName')} />
-																		</Grid>
-																		<Grid item xs={12}>
-
-																			<TextField
-																				id="outlined-textarea"
-																				label="Query" value={valueChecker(integrationRow.integration.targetConnection.database.query)}
-																				placeholder="Target Connection Query"
-																				multiline
-																				minrows={4}
-																				maxrows={4}
-																				fullWidth={true}
-																				variant="outlined"
-																				inputProps={{ className: classes.textarea }}
-																				onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.query')}
-																			/>
-																		</Grid>
-																	</Grid>
-																</Box>
-															</Grid>
-														</Grid>
-														<Grid container spacing={3}>
-
-															<Grid item xs={6} >
-																<Box margin={1}>
-																	<Typography variant="h6" gutterBottom component="div">
-																		Source Columns
-																	</Typography>
-																	<Grid item xs={12}>
-
-																		{
-																			integrationRow.integration.columns && integrationRow.integration.columns !== null ? (
-
-																				<Table size="small" >
-																					<caption>
-
-																						<IconButton aria-label="expand row" key={'cellColumnAddAction'} size="small"
-																							onClick={event => addColumn(event, integrationIndex)}>
-																							<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
-																								add_circle
-																							</Icon>
-																						</IconButton>
-																					</caption>
-																					<TableHead>
-																						<TableRow key={'headRowIntegrationSourceColumns'} className={classes.tableRowHeader}>
-																							<TableCell key={'headCellIntegrationColumnAction'} align={'left'} padding={'normal'} className={classes.tableHeadCellAction}>  </TableCell>
-																							<TableCell key={'headCellIntegrationSourceColumnsColumn'} align={'left'} padding={'normal'} className={classes.tableCell}> Name </TableCell>
-																						</TableRow>
-																					</TableHead>
-																					<TableBody>
-																						{integrationRow.integration.columns.map((columnRow, columnIndex) => (
-
-																							<StyledTableRow key={'bodyRowIntegrationSourceColumn' + columnRow.id}>
-																								<StyledTableCell key={'bodyCellColumnDeleteAction' + columnRow.id} className={classes.tableBodyCellAction}>
-
-																									<IconButton key={'cellColumnDeleteAction' + columnRow.id}
-																										size="small" aria-label="expand row"
-																										onClick={event => deleteColumn(event, columnRow, integrationIndex, columnIndex)}>
-																										<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
-																											remove_circle
-																										</Icon>
-																									</IconButton>
-																								</StyledTableCell>
-																								<StyledTableCell key={'bodyCellIntegrationSourceColumnName' + columnRow.id} >
-
-																									<TextField key={'bodyCellTextIntegrationSourceColumnName' + columnRow.id}
-																										id="name" label="" value={columnRow.sourceColumnName}
-																										InputLabelProps={{ shrink: false }} fullWidth={true}
-																										onChange={event => handleColumnChange(event, columnRow, integrationIndex, columnIndex, 'sourceColumnName')} />
-																								</StyledTableCell>
-																							</StyledTableRow>
-																						))}
-																					</TableBody>
-
-																				</Table>
-																			) :
-																				("")
-																		}
-																	</Grid>
-																</Box>
-															</Grid>
-															<Grid item xs={6} >
-																<Box margin={1}>
-																	<Typography variant="h6" gutterBottom component="div">
-																		Target Columns
-																	</Typography>
-																	<Grid item xs={12}>
-																		{
-																			integrationRow.integration.columns && integrationRow.integration.columns !== null ? (
-
-																				<Table size="small" >
-																					<TableHead>
-																						<TableRow key={'headRowIntegrationTargetColumns'} className={classes.tableRowHeader}>
-																							<TableCell key={'headCellIntegrationTargetColumnsColumn'} align={'left'} padding={'normal'} className={classes.tableCell}> Name </TableCell>
-																						</TableRow>
-																					</TableHead>
-																					<TableBody>
-
-																						{integrationRow.integration.columns.map((columnRow, columnIndex) => (
-																							<StyledTableRow key={'bodyRowIntegrationTargetColumn' + columnRow.id}>
-																								<StyledTableCell key={'bodyCellIntegrationTargetColumnName' + columnRow.id} >
-																									<TextField key={'bodyCellTextIntegrationTargetColumnName' + columnRow.id}
-																										id="name" label="" value={columnRow.targetColumnName}
-																										InputLabelProps={{ shrink: false }} fullWidth={true}
-																										onChange={event => handleColumnChange(event, columnRow, integrationIndex, columnIndex, 'targetColumnName')} />
-																								</StyledTableCell>
-																							</StyledTableRow>
-																						))}
-																					</TableBody>
-																				</Table>
-																			) :
-																				("")
-																		}
-																	</Grid>
-																</Box>
-															</Grid>
-														</Grid>
-
-
-														<Divider className={classes.divider} />
-													</Box>
-												</Collapse>
-											</TableCell>
+										<IconButton aria-label="expand row" key={'cellContactAddAction'} size="small" onClick={event => addContact(event)}>
+											<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
+												add_circle
+											</Icon>
+										</IconButton>
+									</caption>
+									<TableHead>
+										<TableRow key={'headRowContact'} className={classes.tableRowHeader}>
+											<StyledTableCell key={'headCellContactEmail'} align={'left'} padding={'normal'} className={classes.tableCell}> Email </StyledTableCell>
+											<StyledTableCell key={'headCellContactAction'} align={'left'} padding={'normal'} className={classes.tableHeadCellAction}> Action </StyledTableCell>
 										</TableRow>
-									</React.Fragment>
-								))}
-							</TableBody>
-						</Table>
-					) :
-						("")
-				}
-			</Box>
+									</TableHead>
+									<TableBody>
+										{values.contacts.map((contactRow, i) => (
+											<StyledTableRow key={'bodyRowContact' + contactRow.id}>
+												<StyledTableCell key={'bodyCellContactEmail' + contactRow.id} >
+
+													<TextField id="name" label="" value={contactRow.email} InputLabelProps={{ shrink: false }} fullWidth={true}
+														onChange={event => handleContactChange(event, contactRow, i, 'email')} />
+												</StyledTableCell>
+												<StyledTableCell key={'bodyCellContactDeleteAction' + contactRow.id} className={classes.tableBodyCellAction}>
+
+													<IconButton aria-label="expand row" key={'cellContactDeleteAction' + contactRow.id} size="small"
+														onClick={event => deleteContact(event, contactRow, i)}>
+														<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
+															remove_circle
+														</Icon>
+													</IconButton>
+												</StyledTableCell>
+											</StyledTableRow>
+										))}
+									</TableBody>
+								</Table>
+							) :
+								("")
+						}
+					</Box>
+
+					<Box >
+						<Typography variant="h4" gutterBottom component="div">
+							Integrations
+						</Typography>
+						{
+							values.integrations && values.integrations !== null ? (
+								<Table size="small" >
+									<caption>
+
+										<IconButton aria-label="expand row" key={'cellIntegrationAddAction'} size="small" onClick={event => addIntegration(event)}>
+											<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
+												add_circle
+											</Icon>
+										</IconButton>
+									</caption>
+									<TableHead>
+										<TableRow key={'headRowIntegration'} className={classes.tableRowHeader}>
+											<StyledTableCell key={'headRowIntegrationCollapse'} align={'left'} padding={'normal'} className={classes.tableCell}>  </StyledTableCell>
+											<StyledTableCell key={'headRowIntegrationCode'} align={'left'} padding={'normal'} className={classes.tableCell}> Code </StyledTableCell>
+											<StyledTableCell key={'headRowIntegrationLimit'} align={'left'} padding={'normal'} className={classes.tableCell}> Limit </StyledTableCell>
+											<StyledTableCell key={'headRowIntegrationProcessCount'} align={'left'} padding={'normal'} className={classes.tableCell}> Process Count </StyledTableCell>
+											<StyledTableCell key={'headRowIntegrationSourceConnectionName'} align={'left'} padding={'normal'} className={classes.tableCell}> Source Connection  </StyledTableCell>
+											<StyledTableCell key={'headRowIntegrationTargetConnectionName'} align={'left'} padding={'normal'} className={classes.tableCell}> Target Connection  </StyledTableCell>
+											<StyledTableCell key={'headRowIntegrationIsTargetTruncate'} align={'left'} padding={'normal'} className={classes.tableCell}> Is Target Truncate </StyledTableCell>
+											<StyledTableCell key={'headRowIntegrationComments'} align={'left'} padding={'normal'} className={classes.tableCell}> Comments </StyledTableCell>
+											<StyledTableCell key={'headRowIntegrationAction'} align={'left'} padding={'normal'} className={classes.tableCell}> Action </StyledTableCell>
+										</TableRow>
+									</TableHead>
+									<TableBody>
+										{values.integrations.map((integrationRow, integrationIndex) => (
+											<React.Fragment>
+												<StyledTableRow4n key={'bodyRowIntegration' + integrationRow.id} className={rowClasses.root}>
+													<StyledTableCell key={'bodyCellIntegrationCollapse' + integrationRow.id} >
+														<IconButton aria-label="expand row" size="small" onClick={() => changeOpen(integrationRow, integrationIndex)}>
+															<Icon className="text-16 arrow-icon" color="inherit">
+																{integrationRow.open ? 'expand_less' : 'expand_more'}
+															</Icon>
+														</IconButton>
+													</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationCode' + integrationRow.id} component="th" scope="row">{integrationRow.integration.code}</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationLimit' + integrationRow.id} align="left">{integrationRow.limit}</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationProcessCount' + integrationRow.id} align="left">{integrationRow.processCount}</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationSourceConnectionName' + integrationRow.id} align="left">{valueChecker(integrationRow.integration.sourceConnection.connection.name) + '-' + valueChecker(integrationRow.integration.sourceConnection.connection.database.connectorType.name)}</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationTargetConnectionName' + integrationRow.id} align="left">{valueChecker(integrationRow.integration.targetConnection.connection.name) + '-' + valueChecker(integrationRow.integration.targetConnection.connection.database.connectorType.name)}</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationIsTargetTruncate' + integrationRow.id} align="left">{integrationRow.integration.isTargetTruncate ? 'true' : 'false'}</StyledTableCell>
+													<StyledTableCell key={'bodyCellIntegrationComments' + integrationRow.id} align="left">{integrationRow.integration.comments}</StyledTableCell>
+
+													<StyledTableCell key={'bodyCellIntegrationDeleteAction' + integrationRow.id}>
+														<IconButton aria-label="expand row" key={'cellIntegrationDeleteAction' + integrationRow.id} size="small" onClick={event => deleteIntegration(event, integrationRow, integrationIndex)}>
+															<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
+																remove_circle
+															</Icon>
+														</IconButton>
+													</StyledTableCell>
+												</StyledTableRow4n>
+												<TableRow key={'bodyRowIntegrationBox' + integrationRow.id}>
+													<TableCell key={'bodyCellIntegrationBox' + integrationRow.id} style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
+														<Collapse key={'integrationBoxCollapse' + integrationRow.id} in={integrationRow.open} timeout="auto" unmountOnExit>
+															<Box key={'integrationBox' + integrationRow.id}>
+																<Typography key={'integrationBoxTypography' + integrationRow.id} variant="h6" gutterBottom component="div">
+																	Integration
+																</Typography>
+																<Grid container spacing={3}>
+																	<Grid item xs>
+																		<TextField id="standard-name" label="Limit" value={valueChecker(integrationRow.limit)}
+																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'limit')} />
+																	</Grid>
+																	<Grid item xs>
+																		<TextField id="standard-name" label="Process Count" value={valueChecker(integrationRow.processCount)}
+																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'processCount')} />
+																	</Grid>
+																	<Grid item xs>
+																	</Grid>
+																	<Grid item xs>
+																	</Grid>
+																</Grid>
+																<Grid container spacing={3}>
+																	<Grid item xs>
+																		<TextField id="standard-name" label="Code" value={valueChecker(integrationRow.integration.code)}
+																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.code')} />
+																	</Grid>
+																	<Grid item xs>
+																		<TextField id="standard-name" label="Is Target Truncate" value={valueChecker(integrationRow.integration.isTargetTruncate)}
+																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.isTargetTruncate')} />
+																	</Grid>
+																	<Grid item xs>
+																		<TextField id="standard-name" label="Comments" value={valueChecker(integrationRow.integration.comments)}
+																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.comments')} />
+																	</Grid>
+																	<Grid item xs>
+																	</Grid>
+																</Grid>
+																<Divider className={classes.divider} />
+																<Grid container spacing={3}>
+
+																	<Grid item xs={6} >
+																		<Box margin={1}>
+																			<Typography variant="h6" gutterBottom component="div">
+																				Source Connection
+																			</Typography>
+
+																			<Grid container spacing={1}>
+																				<Grid item xs={6}>
+																					<TextField id="standard-name" label="ConnectionName" value={valueChecker(integrationRow.integration.sourceConnection.connection.name)}
+																						fullWidth={true}
+																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.connection.name')} />
+																				</Grid>
+																				<Grid item xs={6}>
+																				</Grid>
+																				<Grid item xs={6}>
+																					<TextField id="standard-name" label="Schema" value={valueChecker(integrationRow.integration.sourceConnection.database.schema)}
+																						fullWidth={true}
+																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.schema')} />
+																				</Grid>
+																				<Grid item xs={6}>
+																					<TextField id="standard-name" label="Table" value={valueChecker(integrationRow.integration.sourceConnection.database.tableName)}
+																						fullWidth={true}
+																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.tableName')} />
+																				</Grid>
+																				<Grid item xs={12}>
+
+																					<TextField
+																						id="outlined-textarea"
+																						label="Query" value={valueChecker(integrationRow.integration.sourceConnection.database.query)}
+																						placeholder="Source Connection Query"
+																						multiline
+																						minrows={4}
+																						maxrows={4}
+																						fullWidth={true}
+																						variant="outlined"
+																						inputProps={{ className: classes.textarea }}
+																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.query')}
+																					/>
+																				</Grid>
+																			</Grid>
+																		</Box>
+																	</Grid>
+																	<Grid item style={{ margin: "0 0 0 5" }} xs={6} >
+																		<Box margin={1}>
+																			<Typography variant="h6" gutterBottom component="div">
+																				Target Connection
+																			</Typography>
+																			<Grid container spacing={1}>
+
+																				<Grid item xs={6}>
+																					<TextField id="standard-name" label="ConnectionName" value={valueChecker(integrationRow.integration.targetConnection.connection.name)}
+																						fullWidth={true}
+																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.connection.name')} />
+																				</Grid>
+																				<Grid item xs={6}>
+																				</Grid>
+																				<Grid item xs={6}>
+																					<TextField id="standard-name" label="Schema" value={valueChecker(integrationRow.integration.targetConnection.database.schema)}
+																						fullWidth={true}
+																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.schema')} />
+																				</Grid>
+																				<Grid item xs={6}>
+																					<TextField id="standard-name" label="Table" value={valueChecker(integrationRow.integration.targetConnection.database.tableName)}
+																						fullWidth={true}
+																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.tableName')} />
+																				</Grid>
+																				<Grid item xs={12}>
+
+																					<TextField
+																						id="outlined-textarea"
+																						label="Query" value={valueChecker(integrationRow.integration.targetConnection.database.query)}
+																						placeholder="Target Connection Query"
+																						multiline
+																						minrows={4}
+																						maxrows={4}
+																						fullWidth={true}
+																						variant="outlined"
+																						inputProps={{ className: classes.textarea }}
+																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.query')}
+																					/>
+																				</Grid>
+																			</Grid>
+																		</Box>
+																	</Grid>
+																</Grid>
+																<Grid container spacing={3}>
+
+																	<Grid item xs={6} >
+																		<Box margin={1}>
+																			<Typography variant="h6" gutterBottom component="div">
+																				Source Columns
+																			</Typography>
+																			<Grid item xs={12}>
+
+																				{
+																					integrationRow.integration.columns && integrationRow.integration.columns !== null ? (
+
+																						<Table size="small" >
+																							<caption>
+
+																								<IconButton aria-label="expand row" key={'cellColumnAddAction'} size="small"
+																									onClick={event => addColumn(event, integrationIndex)}>
+																									<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
+																										add_circle
+																									</Icon>
+																								</IconButton>
+																							</caption>
+																							<TableHead>
+																								<TableRow key={'headRowIntegrationSourceColumns'} className={classes.tableRowHeader}>
+																									<TableCell key={'headCellIntegrationColumnAction'} align={'left'} padding={'normal'} className={classes.tableHeadCellAction}>  </TableCell>
+																									<TableCell key={'headCellIntegrationSourceColumnsColumn'} align={'left'} padding={'normal'} className={classes.tableCell}> Name </TableCell>
+																								</TableRow>
+																							</TableHead>
+																							<TableBody>
+																								{integrationRow.integration.columns.map((columnRow, columnIndex) => (
+
+																									<StyledTableRow key={'bodyRowIntegrationSourceColumn' + columnRow.id}>
+																										<StyledTableCell key={'bodyCellColumnDeleteAction' + columnRow.id} className={classes.tableBodyCellAction}>
+
+																											<IconButton key={'cellColumnDeleteAction' + columnRow.id}
+																												size="small" aria-label="expand row"
+																												onClick={event => deleteColumn(event, columnRow, integrationIndex, columnIndex)}>
+																												<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
+																													remove_circle
+																												</Icon>
+																											</IconButton>
+																										</StyledTableCell>
+																										<StyledTableCell key={'bodyCellIntegrationSourceColumnName' + columnRow.id} >
+
+																											<TextField key={'bodyCellTextIntegrationSourceColumnName' + columnRow.id}
+																												id="name" label="" value={columnRow.sourceColumnName}
+																												InputLabelProps={{ shrink: false }} fullWidth={true}
+																												onChange={event => handleColumnChange(event, columnRow, integrationIndex, columnIndex, 'sourceColumnName')} />
+																										</StyledTableCell>
+																									</StyledTableRow>
+																								))}
+																							</TableBody>
+
+																						</Table>
+																					) :
+																						("")
+																				}
+																			</Grid>
+																		</Box>
+																	</Grid>
+																	<Grid item xs={6} >
+																		<Box margin={1}>
+																			<Typography variant="h6" gutterBottom component="div">
+																				Target Columns
+																			</Typography>
+																			<Grid item xs={12}>
+																				{
+																					integrationRow.integration.columns && integrationRow.integration.columns !== null ? (
+
+																						<Table size="small" >
+																							<TableHead>
+																								<TableRow key={'headRowIntegrationTargetColumns'} className={classes.tableRowHeader}>
+																									<TableCell key={'headCellIntegrationTargetColumnsColumn'} align={'left'} padding={'normal'} className={classes.tableCell}> Name </TableCell>
+																								</TableRow>
+																							</TableHead>
+																							<TableBody>
+
+																								{integrationRow.integration.columns.map((columnRow, columnIndex) => (
+																									<StyledTableRow key={'bodyRowIntegrationTargetColumn' + columnRow.id}>
+																										<StyledTableCell key={'bodyCellIntegrationTargetColumnName' + columnRow.id} >
+																											<TextField key={'bodyCellTextIntegrationTargetColumnName' + columnRow.id}
+																												id="name" label="" value={columnRow.targetColumnName}
+																												InputLabelProps={{ shrink: false }} fullWidth={true}
+																												onChange={event => handleColumnChange(event, columnRow, integrationIndex, columnIndex, 'targetColumnName')} />
+																										</StyledTableCell>
+																									</StyledTableRow>
+																								))}
+																							</TableBody>
+																						</Table>
+																					) :
+																						("")
+																				}
+																			</Grid>
+																		</Box>
+																	</Grid>
+																</Grid>
+
+
+																<Divider className={classes.divider} />
+															</Box>
+														</Collapse>
+													</TableCell>
+												</TableRow>
+											</React.Fragment>
+										))}
+									</TableBody>
+								</Table>
+							) :
+								("")
+						}
+					</Box>
+
+				</TabPanel>
+			</TabContext>
 		</div>
 	);
 }
