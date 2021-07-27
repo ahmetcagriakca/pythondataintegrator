@@ -14,7 +14,9 @@ from infrastructure.api.utils.TypeChecker import TypeChecker
 from infrastructure.json.JsonConvert import JsonConvert
 
 T = typing.TypeVar('T')
-
+class NullableString(fields.String):
+    __schema_type__ = ['string', 'null']
+    __schema_example__ = 'nullable string'
 
 class EndpointWrapper:
     BaseModel = IocManager.api.model('BaseModel', {
@@ -46,7 +48,7 @@ class EndpointWrapper:
             if value == int:
                 specified_value = fields.Integer(description=f'{key}')
             elif value == str:
-                specified_value = fields.String(description=f'{key}')
+                specified_value = NullableString(description=f'{key}')
             elif value == bool:
                 specified_value = fields.Boolean(description=f'{key}')
             elif value == datetime:

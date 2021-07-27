@@ -222,7 +222,7 @@ function DataOperationContent() {
 			newSet[propsplits[0]] = newSubSet1
 		}
 		newSetData[index] = newSet
-		setValues({ ...values, ['integrations']: newSetData });
+		setValues({ ...values, integrations: newSetData });
 	};
 	const deleteIntegration = (event, contact, index) => {
 		let newSet = [...values.integrations];
@@ -332,41 +332,41 @@ function DataOperationContent() {
 	}
 	const save = event => {
 		let contacts = []
-		for (var i = 0; i < values.contacts.length; i++) {
+		for (var i= 0; i < values.contacts.length; i++) {
 			contacts = contacts.concat({ Email: values.contacts[i].email })
 		}
 
 		let integrations = []
-		for (var i = 0; i < values.integrations.length; i++) {
+		for (var j = 0; j < values.integrations.length; j++) {
 			let sourceColumns = []
 			let targetColumns = []
-			for (var j = 0; j < values.integrations[i].integration.columns.length; j++) {
-				sourceColumns = sourceColumns.concat(values.integrations[i].integration.columns[j].sourceColumnName)
-				targetColumns = targetColumns.concat(values.integrations[i].integration.columns[j].targetColumnName)
+			for (var k = 0; k < values.integrations[j].integration.columns.length; k++) {
+				sourceColumns = sourceColumns.concat(values.integrations[j].integration.columns[k].sourceColumnName)
+				targetColumns = targetColumns.concat(values.integrations[j].integration.columns[k].targetColumnName)
 			}
 			integrations = integrations.concat({
-				Limit: values.integrations[i].limit,
-				ProcessCount: values.integrations[i].processCount,
+				Limit: values.integrations[j].limit,
+				ProcessCount: values.integrations[j].processCount,
 				Integration: {
-					Code: values.integrations[i].integration.code,
-					IsTargetTruncate: values.integrations[i].integration.isTargetTruncate,
+					Code: values.integrations[j].integration.code,
+					IsTargetTruncate: values.integrations[j].integration.isTargetTruncate,
 					IsDelta: false,
-					Comments: values.integrations[i].integration.comments?values.integrations[i].integration.comments:'',
+					Comments: (values.integrations[j].integration.comments && values.integrations[j].integration.comments!==null)?values.integrations[j].integration.comments:'',
 					SourceConnections: {
-						ConnectionName: values.integrations[i].integration.sourceConnection.connection.name,
+						ConnectionName: values.integrations[j].integration.sourceConnection.connection.name,
 						Database: {
-							Schema: values.integrations[i].integration.sourceConnection.database.schema,
-							TableName: values.integrations[i].integration.sourceConnection.database.tableName,
-							Query: values.integrations[i].integration.sourceConnection.database.query,
+							Schema: values.integrations[j].integration.sourceConnection.database.schema,
+							TableName: values.integrations[j].integration.sourceConnection.database.tableName,
+							Query: values.integrations[j].integration.sourceConnection.database.query,
 						},
 						Columns:sourceColumns.join()
 					},
 					TargetConnections: {
-						ConnectionName: values.integrations[i].integration.targetConnection.connection.name,
+						ConnectionName: values.integrations[j].integration.targetConnection.connection.name,
 						Database: {
-							Schema: values.integrations[i].integration.targetConnection.database.schema,
-							TableName: values.integrations[i].integration.targetConnection.database.tableName,
-							Query: values.integrations[i].integration.targetConnection.database.query,
+							Schema: values.integrations[j].integration.targetConnection.database.schema,
+							TableName: values.integrations[j].integration.targetConnection.database.tableName,
+							Query: values.integrations[j].integration.targetConnection.database.query,
 						},
 						Columns:targetColumns.join()
 					}
