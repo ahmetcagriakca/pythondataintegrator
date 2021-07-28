@@ -4,6 +4,9 @@ export const tableStyles = makeStyles(themex => ({
 	root: {
 		flexGrow: 1
 	},
+	textarea: {
+		resize: "both",
+	},
 	header: {
 		background: `linear-gradient(to left, ${themex.palette.primary.dark} 0%, ${themex.palette.primary.main} 100%)`,
 		color: themex.palette.getContrastText(themex.palette.primary.main)

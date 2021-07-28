@@ -24,8 +24,8 @@ function DataOperationJobExecutionsFilterForm(props) {
 		},
 	});
 
-	const routeParams = useParams();
 	const isDataOperation = () => (props.DataOperationId && props.DataOperationId !== null && props.DataOperationId !== 0)
+	const routeParams = useParams();
 	routeParams.DataOperationId = isDataOperation() ? props.DataOperationId : null;
 	useEffect(() => {
 		dispatch(getDataOperationName(routeParams));
@@ -85,7 +85,7 @@ function DataOperationJobExecutionsFilterForm(props) {
 			<Grid container spacing={3}>
 				{
 					!isDataOperation() ? (
-						<Grid item xs={3}>
+						<Grid item xs>
 							<Autocomplete
 								id="country-select-demo"
 								style={{ width: 300 }}
@@ -122,7 +122,7 @@ function DataOperationJobExecutionsFilterForm(props) {
 						</Grid>
 					) : ("")
 				}
-				<Grid item xs={3}>
+				<Grid item xs>
 					<Autocomplete
 						id="country-select-demo"
 						style={{ width: 300 }}
@@ -157,7 +157,7 @@ function DataOperationJobExecutionsFilterForm(props) {
 						openOnFocus
 					/>
 				</Grid>
-				<Grid item xs={3}>
+				<Grid item xs>
 
 					<FormGroup row>
 						<FormControlLabel

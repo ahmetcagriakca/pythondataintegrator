@@ -34,12 +34,12 @@ function DataOperationJobsFilterForm(props) {
 	const [dataOperation, setDataOperation] = React.useState(null);
 	const selectDataOperationNames = useSelector(selectDataOperationName);
 
-	const [onlyCron, setOnlyCron] = React.useState(isDataOperation() ? false :true);
+	const [onlyCron, setOnlyCron] = React.useState(isDataOperation() ? false : true);
 	const handleOnlyCronChange = (event) => {
 		setOnlyCron(event.target.checked);
 	};
 
-	const [onlyUndeleted, setOnlyUndeleted] = React.useState(isDataOperation() ? false :true);
+	const [onlyUndeleted, setOnlyUndeleted] = React.useState(isDataOperation() ? false : true);
 	const handleOnlyUndeletedChange = (event) => {
 		setOnlyUndeleted(event.target.checked);
 	};

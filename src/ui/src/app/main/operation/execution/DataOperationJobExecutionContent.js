@@ -14,6 +14,8 @@ import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
 import { getDataOperationJobExecution } from './store/dataOperationJobExecutionSlice';
 import { getStatusName, selectStatusName } from './store/statusNameSlice';
+import DataOperationJobExecutionIntegrationsData from './DataOperationJobExecutionIntegrationsData'
+import DataOperationJobExecutionLogsData from './DataOperationJobExecutionLogsData'
 
 const useStyles = makeStyles(theme => ({
 
@@ -225,6 +227,20 @@ function DataOperationJobExecutionContent(props) {
 					</TabList>
 				</AppBar>
 				<TabPanel value="1">
+					{
+						values.id && values.id !== null && values.id !== 0 ? (
+							<DataOperationJobExecutionIntegrationsData ExecutionId={values.id} />
+						) :
+							("")
+					}
+				</TabPanel>
+				<TabPanel value="2">
+					{
+						values.id && values.id !== null && values.id !== 0 ? (
+							<DataOperationJobExecutionLogsData ExecutionId={values.id} />
+						) :
+							("")
+					}
 				</TabPanel>
 			</TabContext>
 		</div>

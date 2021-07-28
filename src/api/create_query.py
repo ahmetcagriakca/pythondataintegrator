@@ -149,7 +149,7 @@ class {query_name}Response:
             content += '\n'
         content += '\n'
         content += \
-f'''
+            f'''
 class {query_name}Specifications(IScoped):
     @inject
     def __init__(self,\n'''
@@ -308,5 +308,6 @@ generate_query = GenerateQuery(application_config=application_config, module_fin
 # IocManager.initialize()
 # IocManager.injector.get(GenerateQuery).generate('connection', 'CreateConnectionFile')
 
-generate_query.generate('operation', 'GetDataOperationJobExecution', is_list=False, has_paging=False, dao={'Name': 'DataOperationJobExecution',
-                                                                                               'Namespace': 'from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution'})
+generate_query.generate('operation', 'GetDataOperationJobExecutionLogList', is_list=True, has_paging=False,
+                        dao={'Name': 'Log',
+                             'Namespace': 'from models.dao.common.Log import Log'})
