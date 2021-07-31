@@ -22,7 +22,7 @@ const authDB = {
 				email: 'admin',
 				settings: {
 					layout: {
-						style: 'layout1',
+						style: 'layout3',
 						config: {
 							scroll: 'content',
 							navbar: {

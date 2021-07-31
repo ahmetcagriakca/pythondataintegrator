@@ -38,8 +38,8 @@ function DataOperationsFilterForm() {
 	const [onlyUndeleted, setOnlyUndeleted] = React.useState(true);
 	const handleOnlyUndeletedChange = (event) => {
 		setOnlyUndeleted(event.target.checked);
-	  };
-	
+	};
+
 
 	const clear = event => {
 		setDataOperation(null);
@@ -79,7 +79,7 @@ function DataOperationsFilterForm() {
 				<Grid item xs>
 					<Autocomplete
 						id="country-select-demo"
-						style={{ width: 300 }}
+						style={{ width: '100%' }}
 						value={dataOperation}
 						onChange={(event, newValue) => {
 							setDataOperation(newValue);
@@ -98,7 +98,7 @@ function DataOperationsFilterForm() {
 						renderInput={(params) => (
 							<TextField
 								{...params}
-								label="Choose a dataOperation "
+								label="DataOperation "
 								variant="outlined"
 								inputProps={{
 									...params.inputProps,
@@ -113,7 +113,7 @@ function DataOperationsFilterForm() {
 				</Grid>
 				<Grid item xs>
 					<FormGroup row>
-						<FormControlLabel
+						<FormControlLabel style={{ margin: "5px" }}
 							control={<Checkbox checked={onlyUndeleted} onChange={handleOnlyUndeletedChange} name="onlyUndeleted" />}
 							label="Only Undeleted"
 						/>

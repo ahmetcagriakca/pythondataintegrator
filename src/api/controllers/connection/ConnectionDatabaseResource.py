@@ -21,4 +21,3 @@ class ConnectionDatabaseResource(ResourceBase):
         """
         command = CreateConnectionDatabaseCommand(request=req)
         self.dispatcher.dispatch(command)
-        return "Connected created"

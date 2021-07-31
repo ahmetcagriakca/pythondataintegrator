@@ -21,4 +21,3 @@ class ConnectionQueueResource(ResourceBase):
         """
         command = CreateConnectionQueueCommand(request=req)
         self.dispatcher.dispatch(command)
-        return "Connected created"

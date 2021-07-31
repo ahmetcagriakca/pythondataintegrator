@@ -10,6 +10,12 @@ import { getConnections } from './store/connectionsSlice';
 import Button from '@material-ui/core/Button';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import { filterFormStyles } from '../../common/styles/FilterFormStyles';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Icon from '@material-ui/core/Icon';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Box from '@material-ui/core/Box';
+
 
 
 function ConnectionsFilterFom() {
@@ -29,8 +35,12 @@ function ConnectionsFilterFom() {
 	const selectConnectionTypeNames = useSelector(selectConnectionTypeName);
 	const selectConnectorTypeNames = useSelector(selectConnectorTypeName);
 
-	const routeParams = useParams();
+	const [onlyUndeleted, setOnlyUndeleted] = React.useState(true);
+	const handleOnlyUndeletedChange = (event) => {
+		setOnlyUndeleted(event.target.checked);
+	};
 
+	const routeParams = useParams();
 
 	useEffect(() => {
 		dispatch(getConnectionName(routeParams));
@@ -42,11 +52,11 @@ function ConnectionsFilterFom() {
 		dispatch(getConnectorTypeName(routeParams));
 	}, [dispatch, routeParams]);
 
-
 	const clear = event => {
 		setConnection(null);
 		setConnectionType(null);
 		setConnectorType(null);
+		setOnlyUndeleted(true);
 
 		routeParams.ConnectionId = null;
 		routeParams.ConnectionTypeId = null;
@@ -54,11 +64,11 @@ function ConnectionsFilterFom() {
 		routeParams.OrderBy = "Connection.Id";
 		routeParams.PageNumber = 1;
 		routeParams.Order = null;
+		routeParams.OnlyUndeleted = true;
 		dispatch(getConnections(routeParams));
 	};
 
 	const filter = event => {
-
 		let connectionId = null;
 		if (connection != null) {
 			connectionId = connection.id;
@@ -75,12 +85,10 @@ function ConnectionsFilterFom() {
 			connectorTypeId = connectorType.id;
 		}
 		routeParams.ConnectorTypeId = connectorTypeId;
+		routeParams.OnlyUndeleted = onlyUndeleted;
 		routeParams.PageNumber = 1;
 		dispatch(getConnections(routeParams));
 	};
-
-
-
 
 	return (
 
@@ -92,7 +100,7 @@ function ConnectionsFilterFom() {
 				<Grid item xs>
 					<Autocomplete
 						id="country-select-demo"
-						style={{ width: 300 }}
+						style={{ width: '100%' }}
 						value={connection}
 						onChange={(event, newValue) => {
 							setConnection(newValue);
@@ -111,7 +119,7 @@ function ConnectionsFilterFom() {
 						renderInput={(params) => (
 							<TextField
 								{...params}
-								label="Choose a connection "
+								label="Connection "
 								variant="outlined"
 								inputProps={{
 									...params.inputProps,
@@ -127,7 +135,7 @@ function ConnectionsFilterFom() {
 				<Grid item xs>
 					<Autocomplete
 						id="country-select-demo"
-						style={{ width: 300 }}
+						style={{ width: '100%' }}
 						value={connectionType}
 						onChange={(event, newValue) => {
 							setConnectionType(newValue);
@@ -146,7 +154,7 @@ function ConnectionsFilterFom() {
 						renderInput={(params) => (
 							<TextField
 								{...params}
-								label="Choose a connection type"
+								label="Connection type"
 								variant="outlined"
 								inputProps={{
 									...params.inputProps,
@@ -162,7 +170,7 @@ function ConnectionsFilterFom() {
 				<Grid item xs>
 					<Autocomplete
 						id="country-select-demo"
-						style={{ width: 300 }}
+						style={{ width: '100%' }}
 						value={connectorType}
 						onChange={(event, newValue) => {
 							setConnectorType(newValue);
@@ -181,7 +189,7 @@ function ConnectionsFilterFom() {
 						renderInput={(params) => (
 							<TextField
 								{...params}
-								label="Choose a connector type"
+								label="Connector type"
 								variant="outlined"
 								inputProps={{
 									...params.inputProps,
@@ -195,37 +203,42 @@ function ConnectionsFilterFom() {
 					/>
 
 				</Grid>
-				<Grid item xs></Grid>
+				<Grid item xs>
+					<FormControlLabel style={{ margin: "5px" }}
+						control={<Checkbox checked={onlyUndeleted} onChange={handleOnlyUndeletedChange} name="onlyUndeleted" />}
+						label="Only Undeleted"
+					/>
+				</Grid>
 			</Grid>
 
-			<Grid container spacing={3}>
-				<Grid item xs>
-				</Grid>
-				<Grid item xs={1}>
+			<Box
+				component="span"
+				m={1} //margin
+				className={`${classes.bottomRightBox} ${classes.box}`}
+			>
+				<ButtonGroup aria-label="outlined primary button group">
 					<Button
 						variant="contained"
 						color="secondary"
 						size="large"
 						className={classes.button}
-						// startIcon={<SearchIcon />}
+						startIcon={<Icon >clear</Icon>}
 						onClick={clear}
 					>
 						Clear
 					</Button>
-				</Grid>
-				<Grid item xs={1}>
 					<Button
 						variant="contained"
 						color="secondary"
 						size="large"
 						className={classes.button}
-						// startIcon={<SearchIcon />}
+						startIcon={<Icon >search</Icon>}
 						onClick={filter}
 					>
 						Search
 					</Button>
-				</Grid>
-			</Grid>
+				</ButtonGroup>
+			</Box>
 		</div>
 	);
 }

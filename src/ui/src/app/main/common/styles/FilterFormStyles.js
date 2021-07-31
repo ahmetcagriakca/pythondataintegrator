@@ -26,5 +26,27 @@ export const filterFormStyles = makeStyles(theme => ({
 	},
 	button: {
 		margin: theme.spacing(1),
+		"white-space": "nowrap",
 	},
+	withoutLabel: {
+	  marginTop: theme.spacing(3),
+	},
+	textField: {
+	  width: '25ch',
+	},//styling
+	box: {
+	  display: "flex",
+	},
+	bottomRightBox: {
+	  justifyContent: "flex-end",
+	  alignItems: "flex-end"
+	},
+	centerBox: {
+	  justifyContent: "center",
+	  alignItems: "center"
+	},
+	topLeftBox: {
+	  justifyContent: "flex-start",
+	  alignItems: "flex-start"
+	}
 }));

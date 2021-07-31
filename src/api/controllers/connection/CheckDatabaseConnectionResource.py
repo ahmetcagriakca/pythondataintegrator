@@ -1,5 +1,6 @@
 from injector import inject
 from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
+from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionRequest import CheckDatabaseConnectionRequest
 from infrastructure.api.ResourceBase import ResourceBase
 from infrastructure.api.decorators.Controller import controller
 from infrastructure.cqrs.Dispatcher import Dispatcher
@@ -14,10 +15,9 @@ class CheckConnectionDatabaseResource(ResourceBase):
         super().__init__(*args, **kwargs)
         self.dispatcher = dispatcher
 
-    def post(self, ConnectionName: str):
+    def post(self, req: CheckDatabaseConnectionRequest):
         """
         Check Database Connection
         """
-        command = CheckDatabaseConnectionCommand(ConnectionName=ConnectionName)
+        command = CheckDatabaseConnectionCommand(request=req)
         self.dispatcher.dispatch(command)
-        return "Connected Successfully"

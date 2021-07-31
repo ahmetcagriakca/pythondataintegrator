@@ -86,7 +86,7 @@ function DataOperationJobsFilterForm(props) {
 							<Grid item xs>
 								<Autocomplete
 									id="country-select-demo"
-									style={{ width: 300 }}
+									style={{ width: '100%' }}
 									value={dataOperation}
 									onChange={(event, newValue) => {
 										setDataOperation(newValue);
@@ -105,7 +105,7 @@ function DataOperationJobsFilterForm(props) {
 									renderInput={(params) => (
 										<TextField
 											{...params}
-											label="Choose a Data Operation "
+											label="Data Operation "
 											variant="outlined"
 											inputProps={{
 												...params.inputProps,
@@ -123,7 +123,7 @@ function DataOperationJobsFilterForm(props) {
 				<Grid item xs>
 
 					<FormGroup row>
-						<FormControlLabel
+						<FormControlLabel style={{ margin: "5px" }}
 							control={<Checkbox checked={onlyCron} onChange={handleOnlyCronChange} name="onlyCron" />}
 							label="Only Cron"
 						/>
@@ -131,7 +131,7 @@ function DataOperationJobsFilterForm(props) {
 				</Grid>
 				<Grid item xs>
 					<FormGroup row>
-						<FormControlLabel
+						<FormControlLabel style={{ margin: "5px" }}
 							control={<Checkbox checked={onlyUndeleted} onChange={handleOnlyUndeletedChange} name="onlyUndeleted" />}
 							label="Only Undeleted"
 						/>

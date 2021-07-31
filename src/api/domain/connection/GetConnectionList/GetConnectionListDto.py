@@ -26,3 +26,4 @@ class GetConnectionListDto:
     ServiceName: str = None
     DatabaseName: str = None
     CreationDate: datetime.datetime = None
+    IsDeleted: int = None

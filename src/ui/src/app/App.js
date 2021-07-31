@@ -9,7 +9,7 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { create } from 'jss';
 import jssExtend from 'jss-plugin-extend';
 import rtl from 'jss-rtl';
-import React from 'react';
+import React from "react";
 import Provider from 'react-redux/es/components/Provider';
 import { Router } from 'react-router-dom';
 import AppContext from './AppContext';
@@ -18,6 +18,7 @@ import routes from './fuse-configs/routesConfig';
 import store from './store';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Notification from './notification/Notification';
 
 const jss = create({
 	...jssPreset(),
@@ -25,8 +26,12 @@ const jss = create({
 	insertionPoint: document.getElementById('jss-insertion-point')
 });
 
+
 const generateClassName = createGenerateClassName();
 toast.configure()
+
+
+
 const App = () => {
 	return (
 		<AppContext.Provider
@@ -42,6 +47,7 @@ const App = () => {
 								<FuseAuthorization>
 									<FuseTheme>
 										<FuseLayout />
+										<Notification />
 									</FuseTheme>
 								</FuseAuthorization>
 							</Router>

@@ -29,9 +29,6 @@ export const addAuthInterceptors = async (axios) => {
         response.headers['content-type'] === 'application/json'
       ) {
         response.data = camelizeKeys(response.data);
-        if (response.data.message && response.data.message !== null && response.data.message !== '') {
-          toast.success(response.data.message, { position: toast.POSITION.BOTTOM_RIGHT })
-        }
       }
 
       return response;

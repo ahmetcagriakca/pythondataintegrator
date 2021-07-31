@@ -2,7 +2,7 @@ from injector import inject
 from sqlalchemy.orm import Query
 from infrastructure.dependency.scopes import IScoped
 from domain.connection.GetConnection.GetConnectionQuery import GetConnectionQuery
-from models.dao.connection import ConnectionDatabase, ConnectionType, ConnectorType, Connection
+from models.dao.connection import ConnectionDatabase, ConnectionType, ConnectorType, Connection, ConnectionServer
 
 
 class GetConnectionSpecifications(IScoped):
@@ -14,6 +14,7 @@ class GetConnectionSpecifications(IScoped):
     def __specified_query(self, query: GetConnectionQuery, data_query: Query) -> Query:
         specified_query = data_query \
             .join(ConnectionType, ConnectionType.Id == Connection.ConnectionTypeId) \
+            .join(ConnectionServer, ConnectionServer.ConnectionId == Connection.Id) \
             .join(ConnectionDatabase, ConnectionDatabase.ConnectionId == Connection.Id) \
             .join(ConnectorType, ConnectorType.Id == ConnectionDatabase.ConnectorTypeId)
         specified_query = specified_query.filter(Connection.Id == query.request.Id)

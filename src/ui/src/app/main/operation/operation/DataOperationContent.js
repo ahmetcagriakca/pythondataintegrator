@@ -423,7 +423,8 @@ function DataOperationContent() {
 							type="number"
 							InputLabelProps={{
 								shrink: true,
-							}} onChange={handleChange('definitionId')} />
+							}} 
+							onChange={handleChange('definitionId')} />
 					</Grid>
 					<Grid item xs>
 						<DateTimePicker

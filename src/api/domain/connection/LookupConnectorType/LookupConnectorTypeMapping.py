@@ -7,8 +7,9 @@ class LookupConnectorTypeMapping:
     @staticmethod
     def to_dto(entity: ConnectorType) -> LookupConnectorTypeDto:
         dto = LookupConnectorTypeDto()
-        dto.Id=entity.Id
-        dto.Name=entity.Name
+        dto.Id = entity.Id
+        dto.Name = entity.Name
+        dto.ConnectionTypeId = entity.ConnectionTypeId
         return dto
 
     @staticmethod

@@ -22,5 +22,5 @@ class GetConnectionQueryHandler(IQueryHandler[GetConnectionQuery], IScoped):
         repository = self.repository_provider.get(Connection)
         data_query = repository.table
         data_query = self.specifications.specify(query=query, data_query=data_query)
-        result.Data = GetConnectionMapping.to_dto(data_query)
+        result.Data = GetConnectionMapping.to_dto(data_query.first())
         return result

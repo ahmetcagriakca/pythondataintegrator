@@ -9,7 +9,6 @@ import { getDataOperationJobExecutionIntegrations, selectDataOperationJobExecuti
 import StyledTableRow from '../../common/components/StyledTableRow';
 import { tableStyles } from '../../common/styles/TableStyles';
 import TableHead from '@material-ui/core/TableHead';
-import TextField from '@material-ui/core/TextField';
 
 
 function DataOperationJobExecutionIntegrationsData(props) {

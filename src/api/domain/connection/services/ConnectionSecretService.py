@@ -28,6 +28,10 @@ class ConnectionSecretService(IScoped):
         """
         Create ConnectionSecret
         """
+        if user is None or user=='':
+            raise OperationalException("User cannot be null")
+        if password is None or password=='':
+            raise OperationalException("Password cannot be null")
         secret = self.secret_service.create_basic_authentication(name=connection.Name, user=user, password=password)
         connection_secret = ConnectionSecret(Connection=connection, Secret=secret)
         self.connection_secret_repository.insert(connection_secret)
@@ -37,6 +41,10 @@ class ConnectionSecretService(IScoped):
         """
         Update ConnectionSecret
         """
+        if user is None or user=='':
+            raise OperationalException("User cannot be null")
+        if password is None or password=='':
+            raise OperationalException("Password cannot be null")
         connection_secret = self.connection_secret_repository.first(IsDeleted=0, Connection=connection)
         if connection_secret is None:
             raise OperationalException("Connection Secret Not Found")

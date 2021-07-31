@@ -22,7 +22,7 @@ const config = {
 			display: false
 		},
 		rightSidePanel: {
-			display: false
+			display: true
 		}
 	},
 	form: {

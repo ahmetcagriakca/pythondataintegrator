@@ -20,6 +20,7 @@ class GetConnectionListMapping:
         dto.ServiceName = entity.Database.ServiceName
         dto.DatabaseName = entity.Database.DatabaseName
         dto.CreationDate = entity.Database.CreationDate
+        dto.IsDeleted = entity.IsDeleted
         return dto
 
     @staticmethod

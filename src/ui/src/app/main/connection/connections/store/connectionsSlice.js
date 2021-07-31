@@ -12,6 +12,7 @@ export const getConnections = createAsyncThunk('connectionsApp/connections/getCo
 			Id: params.ConnectionId,
 			ConnectionTypeId: params.ConnectionTypeId,
 			ConnectorTypeId: params.ConnectorTypeId,
+			OnlyUndeleted: params.OnlyUndeleted,
 		}
 	});
 	const data = await response.data;
@@ -29,7 +30,7 @@ const connectionSlice = createSlice({
 	name: 'connectionsApp/connections',
 	initialState: connectionsAdapter.getInitialState({
 		count: 0,
-		connection: {},
+		data: {},
 		pageNumber: 1,
 		pageSize: 0
 	}),
@@ -37,6 +38,7 @@ const connectionSlice = createSlice({
 	extraReducers: {
 		[getConnections.fulfilled]: (state, action) => {
 			connectionsAdapter.setAll(state, action.payload.result.data);
+			state.data = action.payload.result.pageNumber;
 			state.pageNumber = action.payload.result.pageNumber;
 			state.pageSize = action.payload.result.pageSize;
 			state.count = action.payload.result.count;

@@ -65,7 +65,7 @@ class ConnectionService(IScoped):
         """
         Create File connection
         """
-        connection = self.connection_repository.first(IsDeleted=0, Name=request.Name)
+        connection = self.get_by_name(name=request.Name)
         if connection is None:
             connection = self.create_connection(name=request.Name,
                                                 connection_type_name=ConnectionTypes.Database.name)
@@ -76,6 +76,7 @@ class ConnectionService(IScoped):
                                                     connector_type_name=request.ConnectorTypeName, sid=request.Sid,
                                                     service_name=request.ServiceName,
                                                     database_name=request.DatabaseName)
+            self.connection_repository.insert(connection)
         else:
             self.connection_secret_service.update(connection=connection, user=request.User,
                                                   password=request.Password)
@@ -84,9 +85,6 @@ class ConnectionService(IScoped):
                                                     connector_type_name=request.ConnectorTypeName, sid=request.Sid,
                                                     service_name=request.ServiceName,
                                                     database_name=request.DatabaseName)
-        self.connection_repository.insert(connection)
-        self.repository_provider.commit()
-        connection = self.connection_repository.first(Id=connection.Id)
         return connection
 
     def create_connection_file(self, request: CreateConnectionFileRequest) -> Connection:
@@ -101,24 +99,20 @@ class ConnectionService(IScoped):
                                                   password=request.Password)
             self.connection_server_service.create(connection=connection, host=request.Host, port=request.Port)
             self.connection_file_service.create(connection=connection, connector_type_name=request.ConnectorTypeName)
+            self.connection_repository.insert(connection)
         else:
             self.connection_secret_service.update(connection=connection, user=request.User,
                                                   password=request.Password)
             self.connection_server_service.update(connection=connection, host=request.Host, port=request.Port)
             self.connection_file_service.update(connection=connection, connector_type_name=request.ConnectorTypeName)
 
-        self.connection_repository.insert(connection)
-        self.repository_provider.commit()
-        connection = self.connection_repository.first(Id=connection.Id)
         return connection
 
     def create_connection_queue(self, request: CreateConnectionQueueRequest) -> Connection:
         """
         Create File connection
         """
-
-        connection = self.connection_repository.first(IsDeleted=0, Name=request.Name)
-
+        connection = self.get_by_name(name=request.Name)
         if connection is None:
             connection = self.create_connection(name=request.Name,
                                                 connection_type_name=ConnectionTypes.Queue.name)
@@ -128,6 +122,7 @@ class ConnectionService(IScoped):
                 self.connection_server_service.create(connection=connection, host=server.Host, port=server.Port)
             self.connection_queue_service.create(connection=connection, connector_type_name=request.ConnectorTypeName,
                                                  protocol=request.Protocol, mechanism=request.Mechanism)
+            connection = self.connection_repository.first(Id=connection.Id)
         else:
             self.connection_secret_service.update(connection=connection, user=request.User,
                                                   password=request.Password)
@@ -150,9 +145,6 @@ class ConnectionService(IScoped):
 
             self.connection_queue_service.update(connection=connection, connector_type_name=request.ConnectorTypeName,
                                                  protocol=request.Protocol, mechanism=request.Mechanism)
-        self.connection_repository.insert(connection)
-        self.repository_provider.commit()
-        connection = self.connection_repository.first(Id=connection.Id)
         return connection
 
     def delete_connection(self, id: int):
@@ -177,5 +169,4 @@ class ConnectionService(IScoped):
                 self.connection_secret_service.delete(id=connection_secret.Id)
         message = f'{connection.Name} connection deleted'
         self.sql_logger.info(message)
-        self.repository_provider.commit()
         return message

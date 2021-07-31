@@ -21,4 +21,3 @@ class ConnectionFileResource(ResourceBase):
         """
         command = CreateConnectionFileCommand(request=req)
         self.dispatcher.dispatch(command)
-        return "Connected created"

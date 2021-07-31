@@ -12,7 +12,7 @@ import { selectToolbarTheme } from 'app/store/fuse/settingsSlice';
 import LanguageSwitcher from '../../shared-components/LanguageSwitcher';
 import UserMenu from 'app/fuse-layouts/shared-components/UserMenu';
 import FullScreenToggle from '../../shared-components/FullScreenToggle';
-// import QuickPanelToggleButton from 'app/fuse-layouts/shared-components/quickPanel/QuickPanelToggleButton';
+import QuickPanelToggleButton from 'app/fuse-layouts/shared-components/quickPanel/QuickPanelToggleButton';
 
 
 const useStyles = makeStyles(theme => ({
@@ -54,7 +54,7 @@ function ToolbarLayout1(props) {
 
 						<FuseSearch />
 
-						{/* <QuickPanelToggleButton /> */}
+						<QuickPanelToggleButton />
 
 						<UserMenu />
 					</div>
