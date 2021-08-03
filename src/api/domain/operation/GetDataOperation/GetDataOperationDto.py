@@ -13,6 +13,7 @@ class ConnectionTypeDto:
 class ConnectorTypeDto:
     Id: int = None
     Name: str = None
+    ConnectionTypeId: int = None
 
 
 @dtoclass
@@ -30,6 +31,7 @@ class ConnectionDto:
     Name: str = None
     Database: ConnectionDatabaseDto = None
     ConnectionType: ConnectionTypeDto = None
+    ConnectionTypeId: int = None
 
 
 @dtoclass

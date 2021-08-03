@@ -4,6 +4,7 @@ from domain.operation.GetDataOperation.GetDataOperationDto import GetDataOperati
     DataOperationIntegrationDto, DataIntegrationDto, DataIntegrationColumnDto, ConnectionDto, ConnectionDatabaseDto, \
     ConnectorTypeDto, ConnectionTypeDto, DataIntegrationConnectionDatabaseDto, DataIntegrationConnectionDto
 from models.dao.operation.DataOperation import DataOperation
+from models.enums import ConnectionTypes
 
 
 class GetDataOperationMapping:
@@ -47,25 +48,30 @@ class GetDataOperationMapping:
                         )
                         connector_type = ConnectorTypeDto(
                             Id=data_integration_connection.Connection.Database.ConnectorType.Id,
-                            Name=data_integration_connection.Connection.Database.ConnectorType.Name
+                            Name=data_integration_connection.Connection.Database.ConnectorType.Name,
+                            ConnectionTypeId=data_integration_connection.Connection.Database.ConnectorType.ConnectionTypeId
                         )
                         connection = ConnectionDto(
                             Id=data_integration_connection.Connection.Id,
                             Name=data_integration_connection.Connection.Name,
-                            Database=ConnectionDatabaseDto(
+                            ConnectionType=connection_type,
+                            ConnectionTypeId=data_integration_connection.Connection.ConnectionTypeId
+                        )
+                        database = None
+                        if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Database.value:
+                            connection.Database = ConnectionDatabaseDto(
                                 Id=data_integration_connection.Connection.Database.Id,
                                 Sid=data_integration_connection.Connection.Database.Sid,
                                 ServiceName=data_integration_connection.Connection.Database.ServiceName,
                                 DatabaseName=data_integration_connection.Connection.Database.DatabaseName,
                                 ConnectorType=connector_type
-                            ),
-                            ConnectionType=connection_type
-                        )
-                        database = DataIntegrationConnectionDatabaseDto(
-                            Id=data_integration_connection.Database.Id,
-                            Schema=data_integration_connection.Database.Schema,
-                            TableName=data_integration_connection.Database.TableName,
-                            Query=data_integration_connection.Database.Query)
+                            )
+                            database = DataIntegrationConnectionDatabaseDto(
+                                Id=data_integration_connection.Database.Id,
+                                Schema=data_integration_connection.Database.Schema,
+                                TableName=data_integration_connection.Database.TableName,
+                                Query=data_integration_connection.Database.Query)
+
                         if data_integration_connection.SourceOrTarget == 0:
                             data_operation_integration.Integration.SourceConnection = DataIntegrationConnectionDto(
                                 Id=data_integration_connection.Id,

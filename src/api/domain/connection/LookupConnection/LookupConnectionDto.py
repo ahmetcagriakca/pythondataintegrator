@@ -5,3 +5,4 @@ from domain.common.decorators.dtoclass import dtoclass
 class LookupConnectionDto:
     Id:int = None
     Name:str = None
+    ConnectionTypeId: int = None

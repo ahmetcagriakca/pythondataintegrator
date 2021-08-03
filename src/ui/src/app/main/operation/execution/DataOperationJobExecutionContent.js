@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { withRouter, useParams } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import { filterFormStyles } from '../../common/styles/FilterFormStyles';
 import { makeStyles } from '@material-ui/core/styles';
 import { DateTimePicker } from "@material-ui/pickers";
 import AppBar from '@material-ui/core/AppBar';
@@ -12,6 +11,7 @@ import Tab from '@material-ui/core/Tab';
 import TabContext from '@material-ui/lab/TabContext';
 import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
+import Box from '@material-ui/core/Box';
 import { getDataOperationJobExecution } from './store/dataOperationJobExecutionSlice';
 import { getStatusName, selectStatusName } from './store/statusNameSlice';
 import DataOperationJobExecutionIntegrationsData from './DataOperationJobExecutionIntegrationsData'
@@ -38,7 +38,6 @@ function DataOperationJobExecutionContent(props) {
 
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const formClasses = filterFormStyles();
 	const [values, setValues] = React.useState({
 		id: 0,
 		jobId: 0,
@@ -89,11 +88,7 @@ function DataOperationJobExecutionContent(props) {
 
 	const checkValue = value => value ? value : ''
 	return (
-		<div className={formClasses.root}
-			style={{ padding: '15px 40px 15px 40px' }}
-		>
-			<div className="flex flex-col flex-shrink-0 sm:flex-row items-center justify-between py-10"></div>
-
+		<Box>
 			<form className={classes.root} noValidate autoComplete="off" style={{ padding: ' 0 0 15px 0' }}>
 				<Grid container spacing={3}>
 					<Grid item xs={2}>
@@ -243,7 +238,7 @@ function DataOperationJobExecutionContent(props) {
 					}
 				</TabPanel>
 			</TabContext>
-		</div>
+		</Box>
 	);
 }
 

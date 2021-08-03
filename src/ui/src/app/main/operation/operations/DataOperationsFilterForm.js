@@ -11,6 +11,9 @@ import { filterFormStyles } from '../../common/styles/FilterFormStyles';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import Icon from '@material-ui/core/Icon';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Box from '@material-ui/core/Box';
 
 
 
@@ -48,7 +51,7 @@ function DataOperationsFilterForm() {
 		routeParams.DataOperationId = null;
 		routeParams.OrderBy = "DataOperation.Id";
 		routeParams.PageNumber = 1;
-		routeParams.Order = null;
+		routeParams.Order = 'desc';
 		routeParams.OnlyUndeleted = true;
 		dispatch(getDataOperations(routeParams));
 	};
@@ -70,11 +73,7 @@ function DataOperationsFilterForm() {
 
 
 	return (
-
-		<div className={classes.root}
-			style={{ padding: '15px 40px 15px 40px' }}
-		>
-			<div className="flex flex-col flex-shrink-0 sm:flex-row items-center justify-between py-10"></div>
+		<Box>
 			<Grid container spacing={3}>
 				<Grid item xs>
 					<Autocomplete
@@ -125,35 +124,35 @@ function DataOperationsFilterForm() {
 				</Grid>
 			</Grid>
 
-			<Grid container spacing={3}>
-				<Grid item xs>
-				</Grid>
-				<Grid item xs={1}>
+			<Box
+				component="span"
+				m={1} //margin
+				className={`${classes.bottomRightBox} ${classes.box}`}
+			>
+				<ButtonGroup aria-label="outlined primary button group">
 					<Button
 						variant="contained"
 						color="secondary"
 						size="large"
 						className={classes.button}
-						// startIcon={<SearchIcon />}
+						startIcon={<Icon >clear</Icon>}
 						onClick={clear}
 					>
 						Clear
 					</Button>
-				</Grid>
-				<Grid item xs={1}>
 					<Button
 						variant="contained"
 						color="secondary"
 						size="large"
 						className={classes.button}
-						// startIcon={<SearchIcon />}
+						startIcon={<Icon >search</Icon>}
 						onClick={filter}
 					>
 						Search
 					</Button>
-				</Grid>
-			</Grid>
-		</div>
+				</ButtonGroup>
+			</Box>
+		</Box>
 	);
 }
 export default DataOperationsFilterForm;

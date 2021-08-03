@@ -61,12 +61,10 @@ class DataOperationService(IScoped):
         definition: Definition = self.definition_service.create_definition(data_operation_model.Name, definition_json)
         data_operation = self.get_by_name(name=data_operation_model.Name)
         if data_operation is None:
-            self.insert_data_operation(data_operation_model, definition)
+            data_operation = self.insert_data_operation(data_operation_model, definition)
         else:
             self.update_data_operation(data_operation_model, definition)
 
-        self.repository_provider.commit()
-        data_operation = self.get_by_name(name=data_operation_model.Name)
         return data_operation
 
     def insert_data_operation(self, data_operation_model: CreateDataOperationRequest,
@@ -125,4 +123,4 @@ class DataOperationService(IScoped):
 
         message = f'{data_operation.Name} data operation deleted'
         self.sql_logger.info(message)
-        self.repository_provider.commit()
+        return message

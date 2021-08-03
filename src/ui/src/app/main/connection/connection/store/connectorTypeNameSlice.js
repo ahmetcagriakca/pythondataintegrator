@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/too
 import axios from './axios';
 
 export const getConnectorTypeName = createAsyncThunk('connectionApp/connectorTypeName/getConnectorTypeName', async params => {
-	// GetConnection
 	const response = await axios.get('/api/Lookup/ConnectorType', {
 	});
 	const data = await response.data;

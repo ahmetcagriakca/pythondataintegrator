@@ -10,7 +10,6 @@ import Icon from '@material-ui/core/Icon';
 import Collapse from '@material-ui/core/Collapse';
 import Box from '@material-ui/core/Box';
 import TableContainer from '@material-ui/core/TableContainer';
-import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter, useParams } from 'react-router-dom';
 import { getConnections, selectConnections } from './store/connectionsSlice';
@@ -137,7 +136,7 @@ function ConnectionsData() {
 	const classes = tableStyles();
 	const headCells = [
 		{ id: 'collapse', orderBy: null, numeric: false, disablePadding: true, label: '' },
-		{ id: 'connectionId', orderBy: 'Connection.Id', numeric: true, disablePadding: true, label: 'Id' },
+		{ id: 'connectionId', orderBy: 'Connection.Id', numeric: false, disablePadding: true, label: 'Id' },
 		{ id: 'connectionName', orderBy: 'Connection.Name', numeric: false, disablePadding: true, label: 'Name' },
 		{ id: 'connectionTypeName', orderBy: 'ConnectionType.Name', numeric: false, disablePadding: true, label: 'Connection Type' },
 		{ id: 'connectorTypeName', orderBy: 'ConnectorType.Name', numeric: false, disablePadding: true, label: 'Connector Type' },
@@ -201,10 +200,6 @@ function ConnectionsData() {
 	const isSelected = name => selected.indexOf(name) !== -1;
 
 	return (
-		<div
-			className={clsx('flex flex-col flex-1 max-w-2x2 w-full mx-auto px-8 sm:px-32')}
-			style={{ padding: '15px 40px 15px 40px' }}
-		>
 			<Paper style={{ borderTopLeftRadius: 30 }} className={classes.paper}>
 				<TableContainer className={classes.container} style={{ maxHeight: 650, borderTopLeftRadius: 30 }}>
 					<Table stickyHeader aria-label="sticky table" size="small">
@@ -227,7 +222,6 @@ function ConnectionsData() {
 					handleChangeRowsPerPage={handleChangeRowsPerPage}
 				/>
 			</Paper>
-		</div>
 	);
 }
 

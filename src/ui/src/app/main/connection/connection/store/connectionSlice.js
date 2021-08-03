@@ -29,7 +29,6 @@ export const postConnection = createAsyncThunk('connectionApp/connection/postCon
 });
 
 export const deleteConnection = createAsyncThunk('connectionApp/connection/deleteConnection', async params => {
-	// GetConnection
 	const response = await axios.delete('/api/Connection', {
 		data: {
 			Id: params.id,
@@ -43,7 +42,6 @@ export const deleteConnection = createAsyncThunk('connectionApp/connection/delet
 
 
 export const checkConnection = createAsyncThunk('connectionApp/connection/checkConnection', async params => {
-	// GetConnection
 	const response = await axios.post('/api/Connection/CheckDatabase', {
 		ConnectionName: params.params.name,
 	});

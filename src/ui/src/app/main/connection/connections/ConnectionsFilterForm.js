@@ -91,11 +91,7 @@ function ConnectionsFilterFom() {
 	};
 
 	return (
-
-		<div className={classes.root}
-			style={{ padding: '15px 40px 15px 40px' }}
-		>
-			<div className="flex flex-col flex-shrink-0 sm:flex-row items-center justify-between py-10"></div>
+		<Box>
 			<Grid container spacing={3}>
 				<Grid item xs>
 					<Autocomplete
@@ -239,7 +235,7 @@ function ConnectionsFilterFom() {
 					</Button>
 				</ButtonGroup>
 			</Box>
-		</div>
+		</Box>
 	);
 }
 export default ConnectionsFilterFom;

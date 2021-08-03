@@ -9,6 +9,7 @@ class LookupConnectionMapping:
         dto = LookupConnectionDto()
         dto.Id=entity.Id
         dto.Name=entity.Name
+        dto.ConnectionTypeId=entity.ConnectionTypeId
         return dto
 
     @staticmethod

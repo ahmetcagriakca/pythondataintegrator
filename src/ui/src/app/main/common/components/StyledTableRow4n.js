@@ -7,11 +7,11 @@ const styles = theme => ({
 		'& > *': {
 			borderBottom: 'unset',
 		},
-		'&:nth-of-type(2n+1)': {
+		'&:nth-of-type(4n+1)': {
 			backgroundColor: theme.palette.action.hover,
 		},
 	},
 });
 
-const StyledTableRow = withStyles(styles)(TableRow);
-export default  StyledTableRow;
+const StyledTableRow4n = withStyles(styles)(TableRow);
+export default  StyledTableRow4n;

@@ -4,6 +4,7 @@ import io from "socket.io-client";
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { getConnection } from '../main/connection/connection/store/connectionSlice';
+import { getOperation } from '../main/operation/operation/store/dataOperationSlice';
 
 let socket = io.connect(`${window.NOTIFICATION_URI}`);
 
@@ -31,10 +32,20 @@ const Notification = () => {
 			let id = getAdditionalDataValue(notification.AdditionalData, 'Id')
 			let type = getAdditionalDataValue(notification.AdditionalData, 'Type')
 			let routePath = ''
-			if (type === 'Connection')
-				routePath = 'connection'
-			if (id && id !== null) {
-				routePath += '/' + id
+			switch (type) {
+				case 'Connection':
+					routePath = 'connection'
+					if (id && id !== null) {
+						routePath += '/' + id
+					}
+				case 'DataOperation':
+					routePath = 'operation'
+					if (id && id !== null) {
+						routePath += '/' + id
+					}
+					break;
+				default:
+					break;
 			}
 			if (routePath !== '') {
 				GotoComponent(routePath)
@@ -44,13 +55,29 @@ const Notification = () => {
 	const actionSelector = (action, type, id) => {
 		switch (type) {
 			case 'Connection':
-				let path = '/connection'
-				if (action != 1) {
-					path += '/' + id
+				{
+					let path = '/connection'
+					if (action !== 1) {
+						path += '/' + id
+					}
+					if ((window.location.pathname === path)) {
+						dispatch(getConnection({ id: id }))
+					}
+					break;
 				}
-				if ((window.location.pathname === path)) {
-					dispatch(getConnection({ id: id }))
+			case 'DataOperation':
+				{
+					let path = '/operation'
+					if (action !== 1) {
+						path += '/' + id
+					}
+					if ((window.location.pathname === path)) {
+						dispatch(getOperation({ id: id }))
+					}
+					break;
 				}
+			default:
+				break;
 		}
 	}
 	const actions = (notification) => {
@@ -117,7 +144,6 @@ const Notification = () => {
 	useEffect(() => {
 		getNotifications();
 	}, []);
-
 
 	return (
 		""

@@ -40,12 +40,11 @@ function ConnectionContent() {
 		password: '',
 		showPassword: false,
 	});
-	const [disabilityStatus, setDisabilityStatus] = React.useState({
-	});
+	const [disabilityStatus, setDisabilityStatus] = React.useState({});
 
 	useEffect(() => {
-		if (values.connectorType && values.connectorType !== null && values.connectionType?.id != values.connectorType?.connectionTypeId) {
-			setValues({ ...values, ['connectorType']: null });
+		if (values.connectorType && values.connectorType !== null && values.connectionType?.id !== values.connectorType?.connectionTypeId) {
+			setValues({ ...values, connectorType: null });
 		}
 	}, [values.connectionType]);
 
@@ -54,7 +53,7 @@ function ConnectionContent() {
 	};
 
 	const handleChange = (prop) => (event) => {
-		handleChangeValue(event, prop, event.target.type === 'number' ? parseInt(event.target.value) : event.target.value)
+		handleChangeValue(event, prop, event.target.type === 'number' ? (parseInt(event.target.value) || 0) : event.target.value)
 	};
 
 	const selectConnectionTypeNames = useSelector(selectConnectionTypeName);
@@ -73,7 +72,6 @@ function ConnectionContent() {
 			dispatch(getConnection(routeParams));
 		}
 		else {
-
 			dispatch(clearConnection(routeParams));
 		}
 	}, [dispatch, routeParams]);
@@ -121,11 +119,6 @@ function ConnectionContent() {
 
 	return (
 
-		<div className={classes.root}
-			style={{ padding: '15px 40px 15px 40px' }}
-		>
-			<div className="flex flex-col flex-shrink-0 sm:flex-row items-center justify-between py-10"></div>
-
 			<form className={classes.root} noValidate autoComplete="off">
 				<Grid container spacing={3}>
 					<Grid item xs={1}>
@@ -138,7 +131,7 @@ function ConnectionContent() {
 							InputLabelProps={{
 								shrink: true,
 							}}
-							onChange={handleChange('name')} />
+							onChange={handleChange('id')} />
 					</Grid>
 					<Grid item xs>
 						<TextField id="standard-name"
@@ -383,7 +376,7 @@ function ConnectionContent() {
 									}
 									<Button
 										variant="contained"
-										color="secondary"
+										color="primary"
 										size="large"
 										className={classes.button}
 										startIcon={<Icon >save</Icon>}
@@ -396,7 +389,6 @@ function ConnectionContent() {
 						) : ("")
 				}
 			</form>
-		</div>
 	);
 }
 export default ConnectionContent;

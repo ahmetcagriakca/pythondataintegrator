@@ -1,844 +1,449 @@
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter, useParams } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import { filterFormStyles } from '../../common/styles/FilterFormStyles';
-import { getDataOperation, postOperation } from './store/dataOperationSlice';
-import { getConnectionName, selectConnectionName } from './store/connectionNameSlice';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
+import { makeStyles } from '@material-ui/core/styles';
 import Icon from '@material-ui/core/Icon';
 import Box from '@material-ui/core/Box';
-import Collapse from '@material-ui/core/Collapse';
 import Typography from '@material-ui/core/Typography';
 import { DateTimePicker } from "@material-ui/pickers";
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
-
 import AppBar from '@material-ui/core/AppBar';
 import Tab from '@material-ui/core/Tab';
 import TabContext from '@material-ui/lab/TabContext';
 import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
-
+import { getOperation, postOperation, deleteOperation, clearOperation } from './store/dataOperationSlice';
+import { getConnectionName } from './store/connectionNameSlice';
 import DataOperationJobExecutions from '../executions/DataOperationJobExecutions';
 import DataOperationJobs from '../jobs/DataOperationJobs';
+import DataOperationContactsData from './contacts/DataOperationContactsData';
+import DataOperationIntegrationsData from './DataOperationIntegrationsData';
+import { toast } from 'react-toastify';
 
-const useRowStyles = makeStyles({
-	root: {
-		'& > *': {
-			borderBottom: 'unset',
-		},
-	},
-});
+
 const useStyles = makeStyles(theme => ({
-
 	root: {
 		"& .MuiTextField-root": {
 			margin: theme.spacing(1)
 		}
 	},
-	textarea: {
-		resize: "both",
+	button: {
+		margin: theme.spacing(1),
+		"white-space": "nowrap",
 	},
-	textareamargin: {
-		margin: "10px 0 0 5px"
+	box: {
+		display: "flex",
 	},
-	divider: {
-		margin: theme.spacing(2, 0),
+	bottomRightBox: {
+		justifyContent: "flex-end",
+		alignItems: "flex-end"
 	},
-	tableRowHeader: {
-		height: 70
+	centerBox: {
+		justifyContent: "center",
+		alignItems: "center"
 	},
-	tableCell: {
-		padding: '0px 16px',
-		// backgroundColor: 'gainsboro',
-		backgroundColor: '#006565',
-		color: 'white',
-		// '&:hover': {
-		// 	backgroundColor: 'blue !important'
-		// }
-		hover: {
-			'&:hover': {
-				backgroundColor: 'green !important'
-			}
-		}
-	},
-
-	tableHeadCellAction: {
-		width: '5px',
-		padding: '0px 8px',
-		// backgroundColor: 'gainsboro',
-		backgroundColor: '#006565',
-		color: 'white',
-		// '&:hover': {
-		// 	backgroundColor: 'blue !important'
-		// }
-		hover: {
-			'&:hover': {
-				backgroundColor: 'green !important'
-			}
-		}
-	},
-	tableBodyCellAction: {
-		width: '5px',
-		padding: '0px 8px',
-		color: 'white',
-		hover: {
-			'&:hover': {
-				backgroundColor: 'green !important'
-			}
-		}
+	topLeftBox: {
+		justifyContent: "flex-start",
+		alignItems: "flex-start"
 	}
 }));
 
-const StyledTableCell = withStyles((theme) => ({
-	head: {
-		color: theme.palette.common.white,
-	},
-	body: {
-		fontSize: 14,
-	},
-}))(TableCell);
-const StyledTableRow = withStyles((theme) => ({
-	root: {
-		'&:nth-of-type(2n+1)': {
-			backgroundColor: theme.palette.action.hover,
-		},
-	},
-}))(TableRow);
-
-const StyledTableRow4n = withStyles((theme) => ({
-	root: {
-		'&:nth-of-type(4n+1)': {
-			backgroundColor: theme.palette.action.hover,
-		},
-	},
-}))(TableRow);
-// function DataOperationIntegrationRow() {
-
 function DataOperationContent() {
-	const rowClasses = useRowStyles();
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const formClasses = filterFormStyles();
+	const routeParams = useParams();
+	const checkValue = value => value ? value : ''
+
+	const [tabValue, setTabValue] = React.useState('1');
+	const [disabilityStatus, setDisabilityStatus] = React.useState({});
+	const [readonlyStatus, setReadonlyStatus] = React.useState({});
+	const operation = useSelector(({ dataOperationApp }) => {
+		return dataOperationApp.dataOperation.data
+	});
 
 	const [values, setValues] = React.useState({
+		id: null,
 		name: '',
 		definitionId: 0,
 		creationDate: new Date(),
 		isDeleted: 0,
-		contacts: [],
-		integrations: [],
-	});
-
-	const handleChange = (prop) => (event) => {
-		setValues({ ...values, [prop]: event.target.value });
-	};
-
-	const selectConnectionNames = useSelector(selectConnectionName);
-
-	const routeParams = useParams();
-
-	const operation = useSelector(({ dataOperationApp }) => {
-		return dataOperationApp.dataOperation.entities[routeParams.id]
+		contacts: null,
+		integrations: null,
 	});
 
 	useEffect(() => {
 		dispatch(getConnectionName(routeParams));
-		dispatch(getDataOperation(routeParams));
-	}, [dispatch, routeParams]);
+		if (routeParams.id && routeParams.id != null) {
+			dispatch(getOperation(routeParams));
+		}
+		else {
 
-	useEffect(() => {
+			dispatch(clearOperation(routeParams));
+		}
+	}, [dispatch, routeParams]);
+	const initializeValues = () => {
 		if (operation && operation != null) {
 			let operationData = { ...operation }
-
-			let integrationDatas = [...operationData.integrations]
-			for (var i = 0; i < integrationDatas.length; i++) {
-				let integration = { ...integrationDatas[i] }
-				integration['open'] = false
-				integrationDatas[i] = integration
+			if (!(operationData.contacts && operationData.concats?.length !== 0)) {
+				operationData.contacts = []
 			}
-			operationData.integrations = integrationDatas
+			if (!(operationData.integrations && operationData.integrations?.length !== 0)) {
+				operationData.integrations = []
+			}
 			setValues(operationData);
 		}
-	}, [operation, selectConnectionNames]);
-
-	const uuid = () => {
-		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-			var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-			return v.toString(16);
-		});
 	}
-	const checkValue = value => value ? value : ''
+	useEffect(() => {
+		if (operation && operation != null) {
+			initializeValues()
+			setDisabilityStatus({
+				id: true,
+				name: ((operation.id && operation.id !== null) || operation.isDeleted === 1) ? true : false,
+				definitionId: true,
+				creationDate: true,
+				isDeleted: true,
+			})
+			setReadonlyStatus({
+				id: true,
+				name: ((operation.id && operation.id !== null)) ? true : false,
+				definitionId: true,
+				creationDate: true,
+				isDeleted: true,
+			})
+		}
+	}, [operation]);
 
-	const handleContactChange = (event, contact, index, prop) => {
-		let newSetData = [...values.contacts];
-		let newSet = { ...newSetData[index] };
-		newSet[prop] = event.target.value
-		newSetData[index] = newSet
-		setValues({ ...values, contacts: newSetData });
+	const handleChangeValue = (event, prop, value) => {
+		setValues({ ...values, [prop]: value });
 	};
-	const deleteContact = (event, contact, index) => {
-		let newSet = [...values.contacts];
-		newSet.splice(index, 1)
-		setValues({ ...values, contacts: newSet });
-	}
-	const addContact = (event) => {
-		let newSet = [...values.contacts];
 
-		newSet = newSet.concat({ id: uuid(), email: "" })
-		setValues({ ...values, contacts: newSet });
-	}
-
-	const handleIntegrationChange = (event, contact, index, prop) => {
-		let newSetData = [...values.integrations];
-		let newSet = { ...newSetData[index] };
-		let propsplits = prop.split('.')
-
-		if (propsplits.length === 0) {
-		}
-		else if (propsplits.length === 1) {
-			newSet[propsplits[0]] = event.target.value
-		}
-		else if (propsplits.length === 2) {
-
-			let newSubSet = { ...newSet[propsplits[0]] };
-			newSubSet[propsplits[1]] = event.target.value
-			newSet[propsplits[0]] = newSubSet
-		}
-		else if (propsplits.length === 3) {
-			let newSubSet1 = { ...newSet[propsplits[0]] };
-			let newSubSet2 = { ...newSubSet1[propsplits[1]] };
-			newSubSet2[propsplits[2]] = event.target.value
-			newSubSet1[propsplits[1]] = newSubSet2
-			newSet[propsplits[0]] = newSubSet1
-		}
-		else if (propsplits.length === 4) {
-
-			let newSubSet1 = { ...newSet[propsplits[0]] };
-			let newSubSet2 = { ...newSubSet1[propsplits[1]] };
-			let newSubSet3 = { ...newSubSet2[propsplits[2]] };
-			newSubSet3[propsplits[3]] = event.target.value
-			newSubSet2[propsplits[2]] = newSubSet3
-			newSubSet1[propsplits[1]] = newSubSet2
-			newSet[propsplits[0]] = newSubSet1
-		}
-		newSetData[index] = newSet
-		setValues({ ...values, integrations: newSetData });
+	const handleChange = (prop) => (event) => {
+		handleChangeValue(event, prop, event.target.type === 'number' ? (parseInt(event.target.value) || 0) : event.target.value)
 	};
-	const deleteIntegration = (event, contact, index) => {
-		let newSet = [...values.integrations];
-		newSet.splice(index, 1)
-		setValues({ ...values, integrations: newSet });
-	}
-	const addIntegration = (event) => {
-		let newSet = [...values.integrations];
 
-		newSet = newSet.concat(
-			{
-				id: uuid(),
-				limit: 0,
-				processCount: 0,
-				integration: {
-					id: uuid(),
-					code: '',
-					isTargetTruncate: false,
-					comments: '',
-					sourceConnection: {
-						id: uuid(),
-						connection: {
-							id: uuid(),
-							database: {
-								id: uuid(),
-								connectorType: {
-									id: uuid(),
-								}
-							},
-							connectionType: {
-								id: uuid(),
-							}
-						},
-						database: {
-							id: uuid(),
-						}
-					},
-					targetConnection: {
-						id: uuid(),
-						connection: {
-							id: uuid(),
-							database: {
-								id: uuid(),
-								connectorType: {
-									id: uuid(),
-								}
-							},
-							connectionType: {
-								id: uuid(),
-							}
-						},
-						database: {
-							id: uuid(),
-						}
-					},
-					columns: [
-					]
-				}
-			}
-		)
-		setValues({ ...values, integrations: newSet });
-	}
-
-	const handleColumnChange = (event, row, integrationIndex, index, prop) => {
-
-		let newSetOperationIntegrations = [...values.integrations];
-		let newSetOperationIntegration = { ...newSetOperationIntegrations[integrationIndex] };
-		let newSetIntegration = { ...newSetOperationIntegration.integration };
-		let newSetColumns = [...newSetIntegration.columns];
-		let newSetColumn = { ...newSetColumns[index] };
-		newSetColumn[prop] = event.target.value
-		newSetColumns[index] = newSetColumn
-		newSetIntegration.columns = newSetColumns
-		newSetOperationIntegration.integration = newSetIntegration
-		newSetOperationIntegrations[integrationIndex] = newSetOperationIntegration
-		setValues({ ...values, integrations: newSetOperationIntegrations });
+	const handleTabChange = (event, newValue) => {
+		setTabValue(newValue);
 	};
-	const deleteColumn = (event, row, integrationIndex, index) => {
-		let newSetOperationIntegrations = [...values.integrations];
-		let newSetOperationIntegration = { ...newSetOperationIntegrations[integrationIndex] };
-		let newSetIntegration = { ...newSetOperationIntegration.integration };
-		let newSetColumns = [...newSetIntegration.columns];
-		newSetColumns.splice(index, 1)
-		newSetIntegration.columns = newSetColumns
-		newSetOperationIntegration.integration = newSetIntegration
-		newSetOperationIntegrations[integrationIndex] = newSetOperationIntegration
-		setValues({ ...values, integrations: newSetOperationIntegrations });
-	}
-	const addColumn = (event, integrationIndex) => {
-		let newSetOperationIntegrations = [...values.integrations];
-		let newSetOperationIntegration = { ...newSetOperationIntegrations[integrationIndex] };
-		let newSetIntegration = { ...newSetOperationIntegration.integration };
-		let newSetColumns = [...newSetIntegration.columns];
-		newSetColumns = newSetColumns.concat({ id: uuid() })
-		newSetIntegration.columns = newSetColumns
-		newSetOperationIntegration.integration = newSetIntegration
-		newSetOperationIntegrations[integrationIndex] = newSetOperationIntegration
-		setValues({ ...values, integrations: newSetOperationIntegrations });
-	}
 
-	const changeOpen = (row, index) => {
-		let newSetOperationIntegrations = [...values.integrations];
-		let newSetOperationIntegration = { ...newSetOperationIntegrations[index] };
-		newSetOperationIntegration.open = !row.open
-		newSetOperationIntegrations[index] = newSetOperationIntegration
-		setValues({ ...values, integrations: newSetOperationIntegrations });
-	}
 	const save = event => {
+		let hasError = false
 		let contacts = []
 		for (var i = 0; i < values.contacts.length; i++) {
 			contacts = contacts.concat({ Email: values.contacts[i].email })
 		}
 
-		let integrations = []
+		let operationIntegrations = []
 		for (var j = 0; j < values.integrations.length; j++) {
+			let dataOperationIntegration = values.integrations[j]
+			let dataIntegration = dataOperationIntegration.integration
 			let sourceColumns = []
 			let targetColumns = []
-			for (var k = 0; k < values.integrations[j].integration.columns.length; k++) {
-				sourceColumns = sourceColumns.concat(values.integrations[j].integration.columns[k].sourceColumnName)
-				targetColumns = targetColumns.concat(values.integrations[j].integration.columns[k].targetColumnName)
-			}
-			integrations = integrations.concat({
-				Limit: values.integrations[j].limit,
-				ProcessCount: values.integrations[j].processCount,
-				Integration: {
-					Code: values.integrations[j].integration.code,
-					IsTargetTruncate: values.integrations[j].integration.isTargetTruncate,
-					IsDelta: false,
-					Comments: (values.integrations[j].integration.comments && values.integrations[j].integration.comments !== null) ? values.integrations[j].integration.comments : '',
-					SourceConnections: {
-						ConnectionName: values.integrations[j].integration.sourceConnection.connection.name,
-						Database: {
-							Schema: values.integrations[j].integration.sourceConnection.database.schema,
-							TableName: values.integrations[j].integration.sourceConnection.database.tableName,
-							Query: values.integrations[j].integration.sourceConnection.database.query,
-						},
-						Columns: sourceColumns.join()
-					},
-					TargetConnections: {
-						ConnectionName: values.integrations[j].integration.targetConnection.connection.name,
-						Database: {
-							Schema: values.integrations[j].integration.targetConnection.database.schema,
-							TableName: values.integrations[j].integration.targetConnection.database.tableName,
-							Query: values.integrations[j].integration.targetConnection.database.query,
-						},
-						Columns: targetColumns.join()
-					}
+
+			if (
+				dataIntegration?.sourceConnection &&
+				dataIntegration?.sourceConnection != null &&
+				dataIntegration?.sourceConnection?.connection?.name != null &&
+				dataIntegration?.targetConnection &&
+				dataIntegration?.targetConnection != null &&
+				dataIntegration?.targetConnection?.connection?.name != null) {
+				for (var k = 0; k < dataIntegration.columns.length; k++) {
+					sourceColumns = sourceColumns.concat(dataIntegration.columns[k].sourceColumnName)
+					targetColumns = targetColumns.concat(dataIntegration.columns[k].targetColumnName)
 				}
-			})
+			}
+			let sourceConnections = null
+			if (
+				dataIntegration?.sourceConnection &&
+				dataIntegration?.sourceConnection != null &&
+				dataIntegration?.sourceConnection?.connection?.name != null
+			) {
+				sourceConnections = {
+					ConnectionName: dataIntegration.sourceConnection.connection.name
+				}
+				if (dataIntegration?.targetConnection?.connection?.connectionTypeId === 1) {
+					let database = {
+						Schema: dataIntegration.sourceConnection.database.schema,
+						TableName: dataIntegration.sourceConnection.database.tableName,
+						Query: dataIntegration.sourceConnection.database.query,
+					}
+					sourceConnections['Database'] = database
+				}
+				if (sourceColumns?.length > 0) {
+					sourceConnections['Columns'] = sourceColumns.join()
+				}
+			}
+			let targetConnections = null
+			if (
+				dataIntegration?.targetConnection &&
+				dataIntegration?.targetConnection != null &&
+				dataIntegration?.targetConnection?.connection?.name != null) {
+				targetConnections = {
+					ConnectionName: dataIntegration.targetConnection.connection.name,
+				}
+
+				if (dataIntegration?.targetConnection?.connection?.connectionTypeId === 1) {
+					let database = {
+						Schema: dataIntegration.targetConnection.database.schema,
+						TableName: dataIntegration.targetConnection.database.tableName,
+						Query: dataIntegration.targetConnection.database.query,
+					}
+					targetConnections['Database'] = database
+				}
+				if (targetColumns?.length > 0) {
+					targetConnections['Columns'] = targetColumns.join()
+				}
+			}
+			else {
+				toast.error("Error on " + dataIntegration.code + ". Target Connection Required for integraion", { position: toast.POSITION.BOTTOM_RIGHT })
+				hasError = true
+			}
+			let integration = {
+				Code: dataIntegration.code,
+				IsTargetTruncate: dataIntegration.isTargetTruncate,
+				IsDelta: false,
+				Comments: dataIntegration.comments,
+			}
+			if (sourceConnections && sourceConnections != null) {
+				integration['SourceConnections'] = sourceConnections
+			}
+			if (targetConnections && targetConnections != null) {
+				integration['TargetConnections'] = targetConnections
+			}
+			if (integration && integration != null) {
+				let operationIntegration = {
+					Limit: dataOperationIntegration.limit,
+					ProcessCount: dataOperationIntegration.processCount,
+					Integration: integration,
+				}
+				if (operationIntegration && operationIntegration != null) {
+					operationIntegrations = operationIntegrations.concat(operationIntegration)
+				}
+			}
 		}
-		let operation = {
-			Name: values.name,
-			Contacts: contacts,
-			Integrations: integrations
+		if (!hasError) {
+			let operation = {
+				Name: values.name,
+				Contacts: contacts,
+				Integrations: operationIntegrations
+			}
+			dispatch(postOperation(operation));
 		}
-		dispatch(postOperation(operation));
 	};
 
 	const clear = event => {
-		if (operation && operation != null) {
-			setValues(operation);
-		}
+		initializeValues()
 	};
 
-	const [tabValue, setTabValue] = React.useState('1');
-	const handleTabChange = (event, newValue) => {
+	const deleteAction = () => {
+		dispatch(deleteOperation({ id: parseInt(routeParams.id) }));
 
-		setTabValue(newValue);
-	};
+	}
+
+	const applyDataOperationIntegrationsChange = (data, index) => {
+		setValues({ ...values, integrations: data });
+	}
+
+	const applyDataOperationContactsChange = (data) => {
+		setValues({ ...values, contacts: data });
+	}
+
 	return (
-
-		<div className={formClasses.root}
-			style={{ padding: '15px 40px 15px 40px' }}
-		>
-			<div className="flex flex-col flex-shrink-0 sm:flex-row items-center justify-between py-10"></div>
-
+		<Box>
 			<form className={classes.root} noValidate autoComplete="off" style={{ padding: ' 0 0 15px 0' }}>
 				<Grid container spacing={3}>
 					<Grid item xs>
-						<TextField id="name" label="Name" value={values.name}
-							disabled
-
-							fullWidth={true} onChange={handleChange('name')} />
+						<Box style={{ width: '100%' }}>
+							<Grid container spacing={3}>
+								<Grid item xs={3}>
+									<TextField
+										id="id"
+										label="Id"
+										type="number"
+										fullWidth={true}
+										InputLabelProps={{
+											shrink: true,
+										}}
+										disabled={disabilityStatus.id}
+										InputProps={{
+											readOnly: readonlyStatus.id,
+										}}
+										value={checkValue(values.id)}
+									/>
+								</Grid>
+								<Grid item xs>
+									<TextField
+										id="name"
+										label="Name"
+										fullWidth={true}
+										InputLabelProps={{
+											shrink: true,
+										}}
+										disabled={disabilityStatus.name}
+										InputProps={{
+											readOnly: readonlyStatus.name,
+										}}
+										value={values.name}
+										onChange={handleChange('name')}
+									/>
+								</Grid>
+							</Grid>
+						</Box>
 					</Grid>
 					<Grid item xs>
-						<TextField id="definitionId" label="Definition Id" value={values.definitionId}
-							disabled
-							fullWidth={true}
+						<TextField
+							id="definitionId"
+							label="Definition Id"
 							type="number"
+							fullWidth={true}
 							InputLabelProps={{
 								shrink: true,
-							}} 
-							onChange={handleChange('definitionId')} />
-					</Grid>
-					<Grid item xs>
-						<DateTimePicker
-							disabled
-							fullWidth={true}
-							label="Creation Date"
-							inputVariant="outlined"
-							value={values.creationDate}
-							onChange={handleChange('creationDate')}
-							format="DD/MM/yyyy HH:mm:sss a"
+							}}
+							disabled={disabilityStatus.definitionId}
+							InputProps={{
+								readOnly: readonlyStatus.definitionId,
+							}}
+							value={values.definitionId}
 						/>
 					</Grid>
 					<Grid item xs>
-						<TextField id="isDeleted" label="Is Deleted" value={values.isDeleted}
-							disabled
+						<DateTimePicker
+							label="Creation Date"
+							inputVariant="outlined"
+							format="DD/MM/yyyy HH:mm:sss a"
 							fullWidth={true}
+							disabled={disabilityStatus.creationDate}
+							readOnly={readonlyStatus.creationDate}
+							value={values.creationDate}
+						/>
+					</Grid>
+					<Grid item xs>
+						<TextField
+							id="isDeleted"
+							label="Is Deleted"
 							type="number"
+							fullWidth={true}
 							InputLabelProps={{
 								shrink: true,
-							}} onChange={handleChange('name')} />
+							}}
+							disabled={disabilityStatus.isDeleted}
+							readOnly={readonlyStatus.isDeleted}
+							value={values.isDeleted}
+						/>
 					</Grid>
 				</Grid>
 
-				<Grid container spacing={3}>
-					<Grid item xs>
-					</Grid>
-					<Grid item xs={1}>
-						<Button
-							variant="contained"
-							color="secondary"
-							size="large"
-							onClick={clear}
-						>
-							Clear
-						</Button>
-					</Grid>
-					<Grid item xs={1}>
-						<Button
-							variant="contained"
-							color="secondary"
-							size="large"
-							onClick={save}
-						>
-							Save
-						</Button>
-					</Grid>
-				</Grid>
+				{
+					values.isDeleted !== 1 ?
+						(
+							<Box
+								component="span"
+								m={1} //margin
+								className={`${classes.bottomRightBox} ${classes.box}`}
+							>
+								<ButtonGroup aria-label="outlined primary button group">
+									{
+										values.id && values.id != null ? (
+											<Button
+												variant="contained"
+												color="default"
+												size="large"
+												className={classes.button}
+												startIcon={<Icon >delete</Icon>}
+												onClick={deleteAction}
+											>
+												Delete
+											</Button>
+										) : ("")
+									}
+									<Button
+										variant="contained"
+										color="secondary"
+										size="large"
+										className={classes.button}
+										startIcon={<Icon >clear</Icon>}
+										onClick={clear}
+									>
+										Clear
+									</Button>
+									<Button
+										variant="contained"
+										color="primary"
+										size="large"
+										className={classes.button}
+										startIcon={<Icon >save</Icon>}
+										onClick={save}
+									>
+										Save
+									</Button>
+								</ButtonGroup>
+							</Box>
+						) : ("")
+				}
 			</form>
 
 			<TabContext value={tabValue}>
 				<AppBar position="static">
-					<TabList onChange={handleTabChange} aria-label="simple tabs example" >
-						<Tab label="Definition" value="1" />
-						{/* <Tab label="Definitions" value="2" />*/}
-						<Tab label="Jobs" value="3" />
-						<Tab label="Executions" value="4" />
-					</TabList>
+
+					{
+						values.id && values.id !== null && values.id !== 0 ?
+							(
+								<TabList onChange={handleTabChange} aria-label="simple tabs example" >
+									<Tab label="Definition" value="1" />
+									<Tab label="Jobs" value="3" />
+									<Tab label="Executions" value="4" />
+								</TabList>
+							) : (
+								<TabList onChange={handleTabChange} aria-label="simple tabs example" >
+									<Tab label="Definition" value="1" />
+								</TabList>
+							)
+					}
 				</AppBar>
 				<TabPanel value="1">
-					<Box >
-						{
-							values.contacts && values.contacts !== null ? (
-								<Table size="small" >
-									<caption>
-
-										<IconButton aria-label="expand row" key={'cellContactAddAction'} size="small" onClick={event => addContact(event)}>
-											<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
-												add_circle
-											</Icon>
-										</IconButton>
-									</caption>
-									<TableHead>
-										<TableRow key={'headRowContact'} className={classes.tableRowHeader}>
-											<StyledTableCell key={'headCellContactEmail'} align={'left'} padding={'normal'} className={classes.tableCell}> Email </StyledTableCell>
-											<StyledTableCell key={'headCellContactAction'} align={'left'} padding={'normal'} className={classes.tableHeadCellAction}> Action </StyledTableCell>
-										</TableRow>
-									</TableHead>
-									<TableBody>
-										{values.contacts.map((contactRow, i) => (
-											<StyledTableRow key={'bodyRowContact' + contactRow.id}>
-												<StyledTableCell key={'bodyCellContactEmail' + contactRow.id} >
-
-													<TextField id="name" label="" value={contactRow.email} InputLabelProps={{ shrink: false }} fullWidth={true}
-														onChange={event => handleContactChange(event, contactRow, i, 'email')} />
-												</StyledTableCell>
-												<StyledTableCell key={'bodyCellContactDeleteAction' + contactRow.id} className={classes.tableBodyCellAction}>
-
-													<IconButton aria-label="expand row" key={'cellContactDeleteAction' + contactRow.id} size="small"
-														onClick={event => deleteContact(event, contactRow, i)}>
-														<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
-															remove_circle
-														</Icon>
-													</IconButton>
-												</StyledTableCell>
-											</StyledTableRow>
-										))}
-									</TableBody>
-								</Table>
-							) :
-								("")
-						}
-					</Box>
-
-					<Box >
-						<Typography variant="h4" gutterBottom component="div">
-							Integrations
-						</Typography>
-						{
-							values.integrations && values.integrations !== null ? (
-								<Table size="small" >
-									<caption>
-
-										<IconButton aria-label="expand row" key={'cellIntegrationAddAction'} size="small" onClick={event => addIntegration(event)}>
-											<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
-												add_circle
-											</Icon>
-										</IconButton>
-									</caption>
-									<TableHead>
-										<TableRow key={'headRowIntegration'} className={classes.tableRowHeader}>
-											<StyledTableCell key={'headRowIntegrationCollapse'} align={'left'} padding={'normal'} className={classes.tableCell}>  </StyledTableCell>
-											<StyledTableCell key={'headRowIntegrationCode'} align={'left'} padding={'normal'} className={classes.tableCell}> Code </StyledTableCell>
-											<StyledTableCell key={'headRowIntegrationLimit'} align={'left'} padding={'normal'} className={classes.tableCell}> Limit </StyledTableCell>
-											<StyledTableCell key={'headRowIntegrationProcessCount'} align={'left'} padding={'normal'} className={classes.tableCell}> Process Count </StyledTableCell>
-											<StyledTableCell key={'headRowIntegrationSourceConnectionName'} align={'left'} padding={'normal'} className={classes.tableCell}> Source Connection  </StyledTableCell>
-											<StyledTableCell key={'headRowIntegrationTargetConnectionName'} align={'left'} padding={'normal'} className={classes.tableCell}> Target Connection  </StyledTableCell>
-											<StyledTableCell key={'headRowIntegrationIsTargetTruncate'} align={'left'} padding={'normal'} className={classes.tableCell}> Is Target Truncate </StyledTableCell>
-											<StyledTableCell key={'headRowIntegrationComments'} align={'left'} padding={'normal'} className={classes.tableCell}> Comments </StyledTableCell>
-											<StyledTableCell key={'headRowIntegrationAction'} align={'left'} padding={'normal'} className={classes.tableCell}> Action </StyledTableCell>
-										</TableRow>
-									</TableHead>
-									<TableBody>
-										{values.integrations.map((integrationRow, integrationIndex) => (
-											<React.Fragment>
-												<StyledTableRow4n key={'bodyRowIntegration' + integrationRow.id} className={rowClasses.root}>
-													<StyledTableCell key={'bodyCellIntegrationCollapse' + integrationRow.id} >
-														<IconButton aria-label="expand row" size="small" onClick={() => changeOpen(integrationRow, integrationIndex)}>
-															<Icon className="text-16 arrow-icon" color="inherit">
-																{integrationRow.open ? 'expand_less' : 'expand_more'}
-															</Icon>
-														</IconButton>
-													</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationCode' + integrationRow.id} component="th" scope="row">{integrationRow.integration.code}</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationLimit' + integrationRow.id} align="left">{integrationRow.limit}</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationProcessCount' + integrationRow.id} align="left">{integrationRow.processCount}</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationSourceConnectionName' + integrationRow.id} align="left">{checkValue(integrationRow.integration.sourceConnection.connection.name) + '-' + checkValue(integrationRow.integration.sourceConnection.connection.database.connectorType.name)}</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationTargetConnectionName' + integrationRow.id} align="left">{checkValue(integrationRow.integration.targetConnection.connection.name) + '-' + checkValue(integrationRow.integration.targetConnection.connection.database.connectorType.name)}</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationIsTargetTruncate' + integrationRow.id} align="left">{integrationRow.integration.isTargetTruncate ? 'true' : 'false'}</StyledTableCell>
-													<StyledTableCell key={'bodyCellIntegrationComments' + integrationRow.id} align="left">{integrationRow.integration.comments}</StyledTableCell>
-
-													<StyledTableCell key={'bodyCellIntegrationDeleteAction' + integrationRow.id}>
-														<IconButton aria-label="expand row" key={'cellIntegrationDeleteAction' + integrationRow.id} size="small" onClick={event => deleteIntegration(event, integrationRow, integrationIndex)}>
-															<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
-																remove_circle
-															</Icon>
-														</IconButton>
-													</StyledTableCell>
-												</StyledTableRow4n>
-												<TableRow key={'bodyRowIntegrationBox' + integrationRow.id}>
-													<TableCell key={'bodyCellIntegrationBox' + integrationRow.id} style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
-														<Collapse key={'integrationBoxCollapse' + integrationRow.id} in={integrationRow.open} timeout="auto" unmountOnExit>
-															<Box key={'integrationBox' + integrationRow.id}>
-																<Typography key={'integrationBoxTypography' + integrationRow.id} variant="h6" gutterBottom component="div">
-																	Integration
-																</Typography>
-																<Grid container spacing={3}>
-																	<Grid item xs>
-																		<TextField id="standard-name" label="Limit" value={checkValue(integrationRow.limit)}
-																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'limit')} />
-																	</Grid>
-																	<Grid item xs>
-																		<TextField id="standard-name" label="Process Count" value={checkValue(integrationRow.processCount)}
-																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'processCount')} />
-																	</Grid>
-																	<Grid item xs>
-																	</Grid>
-																	<Grid item xs>
-																	</Grid>
-																</Grid>
-																<Grid container spacing={3}>
-																	<Grid item xs>
-																		<TextField id="standard-name" label="Code" value={checkValue(integrationRow.integration.code)}
-																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.code')} />
-																	</Grid>
-																	<Grid item xs>
-																		<TextField id="standard-name" label="Is Target Truncate" value={checkValue(integrationRow.integration.isTargetTruncate)}
-																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.isTargetTruncate')} />
-																	</Grid>
-																	<Grid item xs>
-																		<TextField id="standard-name" label="Comments" value={checkValue(integrationRow.integration.comments)}
-																			fullWidth={true} onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.comments')} />
-																	</Grid>
-																	<Grid item xs>
-																	</Grid>
-																</Grid>
-																<Divider className={classes.divider} />
-																<Grid container spacing={3}>
-
-																	<Grid item xs={6} >
-																		<Box margin={1}>
-																			<Typography variant="h6" gutterBottom component="div">
-																				Source Connection
-																			</Typography>
-
-																			<Grid container spacing={1}>
-																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="ConnectionName" value={checkValue(integrationRow.integration.sourceConnection.connection.name)}
-																						fullWidth={true}
-																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.connection.name')} />
-																				</Grid>
-																				<Grid item xs={6}>
-																				</Grid>
-																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="Schema" value={checkValue(integrationRow.integration.sourceConnection.database.schema)}
-																						fullWidth={true}
-																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.schema')} />
-																				</Grid>
-																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="Table" value={checkValue(integrationRow.integration.sourceConnection.database.tableName)}
-																						fullWidth={true}
-																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.tableName')} />
-																				</Grid>
-																				<Grid item xs={12}>
-
-																					<TextField
-																						id="outlined-textarea"
-																						label="Query" value={checkValue(integrationRow.integration.sourceConnection.database.query)}
-																						placeholder="Source Connection Query"
-																						multiline
-																						minrows={4}
-																						maxrows={4}
-																						fullWidth={true}
-																						variant="outlined"
-																						inputProps={{ className: classes.textarea }}
-																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.sourceConnection.database.query')}
-																					/>
-																				</Grid>
-																			</Grid>
-																		</Box>
-																	</Grid>
-																	<Grid item style={{ margin: "0 0 0 5" }} xs={6} >
-																		<Box margin={1}>
-																			<Typography variant="h6" gutterBottom component="div">
-																				Target Connection
-																			</Typography>
-																			<Grid container spacing={1}>
-
-																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="ConnectionName" value={checkValue(integrationRow.integration.targetConnection.connection.name)}
-																						fullWidth={true}
-																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.connection.name')} />
-																				</Grid>
-																				<Grid item xs={6}>
-																				</Grid>
-																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="Schema" value={checkValue(integrationRow.integration.targetConnection.database.schema)}
-																						fullWidth={true}
-																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.schema')} />
-																				</Grid>
-																				<Grid item xs={6}>
-																					<TextField id="standard-name" label="Table" value={checkValue(integrationRow.integration.targetConnection.database.tableName)}
-																						fullWidth={true}
-																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.tableName')} />
-																				</Grid>
-																				<Grid item xs={12}>
-
-																					<TextField
-																						id="outlined-textarea"
-																						label="Query" value={checkValue(integrationRow.integration.targetConnection.database.query)}
-																						placeholder="Target Connection Query"
-																						multiline
-																						minrows={4}
-																						maxrows={4}
-																						fullWidth={true}
-																						variant="outlined"
-																						inputProps={{ className: classes.textarea }}
-																						onChange={event => handleIntegrationChange(event, integrationRow, integrationIndex, 'integration.targetConnection.database.query')}
-																					/>
-																				</Grid>
-																			</Grid>
-																		</Box>
-																	</Grid>
-																</Grid>
-																<Grid container spacing={3}>
-
-																	<Grid item xs={6} >
-																		<Box margin={1}>
-																			<Typography variant="h6" gutterBottom component="div">
-																				Source Columns
-																			</Typography>
-																			<Grid item xs={12}>
-
-																				{
-																					integrationRow.integration.columns && integrationRow.integration.columns !== null ? (
-
-																						<Table size="small" >
-																							<caption>
-
-																								<IconButton aria-label="expand row" key={'cellColumnAddAction'} size="small"
-																									onClick={event => addColumn(event, integrationIndex)}>
-																									<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
-																										add_circle
-																									</Icon>
-																								</IconButton>
-																							</caption>
-																							<TableHead>
-																								<TableRow key={'headRowIntegrationSourceColumns'} className={classes.tableRowHeader}>
-																									<TableCell key={'headCellIntegrationColumnAction'} align={'left'} padding={'normal'} className={classes.tableHeadCellAction}>  </TableCell>
-																									<TableCell key={'headCellIntegrationSourceColumnsColumn'} align={'left'} padding={'normal'} className={classes.tableCell}> Name </TableCell>
-																								</TableRow>
-																							</TableHead>
-																							<TableBody>
-																								{integrationRow.integration.columns.map((columnRow, columnIndex) => (
-
-																									<StyledTableRow key={'bodyRowIntegrationSourceColumn' + columnRow.id}>
-																										<StyledTableCell key={'bodyCellColumnDeleteAction' + columnRow.id} className={classes.tableBodyCellAction}>
-
-																											<IconButton key={'cellColumnDeleteAction' + columnRow.id}
-																												size="small" aria-label="expand row"
-																												onClick={event => deleteColumn(event, columnRow, integrationIndex, columnIndex)}>
-																												<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
-																													remove_circle
-																												</Icon>
-																											</IconButton>
-																										</StyledTableCell>
-																										<StyledTableCell key={'bodyCellIntegrationSourceColumnName' + columnRow.id} >
-
-																											<TextField key={'bodyCellTextIntegrationSourceColumnName' + columnRow.id}
-																												id="name" label="" value={columnRow.sourceColumnName}
-																												InputLabelProps={{ shrink: false }} fullWidth={true}
-																												onChange={event => handleColumnChange(event, columnRow, integrationIndex, columnIndex, 'sourceColumnName')} />
-																										</StyledTableCell>
-																									</StyledTableRow>
-																								))}
-																							</TableBody>
-
-																						</Table>
-																					) :
-																						("")
-																				}
-																			</Grid>
-																		</Box>
-																	</Grid>
-																	<Grid item xs={6} >
-																		<Box margin={1}>
-																			<Typography variant="h6" gutterBottom component="div">
-																				Target Columns
-																			</Typography>
-																			<Grid item xs={12}>
-																				{
-																					integrationRow.integration.columns && integrationRow.integration.columns !== null ? (
-
-																						<Table size="small" >
-																							<TableHead>
-																								<TableRow key={'headRowIntegrationTargetColumns'} className={classes.tableRowHeader}>
-																									<TableCell key={'headCellIntegrationTargetColumnsColumn'} align={'left'} padding={'normal'} className={classes.tableCell}> Name </TableCell>
-																								</TableRow>
-																							</TableHead>
-																							<TableBody>
-
-																								{integrationRow.integration.columns.map((columnRow, columnIndex) => (
-																									<StyledTableRow key={'bodyRowIntegrationTargetColumn' + columnRow.id}>
-																										<StyledTableCell key={'bodyCellIntegrationTargetColumnName' + columnRow.id} >
-																											<TextField key={'bodyCellTextIntegrationTargetColumnName' + columnRow.id}
-																												id="name" label="" value={columnRow.targetColumnName}
-																												InputLabelProps={{ shrink: false }} fullWidth={true}
-																												onChange={event => handleColumnChange(event, columnRow, integrationIndex, columnIndex, 'targetColumnName')} />
-																										</StyledTableCell>
-																									</StyledTableRow>
-																								))}
-																							</TableBody>
-																						</Table>
-																					) :
-																						("")
-																				}
-																			</Grid>
-																		</Box>
-																	</Grid>
-																</Grid>
-
-
-																<Divider className={classes.divider} />
-															</Box>
-														</Collapse>
-													</TableCell>
-												</TableRow>
-											</React.Fragment>
-										))}
-									</TableBody>
-								</Table>
-							) :
-								("")
-						}
-					</Box>
-
-				</TabPanel>
-				<TabPanel value="3">
 					{
-						values.id && values.id !== null && values.id !== 0 ? (
+						values.contacts && values.contacts != null ? (
+							<Box >
+								<Typography variant="h4" gutterBottom component="div">
+									Contacts
+								</Typography>
+
+								<DataOperationContactsData rowData={values.contacts} applyChange={applyDataOperationContactsChange} />
+							</Box>
+						) : ('')
+					}
+					{
+						values.integrations && values.integrations != null ? (
+							<Box >
+								<Typography variant="h4" gutterBottom component="div">
+									Integrations
+								</Typography>
+								<DataOperationIntegrationsData
+									rowData={values.integrations}
+									applyChange={applyDataOperationIntegrationsChange}
+								/>
+							</Box>
+						) : ("")
+					}
+				</TabPanel>
+				{
+					values.id && values.id !== null && values.id !== 0 ? (
+						<TabPanel value="3">
 							<DataOperationJobs HasHeader={false} DataOperationId={values.id} />
-						) :
-							("")
-					}
-				</TabPanel>
-				<TabPanel value="4">
-					{
-						values.id && values.id !== null && values.id !== 0 ? (
+						</TabPanel>
+					) : ("")
+				}
+				{
+					values.id && values.id !== null && values.id !== 0 ? (
+						<TabPanel value="4">
 							<DataOperationJobExecutions HasHeader={false} DataOperationId={values.id} />
-						) :
-							("")
-					}
-				</TabPanel>
+						</TabPanel>
+					) : ("")
+				}
 			</TabContext>
-		</div>
+		</Box>
 	);
 }
 

@@ -1,5 +1,6 @@
 from injector import inject
 
+from domain.operation.DeleteDataOperation.DeleteDataOperationRequest import DeleteDataOperationRequest
 from domain.operation.GetDataOperation.GetDataOperationQuery import GetDataOperationQuery
 from domain.operation.GetDataOperation.GetDataOperationRequest import GetDataOperationRequest
 from domain.operation.GetDataOperation.GetDataOperationResponse import GetDataOperationResponse
@@ -55,12 +56,10 @@ class OperationResource(ResourceBase):
         """
         command = CreateDataOperationCommand(request=req)
         self.dispatcher.dispatch(command)
-        return "Data operation created"
 
-    def delete(self, Id: int):
+    def delete(self, req: DeleteDataOperationRequest):
         """
         Delete Existing Data Operation
         """
-        command = DeleteDataOperationCommand(Id=Id)
+        command = DeleteDataOperationCommand(request=req)
         self.dispatcher.dispatch(command)
-        return "Data operation removed"

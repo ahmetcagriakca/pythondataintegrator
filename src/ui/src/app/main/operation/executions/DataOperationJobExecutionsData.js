@@ -4,7 +4,6 @@ import TableCell from '@material-ui/core/TableCell';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import React, { useEffect } from 'react';
-import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter, useParams } from 'react-router-dom';
 import { getDataOperationJobExecutions, selectDataOperationJobExecutions } from './store/dataOperationJobExecutionsSlice';
@@ -21,8 +20,8 @@ function DataOperationJobExecutionsData(props) {
 	const classes = tableStyles();
 	const history = useHistory();
 	const headCells = [
-		{ id: 'id', orderBy: 'DataOperationJobExecution.Id', numeric: true, disablePadding: true, label: 'Id' },
-		{ id: 'jobId', orderBy: 'DataOperationJob.Id', numeric: true, disablePadding: true, label: 'Job Id' },
+		{ id: 'id', orderBy: 'DataOperationJobExecution.Id', numeric: false, disablePadding: true, label: 'Id' },
+		{ id: 'jobId', orderBy: 'DataOperationJob.Id', numeric: false, disablePadding: true, label: 'Job Id' },
 		{ id: 'dataOperationName', orderBy: 'DataOperation.Name', numeric: false, disablePadding: true, label: 'Name' },
 		{ id: 'scheduleInfo', orderBy: null, numeric: false, disablePadding: true, label: 'Schedule Info' },
 		{ id: 'status', orderBy: 'DataOperationJobExecution.StatusId', numeric: false, disablePadding: true, label: 'Status' },
@@ -100,51 +99,46 @@ function DataOperationJobExecutionsData(props) {
 	const isSelected = name => selected.indexOf(name) !== -1;
 
 	return (
-		<div
-			className={clsx('flex flex-col flex-1 max-w-2x2 w-full mx-auto px-8 sm:px-32')}
-			style={{ padding: '15px 40px 15px 40px' }}
-		>
-			<Paper style={{ borderTopLeftRadius: 30 }} className={classes.paper}>
-				<TableContainer className={classes.container} style={{ maxHeight: 650, borderTopLeftRadius: 30 }}>
-					<Table stickyHeader aria-label="sticky table" size="small">
-						<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells} />
-						<TableBody>
-							{stableSort(dataOperationJobExecutionsList, getComparator(order, orderBy)).map((dataOperationJobExecution, index) => {
-								const isItemSelected = isSelected(dataOperationJobExecution.id);
-								return (
-									<StyledTableRow
-										hover
-										aria-checked={isItemSelected}
-										tabIndex={-1}
-										key={dataOperationJobExecution.id}
-										selected={isItemSelected}
-										onDoubleClick={event => handleClick(event, dataOperationJobExecution)}
-									>
-										<TableCell align="left">{dataOperationJobExecution.id}</TableCell>
-										<TableCell align="left">{dataOperationJobExecution.jobId}</TableCell>
-										<TableCell align="left">{dataOperationJobExecution.dataOperationName}</TableCell>
-										<TableCell align="left">{dataOperationJobExecution.scheduleInfo.cron}({dataOperationJobExecution.scheduleInfo.startDate}-{dataOperationJobExecution.scheduleInfo.endDate})</TableCell>
-										<TableCell align="left">{dataOperationJobExecution.statusDescription}</TableCell>
-										{/* <TableCell align="left">{dataOperationJobExecution.log}</TableCell> */}
-										<TableCell align="left">{dataOperationJobExecution.sourceDataCount}</TableCell>
-										<TableCell align="left">{dataOperationJobExecution.affectedRowCount}</TableCell>
-										<TableCell align="left">{dataOperationJobExecution.startDate}</TableCell>
-										<TableCell align="left">{dataOperationJobExecution.endDate}</TableCell>
-									</StyledTableRow>
-								);
-							})}
-						</TableBody>
-					</Table>
-				</TableContainer>
-				<CustomPagination
-					rowsPerPage={rowsPerPage}
-					page={page}
-					totalCount={totalCount}
-					handleChangePage={handleChangePage}
-					handleChangeRowsPerPage={handleChangeRowsPerPage}
-				/>
-			</Paper>
-		</div>
+		<Paper style={{ borderTopLeftRadius: 30 }} className={classes.paper}>
+			<TableContainer className={classes.container} style={{ maxHeight: 650, borderTopLeftRadius: 30 }}>
+				<Table stickyHeader aria-label="sticky table" size="small">
+					<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells} />
+					<TableBody>
+						{stableSort(dataOperationJobExecutionsList, getComparator(order, orderBy)).map((dataOperationJobExecution, index) => {
+							const isItemSelected = isSelected(dataOperationJobExecution.id);
+							return (
+								<StyledTableRow
+									hover
+									aria-checked={isItemSelected}
+									tabIndex={-1}
+									key={dataOperationJobExecution.id}
+									selected={isItemSelected}
+									onDoubleClick={event => handleClick(event, dataOperationJobExecution)}
+								>
+									<TableCell align="left">{dataOperationJobExecution.id}</TableCell>
+									<TableCell align="left">{dataOperationJobExecution.jobId}</TableCell>
+									<TableCell align="left">{dataOperationJobExecution.dataOperationName}</TableCell>
+									<TableCell align="left">{dataOperationJobExecution.scheduleInfo.cron}({dataOperationJobExecution.scheduleInfo.startDate}-{dataOperationJobExecution.scheduleInfo.endDate})</TableCell>
+									<TableCell align="left">{dataOperationJobExecution.statusDescription}</TableCell>
+									{/* <TableCell align="left">{dataOperationJobExecution.log}</TableCell> */}
+									<TableCell align="left">{dataOperationJobExecution.sourceDataCount}</TableCell>
+									<TableCell align="left">{dataOperationJobExecution.affectedRowCount}</TableCell>
+									<TableCell align="left">{dataOperationJobExecution.startDate}</TableCell>
+									<TableCell align="left">{dataOperationJobExecution.endDate}</TableCell>
+								</StyledTableRow>
+							);
+						})}
+					</TableBody>
+				</Table>
+			</TableContainer>
+			<CustomPagination
+				rowsPerPage={rowsPerPage}
+				page={page}
+				totalCount={totalCount}
+				handleChangePage={handleChangePage}
+				handleChangeRowsPerPage={handleChangeRowsPerPage}
+			/>
+		</Paper>
 	);
 }
 

@@ -16,6 +16,10 @@ const DataOperationConfig = {
 			component: React.lazy(() => import('./operation/DataOperation'))
 		},
 		{
+			path: '/operation',
+			component: React.lazy(() => import('./operation/DataOperation'))
+		},
+		{
 			path: '/jobs',
 			component: React.lazy(() => import('./jobs/DataOperationJobs'))
 		},

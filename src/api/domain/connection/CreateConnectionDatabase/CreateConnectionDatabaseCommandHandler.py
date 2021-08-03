@@ -23,12 +23,12 @@ class CreateConnectionDatabaseCommandHandler(ICommandHandler[CreateConnectionDat
         self.connection_service = connection_service
 
     def handle(self, command: CreateConnectionDatabaseCommand):
-        check_connection = self.connection_service.check_connection_name(command.request.Name)
+        check_existing = self.connection_service.check_connection_name(command.request.Name)
         connection = self.connection_service.create_connection_database(command.request)
         self.repository_provider.commit()
-        self.notify(id=connection.Id, name=connection.Name, check_connection=check_connection)
+        self.notify(id=connection.Id, name=connection.Name, check_existing=check_existing)
 
-    def notify(self, id: int, name: str, check_connection: bool):
+    def notify(self, id: int, name: str, check_existing: bool):
         data_list = []
         data = NotificationAdditionalData(Key="Type", Value="Connection")
         data_list.append(data)
@@ -36,12 +36,12 @@ class CreateConnectionDatabaseCommandHandler(ICommandHandler[CreateConnectionDat
         data_list.append(data)
         data = NotificationAdditionalData(Key="Name", Value=name)
         data_list.append(data)
-        if check_connection:
+        if check_existing:
             action = 2
-            message = "Connection Updated"
+            message = f"{name} Connection Updated"
         else:
             action = 1
-            message = "Connection Created"
+            message = f"{name} Connection Created"
 
         send_notification_request = SendNotificationRequest(Message=message, Type=1, Action=action,
                                                             AdditionalData=data_list)
