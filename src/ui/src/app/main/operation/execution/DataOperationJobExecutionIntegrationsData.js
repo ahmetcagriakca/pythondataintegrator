@@ -14,16 +14,19 @@ import TableHead from '@material-ui/core/TableHead';
 function DataOperationJobExecutionIntegrationsData(props) {
 	const dispatch = useDispatch();
 	const classes = tableStyles();
+
+	const { ExecutionId } = props;
+
 	const dataOperationJobExecutionIntegrationsList = useSelector(selectDataOperationJobExecutionIntegrations);
 
 
 	const routeParams = useParams();
-	routeParams.ExecutionId = props.ExecutionId
 
 
 	useEffect(() => {
+		routeParams.ExecutionId = ExecutionId
 		dispatch(getDataOperationJobExecutionIntegrations(routeParams));
-	}, [dispatch, routeParams]);
+	}, [dispatch, routeParams,ExecutionId]);
 
 
 	return (
@@ -52,8 +55,8 @@ function DataOperationJobExecutionIntegrationsData(props) {
 									key={dataOperationJobExecutionIntegrations.id}
 								>
 									<TableCell align="left">{dataOperationJobExecutionIntegrations.order}</TableCell>
-									<TableCell align="left">{dataOperationJobExecutionIntegrations.dataIntegrationCode}</TableCell>
-									<TableCell align="left">{dataOperationJobExecutionIntegrations.status}</TableCell>
+									<TableCell align="left" style={{ width: 100 }}>{dataOperationJobExecutionIntegrations.dataIntegrationCode}</TableCell>
+									<TableCell align="left">{dataOperationJobExecutionIntegrations.statusDescription}</TableCell>
 									<TableCell align="left">{dataOperationJobExecutionIntegrations.sourceConnectionName}</TableCell>
 									<TableCell align="left">{dataOperationJobExecutionIntegrations.targetConnectionName}</TableCell>
 									<TableCell align="left">{dataOperationJobExecutionIntegrations.limit}</TableCell>

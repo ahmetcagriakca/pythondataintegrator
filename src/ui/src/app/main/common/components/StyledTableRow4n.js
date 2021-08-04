@@ -10,6 +10,12 @@ const styles = theme => ({
 		'&:nth-of-type(4n+1)': {
 			backgroundColor: theme.palette.action.hover,
 		},
+		"&:hover": {
+			backgroundColor: " rgba(0, 0, 0, 0.25) !important",
+			'@media (hover: none)': {
+			  backgroundColor: 'transparent',
+			},
+		}
 	},
 });
 

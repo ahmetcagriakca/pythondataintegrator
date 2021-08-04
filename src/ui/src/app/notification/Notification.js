@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { getConnection } from '../main/connection/connection/store/connectionSlice';
 import { getOperation } from '../main/operation/operation/store/dataOperationSlice';
+import { getOperationJob } from '../main/operation/job/store/dataOperationJobSlice';
 
 let socket = io.connect(`${window.NOTIFICATION_URI}`);
 
@@ -44,6 +45,12 @@ const Notification = () => {
 						routePath += '/' + id
 					}
 					break;
+				case 'DataOperationJob':
+					routePath = 'operationjob'
+					if (id && id !== null) {
+						routePath += '/' + id
+					}
+					break;
 				default:
 					break;
 			}
@@ -73,6 +80,17 @@ const Notification = () => {
 					}
 					if ((window.location.pathname === path)) {
 						dispatch(getOperation({ id: id }))
+					}
+					break;
+				}
+			case 'DataOperationJob':
+				{
+					let path = '/operationjob'
+					if (action !== 1) {
+						path += '/' + id
+					}
+					if ((window.location.pathname === path)) {
+						dispatch(getOperationJob({ id: id }))
 					}
 					break;
 				}

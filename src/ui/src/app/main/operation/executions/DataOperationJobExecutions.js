@@ -41,13 +41,19 @@ function DataOperationJobExecutions(props) {
 				style={{ padding: '15px 40px 15px 40px' }}
 			>
 				<div className="flex flex-col flex-shrink-0 sm:flex-row items-center justify-between py-10"></div>
-				<DataOperationJobExecutionsFilterForm DataOperationId={props.DataOperationId} />
+				<DataOperationJobExecutionsFilterForm
+					DataOperationId={props.DataOperationId}
+					DataOperationJobId={props.DataOperationJobId}
+				/>
 
 			</div>
 			<div
 				className={clsx('flex flex-col flex-1 max-w-2x2 w-full mx-auto px-8 sm:px-32')}
 			>
-				<DataOperationJobExecutionsData DataOperationId={props.DataOperationId} />
+				<DataOperationJobExecutionsData
+					DataOperationId={props.DataOperationId}
+					DataOperationJobId={props.DataOperationJobId}
+				/>
 			</div>
 		</div>
 	);

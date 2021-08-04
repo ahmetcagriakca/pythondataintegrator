@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from domain.schedule.DeleteJob.DeleteJobRequest import DeleteJobRequest
 from infrastructure.cqrs.ICommand import ICommand
 
 
 @dataclass
 class DeleteJobCommand(ICommand):
-    Id: int = None
+    request: DeleteJobRequest = None

@@ -15,16 +15,17 @@ import TextField from '@material-ui/core/TextField';
 function DataOperationJobExecutionLogsData(props) {
 	const dispatch = useDispatch();
 	const classes = tableStyles();
+	const { ExecutionId } = props;
 	const dataOperationJobExecutionLogsList = useSelector(selectDataOperationJobExecutionLogs);
 
 
 	const routeParams = useParams();
-	routeParams.ExecutionId = props.ExecutionId
 
 
 	useEffect(() => {
+		routeParams.ExecutionId = ExecutionId
 		dispatch(getDataOperationJobExecutionLogs(routeParams));
-	}, [dispatch, routeParams]);
+	}, [dispatch, routeParams, ExecutionId]);
 
 
 	return (
@@ -48,7 +49,7 @@ function DataOperationJobExecutionLogsData(props) {
 									<TableCell align="left">{dataOperationJobExecutionLogs.creationDate}</TableCell>
 									<TableCell align="left">{dataOperationJobExecutionLogs.comments}</TableCell>
 									<TableCell align="left">
-									{/* {dataOperationJobExecutionLogs.content} */}
+										{/* {dataOperationJobExecutionLogs.content} */}
 										<TextField
 											id="outlined-textarea"
 											value={dataOperationJobExecutionLogs.content}

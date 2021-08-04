@@ -12,6 +12,7 @@ class GetDataOperationJobExecutionIntegrationListDto:
     SourceConnectionName: str = None
     TargetConnectionName: str = None
     StatusId: int = None
+    StatusDescription: str = None
     Status: str = None
     Limit: int = None
     ProcessCount: int = None

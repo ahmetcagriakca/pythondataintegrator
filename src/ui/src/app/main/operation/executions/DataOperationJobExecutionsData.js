@@ -19,6 +19,9 @@ function DataOperationJobExecutionsData(props) {
 	const dispatch = useDispatch();
 	const classes = tableStyles();
 	const history = useHistory();
+
+	const { DataOperationId, DataOperationJobId } = props;
+
 	const headCells = [
 		{ id: 'id', orderBy: 'DataOperationJobExecution.Id', numeric: false, disablePadding: true, label: 'Id' },
 		{ id: 'jobId', orderBy: 'DataOperationJob.Id', numeric: false, disablePadding: true, label: 'Job Id' },
@@ -47,18 +50,20 @@ function DataOperationJobExecutionsData(props) {
 	});
 	const PageSize = useSelector(({ dataOperationJobExecutionsApp }) => dataOperationJobExecutionsApp.dataOperationJobExecutions.pageSize);
 
-	const isDataOperation = () => (props.DataOperationId && props.DataOperationId !== null && props.DataOperationId !== 0)
+	const isDataOperation = (DataOperationId && DataOperationId !== null && DataOperationId !== 0)
+	const isDataOperationJob = (DataOperationJobId && DataOperationJobId !== null && DataOperationJobId !== 0)
 	const routeParams = useParams();
 	routeParams.PageNumber = PageNumber;
 	routeParams.PageSize = PageSize === 0 ? 10 : PageSize;
 	routeParams.OrderBy = orderBy;
 	routeParams.Order = order;
-	routeParams.DataOperationId = isDataOperation() ? props.DataOperationId : null;
 
 
 	useEffect(() => {
+		routeParams.DataOperationId = isDataOperation ? DataOperationId : null;
+		routeParams.DataOperationJobId = isDataOperationJob ? DataOperationJobId : null;
 		dispatch(getDataOperationJobExecutions(routeParams));
-	}, [dispatch, routeParams, props]);
+	}, [dispatch, routeParams, DataOperationId, DataOperationJobId]);
 
 	const handleRequestSort = (event, orderByValue) => {
 		const isAsc = orderBy === orderByValue && order === 'asc';

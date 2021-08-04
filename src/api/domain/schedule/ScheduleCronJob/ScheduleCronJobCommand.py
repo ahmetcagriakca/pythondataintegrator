@@ -5,6 +5,4 @@ from domain.schedule.ScheduleCronJob.ScheduleCronJobRequest import ScheduleCronJ
 
 @dataclass
 class ScheduleCronJobCommand(ICommand):
-    # TODO:Command attributes
     request: ScheduleCronJobRequest = None
-    pass

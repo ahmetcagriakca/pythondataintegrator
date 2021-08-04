@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
 
-export const getDataOperationJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/getDataOperationJob', async params => {
+export const getOperationJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/getDataOperationJob', async params => {
 	// GetDataOperationJob
 	const response = await axios.get('/api/Operation/JobById', {
 		params: {
@@ -12,6 +12,36 @@ export const getDataOperationJob = createAsyncThunk('dataOperationJobApp/dataOpe
 	return data;
 });
 
+export const postScheduleCronJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/postScheduleCronJob', async requestData => {
+	const response = await axios.post('/api/Schedule/CronJob', requestData);
+	const data = await response.data;
+	return data;
+});
+export const postScheduleJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/postScheduleJob', async requestData => {
+	const response = await axios.post('/api/Schedule/Job', requestData);
+	const data = await response.data;
+	return data;
+});
+
+export const deleteScheduleCronJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/deleteScheduleCronJob', async requestData => {
+	const response = await axios.delete('/api/Schedule/CronJob', {
+		data: requestData
+	});
+	const data = await response.data;
+	return data;
+});
+
+export const deleteScheduleJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/deleteScheduleJob', async requestData => {
+	const response = await axios.delete('/api/Schedule/Job', {
+		data: requestData
+	});
+	const data = await response.data;
+	return data;
+});
+
+export const clearDataOperationJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/clearOperation', async params => {
+	return {};
+});
 
 const dataOperationJobAdapter = createEntityAdapter({});
 
@@ -22,13 +52,18 @@ export const { selectAll: selectDataOperationJob, selectById: selectDataOperatio
 const dataOperationJobSlice = createSlice({
 	name: 'dataOperationJobApp/dataOperationJob',
 	initialState: dataOperationJobAdapter.getInitialState({
-		dataOperationJob: {},
+		data: {},
 	}),
 	reducers: {},
 	extraReducers: {
-		[getDataOperationJob.fulfilled]: (state, action) => {
+		[getOperationJob.fulfilled]: (state, action) => {
 			dataOperationJobAdapter.setAll(state, [action.payload.result.data]);
-		}
+			state.data = action.payload.result.data;
+		},
+		[clearDataOperationJob.fulfilled]: (state, action) => {
+			dataOperationJobAdapter.setAll(state, []);
+			state.data = {};
+		},
 	}
 });
 export default dataOperationJobSlice.reducer;

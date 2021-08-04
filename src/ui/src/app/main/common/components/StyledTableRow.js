@@ -10,8 +10,14 @@ const styles = theme => ({
 		'&:nth-of-type(2n+1)': {
 			backgroundColor: theme.palette.action.hover,
 		},
+		"&:hover": {
+			backgroundColor: " rgba(0, 0, 0, 0.25) !important",
+			'@media (hover: none)': {
+			  backgroundColor: 'transparent',
+			},
+		}
 	},
 });
 
 const StyledTableRow = withStyles(styles)(TableRow);
-export default  StyledTableRow;
+export default StyledTableRow;

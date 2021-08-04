@@ -68,10 +68,11 @@ function DataOperationContent() {
 		id: null,
 		name: '',
 		definitionId: 0,
-		creationDate: new Date(),
-		isDeleted: 0,
+		version: 0,
 		contacts: null,
 		integrations: null,
+		creationDate: new Date(),
+		isDeleted: true,
 	});
 
 	useEffect(() => {
@@ -309,29 +310,37 @@ function DataOperationContent() {
 						/>
 					</Grid>
 					<Grid item xs>
-						<DateTimePicker
-							label="Creation Date"
-							inputVariant="outlined"
-							format="DD/MM/yyyy HH:mm:sss a"
-							fullWidth={true}
-							disabled={disabilityStatus.creationDate}
-							readOnly={readonlyStatus.creationDate}
-							value={values.creationDate}
-						/>
-					</Grid>
-					<Grid item xs>
-						<TextField
-							id="isDeleted"
-							label="Is Deleted"
-							type="number"
-							fullWidth={true}
-							InputLabelProps={{
-								shrink: true,
-							}}
-							disabled={disabilityStatus.isDeleted}
-							readOnly={readonlyStatus.isDeleted}
-							value={values.isDeleted}
-						/>
+						<Box style={{ width: '100%' }}>
+							<Grid container spacing={1}>
+								<Grid item xs>
+									<DateTimePicker
+										label="Creation Date"
+										inputVariant="outlined"
+										format="DD/MM/yyyy HH:mm:sss a"
+										fullWidth={true}
+										disabled={disabilityStatus.creationDate}
+										readOnly={readonlyStatus.creationDate}
+										value={values.creationDate}
+										onChange={handleChange('creationDate')}
+									/>
+								</Grid>
+								<Grid item xs={4}>
+									<TextField
+										id="isDeleted"
+										label="Is Deleted"
+										type="number"
+										variant="outlined"
+										fullWidth={true}
+										InputLabelProps={{
+											shrink: true,
+										}}
+										disabled={disabilityStatus.isDeleted}
+										readOnly={readonlyStatus.isDeleted}
+										value={values.isDeleted}
+									/>
+								</Grid>
+							</Grid>
+						</Box>
 					</Grid>
 				</Grid>
 
@@ -443,7 +452,7 @@ function DataOperationContent() {
 					) : ("")
 				}
 			</TabContext>
-		</Box>
+		</Box >
 	);
 }
 

@@ -1,5 +1,6 @@
 from injector import inject
 from domain.schedule.DeleteCronJob.DeleteCronJobCommand import DeleteCronJobCommand
+from domain.schedule.DeleteCronJob.DeleteCronJobRequest import DeleteCronJobRequest
 from domain.schedule.ScheduleCronJob.ScheduleCronJobCommand import ScheduleCronJobCommand
 from domain.schedule.ScheduleCronJob.ScheduleCronJobRequest import ScheduleCronJobRequest
 from infrastructure.api.ResourceBase import ResourceBase
@@ -22,12 +23,10 @@ class ScheduleCronJobResource(ResourceBase):
         """
         command = ScheduleCronJobCommand(request=req)
         self.dispatcher.dispatch(command)
-        return "Data operation cron job created"
 
-    def delete(self, DataOperationName: str):
+    def delete(self, req: DeleteCronJobRequest):
         """
         Delete Existing Data Operation
         """
-        command = DeleteCronJobCommand(DataOperationName=DataOperationName)
+        command = DeleteCronJobCommand(request=req)
         self.dispatcher.dispatch(command)
-        return "Data Operation Cron Job removed successfully"

@@ -27,6 +27,22 @@ class DataOperationJobService(IScoped):
                                                                 DataOperationId=data_operation_id)
         return entities
 
+    def check_existing_cron_jobs_by_data_operation_id(self, data_operation_id: int) -> DataOperationJob:
+        query = self.data_operation_job_repository.table \
+            .filter(DataOperationJob.IsDeleted == 0) \
+            .filter(DataOperationJob.Cron != None) \
+            .filter(DataOperationJob.Cron != '') \
+            .filter(DataOperationJob.DataOperationId == data_operation_id)
+        return query.count()>0
+
+    def get_all_cron_jobs_by_data_operation_id(self, data_operation_id: int) -> DataOperationJob:
+        entities = self.data_operation_job_repository.table \
+            .filter(DataOperationJob.IsDeleted == 0) \
+            .filter(DataOperationJob.Cron != None) \
+            .filter(DataOperationJob.Cron != '') \
+            .filter(DataOperationJob.DataOperationId == data_operation_id)
+        return entities
+
     def get_by_job_id(self, job_id: int) -> DataOperationJob:
         entity = self.data_operation_job_repository.first(IsDeleted=0,
                                                           ApSchedulerJobId=job_id)

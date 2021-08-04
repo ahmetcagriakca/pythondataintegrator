@@ -27,10 +27,14 @@ function DataOperationJobExecutionsFilterForm(props) {
 		},
 	});
 
-	const isDataOperation = () => (props.DataOperationId && props.DataOperationId !== null && props.DataOperationId !== 0)
+	const { DataOperationId, DataOperationJobId } = props;
+
+	const isDataOperation = (DataOperationId && DataOperationId !== null && DataOperationId !== 0)
+	const isDataOperationJob = (DataOperationJobId && DataOperationJobId !== null && DataOperationJobId !== 0)
 	const routeParams = useParams();
-	routeParams.DataOperationId = isDataOperation() ? props.DataOperationId : null;
 	useEffect(() => {
+		routeParams.DataOperationId = isDataOperation ? DataOperationId : null;
+		routeParams.DataOperationJobId = isDataOperationJob ? DataOperationJobId : null;
 		dispatch(getDataOperationName(routeParams));
 		dispatch(getStatusName(routeParams));
 	}, [dispatch, routeParams]);
@@ -49,15 +53,16 @@ function DataOperationJobExecutionsFilterForm(props) {
 	const clear = event => {
 		setDataOperation(null);
 		setStatus(null);
-		setOnlyCron(isDataOperation() ? false : true);
+		setOnlyCron(isDataOperation || isDataOperationJob ? false : true);
 
 		routeParams.OrderBy = "DataOperationJobExecution.Id";
 		routeParams.PageNumber = 1;
 		routeParams.Order = null;
 		routeParams.DataOperationName = null;
-		routeParams.OnlyCron = isDataOperation() ? false : true;
+		routeParams.OnlyCron = isDataOperation || isDataOperationJob ? false : true;
 		routeParams.StatusId = null;
-		routeParams.DataOperationId = isDataOperation() ? props.DataOperationId : null;
+		routeParams.DataOperationId = isDataOperation ? DataOperationId : null;
+		routeParams.DataOperationJobId = isDataOperationJob ? DataOperationJobId : null;
 		dispatch(getDataOperationJobExecutions(routeParams));
 	};
 
@@ -76,6 +81,8 @@ function DataOperationJobExecutionsFilterForm(props) {
 		}
 		routeParams.StatusId = statusId;
 		routeParams.PageNumber = 1;
+		routeParams.DataOperationId = isDataOperation ? DataOperationId : null;
+		routeParams.DataOperationJobId = isDataOperationJob ? DataOperationJobId : null;
 		dispatch(getDataOperationJobExecutions(routeParams));
 	};
 
@@ -83,7 +90,7 @@ function DataOperationJobExecutionsFilterForm(props) {
 		<Box>
 			<Grid container spacing={3}>
 				{
-					!isDataOperation() ? (
+					!(isDataOperation || isDataOperationJob) ? (
 						<Grid item xs>
 							<Autocomplete
 								id="country-select-demo"
@@ -156,15 +163,19 @@ function DataOperationJobExecutionsFilterForm(props) {
 						openOnFocus
 					/>
 				</Grid>
-				<Grid item xs>
+				{
+					!isDataOperationJob ? (
+						<Grid item xs>
 
-					<FormGroup row>
-						<FormControlLabel style={{ margin: "5px" }}
-							control={<Checkbox checked={onlyCron} onChange={handleOnlyCronChange} name="onlyCron" />}
-							label="Only Cron"
-						/>
-					</FormGroup>
-				</Grid>
+							<FormGroup row>
+								<FormControlLabel style={{ margin: "5px" }}
+									control={<Checkbox checked={onlyCron} onChange={handleOnlyCronChange} name="onlyCron" />}
+									label="Only Cron"
+								/>
+							</FormGroup>
+						</Grid>
+					) : ("")
+				}
 				<Grid item xs></Grid>
 
 			</Grid>
@@ -197,7 +208,7 @@ function DataOperationJobExecutionsFilterForm(props) {
 					</Button>
 				</ButtonGroup>
 			</Box>
-			</Box>
+		</Box>
 	);
 }
 export default DataOperationJobExecutionsFilterForm;

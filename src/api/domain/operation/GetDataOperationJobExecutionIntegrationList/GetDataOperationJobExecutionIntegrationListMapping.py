@@ -11,14 +11,14 @@ class GetDataOperationJobExecutionIntegrationListMapping:
     @staticmethod
     def to_dto(entity: Query) -> GetDataOperationJobExecutionIntegrationListDto:
         dto = GetDataOperationJobExecutionIntegrationListDto()
-
         dto.Id = entity.DataOperationJobExecutionIntegration.Id
         dto.DataIntegrationId = entity.DataOperationIntegration.DataIntegration.Id
         dto.DataIntegrationCode = entity.DataOperationIntegration.DataIntegration.Code
         dto.Order = entity.DataOperationIntegration.Order
-        dto.SourceConnectionName = entity.DataOperationIntegration.Id
-        dto.TargetConnectionName = entity.DataOperationIntegration.Id
-        dto.Status = entity.DataOperationJobExecutionIntegration.StatusId
+        dto.SourceConnectionName = entity.SourceConnectionName
+        dto.TargetConnectionName = entity.TargetConnectionName
+        dto.StatusId = entity.DataOperationJobExecutionIntegration.Status.Id
+        dto.StatusDescription = entity.DataOperationJobExecutionIntegration.Status.Description
         dto.Limit = entity.DataOperationIntegration.Limit
         dto.ProcessCount = entity.DataOperationIntegration.ProcessCount
         dto.SourceDataCount = entity.DataOperationJobExecutionIntegration.SourceDataCount

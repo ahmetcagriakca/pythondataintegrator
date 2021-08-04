@@ -28,6 +28,10 @@ const DataOperationConfig = {
 			component: React.lazy(() => import('./job/DataOperationJob'))
 		},
 		{
+			path: '/operationjob',
+			component: React.lazy(() => import('./job/DataOperationJob'))
+		},
+		{
 			path: '/job/executions',
 			component: React.lazy(() => import('./executions/DataOperationJobExecutions'))
 		},

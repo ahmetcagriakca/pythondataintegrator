@@ -59,13 +59,13 @@ class GetDataOperationJobExecutionSpecifications(IScoped):
             .join(DataOperation, DataOperation.Id == DataOperationJob.DataOperationId) \
             .join(Status, Status.Id == DataOperationJobExecution.StatusId) \
             .join(max_integration_subquery,
-                  max_integration_subquery.c.DataOperationJobExecutionId == DataOperationJobExecution.Id) \
+                  max_integration_subquery.c.DataOperationJobExecutionId == DataOperationJobExecution.Id, isouter=True) \
             .join(DataOperationJobExecutionIntegration,
-                  max_integration_subquery.c.DataOperationJobExecutionIntegrationId == DataOperationJobExecutionIntegration.Id) \
+                  max_integration_subquery.c.DataOperationJobExecutionIntegrationId == DataOperationJobExecutionIntegration.Id, isouter=True) \
             .join(total_source_data_count_subquery,
-                  total_source_data_count_subquery.c.DataOperationJobExecutionId == DataOperationJobExecution.Id) \
+                  total_source_data_count_subquery.c.DataOperationJobExecutionId == DataOperationJobExecution.Id, isouter=True) \
             .join(total_affected_row_subquery,
-                  total_affected_row_subquery.c.DataOperationJobExecutionId == DataOperationJobExecution.Id)
+                  total_affected_row_subquery.c.DataOperationJobExecutionId == DataOperationJobExecution.Id, isouter=True)
 
         specified_query = specified_query.filter(DataOperationJobExecution.Id == query.request.Id)
 
