@@ -14,24 +14,28 @@ class _Endpoint:
 
     def __call__(self, *args, **kwargs):
         input_type, input_name = self.find_input_type()
+        req = None
+        if input_type is not None and input_name is not None:
 
-        if TypeChecker().is_class(input_type):
-            if self.function.__name__ == 'get':
-                req = self.endpoint_wrapper.get_request_from_parser(input_type)
+            if TypeChecker().is_class(input_type):
+                if self.function.__name__ == 'get':
+                    req = self.endpoint_wrapper.get_request_from_parser(input_type)
+                else:
+                    req = self.endpoint_wrapper.get_request_from_body(input_type)
             else:
-                req = self.endpoint_wrapper.get_request_from_body(input_type)
+
+                req = self.endpoint_wrapper.get_request_from_parser_for_primitive(input_name, input_type)
+        if req is not None:
+            res = self.function(args[0], req, **kwargs)
         else:
-
-            req = self.endpoint_wrapper.get_request_from_parser_for_primitive(input_name, input_type)
-
-        res = self.function(args[0], req, **kwargs)
+            res = self.function(args[0], **kwargs)
 
         if self.return_type() is not None:
             result = json.loads(json.dumps(res.to_dict(), default=self.endpoint_wrapper.date_converter))
             endpoint_response = self.endpoint_wrapper.get_response(result=result)
             return endpoint_response
         else:
-            endpoint_response = self.endpoint_wrapper.get_response(message=res)
+            endpoint_response = self.endpoint_wrapper.get_response(result=res)
             return endpoint_response
 
     def input_type_names(self):
@@ -58,23 +62,24 @@ class _Endpoint:
     def find_input_type(self):
         input_types, input_names = self.input_types()
         if input_types == None or len(input_types) == 0:
-            return None
+            return None, None
         elif len(input_types) == 1:
             return input_types[0], input_names[0]
         else:
-            return None
+            return None, None
 
     def expect_inputs(self):
         input_type, input_name = self.find_input_type()
-
-        if TypeChecker().is_class(input_type):
-            if self.function.__name__ == 'get':
-                expect_model = self.endpoint_wrapper.request_parser(input_type)
+        expect_model = None
+        if input_type is not None and input_name is not None:
+            if TypeChecker().is_class(input_type):
+                if self.function.__name__ == 'get':
+                    expect_model = self.endpoint_wrapper.request_parser(input_type)
+                else:
+                    expect_model = self.endpoint_wrapper.request_model(input_type)
             else:
-                expect_model = self.endpoint_wrapper.request_model(input_type)
-        else:
 
-            expect_model = self.endpoint_wrapper.create_parser(input_name, input_type)
+                expect_model = self.endpoint_wrapper.create_parser(input_name, input_type)
 
         return expect_model
 

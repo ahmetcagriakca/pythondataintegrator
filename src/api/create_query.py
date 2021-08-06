@@ -1,5 +1,7 @@
 from injector import inject
 import os
+
+from FolderManager import FolderManager
 from infrastructure.dependency.scopes import IScoped
 from infrastructure.utils.ModuleFinder import ModuleFinder
 from models.configs.ApplicationConfig import ApplicationConfig
@@ -9,7 +11,9 @@ class GenerateQuery(IScoped):
     @inject
     def __init__(self,
                  application_config: ApplicationConfig,
-                 module_finder: ModuleFinder):
+                 module_finder: ModuleFinder,
+                 folder_manager: FolderManager):
+        self.folder_manager = folder_manager
         self.application_config = application_config
         self.module_finder = module_finder
 
@@ -22,19 +26,9 @@ class GenerateQuery(IScoped):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-    def create_old_file(self, file_path, old_file_path):
-        with open(file_path, "r") as outfile:
-            content = outfile.read()
-
-        with open(old_file_path, "w") as outfile:
-            outfile.write(content)
-
     def create_file(self, folder, file_name, content, file_extension='.py'):
         self.create_folder_if_not_exist(folder)
         file_path = '/'.join([folder, f'{file_name}{file_extension}'])
-        if self.check_path_exist(folder, f'{file_name}{file_extension}'):
-            old_file_path = '/'.join([folder, f'{file_name}_old{file_extension}'])
-            self.create_old_file(file_path=file_path, old_file_path=old_file_path)
 
         with open(file_path, "w") as outfile:
             outfile.write(content.strip() + '\n')
@@ -275,13 +269,15 @@ class {query_name}QueryHandler(IQueryHandler[{query_name}Query], IScoped):
         self.create_file(folder=query_folder_path, file_name=file_name,
                          content=content)
 
-    def generate(self, domain, name, has_request=False, is_list: bool = True,
+    def generate(self, base_folder, domain, name, has_request=False, is_list: bool = True,
                  has_paging: bool = True,
                  dao={}):
-        base_folder = "domain"
+
         domain_folder = f"{domain}"
         query_folder = f"{name}"
         query_folder_path = "/".join([base_folder, domain_folder, query_folder])
+
+        self.folder_manager.start_copy(query_folder_path)
 
         self.create_request_file(query_name=name, query_folder_path=query_folder_path, is_list=is_list,
                                  has_paging=has_paging)
@@ -301,13 +297,21 @@ class {query_name}QueryHandler(IQueryHandler[{query_name}Query], IScoped):
 
 
 root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__))))
+folder_manager = FolderManager(root_directory)
 application_config = ApplicationConfig(root_directory=root_directory)
 module_finder = ModuleFinder(application_config=application_config)
-generate_query = GenerateQuery(application_config=application_config, module_finder=module_finder)
+generate_query = GenerateQuery(application_config=application_config, module_finder=module_finder,
+                               folder_manager=folder_manager)
 # generate_query.generate('connection', 'CreateConnectionFile', has_request=True)
 # IocManager.initialize()
 # IocManager.injector.get(GenerateQuery).generate('connection', 'CreateConnectionFile')
-
-generate_query.generate('operation', 'GetDataOperationJobExecutionLogList', is_list=True, has_paging=False,
-                        dao={'Name': 'Log',
-                             'Namespace': 'from models.dao.common.Log import Log'})
+base_dir = "domain"
+domain = "connection"
+query = f"CheckDatabaseConnection"
+is_list = True
+has_paging = False
+dao = {
+    'Name': 'Log',
+    'Namespace': 'from models.dao.common.Log import Log'
+}
+generate_query.generate(base_dir, domain, query, is_list=is_list, has_paging=has_paging, dao=dao)

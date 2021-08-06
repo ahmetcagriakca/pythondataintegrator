@@ -43,7 +43,7 @@ export const deleteConnection = createAsyncThunk('connectionApp/connection/delet
 
 export const checkConnection = createAsyncThunk('connectionApp/connection/checkConnection', async params => {
 	const response = await axios.post('/api/Connection/CheckDatabase', {
-		ConnectionName: params.params.name,
+		ConnectionName: params.name,
 	});
 	const data = await response.data;
 	return data;

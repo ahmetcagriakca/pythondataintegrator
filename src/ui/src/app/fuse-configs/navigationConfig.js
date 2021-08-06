@@ -12,7 +12,7 @@ const navigationConfig = [
 		translate: 'HOME',
 		type: 'group',
 		icon: 'home',
-		url: '/'
+		url  : '/apps/dashboards/analytics'
 	},
 	{
 		id: 'connections',
@@ -24,10 +24,20 @@ const navigationConfig = [
 			{
 				id: 'connection-list',
 				title: 'Connection List',
+				type: 'collapse',
+				icon: 'format_list_bulleted',
+				translate: 'CONNECTION_LIST',
+				children: [
+					{
+						
+				id: 'connection-list',
+				title: 'Connection List',
 				type: 'item',
 				icon: 'format_list_bulleted',
 				translate: 'CONNECTION_LIST',
-				url: '/connections'
+				url: '/connections',
+					}
+				]
 			}
 		]
 	},

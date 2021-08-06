@@ -28,8 +28,21 @@ def add_user():
 @socketIo.on("notification")
 def handleNotification(ntf):
     send(ntf, broadcast=True)
-    return None
 
 
+@socketIo.on("connection")
+def handleNotification(ntf):
+    send('test')
+@socketIo.event
+def connect():
+    print("I'm connected!")
+
+@socketIo.event
+def connect_error(data):
+    print("The connection failed!")
+
+@socketIo.event
+def disconnect():
+    print("I'm disconnected!")
 if __name__ == '__main__':
     socketIo.run(app, port=7500)
