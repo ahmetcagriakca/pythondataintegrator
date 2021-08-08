@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function DataOperationJobs(props) {
-	const icon = 'microwave';
-	const title = 'DataOperationJobs';
+	const icon = 'repeat';
+	const title = 'Jobs';
 	const classes = useStyles();
 	const history = useHistory();
 	function GotoComponent(path) {

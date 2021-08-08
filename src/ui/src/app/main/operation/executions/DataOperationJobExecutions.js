@@ -26,8 +26,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function DataOperationJobExecutions(props) {
-	const icon = 'microwave';
-	const title = 'DataOperationJobExecutions';
+	const icon = 'play_arrow';
+	const title = 'Executions';
 	const classes = useStyles();
 	const hasHeader = () => (props.HasHeader === undefined || props.HasHeader === null || props.HasHeader === true)
 	return (

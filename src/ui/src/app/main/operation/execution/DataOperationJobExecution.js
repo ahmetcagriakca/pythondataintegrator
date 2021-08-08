@@ -14,8 +14,8 @@ const useStyles = makeStyles((theme) => ({
 
 
 function DataOperationJobExecution(props) {
-	const icon = 'microwave';
-	const title = 'DataOperationJobExecutions';
+	const icon = 'play_arrow';
+	const title = 'Execution';
 	const classes = useStyles();
 	return (
 		<div style={{ position: 'relative' }}>

@@ -10,34 +10,24 @@ const navigationConfig = [
 		id: 'home',
 		title: 'Home',
 		translate: 'HOME',
-		type: 'group',
-		icon: 'home',
+		type: 'item',
+		icon: 'house',
 		url  : '/apps/dashboards/analytics'
 	},
 	{
 		id: 'connections',
 		title: 'Connections',
 		type: 'group',
-		icon: 'connections',
+		icon: 'https',
 		translate: 'CONNECTIONS',
 		children: [
 			{
 				id: 'connection-list',
 				title: 'Connection List',
-				type: 'collapse',
-				icon: 'format_list_bulleted',
-				translate: 'CONNECTION_LIST',
-				children: [
-					{
-						
-				id: 'connection-list',
-				title: 'Connection List',
 				type: 'item',
-				icon: 'format_list_bulleted',
+				icon: 'https',
 				translate: 'CONNECTION_LIST',
 				url: '/connections',
-					}
-				]
 			}
 		]
 	},
@@ -45,55 +35,37 @@ const navigationConfig = [
 		id: 'dataoperations',
 		title: 'DataOperations',
 		type: 'group',
-		icon: 'dataoperations',
+		icon: 'library_books',
 		translate: 'DATAOPERATIONS',
 		children: [
 			{
 				id: 'data-operation-list',
 				title: 'Data Operation List',
 				type: 'item',
-				icon: 'format_list_bulleted',
+				icon: 'library_books',
 				translate: 'DATAOPERATION_LIST',
 				url: '/operations'
-			}
-		]
-	},
-	
-	{
-		id: 'dataoperationjobs',
-		title: 'DataOperationJobs',
-		type: 'group',
-		icon: 'dataoperationjobs',
-		translate: 'DATAOPERATIONJOBS',
-		children: [
+			},
 			{
 				id: 'data-operation--job-list',
 				title: 'Data Operation Job List',
 				type: 'item',
-				icon: 'format_list_bulleted',
+				icon: 'repeat',
 				translate: 'DATAOPERATION_JOB_LIST',
 				url: '/jobs'
-			}
-		]
-	},
-	
-	{
-		id: 'dataoperationjobexecutions',
-		title: 'DataOperationJobExecutions',
-		type: 'group',
-		icon: 'dataoperationjobexecutions',
-		translate: 'DATAOPERATIONJOBEXECUTIONS',
-		children: [
+			},
+			
 			{
 				id: 'data-operation--job-execution-list',
 				title: 'Data Operation Job Execution List',
 				type: 'item',
-				icon: 'format_list_bulleted',
+				icon: 'play_arrow',
 				translate: 'DATAOPERATION_JOB_EXECUTION_LIST',
 				url: '/job/executions'
 			}
 		]
-	}
+	},
+	
 ];
 
 export default navigationConfig;

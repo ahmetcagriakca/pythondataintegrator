@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function DataOperations() {
-	const icon = 'microwave';
-	const title = 'DataOperations';
+	const icon = 'library_books';
+	const title = 'Data Operations';
 	const classes = useStyles();
 	const history = useHistory();
 	function GotoComponent(path) {

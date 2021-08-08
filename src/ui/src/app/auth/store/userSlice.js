@@ -62,9 +62,9 @@ export const updateUserData = user => async (dispatch, getState) => {
 const initialState = {
 	role: [], // guest
 	data: {
-		displayName: 'John Doe',
-		photoURL: 'assets/images/avatars/Velazquez.jpg',
-		email: 'johndoe@withinpixels.com',
+		displayName: 'PDI',
+		photoURL: 'assets/images/logos/turkcell-logo.png',
+		email: 'PDI_INFO',
 		shortcuts: ['calendar', 'mail', 'contacts', 'todo']
 	}
 };

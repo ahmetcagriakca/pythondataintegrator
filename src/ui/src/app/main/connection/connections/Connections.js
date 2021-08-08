@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Connections() {
-	const icon = 'microwave';
+	const icon = 'https';
 	const title = 'Connections';
 	const classes = useStyles();
 	const history = useHistory();

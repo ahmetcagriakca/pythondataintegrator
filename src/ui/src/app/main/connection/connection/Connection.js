@@ -11,7 +11,7 @@ export const useStyles = makeStyles(theme => ({
 	}
 }));
 function Connection() {
-	const icon = 'microwave';
+	const icon = 'https';
 	const title = 'Connection';
 	const classes = useStyles();
 	return (

@@ -1,9 +1,13 @@
 import os, shutil
 
+from models.configs.ApplicationConfig import ApplicationConfig
+
 
 class FolderManager:
-    def __init__(self,root_directory):
-        self.root_directory = root_directory
+    def __init__(self,
+                 application_config: ApplicationConfig
+                 ):
+        self.application_config = application_config
 
     def create_folder_if_not_exist(self, folder):
         if not os.path.exists(folder):
@@ -26,7 +30,9 @@ class FolderManager:
             return folder + '_old'
 
     def start_copy(self, folder):
-        path = os.path.join(self.root_directory, folder)
-        path_old = self.get_old_folder_path(path)
-        self.create_folder_if_not_exist(path_old)
-        self.copytree(path, path_old)
+        path = os.path.join(self.application_config.root_directory, folder)
+
+        if os.path.exists(path):
+            path_old = self.get_old_folder_path(path)
+            self.create_folder_if_not_exist(path_old)
+            self.copytree(path, path_old)
