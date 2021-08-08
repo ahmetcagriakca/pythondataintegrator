@@ -14,9 +14,12 @@ from infrastructure.api.utils.TypeChecker import TypeChecker
 from infrastructure.json.JsonConvert import JsonConvert
 
 T = typing.TypeVar('T')
+
+
 class NullableString(fields.String):
     __schema_type__ = ['string', 'null']
     __schema_example__ = 'nullable string'
+
 
 class EndpointWrapper:
     BaseModel = IocManager.api.model('BaseModel', {
@@ -58,15 +61,21 @@ class EndpointWrapper:
             elif value == float:
                 specified_value = fields.Float(description=f'{key}')
                 pass
+            elif value == any:
+                specified_value = fields.Raw(description=f'{key}')
+                pass
             else:
 
                 if generic_type_checker.is_generic(value):
-                    instance = value.__args__[0]()
-                    nested_annotations = EndpointWrapper.get_annotations(instance)
-                    if nested_annotations is not None:
-                        nested_model_definition = EndpointWrapper.annotation_resolver(nested_annotations)
-                        nested_model = IocManager.api.model(value.__args__[0].__name__, nested_model_definition)
-                        specified_value = fields.List(fields.Nested(nested_model), description=f'')
+                    if value.__args__[0] is any:
+                        specified_value = fields.List(fields.Raw(), description=f'')
+                    else:
+                        instance = value.__args__[0]()
+                        nested_annotations = EndpointWrapper.get_annotations(instance)
+                        if nested_annotations is not None:
+                            nested_model_definition = EndpointWrapper.annotation_resolver(nested_annotations)
+                            nested_model = IocManager.api.model(value.__args__[0].__name__, nested_model_definition)
+                            specified_value = fields.List(fields.Nested(nested_model), description=f'')
                 elif generic_type_checker.is_base_generic(value):
                     # TODO:Base generic class
                     print('value type should be a structure of', value.__args__[0])
@@ -122,8 +131,8 @@ class EndpointWrapper:
     @staticmethod
     def create_argument(name, type, location, help) -> Argument:
         specified_type = type
-        if(TypeChecker().is_generic(type) == True):
-            specified_type =type.__args__[0]
+        if TypeChecker().is_generic(type) == True:
+            specified_type = type.__args__[0]
 
         if specified_type == bool:
             specified_type = inputs.boolean
@@ -161,13 +170,10 @@ class EndpointWrapper:
         req: T = JsonConvert.FromJSON(json.dumps(data))
         return req
 
-
     @staticmethod
     def get_request_from_body(parser_type: typing.Type[T]) -> T:
-
-        request_converter =RequestConverter()
+        request_converter = RequestConverter()
         request_converter.register(parser_type)
         data = IocManager.api.payload
         req: T = request_converter.FromJSON(json.dumps(data))
         return req
-

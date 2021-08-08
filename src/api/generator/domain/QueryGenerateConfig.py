@@ -1,11 +1,9 @@
-import dataclasses
+from dataclasses import dataclass
 
 from generator.domain.GenerateConfig import GenerateConfig
 
 
-@dataclasses
+@dataclass
 class QueryGenerateConfig(GenerateConfig):
-    is_list = True
-    has_paging = False
-
-
+    is_list: bool = True
+    has_paging: bool = False

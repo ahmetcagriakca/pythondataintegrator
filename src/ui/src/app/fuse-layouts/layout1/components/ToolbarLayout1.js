@@ -48,13 +48,13 @@ function ToolbarLayout1(props) {
 
 
 					<div className="flex items-center px-8">
-						<LanguageSwitcher />
+						{/* <LanguageSwitcher /> */}
 
 						<FullScreenToggle />
 
 						<FuseSearch />
 
-						<QuickPanelToggleButton />
+						{/* <QuickPanelToggleButton /> */}
 
 						<UserMenu />
 					</div>

@@ -6,7 +6,7 @@ import _ from '@lodash';
 class SourceDataAffectedRowWidget extends Component {
 
     state = {
-        dataset: 'today'
+        dataset: '24h'
     };
 
     setDataSet = (dataset) => {

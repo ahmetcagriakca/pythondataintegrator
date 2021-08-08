@@ -1,7 +1,7 @@
-import dataclasses
+from dataclasses import dataclass
 
 
-@dataclasses
+@dataclass
 class DaoGenerateConfig:
     name: str = None
     namespace: str = None

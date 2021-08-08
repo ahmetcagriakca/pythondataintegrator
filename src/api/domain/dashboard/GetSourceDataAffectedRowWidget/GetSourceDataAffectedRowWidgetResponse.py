@@ -1,0 +1,8 @@
+from typing import List
+from domain.common.decorators.responseclass import responseclass
+from domain.dashboard.GetSourceDataAffectedRowWidget.GetSourceDataAffectedRowWidgetDto import GetSourceDataAffectedRowWidgetDto
+
+
+@responseclass
+class GetSourceDataAffectedRowWidgetResponse:
+	Data: GetSourceDataAffectedRowWidgetDto = None

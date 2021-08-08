@@ -19,5 +19,7 @@ def cls_to_dict(cls):
                     _dict[attr_name] = attr.to_dict()
         return _dict
 
-    setattr(cls, 'to_dict', to_dict)
+    has_attr = hasattr(cls, 'to_dict')
+    if not has_attr:
+        setattr(cls, 'to_dict', to_dict)
     return cls

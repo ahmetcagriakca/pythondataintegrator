@@ -34,7 +34,8 @@ class QueryGenerator(Generator):
                                     is_list=generate_config.is_list, has_paging=generate_config.has_paging)
         self.__create_query_file(query_name=generate_config.name, query_folder_path=query_folder_path)
         self.__create_specifications_file(query_name=generate_config.name, query_folder_path=query_folder_path,
-                                          is_list=generate_config.is_list, has_paging=generate_config.has_paging)
+                                          dao=generate_config.dao, is_list=generate_config.is_list,
+                                          has_paging=generate_config.has_paging)
 
         self.__create_mapping_file(query_name=generate_config.name, query_folder_path=query_folder_path,
                                    dao=generate_config.dao)
@@ -124,7 +125,8 @@ class {query_name}Response:
         self.file_manager.create_file(folder=query_folder_path, file_name=query_request_file_name,
                                       content=content)
 
-    def __create_specifications_file(self, query_name: str, query_folder_path: str, is_list: bool = True,
+    def __create_specifications_file(self, query_name: str, query_folder_path: str, dao: DaoGenerateConfig,
+                                     is_list: bool = True,
                                      has_paging: bool = True):
         file_name = f"{query_name}Specifications"
 
@@ -142,6 +144,9 @@ class {query_name}Response:
         content += 'from injector import inject\n'
         content += 'from sqlalchemy.orm import Query\n'
         content += 'from infrastructure.dependency.scopes import IScoped\n'
+        content += 'from infrastructure.data.RepositoryProvider import RepositoryProvider\n'
+        content += f'{dao.namespace}\n'
+
         content += f'{query_namespace}\n'
         if has_paging:
             content += orderable['Namespace']
@@ -154,24 +159,29 @@ class {query_name}Response:
 class {query_name}Specifications(IScoped):
     @inject
     def __init__(self,\n'''
+        content += f'''                 repository_provider: RepositoryProvider,\n'''
         if has_paging:
             content += f'''                 order_by_specification: OrderBySpecification,\n'''
             content += f'''                 paging_specification: PagingSpecification,\n'''
         content += f'''                 ):\n'''
+
+        content += f'''        self.repository_provider = repository_provider\n'''
         if has_paging:
             content += f'''        self.paging_specification = paging_specification\n'''
             content += f'''        self.order_by_specification = order_by_specification\n'''
         else:
-            content += f'''        pass\n'''
+            content += f'''        \n'''
         content += \
             f'''
-    def __specified_query(self, query: {query_name}Query, data_query: Query) -> Query:
-        specified_query = data_query 
+    def __specified_query(self, query: {query_name}Query) -> Query:
+        repository = self.repository_provider.get({dao.name})
+        specified_query = repository.table 
         # TODO:specify query
         return specified_query
         
-    def specify(self, data_query: Query, query: {query_name}Query) -> Query:
-        data_query = self.__specified_query(query=query, data_query=data_query)\n'''
+    def specify(self, query: {query_name}Query) -> Query:
+    
+        data_query = self.__specified_query(query=query)\n'''
         if has_paging:
             content += f'''
         order_by = self.order_by_specification.specify(order_by_parameter=query.request)
@@ -186,8 +196,8 @@ class {query_name}Specifications(IScoped):
         content += '''        return data_query\n'''
 
         content += f'''
-    def count(self, query: {query_name}Query, data_query: Query) -> Query:
-        return self.__specified_query(query=query, data_query=data_query).count()
+    def count(self, query: {query_name}Query) -> Query:
+        return self.__specified_query(query=query).count()
     '''
         self.file_manager.create_file(folder=query_folder_path, file_name=file_name,
                                       content=content)
@@ -204,16 +214,16 @@ from typing import List
 
 
 class {query_name}Mapping:
-    @staticmethod
-    def to_dto(entity: {dao.name}) -> {query_name}Dto:
+    @classmethod
+    def to_dto(cls, entity: {dao.name}) -> {query_name}Dto:
         dto = {query_name}Dto()
         return dto
 
-    @staticmethod
-    def to_dtos(entities: List[{dao.name}]) -> List[{query_name}Dto]:
+    @classmethod
+    def to_dtos(cls, entities: List[{dao.name}]) -> List[{query_name}Dto]:
         result: List[{query_name}Dto] = []
         for entity in entities:
-            dto = {query_name}Mapping.to_dto(entity=entity)
+            dto = cls.to_dto(entity=entity)
             result.append(dto)
         return result'''
         self.file_manager.create_file(folder=query_folder_path, file_name=file_name,
@@ -236,32 +246,26 @@ from injector import inject
 {response_namespace}
 {specifications_namespace}
 from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
 from infrastructure.dependency.scopes import IScoped
-{dao.namespace}
 
 
 class {query_name}QueryHandler(IQueryHandler[{query_name}Query], IScoped):
     @inject
     def __init__(self,
-                 repository_provider: RepositoryProvider,
                  specifications: {query_name}Specifications):
-        self.repository_provider = repository_provider
         self.specifications = specifications
 
     def handle(self, query: {query_name}Query) -> {query_name}Response:
-        result = {query_name}Response()
-        repository = self.repository_provider.get({dao.name})
-        data_query = repository.table\n'''
+        result = {query_name}Response()\n'''
         if has_paging:
             content += f'''
-        result.Count = self.specifications.count(query=query, data_query=data_query)
+        result.Count = self.specifications.count(query=query)
 
         result.PageNumber = query.request.PageNumber
         result.PageSize = query.request.PageSize\n'''
 
         content += \
-            f'''        data_query = self.specifications.specify(query=query, data_query=data_query)\n'''
+            f'''        data_query = self.specifications.specify(query=query)\n'''
         if is_list:
             content += \
                 f'''        result.Data = {query_name}Mapping.to_dtos(data_query)\n'''

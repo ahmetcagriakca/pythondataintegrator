@@ -1,9 +1,9 @@
-import dataclasses
+from dataclasses import dataclass
 
 from generator.domain.DaoGenerateConfig import DaoGenerateConfig
 
 
-@dataclasses
+@dataclass
 class GenerateConfig:
     base_directory: str = None
     domain: str = None

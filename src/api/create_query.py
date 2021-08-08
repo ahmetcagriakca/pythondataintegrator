@@ -13,15 +13,15 @@ application_config = ApplicationConfig(root_directory=root_directory)
 folder_manager = FolderManager(application_config=application_config)
 file_manager = FileManager(application_config=application_config)
 module_finder = ModuleFinder(application_config=application_config)
-query_query = QueryGenerator(application_config=application_config, module_finder=module_finder,
+query_generator = QueryGenerator(application_config=application_config, module_finder=module_finder,
                              folder_manager=folder_manager,
                              file_manager=file_manager)
 config = QueryGenerateConfig(
     base_directory="domain",
-    domain="Dashboard",
-    name="CheckDatabaseConnection",
+    domain="dashboard",
+    name="GetSourceDataAffectedRowWidget",
+    dao=DaoGenerateConfig(name='DataOperationJobExecutionIntegration', namespace='from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration'),
     is_list=False,
-    has_paging=False,
-    dao=DaoGenerateConfig(name='Log', namespace='from models.dao.common.Log import Log')
+    has_paging=False
 )
-query_query.generate(config=config)
+query_generator.generate(generate_config=config)

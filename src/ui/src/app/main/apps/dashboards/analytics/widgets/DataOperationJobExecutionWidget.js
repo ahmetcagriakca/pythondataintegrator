@@ -1,12 +1,12 @@
 import React from 'react';
-import {withStyles, Card, Icon, Typography} from '@material-ui/core';
-import {Line} from 'react-chartjs-2';
+import { withStyles, Card, Icon, Typography } from '@material-ui/core';
+import { Line } from 'react-chartjs-2';
 
-const DataOperationJobExecutionWidget = ({data, theme}) => {
+const DataOperationJobExecutionWidget = ({ data, theme }) => {
 
     const dataWithColors = data.datasets.map(obj => ({
         ...obj,
-        borderColor    : theme.palette.secondary.main,
+        borderColor: theme.palette.secondary.main,
         backgroundColor: theme.palette.secondary.main
     }));
 
@@ -18,19 +18,14 @@ const DataOperationJobExecutionWidget = ({data, theme}) => {
                 <div className="pr-16">
                     <Typography className="h3" color="textSecondary">Executions</Typography>
                     <Typography className="text-56 font-300 leading-none mt-8">
-                        {data.conversion.value}
+                        {data.data.value}
                     </Typography>
                 </div>
 
                 <div className="py-4 text-16 flex flex-row items-center">
                     <div className="flex flex-row items-center">
-                        {data.conversion.ofTarget > 0 && (
-                            <Icon className="text-green mr-4">trending_up</Icon>
-                        )}
-                        {data.conversion.ofTarget < 0 && (
-                            <Icon className="text-red mr-4">trending_down</Icon>
-                        )}
-                        <Typography>{data.conversion.ofTarget}%</Typography>
+                        {data.data.yesterdayDifference > 0 && <Icon className="text-green">trending_up</Icon>}
+                        {data.data.yesterdayDifference < 0 && <Icon className="text-red">trending_down</Icon>}
                     </div>
                 </div>
 
@@ -39,7 +34,7 @@ const DataOperationJobExecutionWidget = ({data, theme}) => {
             <div className="h-96 w-100-p">
                 <Line
                     data={{
-                        labels  : data.labels,
+                        labels: data.labels,
                         datasets: dataWithColors
                     }}
                     options={data.options}
@@ -49,4 +44,4 @@ const DataOperationJobExecutionWidget = ({data, theme}) => {
     );
 };
 
-export default withStyles(null, {withTheme: true})(DataOperationJobExecutionWidget);
+export default withStyles(null, { withTheme: true })(DataOperationJobExecutionWidget);

@@ -1,0 +1,8 @@
+from typing import List
+from domain.common.decorators.responseclass import responseclass
+from domain.dashboard.GetDataOperationJobExecutionWidget.GetDataOperationJobExecutionWidgetDto import GetDataOperationJobExecutionWidgetDto
+
+
+@responseclass
+class GetDataOperationJobExecutionWidgetResponse:
+	Data: List[GetDataOperationJobExecutionWidgetDto] = None

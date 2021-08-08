@@ -23,8 +23,8 @@ const widgetsSlice = createSlice({
 	extraReducers: {
 		// [getWidgets.fulfilled]: widgetsAdapter.setAll
 		[getWidgets.fulfilled]: (state, action) => {
-			widgetsAdapter.setAll(state, action.payload.result);
-			state.data = action.payload.result;
+			widgetsAdapter.setAll(state, action.payload.result.data);
+			state.data = action.payload.result.data;
 		},
 	}
 });
