@@ -18,7 +18,7 @@ class SourceDataAffectedRowWidget extends Component {
         const {data: dataRaw, theme} = this.props;
         const {dataset} = this.state;
         const data = _.merge({}, dataRaw);
-        const dataWithColors = data.datasets[dataset].map((obj, index) => {
+        const dataWithColors = data.datasets[dataset].data.map((obj, index) => {
             const palette = theme.palette[index === 0 ? 'primary' : 'secondary'];
             return {
                 ...obj,
@@ -58,7 +58,7 @@ class SourceDataAffectedRowWidget extends Component {
                 <Typography className="relative h-200 sm:h-320 sm:pb-16">
                     <Line
                         data={{
-                            labels  : data.labels,
+                            labels  : data.datasets[dataset].labels,
                             datasets: dataWithColors
                         }}
                         options={data.options}

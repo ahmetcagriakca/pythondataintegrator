@@ -119,90 +119,123 @@ class GetSourceDataAffectedRowWidgetMapping:
     }
 
     @classmethod
+    def calculate_source_data_count(cls, source_data_query, start_time, end_time):
+        source_data = source_data_query \
+            .filter(
+            and_(
+                DataOperationJobExecutionIntegration.StartDate > start_time,
+                DataOperationJobExecutionIntegration.StartDate < end_time,
+            )
+        ) \
+            .first()
+        return source_data.Count if source_data.Count is not None else 0
+
+    @classmethod
+    def calculate_affected_row_count(cls, affected_row_query, start_time, end_time):
+        affected_row = affected_row_query \
+            .filter(
+            and_(
+                DataOperationJobExecutionIntegrationEvent.EventDate > start_time,
+                DataOperationJobExecutionIntegrationEvent.EventDate < end_time
+            )
+        ) \
+            .first()
+        return affected_row.Count if affected_row.Count is not None else 0
+
+    @classmethod
+    def get_label(cls, start_time, end_time):
+        hour_text = ''
+        if start_time.hour == 0:
+            hour_text = f"{start_time.strftime('%A')} "
+        hour_text += f"{start_time.strftime('%H')}:{start_time.strftime('%M')}-{end_time.strftime('%H')}:{end_time.strftime('%M')}"
+        return hour_text
+
+    @classmethod
     def to_dto(cls, queries: List[Query]) -> GetSourceDataAffectedRowWidgetDto:
         dto = GetSourceDataAffectedRowWidgetDto()
         widget_data = cls.widget_data
-        source_data_query = queries[0]
-        affected_row_query = queries[1]
-        last_24_hour_source_data_counts = []
-        last_24_hour_affected_row_counts = []
-        last_24_hour_labels = []
+        source_data_query, affected_row_query = queries
         now = datetime.now()
-        for hour_range in range(12):
-            start_hour = now - timedelta(hours=hour_range * 2 + 2)
-            end_hour = now - timedelta(hours=hour_range * 2)
-            hour_text = end_hour.strftime('%H')
-            source_data = source_data_query \
-                .filter(
-                and_(
-                    DataOperationJobExecutionIntegration.StartDate > start_hour,
-                    DataOperationJobExecutionIntegration.StartDate < end_hour,
-                )
-            ) \
-                .first()
-            affected_row = affected_row_query \
-                .filter(
-                and_(
-                    DataOperationJobExecutionIntegrationEvent.EventDate > start_hour,
-                    DataOperationJobExecutionIntegrationEvent.EventDate < end_hour
-                )
-            ) \
-                .first()
-            last_24_hour_source_data_counts.append(source_data.Count if source_data.Count is not None else 0)
-            last_24_hour_affected_row_counts.append(affected_row.Count if source_data.Count is not None else 0)
-            last_24_hour_labels.append(hour_text)
-        last_48_hour_source_data_counts = [].extend(last_24_hour_source_data_counts)
-        last_48_hour_affected_row_counts = [].extend(last_24_hour_affected_row_counts)
-        last_48_hour_labels = [].extend(last_24_hour_labels)
+        if now.hour % 2 == 0:
+            calculate_start_date = now.replace(minute=0, second=0)
+        else:
+            calculate_start_date = now.replace(hour=now.hour - 1, minute=0, second=0)
+
+        start_time = calculate_start_date
+        end_time = now
+        source_data_count = cls.calculate_source_data_count(source_data_query=source_data_query, start_time=start_time,
+                                                            end_time=end_time)
+        affected_row_count = cls.calculate_affected_row_count(affected_row_query=affected_row_query,
+                                                             start_time=start_time, end_time=end_time)
+        label = cls.get_label(start_time=start_time, end_time=end_time)
+        last_24_hour_source_data_counts = [source_data_count]
+        last_24_hour_affected_row_counts = [affected_row_count]
+        last_24_hour_labels = [label]
+        for hour_range in range(0, 12):
+            start_time = calculate_start_date - timedelta(hours=hour_range * 2 + 2)
+            end_time = calculate_start_date - timedelta(hours=hour_range * 2)
+            source_data_count = cls.calculate_source_data_count(source_data_query=source_data_query,
+                                                                start_time=start_time,
+                                                                end_time=end_time)
+            affected_row_count = cls.calculate_affected_row_count(affected_row_query=affected_row_query,
+                                                                 start_time=start_time, end_time=end_time)
+            label = cls.get_label(start_time=start_time, end_time=end_time)
+            last_24_hour_source_data_counts.append(source_data_count)
+            last_24_hour_affected_row_counts.append(affected_row_count)
+            last_24_hour_labels.append(label)
+        last_48_hour_source_data_counts = []
+        last_48_hour_source_data_counts.extend(last_24_hour_source_data_counts)
+        last_48_hour_affected_row_counts = []
+        last_48_hour_affected_row_counts.extend(last_24_hour_affected_row_counts)
+        last_48_hour_labels = []
+        last_48_hour_labels.extend(last_24_hour_labels)
+
         for hour_range in range(12, 24):
-            start_hour = now - timedelta(hours=hour_range * 2 + 2)
-            end_hour = now - timedelta(hours=hour_range * 2)
-            hour_text = end_hour.strftime('%H')
-            source_data = source_data_query \
-                .filter(
-                and_(
-                    DataOperationJobExecutionIntegration.StartDate > start_hour,
-                    DataOperationJobExecutionIntegration.StartDate < end_hour,
-                )
-            ) \
-                .first()
-            affected_row = affected_row_query \
-                .filter(
-                and_(
-                    DataOperationJobExecutionIntegrationEvent.EventDate > start_hour,
-                    DataOperationJobExecutionIntegrationEvent.EventDate < end_hour
-                )
-            ) \
-                .first()
-            last_48_hour_source_data_counts.append(source_data.Count if source_data.Count is not None else 0)
-            last_48_hour_affected_row_counts.append(affected_row.Count if source_data.Count is not None else 0)
-            last_48_hour_labels.append(hour_text)
+            start_time = calculate_start_date - timedelta(hours=hour_range * 2 + 2)
+            end_time = calculate_start_date - timedelta(hours=hour_range * 2)
+            source_data_count = cls.calculate_source_data_count(source_data_query=source_data_query,
+                                                                start_time=start_time,
+                                                                end_time=end_time)
+            affected_row_count = cls.calculate_affected_row_count(affected_row_query=affected_row_query,
+                                                                 start_time=start_time, end_time=end_time)
+            label = cls.get_label(start_time=start_time, end_time=end_time)
+            last_48_hour_source_data_counts.append(source_data_count)
+            last_48_hour_affected_row_counts.append(affected_row_count)
+            last_48_hour_labels.append(label)
 
         widget_data['datasets'] = {
-            "24h": [
-                {
-                    "label": "Source Data Count",
-                    "data": list(reversed(last_24_hour_source_data_counts)),
-                    "fill": "start"
-                },
-                {
-                    "label": "Affected Row Count",
-                    "data": list(reversed(last_24_hour_affected_row_counts)),
-                    "fill": "start"
-                }
-            ],
-            "48h": [
-                {
-                    "label": "Source Data Count",
-                    "data": list(reversed(last_48_hour_source_data_counts)),
-                    "fill": "start"
-                },
-                {
-                    "label": "Affected Row Count",
-                    "data": list(reversed(last_48_hour_affected_row_counts)),
-                    "fill": "start"
-                }
-            ]
+            "48h": {
+
+                "labels": list(reversed(last_48_hour_labels)),
+                "data": [
+                    {
+                        "label": "Source Data Count",
+                        "data": list(reversed(last_48_hour_source_data_counts)),
+                        "fill": "start"
+                    },
+                    {
+                        "label": "Affected Row Count",
+                        "data": list(reversed(last_48_hour_affected_row_counts)),
+                        "fill": "start"
+                    }
+                ]
+            },
+            "24h": {
+                "labels": list(reversed(last_24_hour_labels)),
+                "data": [
+                    {
+                        "label": "Source Data Count",
+                        "data": list(reversed(last_24_hour_source_data_counts)),
+                        "fill": "start"
+                    },
+                    {
+                        "label": "Affected Row Count",
+                        "data": list(reversed(last_24_hour_affected_row_counts)),
+                        "fill": "start"
+                    }
+                ]
+            }
+
         }
         widget_data['labels'] = list(reversed(last_24_hour_labels))
         dto.WidgetData = widget_data
