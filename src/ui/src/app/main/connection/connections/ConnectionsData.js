@@ -12,15 +12,17 @@ import Box from '@material-ui/core/Box';
 import TableContainer from '@material-ui/core/TableContainer';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter, useParams } from 'react-router-dom';
-import { getConnections, selectConnections } from './store/connectionsSlice';
+import { getConnections, selectConnections,checkDatabaseConnection } from './store/connectionsSlice';
 import CustomPagination from '../../common/components/CustomPagination';
 import EnhancedTableHead from '../../common/components/EnhancedTableHead';
 import StyledTableRow from '../../common/components/StyledTableRow';
 import { stableSort, getComparator } from '../../common/utils/TableUtils';
 import { tableStyles } from '../../common/styles/TableStyles';
 import { useHistory } from 'react-router-dom';
+import Tooltip from '@material-ui/core/Tooltip';
 
 function ConnectionsRow(props) {
+	const dispatch = useDispatch();
 	const { row, isItemSelected } = props;
 	const [open, setOpen] = React.useState(false);
 	const history = useHistory();
@@ -31,6 +33,10 @@ function ConnectionsRow(props) {
 	const handleClick = (event, row) => {
 		GotoComponent('connection/' + row.id)
 	};
+	const checkDatabaseConnectionAction = (event, row) => {
+		dispatch(checkDatabaseConnection({ConnectionName:row.name}))
+	};
+	
 	return (
 		<React.Fragment>
 			<StyledTableRow
@@ -54,9 +60,28 @@ function ConnectionsRow(props) {
 				<TableCell align="left">{row.connectorType.name}</TableCell>
 				<TableCell align="left">{row.creationDate}</TableCell>
 				<TableCell align="left">{row.isDeleted}</TableCell>
+				<TableCell align="left">
+					{
+						row.connectionType.id === 1 ?
+							(
+								<Tooltip title="Check Connection">
+									<IconButton
+										key={'cellColumnDeleteAction' + row?.id}
+										size="small"
+										aria-label="expand row"
+										onClick={event => checkDatabaseConnectionAction(event, row)}>
+										<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
+											check_circle_outline
+										</Icon>
+									</IconButton>
+								</Tooltip>
+
+							) : ('')
+					}
+				</TableCell>
 			</StyledTableRow>
 			<TableRow>
-				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
 					<Collapse in={open} timeout="auto" unmountOnExit>
 						<Box margin={1}>
 							{
@@ -142,6 +167,7 @@ function ConnectionsData() {
 		{ id: 'connectorTypeName', orderBy: 'ConnectorType.Name', numeric: false, disablePadding: true, label: 'Connector Type' },
 		{ id: 'creationDate', orderBy: 'Connection.CreationDate', creationDate: 'creationDate', numeric: false, disablePadding: true, label: 'CreationDate' },
 		{ id: 'isDeleted', orderBy: 'Connection.IsDeleted', numeric: false, disablePadding: true, label: 'Is Deleted' },
+		{ id: 'actions', orderBy: '', numeric: false, disablePadding: true, label: '' },
 	];
 	const [order, setOrder] = React.useState('asc');
 	const [orderBy, setOrderBy] = React.useState('Connection.Id');
@@ -200,28 +226,28 @@ function ConnectionsData() {
 	const isSelected = name => selected.indexOf(name) !== -1;
 
 	return (
-			<Paper style={{ borderTopLeftRadius: 30 }} className={classes.paper}>
-				<TableContainer className={classes.container} style={{ maxHeight: 650, borderTopLeftRadius: 30 }}>
-					<Table stickyHeader aria-label="sticky table" size="small">
-						<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells} />
-						<TableBody>
-							{stableSort(connectionsList, getComparator(order, orderBy)).map((connection, index) => {
-								const isItemSelected = isSelected(connection.id);
-								return (
-									<ConnectionsRow key={connection.id} row={connection} isItemSelected={isItemSelected} />
-								);
-							})}
-						</TableBody>
-					</Table>
-				</TableContainer>
-				<CustomPagination
-					rowsPerPage={rowsPerPage}
-					page={page}
-					totalCount={totalCount}
-					handleChangePage={handleChangePage}
-					handleChangeRowsPerPage={handleChangeRowsPerPage}
-				/>
-			</Paper>
+		<Paper style={{ borderTopLeftRadius: 30 }} className={classes.paper}>
+			<TableContainer className={classes.container} style={{ maxHeight: 650, borderTopLeftRadius: 30 }}>
+				<Table stickyHeader aria-label="sticky table" size="small">
+					<EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells} />
+					<TableBody>
+						{stableSort(connectionsList, getComparator(order, orderBy)).map((connection, index) => {
+							const isItemSelected = isSelected(connection.id);
+							return (
+								<ConnectionsRow key={connection.id} row={connection} isItemSelected={isItemSelected} />
+							);
+						})}
+					</TableBody>
+				</Table>
+			</TableContainer>
+			<CustomPagination
+				rowsPerPage={rowsPerPage}
+				page={page}
+				totalCount={totalCount}
+				handleChangePage={handleChangePage}
+				handleChangeRowsPerPage={handleChangeRowsPerPage}
+			/>
+		</Paper>
 	);
 }
 

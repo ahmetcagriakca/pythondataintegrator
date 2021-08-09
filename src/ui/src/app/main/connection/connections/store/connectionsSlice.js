@@ -19,6 +19,13 @@ export const getConnections = createAsyncThunk('connectionsApp/connections/getCo
 	return data;
 });
 
+export const checkDatabaseConnection = createAsyncThunk('connectionsApp/connections/checkDatabaseConnection', async params => {
+	const response = await axios.post('/api/Connection/CheckDatabase', {
+		ConnectionName: params.ConnectionName,
+	});
+	const data = await response.data;
+	return data;
+});
 
 const connectionsAdapter = createEntityAdapter({});
 
