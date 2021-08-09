@@ -48,7 +48,7 @@ class IocManager:
         @IocManager.app.route('/')
         def home_redirect():
             # Redirect from here, replace your custom site url "www.google.com"
-            return redirect("/Home", code=302, Response=None)
+            return redirect("/documentation", code=302, Response=None)
         IocManager.api = Api(IocManager.app,
             title='Python Data Integrator API',
             version='v0.1',
