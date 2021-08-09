@@ -8,9 +8,8 @@ from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.connection import Connection
 
 
-class CheckDatabaseConnectionCommand:
+class CheckDatabaseTableCountQuery:
     def execute(self, connection_name=None, schema=None, table=None):
-
         try:
             repository_provider: RepositoryProvider = RepositoryProvider()
 
@@ -30,10 +29,10 @@ class CheckDatabaseConnectionCommand:
             if schema is not None and schema != '' and table is not None and table != '':
                 try:
                     count = database_context.get_table_count(f'select * from "{schema}"."{table}"')
-                    count_of_table = f"Count of table:{count}"
+                    count_of_table = f'"{schema}"."{table}" table count:{count}'
                 except Exception as ex:
-                    return f'Count of table getting error! Error: {ex}'
-            return f"Connected successfully. {count_of_table}"
+                    raise Exception(f'"{schema}"."{table}" count of table getting error! Error: {ex}')
+            return count_of_table
 
         except Exception as ex:
-            return f'Connection getting error! Error: {ex}'
+            raise Exception(f'Connection getting error! Error: {ex}')

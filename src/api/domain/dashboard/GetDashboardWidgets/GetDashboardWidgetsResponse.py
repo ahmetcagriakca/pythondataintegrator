@@ -1,6 +1,5 @@
 from typing import List
-from domain.common.decorators.responseclass import responseclass
-from domain.dashboard.GetDashboardWidgets.GetDashboardWidgetsDto import GetDashboardWidgetsDto
+from infrastructure.cqrs.decorators.responseclass import responseclass
 
 
 @responseclass

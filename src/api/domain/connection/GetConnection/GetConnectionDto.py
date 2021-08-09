@@ -1,5 +1,5 @@
 import datetime
-from domain.common.decorators.dtoclass import dtoclass
+from infrastructure.cqrs.decorators.dtoclass import dtoclass
 
 
 @dtoclass

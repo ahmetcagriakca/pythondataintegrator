@@ -1,6 +1,5 @@
-import inspect
 import copy
-from infrastructure.api.utils.TypeChecker import TypeChecker
+from infrastructure.utils.TypeChecker import TypeChecker
 
 
 def cls_to_dict(cls):

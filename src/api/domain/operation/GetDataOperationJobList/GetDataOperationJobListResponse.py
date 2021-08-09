@@ -1,7 +1,6 @@
-from dataclasses import dataclass
 from typing import List
 
-from domain.common.decorators.responseclass import responseclass
+from infrastructure.cqrs.decorators.responseclass import responseclass
 from domain.operation.GetDataOperationJobList.GetDataOperationJobListDto import GetDataOperationJobListDto
 
 

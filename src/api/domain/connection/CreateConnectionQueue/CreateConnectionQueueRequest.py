@@ -1,6 +1,6 @@
 from typing import List
 
-from domain.common.decorators.requestclass import requestclass
+from infrastructure.cqrs.decorators.requestclass import requestclass
 
 
 @requestclass

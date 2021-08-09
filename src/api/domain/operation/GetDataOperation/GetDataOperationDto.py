@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List
-from domain.common.decorators.dtoclass import dtoclass
+from infrastructure.cqrs.decorators.dtoclass import dtoclass
 
 
 @dtoclass

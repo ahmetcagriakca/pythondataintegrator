@@ -1,5 +1,4 @@
-from typing import List
-from domain.common.decorators.responseclass import responseclass
+from infrastructure.cqrs.decorators.responseclass import responseclass
 from domain.dashboard.GetMonthlyExecutionsWidget.GetMonthlyExecutionsWidgetDto import GetMonthlyExecutionsWidgetDto
 
 

@@ -19,7 +19,12 @@ class ProcessRpcClientService(IScoped):
         conn._config['sync_request_timeout'] = 240  # Set timeout to 240 seconds
         return conn
 
-    def call_check_database_connection(self, connection_name=None, schema=None, table=None, *args, **kwargs):
+    def call_check_database_connection(self, connection_name=None, *args, **kwargs):
         conn = self.connect_rpc()
-        result = conn.root.check_database_connection(connection_name, schema, table)
+        result = conn.root.check_database_connection(connection_name)
+        return result
+
+    def call_check_database_table_row_count(self, connection_name=None, schema=None, table=None, *args, **kwargs):
+        conn = self.connect_rpc()
+        result = conn.root.check_database_table_row_count(connection_name, schema, table)
         return result

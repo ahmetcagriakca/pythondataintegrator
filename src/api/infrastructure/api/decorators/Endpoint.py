@@ -1,9 +1,8 @@
-import inspect
 import json
 from functools import wraps
 
 from infrastructure.api.EndpointWrapper import EndpointWrapper
-from infrastructure.api.utils.TypeChecker import TypeChecker
+from infrastructure.utils.TypeChecker import TypeChecker
 
 
 class _Endpoint:

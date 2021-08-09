@@ -10,7 +10,7 @@ from IocManager import IocManager
 from domain.common.request_parameter.OrderByParameter import OrderByParameter
 from domain.common.request_parameter.PagingParameter import PagingParameter
 from infrastructure.api.RequestConverter import RequestConverter
-from infrastructure.api.utils.TypeChecker import TypeChecker
+from infrastructure.utils.TypeChecker import TypeChecker
 from infrastructure.json.JsonConvert import JsonConvert
 
 T = typing.TypeVar('T')

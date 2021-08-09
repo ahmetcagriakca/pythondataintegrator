@@ -1,4 +1,4 @@
-from domain.common.decorators.requestclass import requestclass
+from infrastructure.cqrs.decorators.requestclass import requestclass
 from domain.operation.CreateDataOperation.CreateDataIntegrationConnectionDatabaseRequest import \
     CreateDataIntegrationConnectionDatabaseRequest
 from domain.operation.CreateDataOperation.CreateDataIntegrationConnectionFileRequest import \

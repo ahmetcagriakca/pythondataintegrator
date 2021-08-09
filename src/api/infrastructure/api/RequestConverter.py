@@ -2,7 +2,7 @@ import inspect
 import json
 from datetime import datetime
 
-from infrastructure.api.utils.TypeChecker import TypeChecker
+from infrastructure.utils.TypeChecker import TypeChecker
 from infrastructure.json.DateTimeEncoder import DateTimeEncoder
 
 

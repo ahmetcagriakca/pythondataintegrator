@@ -1,4 +1,6 @@
 from IocManager import IocManager
+from domain.notification.SendNotification.SendNotificationCommand import SendNotificationCommand
+from domain.notification.SendNotification.SendNotificationRequest import SendNotificationRequest
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructure.connection.database.DatabaseProvider import DatabaseProvider
 from infrastructure.cryptography.CryptoService import CryptoService
@@ -13,7 +15,6 @@ class CheckDatabaseConnectionCommand:
 
         try:
             repository_provider: RepositoryProvider = RepositoryProvider()
-
             connection = repository_provider.get(Connection).first(IsDeleted=0, Name=connection_name)
             if connection is None:
                 return "Connection not found!"
@@ -26,14 +27,14 @@ class CheckDatabaseConnectionCommand:
             database_provider = DatabaseProvider(sql_logger=sql_logger, operation_cache_service=operation_cache_service)
             database_context = database_provider.get_context(connection=connection)
             database_context.connector.connect()
-            count_of_table = ''
-            if schema is not None and schema != '' and table is not None and table != '':
-                try:
-                    count = database_context.get_table_count(f'select * from "{schema}"."{table}"')
-                    count_of_table = f"Count of table:{count}"
-                except Exception as ex:
-                    return f'Count of table getting error! Error: {ex}'
-            return f"Connected successfully. {count_of_table}"
+            self.notify(message=f'{command.ConnectionName} connected successfully.')
 
         except Exception as ex:
-            return f'Connection getting error! Error: {ex}'
+            raise Exception(f'Connection connecting getting error! Error: {ex}')
+
+
+
+    def notify(self, message: str):
+        send_notification_request = SendNotificationRequest(Message=message,
+                                                            Type=1)
+        self.dispatcher.dispatch(SendNotificationCommand(request=send_notification_request))
