@@ -1,4 +1,5 @@
 from injector import inject
+
 from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
 from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionRequest import CheckDatabaseConnectionRequest
 from infrastructure.api.ResourceBase import ResourceBase

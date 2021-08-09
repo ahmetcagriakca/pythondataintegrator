@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from domain.common.decorators.cls_to_dict import cls_to_dict
+from infrastructure.cqrs.decorators.cls_to_dict import cls_to_dict
 from infrastructure.json.JsonConvert import JsonConvert
 
 
