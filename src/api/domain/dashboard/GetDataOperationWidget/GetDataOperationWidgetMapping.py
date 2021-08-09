@@ -98,7 +98,7 @@ class GetDataOperationWidgetMapping:
             last_seven_day_counts.append(result)
             last_seven_day_labels.append(day_of_week)
 
-        widget_data['datasets'] = [{"label": "Executions", "data": list(reversed(last_seven_day_counts))}]
+        widget_data['datasets'] = [{"label": "Data Operation", "data": list(reversed(last_seven_day_counts))}]
         widget_data['labels'] = list(reversed(last_seven_day_labels))
         widget_data['options']['scales']['yAxes'][0]['ticks']['min'] = min(last_seven_day_counts) - 10
         widget_data['options']['scales']['yAxes'][0]['ticks']['max'] = max(last_seven_day_counts) + 10

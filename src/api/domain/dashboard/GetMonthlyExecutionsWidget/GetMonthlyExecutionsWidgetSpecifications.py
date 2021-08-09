@@ -1,4 +1,5 @@
 from injector import inject
+from sqlalchemy import func
 from sqlalchemy.orm import Query
 from infrastructure.dependency.scopes import IScoped
 from infrastructure.data.RepositoryProvider import RepositoryProvider
@@ -14,11 +15,15 @@ class GetMonthlyExecutionsWidgetSpecifications(IScoped):
         self.repository_provider = repository_provider
         
 
-    def __specified_query(self, query: GetMonthlyExecutionsWidgetQuery) -> Query:
-        repository = self.repository_provider.get(DataOperationJobExecution)
-        specified_query = repository.table 
-        # TODO:specify query
-        return specified_query
+    def __specified_query(self, query: GetMonthlyExecutionsWidgetQuery) -> (Query,Query):
+        count_query = self.repository_provider.query(
+            func.count(DataOperationJobExecution.Id).label("Count"),
+        )
+        minimum_maximum_query = self.repository_provider.query(
+            func.min(DataOperationJobExecution.StartDate).label("MinimumStartDate"),
+            func.max(DataOperationJobExecution.StartDate).label("MaximumStartDate"),
+        )
+        return (count_query,minimum_maximum_query)
         
     def specify(self, query: GetMonthlyExecutionsWidgetQuery) -> Query:
     

@@ -16,7 +16,7 @@ class GetSourceDataAffectedRowWidgetSpecifications(IScoped):
                  ):
         self.repository_provider = repository_provider
 
-    def __specified_query(self, query: GetSourceDataAffectedRowWidgetQuery) -> Query:
+    def __specified_query(self, query: GetSourceDataAffectedRowWidgetQuery) -> (Query, Query):
         source_data_count_query = self.repository_provider.query(
             func.sum(DataOperationJobExecutionIntegration.SourceDataCount).label("Count"),
         )
@@ -24,10 +24,8 @@ class GetSourceDataAffectedRowWidgetSpecifications(IScoped):
         affected_row_query = self.repository_provider.query(
             func.sum(DataOperationJobExecutionIntegrationEvent.AffectedRowCount).label("Count"),
         )
-
-        return (source_data_count_query,affected_row_query)
+        return (source_data_count_query, affected_row_query)
 
     def specify(self, query: GetSourceDataAffectedRowWidgetQuery) -> Query:
         data_query = self.__specified_query(query=query)
         return data_query
-

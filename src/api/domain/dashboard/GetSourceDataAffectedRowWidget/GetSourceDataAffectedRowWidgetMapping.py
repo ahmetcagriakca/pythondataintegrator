@@ -49,20 +49,6 @@ class GetSourceDataAffectedRowWidgetMapping:
                 }
             ]
         },
-        "labels": [
-            "12am",
-            "2am",
-            "4am",
-            "6am",
-            "8am",
-            "10am",
-            "12pm",
-            "2pm",
-            "4pm",
-            "6pm",
-            "8pm",
-            "10pm"
-        ],
         "options": {
             "spanGaps": False,
             "legend": {
@@ -151,7 +137,7 @@ class GetSourceDataAffectedRowWidgetMapping:
         return hour_text
 
     @classmethod
-    def to_dto(cls, queries: List[Query]) -> GetSourceDataAffectedRowWidgetDto:
+    def to_dto(cls, queries: (Query, Query)) -> GetSourceDataAffectedRowWidgetDto:
         dto = GetSourceDataAffectedRowWidgetDto()
         widget_data = cls.widget_data
         source_data_query, affected_row_query = queries
@@ -237,6 +223,5 @@ class GetSourceDataAffectedRowWidgetMapping:
             }
 
         }
-        widget_data['labels'] = list(reversed(last_24_hour_labels))
         dto.WidgetData = widget_data
         return dto
