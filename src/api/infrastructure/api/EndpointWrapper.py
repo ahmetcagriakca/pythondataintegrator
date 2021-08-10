@@ -22,11 +22,13 @@ class NullableString(fields.String):
 
 
 class EndpointWrapper:
-    BaseModel = IocManager.api.model('BaseModel', {
-        'IsSuccess': fields.Boolean(description='Is Success', default=True),
-        'Message': fields.String(description='Message', default="Operation Completed"),
-        'Result': fields.Raw(description='Service result values'),
-    })
+    @property
+    def BaseModel(cls):
+        return IocManager.api.model('BaseModel', {
+            'IsSuccess': fields.Boolean(description='Is Success', default=True),
+            'Message': fields.String(description='Message', default="Operation Completed"),
+            'Result': fields.Raw(description='Service result values'),
+        })
 
     @staticmethod
     def date_converter(o):

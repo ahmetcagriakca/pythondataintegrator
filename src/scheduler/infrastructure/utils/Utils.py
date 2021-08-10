@@ -1,10 +1,10 @@
 import glob
 import inspect
+from multiprocessing.process import current_process
 import os
 import re
 import sys
 from datetime import datetime
-from multiprocessing.process import current_process
 
 
 class Utils:
@@ -60,6 +60,13 @@ class Utils:
                 yield temp
 
     @staticmethod
+    def path_split(path):
+        splits = path.split('/')
+        if len(splits) == 1:
+            splits = path.split('\\')
+        return splits
+
+    @staticmethod
     def get_modules(folders) -> ([], []):
         module_list = []
         module_attr_list = []
@@ -67,9 +74,7 @@ class Utils:
             sys.path.append(folder)
             files = glob.glob(folder + '/*.py')
             for file in files:
-                file_splits = file.split('/')
-                if len(file_splits) == 1:
-                    file_splits = file.split('\\')
+                file_splits = Utils.path_split(file)
                 file_name = file_splits[len(file_splits) - 1]
                 file_name_without_extension = file_name[0:(len(file_name) - 3)]
                 module = __import__(file_name_without_extension)

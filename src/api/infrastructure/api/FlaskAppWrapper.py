@@ -27,5 +27,6 @@ class FlaskAppWrapper:
         IocManager.app.register_error_handler(HTTPException, self.handlers.handle_http_exception)
         IocManager.app.after_request(RequestHandlers.after_request)
 
+
     def run(self):
         IocManager.app.run(debug=self.api_config.is_debug, host='0.0.0.0', port=self.api_config.port)
