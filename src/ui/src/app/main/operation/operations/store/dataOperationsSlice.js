@@ -1,20 +1,26 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
+import { setLoading } from 'app/loading/store/loadingSlice';
 
-export const getDataOperations = createAsyncThunk('dataOperationsApp/dataOperations/getDataOperations', async params => {
-	// GetDataOperation
-	const response = await axios.get('/api/Operation', {
-		params: {
-			PageNumber: params.PageNumber,
-			PageSize: params.PageSize,
-			OrderBy: params.OrderBy,
-			Order: params.Order,
-			DataOperationName: params.DataOperationName,
-			OnlyUndeleted: params.OnlyUndeleted,
-		}
-	});
-	const data = await response.data;
-	return data;
+export const getDataOperations = createAsyncThunk('dataOperationsApp/dataOperations/getDataOperations', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.get('/api/Operation', {
+			params: {
+				PageNumber: params.PageNumber,
+				PageSize: params.PageSize,
+				OrderBy: params.OrderBy,
+				Order: params.Order,
+				DataOperationName: params.DataOperationName,
+				OnlyUndeleted: params.OnlyUndeleted,
+			}
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
 

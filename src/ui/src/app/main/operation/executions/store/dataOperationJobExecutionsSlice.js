@@ -1,23 +1,29 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
+import { setLoading } from 'app/loading/store/loadingSlice';
 
-export const getDataOperationJobExecutions = createAsyncThunk('dataOperationJobExecutionsApp/dataOperationJobExecutions/getDataOperationJobExecutions', async params => {
-	// GetDataOperationJobExecution
-	const response = await axios.get('/api/Operation/JobExecution', {
-		params: {
-			PageNumber: params.PageNumber,
-			PageSize: params.PageSize,
-			OrderBy: params.OrderBy,
-			Order: params.Order,
-			DataOperationId: params.DataOperationId,
-			DataOperationJobId: params.DataOperationJobId,
-			DataOperationName: params.DataOperationName,
-			OnlyCron: params.OnlyCron,
-			StatusId: params.StatusId,
-		}
-	});
-	const data = await response.data;
-	return data;
+export const getDataOperationJobExecutions = createAsyncThunk('dataOperationJobExecutionsApp/dataOperationJobExecutions/getDataOperationJobExecutions', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.get('/api/Operation/JobExecution', {
+			params: {
+				PageNumber: params.PageNumber,
+				PageSize: params.PageSize,
+				OrderBy: params.OrderBy,
+				Order: params.Order,
+				DataOperationId: params.DataOperationId,
+				DataOperationJobId: params.DataOperationJobId,
+				DataOperationName: params.DataOperationName,
+				OnlyCron: params.OnlyCron,
+				StatusId: params.StatusId,
+			}
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
 

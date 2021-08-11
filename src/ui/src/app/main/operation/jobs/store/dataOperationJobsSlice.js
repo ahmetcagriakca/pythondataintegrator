@@ -1,22 +1,29 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
+import { setLoading } from 'app/loading/store/loadingSlice';
 
-export const getDataOperationJobs = createAsyncThunk('dataOperationJobsApp/dataOperationJobs/getDataOperationJobs', async params => {
-	// GetDataOperationJob
-	const response = await axios.get('/api/Operation/Job', {
-		params: {
-			PageNumber: params.PageNumber,
-			PageSize: params.PageSize,
-			OrderBy: params.OrderBy,
-			Order: params.Order,
-			DataOperationId: params.DataOperationId,
-			DataOperationName: params.DataOperationName,
-			OnlyCron: params.OnlyCron,
-			OnlyUndeleted: params.OnlyUndeleted,
-		}
-	});
-	const data = await response.data;
-	return data;
+
+export const getDataOperationJobs = createAsyncThunk('dataOperationJobsApp/dataOperationJobs/getDataOperationJobs', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.get('/api/Operation/Job', {
+			params: {
+				PageNumber: params.PageNumber,
+				PageSize: params.PageSize,
+				OrderBy: params.OrderBy,
+				Order: params.Order,
+				DataOperationId: params.DataOperationId,
+				DataOperationName: params.DataOperationName,
+				OnlyCron: params.OnlyCron,
+				OnlyUndeleted: params.OnlyUndeleted,
+			}
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
 

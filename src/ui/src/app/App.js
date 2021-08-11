@@ -19,13 +19,12 @@ import store from './store';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Notification from './notification/Notification';
-
+import Loading from './loading/Loading';
 const jss = create({
 	...jssPreset(),
 	plugins: [...jssPreset().plugins, jssExtend(), rtl()],
 	insertionPoint: document.getElementById('jss-insertion-point')
 });
-
 
 const generateClassName = createGenerateClassName();
 toast.configure()
@@ -48,6 +47,7 @@ const App = () => {
 									<FuseTheme>
 										<FuseLayout />
 										<Notification />
+										<Loading />
 									</FuseTheme>
 								</FuseAuthorization>
 							</Router>

@@ -1,66 +1,95 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
+import { setLoading } from 'app/loading/store/loadingSlice';
 
-export const getConnection = createAsyncThunk('connectionApp/connection/getConnection', async params => {
-	// GetConnection
-	const response = await axios.get('/api/Connection/ById', {
-		params: {
-			Id: params.id,
-		}
-	});
-	const data = await response.data;
-	return data;
+export const getConnection = createAsyncThunk('connectionApp/connection/getConnection', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.get('/api/Connection/ById', {
+			params: {
+				Id: params.id,
+			}
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
-export const postConnection = createAsyncThunk('connectionApp/connection/postConnection', async params => {
-	// GetConnection
-	const response = await axios.post('/api/Connection/Database', {
-		Name: params.name,
-		ConnectorTypeName: params.connectorType.name,
-		Host: params.host,
-		Port: params.port,
-		Sid: params.sid,
-		ServiceName: params.serviceName,
-		DatabaseName: params.databaseName,
-		User: params.user,
-		Password: params.password,
-	});
-	const data = await response.data;
-	return data;
-});
-
-export const deleteConnection = createAsyncThunk('connectionApp/connection/deleteConnection', async params => {
-	const response = await axios.delete('/api/Connection', {
-		data: {
-			Id: params.id,
-		}
-
-	});
-	const data = await response.data;
-	return data;
-});
-
-
-
-export const checkDatabaseConnection = createAsyncThunk('connectionApp/connection/checkDatabaseConnection', async params => {
-	const response = await axios.post('/api/Connection/CheckDatabase', {
-		ConnectionName: params.ConnectionName,
-	});
-	const data = await response.data;
-	return data;
+export const postConnection = createAsyncThunk('connectionApp/connection/postConnection', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.post('/api/Connection/Database', {
+			Name: params.name,
+			ConnectorTypeName: params.connectorType.name,
+			Host: params.host,
+			Port: params.port,
+			Sid: params.sid,
+			ServiceName: params.serviceName,
+			DatabaseName: params.databaseName,
+			User: params.user,
+			Password: params.password,
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
-export const checkDatabaseTableRowCount = createAsyncThunk('connectionApp/connection/checkDatabaseTableRowCount', async params => {
-	const response = await axios.post('/api/Connection/CheckDatabaseTableRowCount', {
-		ConnectionName: params.ConnectionName,
-		Schema: params.Schema,
-		Table: params.Table,
-	});
-	const data = await response.data;
-	return data;
+export const deleteConnection = createAsyncThunk('connectionApp/connection/deleteConnection', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.delete('/api/Connection', {
+			data: {
+				Id: params.id,
+			}
+
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
 
-export const clearConnection = createAsyncThunk('connectionApp/connection/clearConnection', async params => {
+
+export const checkDatabaseConnection = createAsyncThunk('connectionApp/connection/checkDatabaseConnection', async (params, extra)  => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.post('/api/Connection/CheckDatabase', {
+			ConnectionName: params.ConnectionName,
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
+});
+
+export const checkDatabaseTableRowCount = createAsyncThunk('connectionApp/connection/checkDatabaseTableRowCount', async (params, extra)  => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.post('/api/Connection/CheckDatabaseTableRowCount', {
+			ConnectionName: params.ConnectionName,
+			Schema: params.Schema,
+			Table: params.Table,
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
+});
+
+
+export const clearConnection = createAsyncThunk('connectionApp/connection/clearConnection', async (params, extra)  => {
 	return {};
 });
 

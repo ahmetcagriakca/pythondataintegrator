@@ -1,36 +1,61 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
+import { setLoading } from 'app/loading/store/loadingSlice';
 
-export const getOperation = createAsyncThunk('dataOperationApp/dataOperation/getOperation', async params => {
-	const response = await axios.get('/api/Operation/ById', {
-		params: {
-			Id: params.id,
-		}
-	});
-	const data = await response.data;
-	return data;
+export const getOperation = createAsyncThunk('dataOperationApp/dataOperation/getOperation', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.get('/api/Operation/ById', {
+			params: {
+				Id: params.id,
+			}
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
-export const postOperation = createAsyncThunk('dataOperationApp/dataOperation/postOperation', async operationData => {
-	const response = await axios.post('/api/Operation',operationData);
-	const data = await response.data;
-	return data;
+export const postOperation = createAsyncThunk('dataOperationApp/dataOperation/postOperation', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.post('/api/Operation', params);
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
-export const deleteOperation = createAsyncThunk('dataOperationApp/dataOperation/deleteOperation', async params => {
-	const response = await axios.delete('/api/Operation', {
-		data: {
-			Id: params.id,
-		}
+export const deleteOperation = createAsyncThunk('dataOperationApp/dataOperation/deleteOperation', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.delete('/api/Operation', {
+			data: {
+				Id: params.id,
+			}
 
-	});
-	const data = await response.data;
-	return data;
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
 
-export const clearOperation = createAsyncThunk('dataOperationApp/dataOperation/clearOperation', async params => {
-	return {};
+export const clearOperation = createAsyncThunk('dataOperationApp/dataOperation/clearOperation', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		return {};
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
 

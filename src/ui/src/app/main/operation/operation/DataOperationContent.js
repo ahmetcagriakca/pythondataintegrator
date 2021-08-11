@@ -95,16 +95,15 @@ function DataOperationContent() {
 	}, [dispatch, routeParams]);
 	const initializeValues = () => {
 		if (operation && operation != null) {
-
 			let operationData = {
-				id: operation.id?operation.id:null,
-				name: operation.name?operation.name:'',
-				definitionId: operation.definitionId?operation.definitionId:0,
-				version: operation.version?operation.version:0,
-				contacts: operation.contacts?operation.contacts:null,
-				integrations: operation.integrations?operation.integrations:null,
-				creationDate: operation.creationDate?operation.creationDate:new Date(),
-				isDeleted: operation.isDeleted?operation.isDeleted:0,
+				id: operation.id ? operation.id : null,
+				name: operation.name ? operation.name : '',
+				definitionId: operation.definitionId ? operation.definitionId : 0,
+				version: operation.version ? operation.version : 0,
+				contacts: operation.contacts ? operation.contacts : null,
+				integrations: operation.integrations ? operation.integrations : null,
+				creationDate: operation.creationDate ? operation.creationDate : new Date(),
+				isDeleted: operation.isDeleted ? operation.isDeleted : 0,
 			}
 			if (!(operationData.contacts && operationData.concats?.length !== 0)) {
 				operationData.contacts = []
@@ -302,7 +301,6 @@ function DataOperationContent() {
 			setOpen(true);
 		}
 	};
-
 	return (
 
 		<React.Fragment>
@@ -545,7 +543,7 @@ function DataOperationContent() {
 				oldJsonContent={oldJsonContent}
 				oldData={operation}
 				applyChange={applyDataOperationChange}
-			></DataOperationJsonContent>
+			/>
 		</React.Fragment>
 	);
 }

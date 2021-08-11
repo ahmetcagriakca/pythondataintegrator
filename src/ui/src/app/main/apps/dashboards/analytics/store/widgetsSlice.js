@@ -1,11 +1,18 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from './axios';
+import { setLoading } from 'app/loading/store/loadingSlice';
 
-export const getWidgets = createAsyncThunk('analyticsDashboardApp/widgets/getWidgets', async () => {
-	const response = await axios.get('/api/Dashboard');
-	const data = await response.data;
+export const getWidgets = createAsyncThunk('analyticsDashboardApp/widgets/getWidgets', async (params,extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.get('/api/Dashboard');
+		const data = await response.data;
 
-	return data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
 const widgetsAdapter = createEntityAdapter({});

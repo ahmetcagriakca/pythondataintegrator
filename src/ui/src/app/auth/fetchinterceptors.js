@@ -1,9 +1,12 @@
 import oidcService from 'app/services/oidcService';
+import { setLoading } from 'app/loading/store/loadingSlice';
 import history from '@history';
 import { camelizeKeys } from 'humps';
+import reducer from './store';
 
 import { toast } from 'react-toastify';
 
+const { dispatch } = reducer;
 export const addAuthInterceptors = async (axios) => {
   try {
     oidcService.init();
@@ -15,15 +18,25 @@ export const addAuthInterceptors = async (axios) => {
         config.headers["Content-Type"] = 'application/json';
         config.headers["Access-Control-Allow-Origin"] = "*";
         return config;
+      }, (error) => {
+        return Promise.reject(error);
       });
+    }
+    else {
+      axios.interceptors.request.use((config) => {
+        return config;
+      }, (error) => {
+        return Promise.reject(error);
+      });
+
     }
   } catch (e) {
     console.log(e);
   }
 
-
   axios.interceptors.response.use(
     (response) => {
+      setLoading(false)
       if (
         response.data &&
         response.headers['content-type'] === 'application/json'
@@ -34,6 +47,7 @@ export const addAuthInterceptors = async (axios) => {
       return response;
     },
     (error) => {
+      setLoading(false)
       if (error.response) {
         if (error.response.status === 401) {
           history.push({
