@@ -590,7 +590,8 @@ function ConnectionContent() {
 					</Box>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={checkCountAction}
+					<Button 
+						onClick={checkCountAction}
 s						variant="contained"
 						color="secondary"
 						size="large">

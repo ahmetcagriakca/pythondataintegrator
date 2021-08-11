@@ -32,6 +32,7 @@ class ConnectionDto:
     Database: ConnectionDatabaseDto = None
     ConnectionType: ConnectionTypeDto = None
     ConnectionTypeId: int = None
+    IsDeleted: int = None
 
 
 @dtoclass
@@ -90,6 +91,7 @@ class GetDataOperationDto:
     Contacts: List[DataOperationContactDto] = None
     Integrations: List[DataOperationIntegrationDto] = None
     DefinitionId: int = None
+    Version: int = None
     CreationDate: datetime = None
     LastUpdatedDate: datetime = None
     IsDeleted: int = None

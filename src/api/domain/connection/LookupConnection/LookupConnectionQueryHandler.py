@@ -20,7 +20,7 @@ class LookupConnectionQueryHandler(IQueryHandler[LookupConnectionQuery], IScoped
     def handle(self, query: LookupConnectionQuery) -> LookupConnectionResponse:
         result = LookupConnectionResponse()
         repository = self.repository_provider.get(Connection)
-        data_query = repository.table
+        data_query = repository.table.filter(Connection.IsDeleted==0)
         data_query = self.specifications.specify(query=query, data_query=data_query)
         result.Data = LookupConnectionMapping.to_dtos(data_query)
         return result

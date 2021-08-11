@@ -7,9 +7,10 @@ class LookupConnectionMapping:
     @staticmethod
     def to_dto(entity: Connection) -> LookupConnectionDto:
         dto = LookupConnectionDto()
-        dto.Id=entity.Id
-        dto.Name=entity.Name
-        dto.ConnectionTypeId=entity.ConnectionTypeId
+        dto.Id = entity.Id
+        dto.Name = entity.Name
+        dto.ConnectionTypeId = entity.ConnectionTypeId
+        dto.IsDeleted = entity.IsDeleted
         return dto
 
     @staticmethod

@@ -18,7 +18,6 @@ function DataOperation() {
 	return (
 		<div style={{ position: 'relative' }}>
 			<CommonHeader icon={icon} title={title} />
-
 			<div className={classes.root}
 				style={{ padding: '15px 40px 15px 40px' }}
 			>

@@ -14,6 +14,7 @@ class GetDataOperationMapping:
         dto.Id = entity.Id
         dto.Name = entity.Name
         dto.DefinitionId = entity.DefinitionId
+        dto.Version = entity.Definition.Version
         dto.IsDeleted = entity.IsDeleted
         dto.CreationDate = entity.CreationDate
         dto.LastUpdatedDate = entity.LastUpdatedDate
@@ -55,7 +56,8 @@ class GetDataOperationMapping:
                             Id=data_integration_connection.Connection.Id,
                             Name=data_integration_connection.Connection.Name,
                             ConnectionType=connection_type,
-                            ConnectionTypeId=data_integration_connection.Connection.ConnectionTypeId
+                            ConnectionTypeId=data_integration_connection.Connection.ConnectionTypeId,
+                            IsDeleted=data_integration_connection.Connection.IsDeleted
                         )
                         database = None
                         if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Database.value:

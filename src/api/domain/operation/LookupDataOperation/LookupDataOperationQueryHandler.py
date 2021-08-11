@@ -20,7 +20,7 @@ class LookupDataOperationQueryHandler(IQueryHandler[LookupDataOperationQuery], I
     def handle(self, query: LookupDataOperationQuery) -> LookupDataOperationResponse:
         result = LookupDataOperationResponse()
         repository = self.repository_provider.get(DataOperation)
-        data_query = repository.table
+        data_query = repository.table.filter(DataOperation.IsDeleted==0)
         data_query = self.specifications.specify(query=query, data_query=data_query)
         result.Data = LookupDataOperationMapping.to_dtos(data_query)
         return result

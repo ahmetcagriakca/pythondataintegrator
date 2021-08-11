@@ -11,7 +11,6 @@ import DataIntegrationSourceConnectionContent from './DataIntegrationSourceConne
 import DataIntegrationTargetConnectionContent from './DataIntegrationTargetConnectionContent';
 import DataIntegrationColumnsData from './DataIntegrationColumnsData';
 
-
 const useStyles = makeStyles(theme => ({
 	divider: {
 		margin: theme.spacing(2, 0),
@@ -65,94 +64,96 @@ function DataIntegrationContent(props) {
 		changeApply(newRow)
 	};
 
+
 	return (
-		<Box>
-			<Grid container spacing={3}>
-				<Grid item xs>
-					<TextField
-						id={"code" + row?.id}
-						label="Code"
-						fullWidth={true}
-						InputLabelProps={{
-							shrink: true,
-						}}
-						value={checkValue(row?.code)}
-						onChange={event => handleChange(event, 'code')}
-						onBlur={event => changeApply()}
-					/>
-				</Grid>
-				<Grid item xs>
-
-					<FormControlLabel
-						id={"isTargetTruncate" + row?.id}
-						style={{ margin: "5px" }}
-						control={
-							<Checkbox
-								name="isTargetTruncate"
-								checked={row?.isTargetTruncate}
-								onChange={(event, newValue) => {
-									handleIsTargetTruncateChange(event, newValue);
-								}} />
-						}
-						label="Is Target Truncate"
-					/>
-				</Grid>
-				<Grid item xs>
-					<TextField
-						id={"comments" + row?.id}
-						label="Comments"
-						fullWidth={true}
-						InputLabelProps={{
-							shrink: true,
-						}}
-						value={checkValue(row?.comments)}
-						onChange={event => handleChange(event, 'comments')}
-						onBlur={event => changeApply()}
-					/>
-				</Grid>
-				<Grid item xs>
-				</Grid>
-			</Grid>
-			<Divider className={classes.divider} />
-			<Grid container spacing={3}>
-
-				<Grid item xs={6} >
-					<Box margin={1}>
-						<Typography variant="h6" gutterBottom component="div">
-							Source Connection
-						</Typography>
-
-						<DataIntegrationSourceConnectionContent
-							key={"sourceConncetion" + row.id}
-							rowData={row?.sourceConnection}
-							applyChange={applyDataIntegrationSourceConnectionChange}
+			<Box>
+				<Grid container spacing={3}>
+					<Grid item xs>
+						<TextField
+							id={"code" + row?.id}
+							label="Code"
+							fullWidth={true}
+							InputLabelProps={{
+								shrink: true,
+							}}
+							value={checkValue(row?.code)}
+							onChange={event => handleChange(event, 'code')}
+							onBlur={event => changeApply()}
 						/>
-					</Box>
-				</Grid>
-				<Grid item style={{ margin: "0 0 0 5" }} xs={6} >
-					<Box margin={1}>
-						<Typography variant="h6" gutterBottom component="div">
-							Target Connection
-						</Typography>
-						<DataIntegrationTargetConnectionContent
-							key={"targetConnection" + row.id}
-							rowData={row?.targetConnection}
-							applyChange={applyDataIntegrationTargetConnectionChange}
+					</Grid>
+					<Grid item xs>
+
+						<FormControlLabel
+							id={"isTargetTruncate" + row?.id}
+							style={{ margin: "5px" }}
+							control={
+								<Checkbox
+									name="isTargetTruncate"
+									checked={row?.isTargetTruncate}
+									onChange={(event, newValue) => {
+										handleIsTargetTruncateChange(event, newValue);
+									}} />
+							}
+							label="Is Target Truncate"
 						/>
-					</Box>
-				</Grid>
-			</Grid>
-			{
-				row?.sourceConnection && row?.sourceConnection != null && row?.sourceConnection?.connection?.name != null && row?.targetConnection && row?.targetConnection != null && row?.targetConnection?.connection?.name != null ?
-					(
-						<DataIntegrationColumnsData
-							key={"targetConnection" + row.id}
-							rowData={row?.columns}
-							applyChange={applyDataIntegrationColumnsChange}
+					</Grid>
+					<Grid item xs>
+						<TextField
+							id={"comments" + row?.id}
+							label="Comments"
+							fullWidth={true}
+							InputLabelProps={{
+								shrink: true,
+							}}
+							value={checkValue(row?.comments)}
+							onChange={event => handleChange(event, 'comments')}
+							onBlur={event => changeApply()}
 						/>
-					) : ('')
-			}
-		</Box>
+					</Grid>
+					<Grid item xs>
+					</Grid>
+				</Grid>
+				<Divider className={classes.divider} />
+				<Grid container spacing={3}>
+
+					<Grid item xs={6} >
+						<Box margin={1}>
+							<Typography variant="h6" gutterBottom component="div">
+								Source Connection
+							</Typography>
+
+							<DataIntegrationSourceConnectionContent
+								key={"sourceConncetion" + row.id}
+								rowData={row?.sourceConnection}
+								applyChange={applyDataIntegrationSourceConnectionChange}
+							/>
+						</Box>
+					</Grid>
+					<Grid item style={{ margin: "0 0 0 5" }} xs={6} >
+						<Box margin={1}>
+							<Typography variant="h6" gutterBottom component="div">
+								Target Connection
+							</Typography>
+							<DataIntegrationTargetConnectionContent
+								key={"targetConnection" + row.id}
+								rowData={row?.targetConnection}
+								applyChange={applyDataIntegrationTargetConnectionChange}
+							/>
+						</Box>
+					</Grid>
+				</Grid>
+				{
+					row?.sourceConnection && row?.sourceConnection != null && row?.sourceConnection?.connection?.name != null && row?.targetConnection && row?.targetConnection != null && row?.targetConnection?.connection?.name != null ?
+						(
+							<DataIntegrationColumnsData
+								key={"targetConnection" + row.id}
+								rowData={row?.columns}
+								applyChange={applyDataIntegrationColumnsChange}
+							/>
+						) : ('')
+				}
+			</Box>
+
 	)
 }
 

@@ -7,8 +7,9 @@ class LookupDataOperationMapping:
     @staticmethod
     def to_dto(entity: DataOperation) -> LookupDataOperationDto:
         dto = LookupDataOperationDto()
-        dto.Id=entity.Id
-        dto.Name=entity.Name
+        dto.Id = entity.Id
+        dto.Name = entity.Name
+        dto.IsDeleted = entity.IsDeleted
         return dto
 
     @staticmethod

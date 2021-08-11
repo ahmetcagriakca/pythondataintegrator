@@ -23,6 +23,7 @@ import DataOperationContactsData from './contacts/DataOperationContactsData';
 import DataOperationIntegrationsData from './DataOperationIntegrationsData';
 import { toast } from 'react-toastify';
 
+import DataOperationJsonContent from './DataOperationJsonContent';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -48,7 +49,14 @@ const useStyles = makeStyles(theme => ({
 	topLeftBox: {
 		justifyContent: "flex-start",
 		alignItems: "flex-start"
-	}
+	},
+	appBar: {
+		position: 'relative',
+	},
+	title: {
+		marginLeft: theme.spacing(2),
+		flex: 1,
+	},
 }));
 
 function DataOperationContent() {
@@ -87,7 +95,17 @@ function DataOperationContent() {
 	}, [dispatch, routeParams]);
 	const initializeValues = () => {
 		if (operation && operation != null) {
-			let operationData = { ...operation }
+
+			let operationData = {
+				id: operation.id?operation.id:null,
+				name: operation.name?operation.name:'',
+				definitionId: operation.definitionId?operation.definitionId:0,
+				version: operation.version?operation.version:0,
+				contacts: operation.contacts?operation.contacts:null,
+				integrations: operation.integrations?operation.integrations:null,
+				creationDate: operation.creationDate?operation.creationDate:new Date(),
+				isDeleted: operation.isDeleted?operation.isDeleted:0,
+			}
 			if (!(operationData.contacts && operationData.concats?.length !== 0)) {
 				operationData.contacts = []
 			}
@@ -104,6 +122,7 @@ function DataOperationContent() {
 				id: true,
 				name: ((operation.id && operation.id !== null) || operation.isDeleted === 1) ? true : false,
 				definitionId: true,
+				version: true,
 				creationDate: true,
 				isDeleted: true,
 			})
@@ -111,6 +130,7 @@ function DataOperationContent() {
 				id: true,
 				name: ((operation.id && operation.id !== null)) ? true : false,
 				definitionId: true,
+				version: true,
 				creationDate: true,
 				isDeleted: true,
 			})
@@ -129,16 +149,16 @@ function DataOperationContent() {
 		setTabValue(newValue);
 	};
 
-	const save = event => {
+	const createOperationJson = (operationData, validate) => {
 		let hasError = false
 		let contacts = []
-		for (var i = 0; i < values.contacts.length; i++) {
-			contacts = contacts.concat({ Email: values.contacts[i].email })
+		for (var i = 0; i < operationData?.contacts?.length; i++) {
+			contacts = contacts.concat({ Email: operationData.contacts[i].email })
 		}
 
 		let operationIntegrations = []
-		for (var j = 0; j < values.integrations.length; j++) {
-			let dataOperationIntegration = values.integrations[j]
+		for (var j = 0; j < operationData?.integrations?.length; j++) {
+			let dataOperationIntegration = operationData.integrations[j]
 			let dataIntegration = dataOperationIntegration.integration
 			let sourceColumns = []
 			let targetColumns = []
@@ -198,7 +218,9 @@ function DataOperationContent() {
 				}
 			}
 			else {
-				toast.error("Error on " + dataIntegration.code + ". Target Connection Required for integraion", { position: toast.POSITION.BOTTOM_RIGHT })
+				if (validate === true) {
+					toast.error("Error on " + dataIntegration.code + ". Target Connection Required for integraion", { position: toast.POSITION.BOTTOM_RIGHT })
+				}
 				hasError = true
 			}
 			let integration = {
@@ -224,13 +246,24 @@ function DataOperationContent() {
 				}
 			}
 		}
-		if (!hasError) {
+		if (hasError && validate === true) {
+			return null
+		}
+		else {
 			let operation = {
-				Name: values.name,
+				Name: operationData.name,
 				Contacts: contacts,
 				Integrations: operationIntegrations
 			}
-			dispatch(postOperation(operation));
+			return operation
+		}
+	};
+
+
+	const save = event => {
+		let operationData = createOperationJson(values, true)
+		if (operationData != null) {
+			dispatch(postOperation(operationData));
 		}
 	};
 
@@ -251,208 +284,269 @@ function DataOperationContent() {
 		setValues({ ...values, contacts: data });
 	}
 
+	const applyDataOperationChange = (data) => {
+		setValues(data);
+		setOpen(false)
+	}
+
+	const [open, setOpen] = React.useState(false);
+	const [content, setContent] = React.useState('{}');
+	const [oldJsonContent, setOldJsonContent] = React.useState('{}');
+	const handleOpen = () => {
+
+		let operationData = createOperationJson(values)
+		let oldOperationJson = createOperationJson(operation)
+		if (operationData != null) {
+			setContent(JSON.stringify(operationData, null, "\t"))
+			setOldJsonContent(oldOperationJson)
+			setOpen(true);
+		}
+	};
+
 	return (
-		<Box>
-			<form className={classes.root} noValidate autoComplete="off" style={{ padding: ' 0 0 15px 0' }}>
-				<Grid container spacing={3}>
-					<Grid item xs>
-						<Box style={{ width: '100%' }}>
-							<Grid container spacing={3}>
-								<Grid item xs={3}>
-									<TextField
-										id="id"
-										label="Id"
-										type="number"
-										fullWidth={true}
-										InputLabelProps={{
-											shrink: true,
-										}}
-										disabled={disabilityStatus.id}
-										InputProps={{
-											readOnly: readonlyStatus.id,
-										}}
-										value={checkValue(values.id)}
-									/>
-								</Grid>
-								<Grid item xs>
-									<TextField
-										id="name"
-										label="Name"
-										fullWidth={true}
-										InputLabelProps={{
-											shrink: true,
-										}}
-										disabled={disabilityStatus.name}
-										InputProps={{
-											readOnly: readonlyStatus.name,
-										}}
-										value={values.name}
-										onChange={handleChange('name')}
-									/>
-								</Grid>
-							</Grid>
-						</Box>
-					</Grid>
-					<Grid item xs>
-						<TextField
-							id="definitionId"
-							label="Definition Id"
-							type="number"
-							fullWidth={true}
-							InputLabelProps={{
-								shrink: true,
-							}}
-							disabled={disabilityStatus.definitionId}
-							InputProps={{
-								readOnly: readonlyStatus.definitionId,
-							}}
-							value={values.definitionId}
-						/>
-					</Grid>
-					<Grid item xs>
-						<Box style={{ width: '100%' }}>
-							<Grid container spacing={1}>
-								<Grid item xs>
-									<DateTimePicker
-										label="Creation Date"
-										inputVariant="outlined"
-										format="DD/MM/yyyy HH:mm:sss a"
-										fullWidth={true}
-										disabled={disabilityStatus.creationDate}
-										readOnly={readonlyStatus.creationDate}
-										value={values.creationDate}
-										onChange={handleChange('creationDate')}
-									/>
-								</Grid>
-								<Grid item xs={4}>
-									<TextField
-										id="isDeleted"
-										label="Is Deleted"
-										type="number"
-										variant="outlined"
-										fullWidth={true}
-										InputLabelProps={{
-											shrink: true,
-										}}
-										disabled={disabilityStatus.isDeleted}
-										readOnly={readonlyStatus.isDeleted}
-										value={values.isDeleted}
-									/>
-								</Grid>
-							</Grid>
-						</Box>
-					</Grid>
-				</Grid>
 
-				{
-					values.isDeleted !== 1 ?
-						(
-							<Box
-								component="span"
-								m={1} //margin
-								className={`${classes.bottomRightBox} ${classes.box}`}
-							>
-								<ButtonGroup aria-label="outlined primary button group">
-									{
-										values.id && values.id != null ? (
-											<Button
-												variant="contained"
-												color="default"
-												size="large"
-												className={classes.button}
-												startIcon={<Icon >delete</Icon>}
-												onClick={deleteAction}
-											>
-												Delete
-											</Button>
-										) : ("")
-									}
-									<Button
-										variant="contained"
-										color="secondary"
-										size="large"
-										className={classes.button}
-										startIcon={<Icon >clear</Icon>}
-										onClick={clear}
-									>
-										Clear
-									</Button>
-									<Button
-										variant="contained"
-										color="primary"
-										size="large"
-										className={classes.button}
-										startIcon={<Icon >save</Icon>}
-										onClick={save}
-									>
-										Save
-									</Button>
-								</ButtonGroup>
+		<React.Fragment>
+			<Box>
+				<form className={classes.root} noValidate autoComplete="off" style={{ padding: ' 0 0 15px 0' }}>
+					<Grid container spacing={3}>
+						<Grid item xs>
+							<Box style={{ width: '100%' }}>
+								<Grid container spacing={3}>
+									<Grid item xs={3}>
+										<TextField
+											id="id"
+											label="Id"
+											type="number"
+											fullWidth={true}
+											InputLabelProps={{
+												shrink: true,
+											}}
+											disabled={disabilityStatus.id}
+											InputProps={{
+												readOnly: readonlyStatus.id,
+											}}
+											value={checkValue(values.id)}
+										/>
+									</Grid>
+									<Grid item xs>
+										<TextField
+											id="name"
+											label="Name"
+											fullWidth={true}
+											InputLabelProps={{
+												shrink: true,
+											}}
+											disabled={disabilityStatus.name}
+											InputProps={{
+												readOnly: readonlyStatus.name,
+											}}
+											value={values.name}
+											onChange={handleChange('name')}
+										/>
+									</Grid>
+								</Grid>
 							</Box>
-						) : ("")
-				}
-			</form>
-
-			<TabContext value={tabValue}>
-				<AppBar position="static">
-
+						</Grid>
+						<Grid item xs>
+							<Box style={{ width: '100%' }}>
+								<Grid container spacing={3}>
+									<Grid item xs={9}>
+										<TextField
+											id="definitionId"
+											label="Definition Id"
+											type="number"
+											fullWidth={true}
+											InputLabelProps={{
+												shrink: true,
+											}}
+											disabled={disabilityStatus.definitionId}
+											InputProps={{
+												readOnly: readonlyStatus.definitionId,
+											}}
+											value={values.definitionId}
+										/>
+									</Grid>
+									<Grid item xs={3}>
+										<TextField
+											id="version"
+											label="Version"
+											type="number"
+											fullWidth={true}
+											InputLabelProps={{
+												shrink: true,
+											}}
+											disabled={disabilityStatus.version}
+											InputProps={{
+												readOnly: readonlyStatus.version,
+											}}
+											value={values.version}
+										/>
+									</Grid>
+								</Grid>
+							</Box>
+						</Grid>
+						<Grid item xs>
+							<Box style={{ width: '100%' }}>
+								<Grid container spacing={1}>
+									<Grid item xs>
+										<DateTimePicker
+											label="Creation Date"
+											inputVariant="outlined"
+											format="DD/MM/yyyy HH:mm:sss a"
+											fullWidth={true}
+											disabled={disabilityStatus.creationDate}
+											readOnly={readonlyStatus.creationDate}
+											value={values.creationDate}
+											onChange={handleChange('creationDate')}
+										/>
+									</Grid>
+									<Grid item xs={4}>
+										<TextField
+											id="isDeleted"
+											label="Is Deleted"
+											type="number"
+											variant="outlined"
+											fullWidth={true}
+											InputLabelProps={{
+												shrink: true,
+											}}
+											disabled={disabilityStatus.isDeleted}
+											readOnly={readonlyStatus.isDeleted}
+											value={values.isDeleted}
+										/>
+									</Grid>
+								</Grid>
+							</Box>
+						</Grid>
+					</Grid>
 					{
-						values.id && values.id !== null && values.id !== 0 ?
+						values.isDeleted !== 1 ?
 							(
-								<TabList onChange={handleTabChange} aria-label="simple tabs example" >
-									<Tab label="Definition" value="1" />
-									<Tab label="Jobs" value="3" />
-									<Tab label="Executions" value="4" />
-								</TabList>
-							) : (
-								<TabList onChange={handleTabChange} aria-label="simple tabs example" >
-									<Tab label="Definition" value="1" />
-								</TabList>
-							)
+								<Box
+									component="span"
+									m={1} //margin
+									className={`${classes.bottomRightBox} ${classes.box}`}
+								>
+									<ButtonGroup aria-label="outlined primary button group">
+										{
+											values.id && values.id != null ? (
+												<Button
+													variant="contained"
+													color="default"
+													size="large"
+													className={classes.button}
+													startIcon={<Icon >delete</Icon>}
+													onClick={deleteAction}
+												>
+													Delete
+												</Button>
+											) : ("")
+										}
+										<Button
+											variant="contained"
+											color="secondary"
+											size="large"
+											className={classes.button}
+											startIcon={<Icon >clear</Icon>}
+											onClick={clear}
+										>
+											Clear
+										</Button>
+										<Button
+											variant="contained"
+											color="primary"
+											size="large"
+											className={classes.button}
+											startIcon={<Icon >upload_file</Icon>}
+											onClick={handleOpen}
+										>
+											Definition
+										</Button>
+										<Button
+											variant="contained"
+											color="primary"
+											size="large"
+											className={classes.button}
+											startIcon={<Icon >save</Icon>}
+											onClick={save}
+										>
+											Save
+										</Button>
+									</ButtonGroup>
+								</Box>
+							) : ("")
 					}
-				</AppBar>
-				<TabPanel value="1">
-					{
-						values.contacts && values.contacts != null ? (
-							<Box >
-								<Typography variant="h4" gutterBottom component="div">
-									Contacts
-								</Typography>
+				</form>
 
-								<DataOperationContactsData rowData={values.contacts} applyChange={applyDataOperationContactsChange} />
-							</Box>
-						) : ('')
-					}
+				<TabContext value={tabValue}>
+					<AppBar position="static">
+
+						{
+							values.id && values.id !== null && values.id !== 0 ?
+								(
+									<TabList onChange={handleTabChange} aria-label="simple tabs example" >
+										<Tab label="Details" value="1" />
+										<Tab label="Jobs" value="3" />
+										<Tab label="Executions" value="4" />
+									</TabList>
+								) : (
+									<TabList onChange={handleTabChange} aria-label="simple tabs example" >
+										<Tab label="Details" value="1" />
+									</TabList>
+								)
+						}
+					</AppBar>
+					<TabPanel value="1">
+						{
+							values.contacts && values.contacts != null ? (
+								<Box >
+									<Typography variant="h4" gutterBottom component="div">
+										Contacts
+									</Typography>
+
+									<DataOperationContactsData rowData={values.contacts} applyChange={applyDataOperationContactsChange} />
+								</Box>
+							) : ('')
+						}
+						{
+							values.integrations && values.integrations != null ? (
+								<Box >
+									<Typography variant="h4" gutterBottom component="div">
+										Integrations
+									</Typography>
+									<DataOperationIntegrationsData
+										rowData={values.integrations}
+										applyChange={applyDataOperationIntegrationsChange}
+									/>
+								</Box>
+							) : ("")
+						}
+					</TabPanel>
 					{
-						values.integrations && values.integrations != null ? (
-							<Box >
-								<Typography variant="h4" gutterBottom component="div">
-									Integrations
-								</Typography>
-								<DataOperationIntegrationsData
-									rowData={values.integrations}
-									applyChange={applyDataOperationIntegrationsChange}
-								/>
-							</Box>
+						values.id && values.id !== null && values.id !== 0 ? (
+							<TabPanel value="3">
+								<DataOperationJobs HasHeader={false} DataOperationId={values.id} />
+							</TabPanel>
 						) : ("")
 					}
-				</TabPanel>
-				{
-					values.id && values.id !== null && values.id !== 0 ? (
-						<TabPanel value="3">
-							<DataOperationJobs HasHeader={false} DataOperationId={values.id} />
-						</TabPanel>
-					) : ("")
-				}
-				{
-					values.id && values.id !== null && values.id !== 0 ? (
-						<TabPanel value="4">
-							<DataOperationJobExecutions HasHeader={false} DataOperationId={values.id} />
-						</TabPanel>
-					) : ("")
-				}
-			</TabContext>
-		</Box >
+					{
+						values.id && values.id !== null && values.id !== 0 ? (
+							<TabPanel value="4">
+								<DataOperationJobExecutions HasHeader={false} DataOperationId={values.id} />
+							</TabPanel>
+						) : ("")
+					}
+				</TabContext>
+			</Box >
+
+			<DataOperationJsonContent
+				open={open} setOpen={setOpen}
+				content={content} setContent={setContent}
+				oldJsonContent={oldJsonContent}
+				oldData={operation}
+				applyChange={applyDataOperationChange}
+			></DataOperationJsonContent>
+		</React.Fragment>
 	);
 }
 
