@@ -59,7 +59,7 @@ elif hasattr(typing, '_Union'):
             return self._is_generic(class_type)
 
         def is_base_generic(self, class_type):
-            return self.is_base_generic(class_type)
+            return self._is_base_generic(class_type)
 
         def _is_generic(self, cls):
             if isinstance(cls, (typing.GenericMeta, typing._Union, typing._Optional, typing._ClassVar)):

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, render_template
 from flask_socketio import SocketIO, send
 import json
 from flask_cors import CORS
@@ -8,8 +8,12 @@ app.config['SECRET_KEY'] = 'mysecret'
 
 socketIo = SocketIO(app, cors_allowed_origins="*")
 
-app.debug = True
-app.host = 'localhost'
+app.debug = False
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 @app.route('/notify', methods=['POST'])
@@ -33,16 +37,22 @@ def handleNotification(ntf):
 @socketIo.on("connection")
 def handleNotification(ntf):
     send('test')
+
+
 @socketIo.event
 def connect():
     print("I'm connected!")
+
 
 @socketIo.event
 def connect_error(data):
     print("The connection failed!")
 
+
 @socketIo.event
 def disconnect():
     print("I'm disconnected!")
+
+
 if __name__ == '__main__':
-    socketIo.run(app, port=7500)
+    socketIo.run(app, host='0.0.0.0', port=7500)

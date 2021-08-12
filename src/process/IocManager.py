@@ -37,7 +37,7 @@ class IocManager:
         # Importing all modules for dependency
         application_config = ApplicationConfig(root_directory=root_directory)
         module_finder = ModuleFinder(application_config)
-        module_finder.import_modules(excluded_modules=['unittests'])
+        module_finder.import_modules(excluded_modules=['tests'])
 
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)

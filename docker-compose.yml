@@ -15,6 +15,16 @@ services:
     volumes:
       - /var/lib/pdipostgresql/data
   
+  pdi-notification:
+    build: 
+      context: src/notification/
+      dockerfile: Dockerfile
+    ports:
+      - '7500:7500'
+    environment:
+      - APPLICATION_ENVIRONMENT=TEST
+      - TZ=Europe/Istanbul
+
   pdi-api:
     build: 
       context: src/api/
@@ -24,12 +34,14 @@ services:
     environment:
       - APPLICATION_ENVIRONMENT=TEST
       - DATABASE_TYPE=POSTGRESQL
-      - DATABASE_HOST=postgresql
+      - DATABASE_HOST=10.220.13.77
       - DATABASE_DATABASE=pdi
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=123456
+      - DATABASE_USERNAME=pdi_user
+      - DATABASE_PASSWORD=PWD_011
       - DATABASE_PORT=5432
       - SCHEDULER_RPC_CLIENT_HOST=pdi-scheduler
+      - PROCESS_RPC_CLIENT_HOST=pdi-process
+      - NOTIFICATION_CLIENT_HOST=http://pdi-notification:7500
       - TZ=Europe/Istanbul
     depends_on:
       - postgresql
@@ -48,6 +60,7 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=123456
       - DATABASE_PORT=5432
+      - NOTIFICATION_CLIENT_HOST=http://pdi-notification:7500
       - TZ=Europe/Istanbul
     depends_on:
       - postgresql
@@ -71,4 +84,18 @@ services:
     depends_on:
       - postgresql
       - pdi-process
-    
+  
+  pdi-ui:
+    build:
+      context: src/ui/
+      dockerfile: Dockerfile
+    ports:
+      - '7000:80'
+    environment:
+      - API_URI=http://localhost1:7100/
+      - NOTIFICATION_URI=trhttp://localhost:7500/
+    volumes:
+      - '/app/node_modules'
+      - ./src/ui/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - postgresql

@@ -80,8 +80,12 @@ class GetDataOperationJobWidgetMapping:
                 and_(DataOperationJob.CreationDate < date.today()),
             )
         ) \
-            .first()[0]
-        widget_data['data']['yesterdayDifference'] = (today_count - yesterday_count) / yesterday_count
+            .first().Count
+        if yesterday_count is not None and yesterday_count!=0:
+          widget_data['data']['yesterdayDifference'] = (today_count - yesterday_count) / yesterday_count
+        else:
+          widget_data['data']['yesterdayDifference'] = 0
+          yesterday_count=0
         last_seven_day_counts = [yesterday_count]
         last_seven_day_labels = [yesterday_date.strftime('%A')]
         # calculating last 7 days

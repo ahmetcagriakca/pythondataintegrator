@@ -63,7 +63,8 @@ class IocManager:
         application_config = ApplicationConfig(root_directory=root_directory)
         module_finder = ModuleFinder(application_config)
         # controllers and api excluded for api decorator
-        module_finder.import_modules(excluded_modules=['controllers', 'infrastructure\\api', 'alembic', 'unittests'])
+        api_path=os.path.join('infrastructure','api')
+        module_finder.import_modules(excluded_modules=['controllers', api_path, 'alembic', 'tests'])
 
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)
@@ -71,7 +72,7 @@ class IocManager:
 
         IocManager.initialize_flask()
         # controllers and api included after flask
-        module_finder.import_modules(included_modules=['controllers', 'infrastructure\\api'])
+        module_finder.import_modules(included_modules=['controllers',api_path])
         # Flask injector configuration
 
         IocManager.injector = Injector()

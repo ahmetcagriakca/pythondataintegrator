@@ -39,6 +39,7 @@ const Notification = () => {
 					if (id && id !== null) {
 						routePath += '/' + id
 					}
+					break;
 				case 'DataOperation':
 					routePath = 'operation'
 					if (id && id !== null) {

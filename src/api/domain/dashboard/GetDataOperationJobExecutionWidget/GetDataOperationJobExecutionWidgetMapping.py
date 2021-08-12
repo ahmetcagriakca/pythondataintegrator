@@ -82,8 +82,12 @@ class GetDataOperationJobExecutionWidgetMapping:
                 and_(DataOperationJobExecution.IsDeleted == 1, DataOperationJobExecution.LastUpdatedDate > date.today())
             )
         ) \
-            .first()[0]
-        widget_data['data']['yesterdayDifference'] = (today_count - yesterday_count) / yesterday_count
+            .first().Count
+        if yesterday_count is not None and yesterday_count!=0:
+          widget_data['data']['yesterdayDifference'] = (today_count - yesterday_count) / yesterday_count
+        else:
+          widget_data['data']['yesterdayDifference'] = 0
+          yesterday_count=0
         last_seven_day_counts = []
         last_seven_day_labels = []
         for date_range in range(7):

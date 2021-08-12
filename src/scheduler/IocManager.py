@@ -43,7 +43,8 @@ class IocManager:
         # Importing all modules for dependency
         application_config = ApplicationConfig(root_directory=root_directory)
         module_finder = ModuleFinder(application_config)
-        module_finder.import_modules(excluded_modules=['models\\dao', 'unittests'])
+        dao_path = os.path.join('models','dao','aps','ApSchedulerJobsTable')
+        module_finder.import_modules(excluded_modules=[dao_path])
 
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)

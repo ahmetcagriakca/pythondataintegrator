@@ -31,7 +31,8 @@ def controller(namespace=None, route=None, exclude=None):
         controllers_path = os.path.join(root_directory, 'controllers')
         module_name = cls.__module__
         module_path = sys.modules[module_name].__file__
-        namespace_folder = module_path.replace(f'{controllers_path}\\', '')
+        path_of_controllers=os.path.join(controllers_path,'')
+        namespace_folder = module_path.replace(path_of_controllers, '')
         split_namespace = Utils.path_split(namespace_folder)
         name=split_namespace[0].title()
         return name

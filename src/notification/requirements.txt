@@ -1,2 +1,4 @@
-flask
-flask_socketio
+Flask==1.1.4
+Flask-SocketIO==5.1.1
+Flask_Cors==3.0.9
+eventlet

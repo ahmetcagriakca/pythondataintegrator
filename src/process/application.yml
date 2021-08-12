@@ -18,3 +18,7 @@ PROCESS_RPC_SERVER:
     allow_public_attrs: True
     sync_request_timeout: 120
   PORT: 7400
+
+
+NOTIFICATION_CLIENT:
+  HOST: http://localhost:7500

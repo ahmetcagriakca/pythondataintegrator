@@ -53,12 +53,13 @@ class ModuleFinder(ISingleton):
 
     def import_modules(self, included_modules=None, excluded_modules=None):
         for module in self.modules:
+            root_path_dir = os.path.join(self.application_config.root_directory, '')
             base_module_folder = \
-                module['module_path'].replace(self.application_config.root_directory + '\\', '')
+                module['module_path'].replace(root_path_dir, '')
             if ((excluded_modules is None) or (
-            not any(base_module_folder.startswith(item) for item in excluded_modules))) and (
+                    not any(base_module_folder.startswith(item) for item in excluded_modules))) and (
                     (included_modules is None) or (included_modules is not None and any(
-                    base_module_folder.startswith(item) for item in included_modules))):
+                base_module_folder.startswith(item) for item in included_modules))):
                 module_address = module["module_address"]
                 importlib.import_module(module_address)
 

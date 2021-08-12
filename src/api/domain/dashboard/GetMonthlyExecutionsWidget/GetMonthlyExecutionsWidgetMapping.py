@@ -89,11 +89,16 @@ class GetMonthlyExecutionsWidgetMapping:
         count_query, minimum_maximum_query = queries
         minimum_start_date = minimum_maximum_query.first().MinimumStartDate
         maximum_start_date = minimum_maximum_query.first().MaximumStartDate
-
-        calculate_start_date = minimum_start_date.replace(day=1, hour=0, minute=0, second=0)
-        calculate_end_date = maximum_start_date.replace(hour=0, minute=0, second=0)
-        datasets = {}
         now = datetime.now()
+        if minimum_start_date is not None:
+            calculate_start_date = minimum_start_date.replace(day=1, hour=0, minute=0, second=0)
+        else:
+            calculate_start_date = now.replace(day=1, hour=0, minute=0, second=0)
+        if maximum_start_date is not None:
+            calculate_end_date = maximum_start_date.replace(hour=0, minute=0, second=0)
+        else:
+            calculate_end_date = now.replace(hour=0, minute=0, second=0)
+        datasets = {}
         end_year = calculate_end_date.year
         end_month = calculate_end_date.month
         for year_range in range(now.year - calculate_start_date.year + 1):
@@ -103,6 +108,8 @@ class GetMonthlyExecutionsWidgetMapping:
             months_execution_labels = []
             if start_year < end_year:
                 range_length = 13 - start_month
+            elif start_year == end_year:
+                range_length = end_month-start_month+1
             else:
                 range_length = end_month
             if start_year == calculate_start_date.year:
@@ -112,7 +119,7 @@ class GetMonthlyExecutionsWidgetMapping:
                     months_execution_labels.append(cls.get_label(start_date=start_date))
             for month_range in range(range_length):
                 start_date = calculate_start_date.replace(year=start_year, month=start_month + month_range).date()
-                if start_month == 12:
+                if start_date.month == 12:
                     end_date = calculate_start_date.replace(year=start_year + 1, month=1).date()
                 else:
                     end_date = calculate_start_date.replace(year=start_year, month=start_month + month_range + 1).date()

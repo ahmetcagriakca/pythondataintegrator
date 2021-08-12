@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+  <title>SocketIO</title>
+</head>
+<body>
+
+  <script type="text/javascript" charset="utf-8">
+    //Establish connection and emit a message to confirm.
+
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    socket.on('connect', function() {
+        socket.emit('notification', {data: 'I\'m connected on own site!'});
+    });
+    socket.on('notification', function(data) {
+        console.log(data);
+    });
+
+  </script>
+
+</body>
+</html>

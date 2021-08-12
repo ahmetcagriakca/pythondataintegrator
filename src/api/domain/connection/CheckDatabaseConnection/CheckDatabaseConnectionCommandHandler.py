@@ -21,5 +21,5 @@ class CheckDatabaseConnectionCommandHandler(ICommandHandler[CheckDatabaseConnect
         try:
             self.process_rpc_client_service.call_check_database_connection(connection_name=command.request.ConnectionName)
         except Exception as ex:
-            message = f'{command.request.ConnectionName} getting error on connection. Error:{ex.args[len(ex.args)-1]}'
+            message = f'{command.request.ConnectionName} getting error on connecting. Error:{ex.args[len(ex.args)-1]}'
             raise OperationalException(message)
