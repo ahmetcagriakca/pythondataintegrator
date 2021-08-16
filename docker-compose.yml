@@ -34,10 +34,10 @@ services:
     environment:
       - APPLICATION_ENVIRONMENT=TEST
       - DATABASE_TYPE=POSTGRESQL
-      - DATABASE_HOST=10.220.13.77
+      - DATABASE_HOST=postgresql
       - DATABASE_DATABASE=pdi
-      - DATABASE_USERNAME=pdi_user
-      - DATABASE_PASSWORD=PWD_011
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=123456
       - DATABASE_PORT=5432
       - SCHEDULER_RPC_CLIENT_HOST=pdi-scheduler
       - PROCESS_RPC_CLIENT_HOST=pdi-process
@@ -45,6 +45,7 @@ services:
       - TZ=Europe/Istanbul
     depends_on:
       - postgresql
+      - pdi-scheduler
 
   pdi-process:
     build: 
@@ -90,10 +91,15 @@ services:
       context: src/ui/
       dockerfile: Dockerfile
     ports:
-      - '7000:80'
+      - '7000:7000'
     environment:
-      - API_URI=http://localhost1:7100/
-      - NOTIFICATION_URI=trhttp://localhost:7500/
+      - AUTHORITY=http://localhost:7001/
+      - CLIENT_ID=http://localhost:7001/
+      - REDIRECT_URI=http://localhost:7000/oidc-login-redirect
+      - POST_REDIRECT_URI=http://localhost:7000/?postLogout=true
+      - SLIENT_REDIRECT_URI=http://localhost:7000/oidc-slient-refresh
+      - API_URI=http://localhost:7100/
+      - NOTIFICATION_URI=http://localhost:7500/
     volumes:
       - '/app/node_modules'
       - ./src/ui/nginx/nginx.conf:/etc/nginx/nginx.conf
