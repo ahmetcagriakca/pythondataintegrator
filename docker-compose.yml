@@ -16,6 +16,7 @@ services:
       - /var/lib/pdipostgresql/data
   
   pdi-notification:
+    image: pythondataintegrator/notification:latest
     build: 
       context: src/notification/
       dockerfile: Dockerfile
@@ -26,6 +27,7 @@ services:
       - TZ=Europe/Istanbul
 
   pdi-api:
+    image: pythondataintegrator/api:latest
     build: 
       context: src/api/
       dockerfile: Dockerfile
@@ -48,6 +50,7 @@ services:
       - pdi-scheduler
 
   pdi-process:
+    image: pythondataintegrator/process:latest
     build: 
       context: src/process/
       dockerfile: Dockerfile
@@ -67,6 +70,7 @@ services:
       - postgresql
 
   pdi-scheduler:
+    image: pythondataintegrator/scheduler:latest
     build: 
       context: src/scheduler/
       dockerfile: Dockerfile
@@ -87,6 +91,7 @@ services:
       - pdi-process
   
   pdi-ui:
+    image: pythondataintegrator/ui:latest
     build:
       context: src/ui/
       dockerfile: Dockerfile
