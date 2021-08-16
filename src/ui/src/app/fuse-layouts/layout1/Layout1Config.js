@@ -5,7 +5,7 @@ const config = {
 		scroll: 'content',
 		navbar: {
 			display: true,
-			folded: false,
+			folded: true,
 			position: 'left'
 		},
 		toolbar: {
@@ -22,7 +22,7 @@ const config = {
 			display: false
 		},
 		rightSidePanel: {
-			display: false
+			display: true
 		}
 	},
 	form: {

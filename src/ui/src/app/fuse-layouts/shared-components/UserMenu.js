@@ -26,7 +26,7 @@ function UserMenu(props) {
 	return (
 		<>
 			<Button className="min-h-40 min-w-40 px-0 md:px-16 py-0 md:py-6" onClick={userMenuClick}>
-				<Avatar className="md:mx-4">{user.data.displayName.split(" ").map((n)=>n[0]).join("")}</Avatar>
+				<Avatar className="md:mx-4">{user.data?.displayName?.split(" ").map((n)=>n[0]).join("")}</Avatar>
 			</Button>
 
 			<Popover

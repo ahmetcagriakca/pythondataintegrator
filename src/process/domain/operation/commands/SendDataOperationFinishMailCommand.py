@@ -1,13 +1,13 @@
 from injector import inject
 from sqlalchemy import func
 
-from infrastructor.configuration.ConfigService import ConfigService
-from infrastructor.data.decorators.TransactionHandler import transaction_handler
-from infrastructor.delivery.EmailProvider import EmailProvider
-from infrastructor.html.HtmlTemplateService import HtmlTemplateService, Pagination
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.configuration.ConfigService import ConfigService
+from infrastructure.data.decorators.TransactionHandler import transaction_handler
+from infrastructure.delivery.EmailProvider import EmailProvider
+from infrastructure.html.HtmlTemplateService import HtmlTemplateService, Pagination
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.integration import DataIntegrationConnection
 from models.dao.operation import DataOperationJobExecution, \

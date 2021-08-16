@@ -2,7 +2,7 @@ from models.base.EntityBase import EntityBase
 from models.base.integration.DataIntegrationConnectionDatabaseBase import DataIntegrationConnectionDatabaseBase
 from models.base.integration.DataIntegrationConnectionFileBase import DataIntegrationConnectionFileBase
 from models.base.integration.DataIntegrationConnectionQueueBase import DataIntegrationConnectionQueueBase
-from infrastructor.json.BaseConverter import BaseConverter
+from infrastructure.json.BaseConverter import BaseConverter
 
 
 @BaseConverter.register

@@ -2,8 +2,8 @@ from datetime import datetime
 
 from injector import inject
 
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.common import OperationEvent
 from models.dao.common.Status import Status
 from models.dao.operation import DataOperationJobExecution

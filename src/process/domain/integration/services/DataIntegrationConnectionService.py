@@ -7,9 +7,9 @@ from domain.integration.services.DataIntegrationConnectionDatabaseService import
     DataIntegrationConnectionDatabaseService
 from domain.integration.services.DataIntegrationConnectionFileService import DataIntegrationConnectionFileService
 from domain.integration.services.DataIntegrationConnectionQueueService import DataIntegrationConnectionQueueService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.enums import ConnectionTypes
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel

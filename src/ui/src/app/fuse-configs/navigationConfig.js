@@ -10,44 +10,62 @@ const navigationConfig = [
 		id: 'home',
 		title: 'Home',
 		translate: 'HOME',
-		type: 'group',
-		icon: 'home',
-		url: '/'
-	},
-	{
-		id: 'sorting',
-		title: 'Sorting',
-		type: 'group',
-		icon: 'Sorting',
-		translate: 'SORTING',
-		children: [
-			{
-				id: 'sorting-list',
-				title: 'Sorting List',
-				type: 'item',
-				icon: 'format_list_bulleted',
-				translate: 'Sorting_LIST',
-				url: '/sorting'
-			}
-		]
+		type: 'item',
+		icon: 'house',
+		url  : '/apps/dashboards/analytics'
 	},
 	{
 		id: 'connections',
 		title: 'Connections',
 		type: 'group',
-		icon: 'connections',
+		icon: 'https',
 		translate: 'CONNECTIONS',
 		children: [
 			{
 				id: 'connection-list',
 				title: 'Connection List',
 				type: 'item',
-				icon: 'format_list_bulleted',
+				icon: 'https',
 				translate: 'CONNECTION_LIST',
-				url: '/connections'
+				url: '/connections',
 			}
 		]
-	}
+	},
+	{
+		id: 'dataoperations',
+		title: 'DataOperations',
+		type: 'group',
+		icon: 'library_books',
+		translate: 'DATAOPERATIONS',
+		children: [
+			{
+				id: 'data-operation-list',
+				title: 'Data Operation List',
+				type: 'item',
+				icon: 'library_books',
+				translate: 'DATAOPERATION_LIST',
+				url: '/operations'
+			},
+			{
+				id: 'data-operation--job-list',
+				title: 'Data Operation Job List',
+				type: 'item',
+				icon: 'repeat',
+				translate: 'DATAOPERATION_JOB_LIST',
+				url: '/jobs'
+			},
+			
+			{
+				id: 'data-operation--job-execution-list',
+				title: 'Data Operation Job Execution List',
+				type: 'item',
+				icon: 'play_arrow',
+				translate: 'DATAOPERATION_JOB_EXECUTION_LIST',
+				url: '/job/executions'
+			}
+		]
+	},
+	
 ];
 
 export default navigationConfig;

@@ -7,12 +7,12 @@ from domain.integration.services.DataIntegrationConnectionDatabaseService import
     DataIntegrationConnectionDatabaseService
 from domain.integration.services.DataIntegrationConnectionFileService import DataIntegrationConnectionFileService
 from domain.integration.services.DataIntegrationConnectionQueueService import DataIntegrationConnectionQueueService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
+from domain.operation.CreateDataOperation.CreateDataIntegrationRequest import CreateDataIntegrationRequest
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.enums import ConnectionTypes
-from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
 
 
@@ -58,13 +58,13 @@ class DataIntegrationConnectionService(IScoped):
 
     def insert(self,
                data_integration: DataIntegration,
-               data: CreateDataIntegrationModel):
+               data: CreateDataIntegrationRequest):
 
         source_connection = None
         if data.SourceConnections is not None and data.SourceConnections.ConnectionName is not None and data.SourceConnections.ConnectionName != '':
             source = self.connection_service.get_by_name(name=data.SourceConnections.ConnectionName)
             if source is None:
-                raise OperationalException("Source Connection not found")
+                raise OperationalException(f"{data_integration.Code} - {data.SourceConnections.ConnectionName} source connection not found")
             source_connection = DataIntegrationConnection(
                 SourceOrTarget=0, DataIntegration=data_integration, Connection=source)
             if source.ConnectionType.Id == ConnectionTypes.Database.value:
@@ -89,11 +89,11 @@ class DataIntegrationConnectionService(IScoped):
             self.data_integration_connection_repository.insert(source_connection)
 
         if data.TargetConnections is None or data.TargetConnections.ConnectionName is None or data.TargetConnections.ConnectionName == '':
-            raise OperationalException("Target Connection cannot be empty")
+            raise OperationalException(f"{data_integration.Code} - {data.TargetConnections.ConnectionName} target connection cannot be empty")
 
         target = self.connection_service.get_by_name(name=data.TargetConnections.ConnectionName)
         if target is None:
-            raise OperationalException("Target Connection not found")
+            raise OperationalException(f"{data_integration.Code} - {data.TargetConnections.ConnectionName} target connection not found")
         target_connection = DataIntegrationConnection(
             SourceOrTarget=1, DataIntegration=data_integration, Connection=target)
         if target.ConnectionType.Id == ConnectionTypes.Database.value:
@@ -116,7 +116,7 @@ class DataIntegrationConnectionService(IScoped):
 
     def update(self,
                data_integration: DataIntegration,
-               data: CreateDataIntegrationModel):
+               data: CreateDataIntegrationRequest):
 
         source_connection = None
         if data.SourceConnections is not None and data.SourceConnections.ConnectionName is not None and data.SourceConnections.ConnectionName != '':
@@ -126,7 +126,7 @@ class DataIntegrationConnectionService(IScoped):
                                                                                   SourceOrTarget=0)
             source = self.connection_service.get_by_name(name=data.SourceConnections.ConnectionName)
             if source is None:
-                raise OperationalException("Source Connection not found")
+                raise OperationalException(f"{data_integration.Code} - {data.SourceConnections.ConnectionName} source connection not found")
             source_connection.Connection = source
             if source.ConnectionType.Id == ConnectionTypes.Database.value:
                 if (
@@ -166,13 +166,13 @@ class DataIntegrationConnectionService(IScoped):
                 raise OperationalException("Connection Type not supported yet")
 
         if data.TargetConnections.ConnectionName is None or data.TargetConnections.ConnectionName == '':
-            raise OperationalException("Target Connection cannot be empty")
+            raise OperationalException(f"{data_integration.Code} - {data.TargetConnections.ConnectionName} target connection cannot be empty")
         target_connection = self.data_integration_connection_repository.first(IsDeleted=0,
                                                                               DataIntegration=data_integration,
                                                                               SourceOrTarget=1)
         target = self.connection_service.get_by_name(name=data.TargetConnections.ConnectionName)
         if target is None:
-            raise OperationalException("Target Connection not found")
+            raise OperationalException(f"{data_integration.Code} - {data.TargetConnections.ConnectionName} target connection not found")
         target_connection.Connection = target
         if target.ConnectionType.Id == ConnectionTypes.Database.value:
             if data.TargetConnections.Database.Query is None or data.TargetConnections.Database.Query == '':

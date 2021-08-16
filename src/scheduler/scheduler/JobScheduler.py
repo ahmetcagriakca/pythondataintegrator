@@ -1,4 +1,4 @@
-from infrastructor.data.RepositoryProvider import RepositoryProvider
+from infrastructure.data.RepositoryProvider import RepositoryProvider
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.events import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN, EVENT_SCHEDULER_PAUSED, \
     EVENT_SCHEDULER_RESUMED, EVENT_EXECUTOR_ADDED, EVENT_EXECUTOR_REMOVED, EVENT_JOBSTORE_ADDED, EVENT_JOBSTORE_REMOVED, \
@@ -11,7 +11,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from injector import inject
 
 from IocManager import IocManager
-from infrastructor.dependency.scopes import ISingleton
+from infrastructure.dependency.scopes import ISingleton
 from scheduler.JobSchedulerEvent import JobSchedulerEvent
 from models.configs.ApsConfig import ApsConfig
 from models.configs.DatabaseConfig import DatabaseConfig

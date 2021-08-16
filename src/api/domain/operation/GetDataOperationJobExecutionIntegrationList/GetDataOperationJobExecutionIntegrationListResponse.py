@@ -1,0 +1,8 @@
+from typing import List
+from infrastructure.cqrs.decorators.responseclass import responseclass
+from domain.operation.GetDataOperationJobExecutionIntegrationList.GetDataOperationJobExecutionIntegrationListDto import GetDataOperationJobExecutionIntegrationListDto
+
+
+@responseclass
+class GetDataOperationJobExecutionIntegrationListResponse:
+	Data: List[GetDataOperationJobExecutionIntegrationListDto] = None

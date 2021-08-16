@@ -2,9 +2,9 @@ import os
 from unittest import TestCase
 
 from IocManager import IocManager
-from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
-from infrastructor.configuration.ConfigService import ConfigService
-from infrastructor.delivery.EmailProvider import EmailProvider
+from infrastructure.api.FlaskAppWrapper import FlaskAppWrapper
+from infrastructure.configuration.ConfigService import ConfigService
+from infrastructure.delivery.EmailProvider import EmailProvider
 from models.dao.common.ConfigParameter import ConfigParameter
 
 
@@ -12,7 +12,7 @@ class TestConfigService(TestCase):
     def __init__(self, methodName='TestConfigService'):
         super(TestConfigService, self).__init__(methodName)
 
-        from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
+        from infrastructure.api.FlaskAppWrapper import FlaskAppWrapper
         os.environ["PYTHON_ENVIRONMENT"] = 'test'
         IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper)
         IocManager.initialize()

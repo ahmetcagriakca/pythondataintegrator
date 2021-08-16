@@ -44,7 +44,13 @@ RUN     date
 
 COPY    . /usr/src/app
 
-USER    1001
+# # openshift set permission to non-root users for /app directory
+RUN chgrp -R 0 /usr/src/app && \
+    chmod -R g=u /usr/src/app && \
+    chgrp -R 0 /etc/passwd && \
+    chmod -R g=u /etc/passwd
 
-ENTRYPOINT 	["python3"]
-CMD 		["app.py"]
+# # set running user 
+USER 1001
+ENTRYPOINT 	["/bin/sh"]
+CMD 	["entrypoint.sh"]

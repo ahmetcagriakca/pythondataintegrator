@@ -1,23 +1,19 @@
 from multiprocessing.process import current_process
 import os
-import sys
-from flask import Flask,redirect
+from flask import Flask, redirect
 from flask_injector import request, FlaskInjector
 from flask_restx import Api
 from injector import singleton, Injector, threadlocal, Binder
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
-from infrastructor.api.ResourceBase import ResourceBase
-from infrastructor.dependency.scopes import ISingleton, IScoped
-from infrastructor.logging.ConsoleLogger import ConsoleLogger
-from infrastructor.utils.ConfigManager import ConfigManager
-from infrastructor.utils.Utils import Utils
+from infrastructure.api.ResourceBase import ResourceBase
+from infrastructure.dependency.scopes import ISingleton, IScoped
+from infrastructure.logging.ConsoleLogger import ConsoleLogger
+from infrastructure.utils.ConfigManager import ConfigManager
+from infrastructure.utils.ModuleFinder import ModuleFinder
 from models.configs.ApiConfig import ApiConfig
 from models.configs.ApplicationConfig import ApplicationConfig
 from models.configs.DatabaseConfig import DatabaseConfig
-from models.configs.ProcessRpcClientConfig import ProcessRpcClientConfig
-from models.configs.SchedulerRpcClientConfig import SchedulerRpcClientConfig
-
 
 
 class IocManager:
@@ -25,12 +21,14 @@ class IocManager:
     api: Api = None
     binder: Binder = None
     app_wrapper = None
-    config_manager = None
+    config_manager: ConfigManager = None
     injector: Injector = None
     Base = declarative_base(metadata=MetaData(schema='Common'))
 
     @staticmethod
     def initialize():
+        logger = ConsoleLogger()
+        logger.info(f"Application initialize started")
         root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__))))
         IocManager.configure_startup(root_directory)
 
@@ -48,33 +46,38 @@ class IocManager:
         @IocManager.app.route('/')
         def home_redirect():
             # Redirect from here, replace your custom site url "www.google.com"
-            return redirect("/Home", code=302, Response=None)
+            return redirect("/documentation", code=302, Response=None)
+
         IocManager.api = Api(IocManager.app,
-            title='Python Data Integrator API',
-            version='v0.1',
-            doc='/documentation',
-            base_url='/', security=[api_config.security], authorizations=api_config.authorizations)
+                             title='Python Data Integrator API',
+                             version='v0.1',
+                             doc='/documentation',
+                             base_url='/', security=[api_config.security], authorizations=api_config.authorizations)
         # Flask instantiate
         # IocManager.api = Api(app=IocManager.app,authorizations=authorizations, security='apikey')
 
     # wrapper required for dependency
     @staticmethod
     def configure_startup(root_directory):
+        # Importing all modules for dependency
+        application_config = ApplicationConfig(root_directory=root_directory)
+        module_finder = ModuleFinder(application_config)
+        # controllers and api excluded for api decorator
+        api_path=os.path.join('infrastructure','api')
+        module_finder.import_modules(excluded_modules=['controllers', api_path, 'alembic', 'tests'])
+
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)
         IocManager.set_database_application_name()
-        IocManager.process_info()
 
         IocManager.initialize_flask()
-
-        # Importing all modules for dependency
-        sys.path.append(root_directory)
-        folders = Utils.find_sub_folders(root_directory)
-        module_list, module_attr_list = Utils.get_modules(folders)
+        # controllers and api included after flask
+        module_finder.import_modules(included_modules=['controllers',api_path])
+        # Flask injector configuration
 
         IocManager.injector = Injector()
-        # Flask injector configuration
         FlaskInjector(app=IocManager.app, modules=[IocManager.configure], injector=IocManager.injector)
+        IocManager.process_info()
 
     @staticmethod
     def set_database_application_name():
@@ -137,5 +140,6 @@ class IocManager:
     def process_info():
         logger = ConsoleLogger()
         application_config: ApplicationConfig = IocManager.config_manager.get(ApplicationConfig)
-        hostname= f'-{application_config.hostname}' if (application_config.hostname is not None and application_config.hostname!='') else ''
+        hostname = f'-{application_config.hostname}' if (
+                application_config.hostname is not None and application_config.hostname != '') else ''
         logger.info(f"Application : {application_config.name}{hostname}")

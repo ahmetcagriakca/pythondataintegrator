@@ -10,9 +10,9 @@ from IocManager import IocManager
 from datetime import datetime
 from domain.operation.execution.services.OperationExecution import OperationExecution
 from domain.operation.services.DataOperationJobService import DataOperationJobService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.data.decorators.TransactionHandler import transaction_handler
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.data.decorators.TransactionHandler import transaction_handler
+from infrastructure.logging.SqlLogger import SqlLogger
 
 from multiprocessing.context import Process
 

@@ -1,7 +1,7 @@
 from typing import List
 from models.base.EntityBase import EntityBase
 from models.base.operation.DataOperationJobExecutionIntegrationBase import DataOperationJobExecutionIntegrationBase
-from infrastructor.json.BaseConverter import BaseConverter
+from infrastructure.json.BaseConverter import BaseConverter
 
 
 @BaseConverter.register

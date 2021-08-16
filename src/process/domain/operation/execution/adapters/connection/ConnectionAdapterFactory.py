@@ -3,11 +3,11 @@ from injector import inject
 from domain.operation.execution.adapters.connection.FileAdapter import FileAdapter
 from domain.operation.execution.adapters.connection.QueueAdapter import QueueAdapter
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructure.connection.adapters.ConnectionAdapter import ConnectionAdapter
 from domain.operation.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.IncompatibleAdapterException import IncompatibleAdapterException
-from infrastructor.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.IncompatibleAdapterException import IncompatibleAdapterException
+from infrastructure.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
 from models.enums import ConnectionTypes
 
 

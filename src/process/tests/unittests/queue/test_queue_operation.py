@@ -3,7 +3,7 @@ import os
 from unittest import TestCase
 
 from IocManager import IocManager
-from infrastructor.connection.queue.QueueProvider import QueueProvider
+from infrastructure.connection.queue.QueueProvider import QueueProvider
 import pandas as pd
 
 from models.configs.ApplicationConfig import ApplicationConfig

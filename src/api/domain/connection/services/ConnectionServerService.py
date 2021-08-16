@@ -2,8 +2,9 @@ from typing import List
 
 from injector import inject
 
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.connection import ConnectionServer
 from models.dao.connection.Connection import Connection
 
@@ -37,6 +38,8 @@ class ConnectionServerService(IScoped):
         """
         Create Server connection
         """
+        if host is None or host=='':
+            raise OperationalException("Host cannot be null")
         connection_server = ConnectionServer(Connection=connection,
                                                Host=host,
                                                Port=port)
@@ -48,7 +51,8 @@ class ConnectionServerService(IScoped):
         """
         Update Server connection
         """
-
+        if host is None or host=='':
+            raise OperationalException("Host cannot be null")
         connection_server = self.get_by_connection_id(connection_id=connection.Id)
         connection_server.Host = host
         connection_server.Port = port

@@ -1,21 +1,21 @@
 from typing import List
 from injector import inject
 
+from domain.connection.CreateConnectionDatabase.CreateConnectionDatabaseRequest import CreateConnectionDatabaseRequest
+from domain.connection.CreateConnectionFile.CreateConnectionFileRequest import CreateConnectionFileRequest
+from domain.connection.CreateConnectionQueue.CreateConnectionQueueRequest import CreateConnectionQueueRequest
 from domain.connection.services.ConnectionFileService import ConnectionFileService
 from domain.connection.services.ConnectionDatabaseService import ConnectionDatabaseService
 from domain.connection.services.ConnectionQueueService import ConnectionQueueService
 from domain.connection.services.ConnectionSecretService import ConnectionSecretService
 from domain.connection.services.ConnectionServerService import ConnectionServerService
 from domain.connection.services.ConnectionTypeService import ConnectionTypeService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.connection.Connection import Connection
 from models.enums.ConnectionTypes import ConnectionTypes
-from models.viewmodels.connection.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel
-from models.viewmodels.connection.CreateConnectionFileModel import CreateConnectionFileModel
-from models.viewmodels.connection.CreateConnectionQueueModel import CreateConnectionQueueModel
 
 
 class ConnectionService(IScoped):
@@ -61,75 +61,73 @@ class ConnectionService(IScoped):
         connection = Connection(Name=name, ConnectionType=connection_type)
         return connection
 
-    def create_connection_database(self, model: CreateConnectionDatabaseModel) -> Connection:
+    def create_connection_database(self, request: CreateConnectionDatabaseRequest) -> Connection:
         """
         Create File connection
         """
-
-        connection = self.connection_repository.first(IsDeleted=0, Name=model.Name)
-
+        connection = self.get_by_name(name=request.Name)
         if connection is None:
-            connection = self.create_connection(name=model.Name,
+            connection = self.create_connection(name=request.Name,
                                                 connection_type_name=ConnectionTypes.Database.name)
-            self.connection_secret_service.create(connection=connection, user=model.User,
-                                                  password=model.Password)
-            self.connection_server_service.create(connection=connection, host=model.Host, port=model.Port)
-            self.connection_database_service.create(connection, model)
+            self.connection_secret_service.create(connection=connection, user=request.User,
+                                                  password=request.Password)
+            self.connection_server_service.create(connection=connection, host=request.Host, port=request.Port)
+            self.connection_database_service.create(connection=connection,
+                                                    connector_type_name=request.ConnectorTypeName, sid=request.Sid,
+                                                    service_name=request.ServiceName,
+                                                    database_name=request.DatabaseName)
+            self.connection_repository.insert(connection)
         else:
-            self.connection_secret_service.update(connection=connection, user=model.User,
-                                                  password=model.Password)
-            self.connection_server_service.update(connection=connection, host=model.Host, port=model.Port)
-            self.connection_database_service.update(connection, model)
-        self.connection_repository.insert(connection)
-        self.repository_provider.commit()
-        connection = self.connection_repository.first(Id=connection.Id)
+            self.connection_secret_service.update(connection=connection, user=request.User,
+                                                  password=request.Password)
+            self.connection_server_service.update(connection=connection, host=request.Host, port=request.Port)
+            self.connection_database_service.update(connection=connection,
+                                                    connector_type_name=request.ConnectorTypeName, sid=request.Sid,
+                                                    service_name=request.ServiceName,
+                                                    database_name=request.DatabaseName)
         return connection
 
-    def create_connection_file(self, model: CreateConnectionFileModel) -> Connection:
+    def create_connection_file(self, request: CreateConnectionFileRequest) -> Connection:
         """
         Create File connection
         """
-
-        connection = self.get_by_name(name=model.Name)
+        connection = self.get_by_name(name=request.Name)
         if connection is None:
-            connection = self.create_connection(name=model.Name,
+            connection = self.create_connection(name=request.Name,
                                                 connection_type_name=ConnectionTypes.File.name)
-            self.connection_secret_service.create(connection=connection, user=model.User,
-                                                  password=model.Password)
-
-            self.connection_server_service.create(connection=connection, host=model.Host, port=model.Port)
-            self.connection_file_service.create(connection=connection, model=model)
+            self.connection_secret_service.create(connection=connection, user=request.User,
+                                                  password=request.Password)
+            self.connection_server_service.create(connection=connection, host=request.Host, port=request.Port)
+            self.connection_file_service.create(connection=connection, connector_type_name=request.ConnectorTypeName)
+            self.connection_repository.insert(connection)
         else:
-            self.connection_secret_service.update(connection=connection, user=model.User,
-                                                  password=model.Password)
-            self.connection_server_service.update(connection=connection, host=model.Host, port=model.Port)
-            self.connection_file_service.update(connection=connection, model=model)
+            self.connection_secret_service.update(connection=connection, user=request.User,
+                                                  password=request.Password)
+            self.connection_server_service.update(connection=connection, host=request.Host, port=request.Port)
+            self.connection_file_service.update(connection=connection, connector_type_name=request.ConnectorTypeName)
 
-        self.connection_repository.insert(connection)
-        self.repository_provider.commit()
-        connection = self.connection_repository.first(Id=connection.Id)
         return connection
 
-    def create_connection_queue(self, model: CreateConnectionQueueModel) -> Connection:
+    def create_connection_queue(self, request: CreateConnectionQueueRequest) -> Connection:
         """
         Create File connection
         """
-
-        connection = self.connection_repository.first(IsDeleted=0, Name=model.Name)
-
+        connection = self.get_by_name(name=request.Name)
         if connection is None:
-            connection = self.create_connection(name=model.Name,
+            connection = self.create_connection(name=request.Name,
                                                 connection_type_name=ConnectionTypes.Queue.name)
-            self.connection_secret_service.create(connection=connection, user=model.User,
-                                                  password=model.Password)
-            for server in model.Servers:
+            self.connection_secret_service.create(connection=connection, user=request.User,
+                                                  password=request.Password)
+            for server in request.Servers:
                 self.connection_server_service.create(connection=connection, host=server.Host, port=server.Port)
-            self.connection_queue_service.create(connection, model)
+            self.connection_queue_service.create(connection=connection, connector_type_name=request.ConnectorTypeName,
+                                                 protocol=request.Protocol, mechanism=request.Mechanism)
+            connection = self.connection_repository.first(Id=connection.Id)
         else:
-            self.connection_secret_service.update(connection=connection, user=model.User,
-                                                  password=model.Password)
+            self.connection_secret_service.update(connection=connection, user=request.User,
+                                                  password=request.Password)
 
-            for server in model.Servers:
+            for server in request.Servers:
                 connection_server = self.connection_server_service.get_by_server_info(connection_id=connection.Id,
                                                                                       host=server.Host,
                                                                                       port=server.Port)
@@ -140,15 +138,13 @@ class ConnectionService(IScoped):
 
             connection_servers = self.connection_server_service.get_all_by_connection_id(connection_id=connection.Id)
             for connection_server in connection_servers:
-                check = [server for server in model.Servers if
+                check = [server for server in request.Servers if
                          server.Host == connection_server.Host and server.Port == connection_server.Port]
                 if check is None or len(check) == 0:
                     self.connection_server_service.delete(id=connection_server.Id)
 
-            self.connection_queue_service.update(connection, model)
-        self.connection_repository.insert(connection)
-        self.repository_provider.commit()
-        connection = self.connection_repository.first(Id=connection.Id)
+            self.connection_queue_service.update(connection=connection, connector_type_name=request.ConnectorTypeName,
+                                                 protocol=request.Protocol, mechanism=request.Mechanism)
         return connection
 
     def delete_connection(self, id: int):
@@ -173,4 +169,4 @@ class ConnectionService(IScoped):
                 self.connection_secret_service.delete(id=connection_secret.Id)
         message = f'{connection.Name} connection deleted'
         self.sql_logger.info(message)
-        self.repository_provider.commit()
+        return message

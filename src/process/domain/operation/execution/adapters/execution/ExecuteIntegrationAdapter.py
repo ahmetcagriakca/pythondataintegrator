@@ -6,8 +6,8 @@ from domain.operation.execution.processes.ExecuteIntegrationProcess import Execu
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION
 
 

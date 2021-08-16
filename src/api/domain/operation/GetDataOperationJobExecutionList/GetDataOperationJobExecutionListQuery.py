@@ -1,0 +1,9 @@
+from dataclasses import dataclass
+from infrastructure.cqrs.IQuery import IQuery
+from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListRequest import GetDataOperationJobExecutionListRequest
+from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListResponse import GetDataOperationJobExecutionListResponse
+
+
+@dataclass
+class GetDataOperationJobExecutionListQuery(IQuery[GetDataOperationJobExecutionListResponse]):
+    request: GetDataOperationJobExecutionListRequest = None

@@ -1,10 +1,8 @@
-from datetime import datetime
-
 from injector import inject
 
 from domain.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.aps import ApSchedulerJob
 from models.dao.operation import DataOperationJob, DataOperation
 
@@ -27,6 +25,22 @@ class DataOperationJobService(IScoped):
     def get_all_by_data_operation_id(self, data_operation_id: int) -> DataOperationJob:
         entities = self.data_operation_job_repository.filter_by(IsDeleted=0,
                                                                 DataOperationId=data_operation_id)
+        return entities
+
+    def check_existing_cron_jobs_by_data_operation_id(self, data_operation_id: int) -> DataOperationJob:
+        query = self.data_operation_job_repository.table \
+            .filter(DataOperationJob.IsDeleted == 0) \
+            .filter(DataOperationJob.Cron != None) \
+            .filter(DataOperationJob.Cron != '') \
+            .filter(DataOperationJob.DataOperationId == data_operation_id)
+        return query.count()>0
+
+    def get_all_cron_jobs_by_data_operation_id(self, data_operation_id: int) -> DataOperationJob:
+        entities = self.data_operation_job_repository.table \
+            .filter(DataOperationJob.IsDeleted == 0) \
+            .filter(DataOperationJob.Cron != None) \
+            .filter(DataOperationJob.Cron != '') \
+            .filter(DataOperationJob.DataOperationId == data_operation_id)
         return entities
 
     def get_by_job_id(self, job_id: int) -> DataOperationJob:

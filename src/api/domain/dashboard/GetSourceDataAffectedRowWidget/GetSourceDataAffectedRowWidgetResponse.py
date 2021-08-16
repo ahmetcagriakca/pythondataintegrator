@@ -1,0 +1,7 @@
+from infrastructure.cqrs.decorators.responseclass import responseclass
+from domain.dashboard.GetSourceDataAffectedRowWidget.GetSourceDataAffectedRowWidgetDto import GetSourceDataAffectedRowWidgetDto
+
+
+@responseclass
+class GetSourceDataAffectedRowWidgetResponse:
+	Data: GetSourceDataAffectedRowWidgetDto = None

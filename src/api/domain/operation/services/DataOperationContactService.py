@@ -1,11 +1,11 @@
 from typing import List
 from injector import inject
 
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
+from domain.operation.CreateDataOperation.CreateDataOperationContactRequest import CreateDataOperationContactRequest
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.operation import DataOperation
 from models.dao.operation.DataOperationContact import DataOperationContact
-from models.viewmodels.operation.CreateDataOperationContactModel import CreateDataOperationContactModel
 
 
 class DataOperationContactService(IScoped):
@@ -15,11 +15,11 @@ class DataOperationContactService(IScoped):
                  repository_provider: RepositoryProvider,
                  ):
         self.repository_provider = repository_provider
-        self.secret_repository = repository_provider.get(DataOperationContact)
+        self.data_operation_contact_repository = repository_provider.get(DataOperationContact)
 
     def insert(self,
                data_operation: DataOperation,
-               data_operation_contact_models: List[CreateDataOperationContactModel]):
+               data_operation_contact_models: List[CreateDataOperationContactRequest]):
         """
         Create Data Operation Contact
         """
@@ -31,7 +31,7 @@ class DataOperationContactService(IScoped):
 
     def update(self,
                data_operation: DataOperation,
-               data_operation_contact_models: List[CreateDataOperationContactModel]):
+               data_operation_contact_models: List[CreateDataOperationContactRequest]):
         """
         Update Data Operation
         """

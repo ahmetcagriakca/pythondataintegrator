@@ -1,0 +1,9 @@
+from dataclasses import dataclass
+from infrastructure.cqrs.IQuery import IQuery
+from domain.dashboard.GetSourceDataAffectedRowWidget.GetSourceDataAffectedRowWidgetRequest import GetSourceDataAffectedRowWidgetRequest
+from domain.dashboard.GetSourceDataAffectedRowWidget.GetSourceDataAffectedRowWidgetResponse import GetSourceDataAffectedRowWidgetResponse
+
+
+@dataclass
+class GetSourceDataAffectedRowWidgetQuery(IQuery[GetSourceDataAffectedRowWidgetResponse]):
+    request: GetSourceDataAffectedRowWidgetRequest = None

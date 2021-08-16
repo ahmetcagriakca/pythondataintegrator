@@ -8,10 +8,10 @@ import pandas as pd
 from pandas import DataFrame
 
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
-from infrastructor.connection.file.FileProvider import FileProvider
-from infrastructor.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructure.connection.file.FileProvider import FileProvider
+from infrastructure.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
 
 

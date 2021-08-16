@@ -7,10 +7,10 @@ from domain.connection.services.ConnectionQueueService import ConnectionQueueSer
 from domain.connection.services.ConnectionSecretService import ConnectionSecretService
 from domain.connection.services.ConnectionServerService import ConnectionServerService
 from domain.connection.services.ConnectionTypeService import ConnectionTypeService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.connection.Connection import Connection
 from models.enums.ConnectionTypes import ConnectionTypes
 from models.viewmodels.connection.CreateConnectionDatabaseModel import CreateConnectionDatabaseModel

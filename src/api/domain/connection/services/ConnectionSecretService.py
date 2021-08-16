@@ -1,8 +1,8 @@
 from injector import inject
 from domain.secret.services.SecretService import SecretService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.connection import ConnectionSecret
 from models.dao.connection.Connection import Connection
 from models.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication
@@ -28,6 +28,10 @@ class ConnectionSecretService(IScoped):
         """
         Create ConnectionSecret
         """
+        if user is None or user=='':
+            raise OperationalException("User cannot be null")
+        if password is None or password=='':
+            raise OperationalException("Password cannot be null")
         secret = self.secret_service.create_basic_authentication(name=connection.Name, user=user, password=password)
         connection_secret = ConnectionSecret(Connection=connection, Secret=secret)
         self.connection_secret_repository.insert(connection_secret)
@@ -37,6 +41,10 @@ class ConnectionSecretService(IScoped):
         """
         Update ConnectionSecret
         """
+        if user is None or user=='':
+            raise OperationalException("User cannot be null")
+        if password is None or password=='':
+            raise OperationalException("Password cannot be null")
         connection_secret = self.connection_secret_repository.first(IsDeleted=0, Connection=connection)
         if connection_secret is None:
             raise OperationalException("Connection Secret Not Found")

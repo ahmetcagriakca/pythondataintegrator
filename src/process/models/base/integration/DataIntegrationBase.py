@@ -4,7 +4,7 @@ from models.base.EntityBase import EntityBase
 from models.base.integration.DataIntegrationColumnBase import DataIntegrationColumnBase
 from models.base.integration.DataIntegrationConnectionBase import DataIntegrationConnectionBase
 from models.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
-from infrastructor.json.BaseConverter import BaseConverter
+from infrastructure.json.BaseConverter import BaseConverter
 
 
 @BaseConverter.register

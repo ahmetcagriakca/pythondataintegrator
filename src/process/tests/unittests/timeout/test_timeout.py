@@ -1,11 +1,9 @@
 import signal
 from unittest import TestCase
 
-from apscheduler.events import EVENT_JOB_REMOVED
-
 from IocManager import IocManager
-from infrastructor.connection.queue.QueueProvider import QueueProvider
-from infrastructor.data.RepositoryProvider import RepositoryProvider
+from infrastructure.connection.queue.QueueProvider import QueueProvider
+from infrastructure.data.RepositoryProvider import RepositoryProvider
 
 from models.dao.aps import ApSchedulerJobEvent, ApSchedulerEvent, ApSchedulerJob
 from models.dao.operation import DataOperationJob

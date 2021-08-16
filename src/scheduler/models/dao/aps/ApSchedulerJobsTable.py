@@ -5,7 +5,7 @@ from IocManager import IocManager
 class ApSchedulerJobsTable(IocManager.Base):
     # TODO: This feels bad man
     __tablename__ = "ApSchedulerJobsTable"
-    __table_args__ = {"schema": "Aps"}
+    __table_args__ = {"schema": "Aps",'extend_existing': True}
 
     Id = Column('id', Unicode(191, _warn_on_bytestring=False), primary_key=True)
     NextRunTime = Column('next_run_time', Float(25), index=True)

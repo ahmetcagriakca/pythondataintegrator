@@ -1,10 +1,11 @@
 from injector import inject
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
+
+from domain.operation.CreateDataOperation.CreateDataIntegrationConnectionDatabaseRequest import \
+    CreateDataIntegrationConnectionDatabaseRequest
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.integration import DataIntegrationConnectionDatabase
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.viewmodels.integration.CreateDataIntegrationConnectionDatabaseModel import \
-    CreateDataIntegrationConnectionDatabaseModel
 
 
 class DataIntegrationConnectionDatabaseService(IScoped):
@@ -31,7 +32,7 @@ class DataIntegrationConnectionDatabaseService(IScoped):
 
     def insert(self,
                data_integration_connection: DataIntegrationConnection,
-               data: CreateDataIntegrationConnectionDatabaseModel) -> DataIntegrationConnectionDatabase:
+               data: CreateDataIntegrationConnectionDatabaseRequest) -> DataIntegrationConnectionDatabase:
         data_integration_connection_database = DataIntegrationConnectionDatabase(Schema=data.Schema,
                                                                                  TableName=data.TableName,
                                                                                  Query=data.Query,
@@ -41,7 +42,7 @@ class DataIntegrationConnectionDatabaseService(IScoped):
 
     def update(self,
                data_integration_connection: DataIntegrationConnection,
-               data: CreateDataIntegrationConnectionDatabaseModel) -> DataIntegrationConnectionDatabase:
+               data: CreateDataIntegrationConnectionDatabaseRequest) -> DataIntegrationConnectionDatabase:
         data_integration_connection_database = self.get_by_data_integration_connection_id(
             data_integration_connection_id=data_integration_connection.Id,
         )

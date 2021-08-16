@@ -4,9 +4,9 @@ from injector import inject
 from pandas import DataFrame
 
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructor.connection.database.DatabaseProvider import DatabaseProvider
-from infrastructor.connection.adapters.ConnectionAdapter import ConnectionAdapter
-from infrastructor.connection.models.DataQueueTask import DataQueueTask
+from infrastructure.connection.database.DatabaseProvider import DatabaseProvider
+from infrastructure.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructure.connection.models.DataQueueTask import DataQueueTask
 from models.dto.PagingModifier import PagingModifier
 
 

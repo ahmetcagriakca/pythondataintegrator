@@ -1,15 +1,15 @@
 from typing import List
 from injector import inject
 
+from domain.operation.CreateDataOperation.CreateDataOperationRequest import CreateDataOperationRequest
 from domain.operation.services.DataOperationContactService import DataOperationContactService
 from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
 from domain.operation.services.DefinitionService import DefinitionService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
-from infrastructor.exceptions.OperationalException import OperationalException
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.operation import DataOperation, Definition
-from models.viewmodels.operation import CreateDataOperationModel
 
 
 class DataOperationService(IScoped):
@@ -53,7 +53,7 @@ class DataOperationService(IScoped):
         data_operation = self.get_by_name(name=name)
         return data_operation is not None
 
-    def post_data_operation(self, data_operation_model: CreateDataOperationModel,
+    def post_data_operation(self, data_operation_model: CreateDataOperationRequest,
                             definition_json: str) -> DataOperation:
         """
         Create Data Operation
@@ -61,15 +61,13 @@ class DataOperationService(IScoped):
         definition: Definition = self.definition_service.create_definition(data_operation_model.Name, definition_json)
         data_operation = self.get_by_name(name=data_operation_model.Name)
         if data_operation is None:
-            self.insert_data_operation(data_operation_model, definition)
+            data_operation = self.insert_data_operation(data_operation_model, definition)
         else:
             self.update_data_operation(data_operation_model, definition)
 
-        self.repository_provider.commit()
-        data_operation = self.get_by_name(name=data_operation_model.Name)
         return data_operation
 
-    def insert_data_operation(self, data_operation_model: CreateDataOperationModel,
+    def insert_data_operation(self, data_operation_model: CreateDataOperationRequest,
                               definition: Definition) -> DataOperation:
         """
         Create Data Operation
@@ -89,7 +87,7 @@ class DataOperationService(IScoped):
         return data_operation
 
     def update_data_operation(self,
-                              data_operation_model: CreateDataOperationModel,
+                              data_operation_model: CreateDataOperationRequest,
                               definition: Definition) -> DataOperation:
         """
         Update Data Operation
@@ -125,4 +123,4 @@ class DataOperationService(IScoped):
 
         message = f'{data_operation.Name} data operation deleted'
         self.sql_logger.info(message)
-        self.repository_provider.commit()
+        return message

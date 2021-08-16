@@ -15,6 +15,16 @@ services:
     volumes:
       - /var/lib/pdipostgresql/data
   
+  pdi-notification:
+    build: 
+      context: src/notification/
+      dockerfile: Dockerfile
+    ports:
+      - '7500:7500'
+    environment:
+      - APPLICATION_ENVIRONMENT=TEST
+      - TZ=Europe/Istanbul
+
   pdi-api:
     build: 
       context: src/api/
@@ -30,9 +40,12 @@ services:
       - DATABASE_PASSWORD=123456
       - DATABASE_PORT=5432
       - SCHEDULER_RPC_CLIENT_HOST=pdi-scheduler
+      - PROCESS_RPC_CLIENT_HOST=pdi-process
+      - NOTIFICATION_CLIENT_HOST=http://pdi-notification:7500
       - TZ=Europe/Istanbul
     depends_on:
       - postgresql
+      - pdi-scheduler
 
   pdi-process:
     build: 
@@ -48,6 +61,7 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=123456
       - DATABASE_PORT=5432
+      - NOTIFICATION_CLIENT_HOST=http://pdi-notification:7500
       - TZ=Europe/Istanbul
     depends_on:
       - postgresql
@@ -71,4 +85,23 @@ services:
     depends_on:
       - postgresql
       - pdi-process
-    
+  
+  pdi-ui:
+    build:
+      context: src/ui/
+      dockerfile: Dockerfile
+    ports:
+      - '7000:7000'
+    environment:
+      - AUTHORITY=http://localhost:7001/
+      - CLIENT_ID=http://localhost:7001/
+      - REDIRECT_URI=http://localhost:7000/oidc-login-redirect
+      - POST_REDIRECT_URI=http://localhost:7000/?postLogout=true
+      - SLIENT_REDIRECT_URI=http://localhost:7000/oidc-slient-refresh
+      - API_URI=http://localhost:7100/
+      - NOTIFICATION_URI=http://localhost:7500/
+    volumes:
+      - '/app/node_modules'
+      - ./src/ui/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - postgresql

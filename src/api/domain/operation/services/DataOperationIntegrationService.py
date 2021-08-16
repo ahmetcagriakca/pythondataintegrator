@@ -2,10 +2,11 @@ from typing import List
 from injector import inject
 
 from domain.integration.services.DataIntegrationService import DataIntegrationService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
+from domain.operation.CreateDataOperation.CreateDataOperationIntegrationRequest import \
+    CreateDataOperationIntegrationRequest
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.operation import DataOperation, DataOperationIntegration, Definition
-from models.viewmodels.operation.CreateDataOperationIntegrationModel import CreateDataOperationIntegrationModel
 
 
 class DataOperationIntegrationService(IScoped):
@@ -17,7 +18,7 @@ class DataOperationIntegrationService(IScoped):
                  ):
         super().__init__()
         self.repository_provider = repository_provider
-        self.secret_repository = repository_provider.get(DataOperationIntegration)
+        self.data_operation_integration_repository = repository_provider.get(DataOperationIntegration)
         self.data_integration_service = data_integration_service
 
     def get_all_by_data_operation_id(self, data_operation_id: int) -> List[DataOperationIntegration]:
@@ -31,7 +32,7 @@ class DataOperationIntegrationService(IScoped):
 
     def insert(self,
                data_operation: DataOperation,
-               data_operation_integration_models: List[CreateDataOperationIntegrationModel],
+               data_operation_integration_models: List[CreateDataOperationIntegrationRequest],
                definition: Definition):
         """
         Create Data Operation Integration
@@ -52,7 +53,7 @@ class DataOperationIntegrationService(IScoped):
 
     def update(self,
                data_operation: DataOperation,
-               data_operation_integration_models: List[CreateDataOperationIntegrationModel],
+               data_operation_integration_models: List[CreateDataOperationIntegrationRequest],
                definition: Definition,
                old_definition: Definition,
                ):

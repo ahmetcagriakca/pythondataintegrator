@@ -1,12 +1,12 @@
 from injector import inject
 
 from domain.integration.services.DataIntegrationConnectionFileCsvService import DataIntegrationConnectionFileCsvService
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.dependency.scopes import IScoped
+from domain.operation.CreateDataOperation.CreateDataIntegrationConnectionFileRequest import \
+    CreateDataIntegrationConnectionFileRequest
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.dependency.scopes import IScoped
 from models.dao.integration import DataIntegrationConnectionFile
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.viewmodels.integration.CreateDataIntegrationConnectionFileModel import \
-    CreateDataIntegrationConnectionFileModel
 
 
 class DataIntegrationConnectionFileService(IScoped):
@@ -33,7 +33,7 @@ class DataIntegrationConnectionFileService(IScoped):
 
     def insert(self,
                data_integration_connection: DataIntegrationConnection,
-               data: CreateDataIntegrationConnectionFileModel) -> DataIntegrationConnectionFile:
+               data: CreateDataIntegrationConnectionFileRequest) -> DataIntegrationConnectionFile:
         data_integration_connection_file = DataIntegrationConnectionFile(
             Folder=data.Folder,
             FileName=data.FileName,
@@ -46,7 +46,7 @@ class DataIntegrationConnectionFileService(IScoped):
 
     def update(self,
                data_integration_connection: DataIntegrationConnection,
-               data: CreateDataIntegrationConnectionFileModel) -> DataIntegrationConnectionFile:
+               data: CreateDataIntegrationConnectionFileRequest) -> DataIntegrationConnectionFile:
         data_integration_connection_file = self.get_by_data_integration_connection_id(
             data_integration_connection_id=data_integration_connection.Id,
         )

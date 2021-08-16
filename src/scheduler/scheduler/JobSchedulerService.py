@@ -3,8 +3,8 @@ from typing import List
 from apscheduler.job import Job
 
 from IocManager import IocManager
-from infrastructor.data.RepositoryProvider import RepositoryProvider
-from infrastructor.logging.SqlLogger import SqlLogger
+from infrastructure.data.RepositoryProvider import RepositoryProvider
+from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.aps import ApSchedulerJobEvent
 from models.dao.aps.ApSchedulerEvent import ApSchedulerEvent
 from models.dao.aps.ApSchedulerJob import ApSchedulerJob

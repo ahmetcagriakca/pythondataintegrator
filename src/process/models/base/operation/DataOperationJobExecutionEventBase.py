@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from models.base.EntityBase import EntityBase
-from infrastructor.json.BaseConverter import BaseConverter
+from infrastructure.json.BaseConverter import BaseConverter
 
 
 @BaseConverter.register

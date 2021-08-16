@@ -3,7 +3,7 @@ from typing import List
 from models.base.EntityBase import EntityBase
 from models.base.connection.ConnectionSecretBase import ConnectionSecretBase
 from models.base.secret.SecretSourceBase import SecretSourceBase
-from infrastructor.json.BaseConverter import BaseConverter
+from infrastructure.json.BaseConverter import BaseConverter
 
 
 @BaseConverter.register

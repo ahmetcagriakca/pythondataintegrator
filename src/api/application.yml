@@ -19,13 +19,17 @@ API:
     oauth2:
       type: oauth2
       flow: password
-      tokenUrl: https://localhost:7500/connect/token
-      authorizationUrl: https://localhost:7500/connect/authorize
+      tokenUrl: https://tokenmicroservicetst.turkcell.com.tr/connect/token
+      authorizationUrl: https://tokenmicroservicetst.turkcell.com.tr/connect/authorize
       scopes:
         pdi.api: Api grant
         offline_access: Grant read-only access
   SECURITY:
     oauth2: pdi.api
+  AUTHORITY: 'https://tokenmicroservicetst.turkcell.com.tr'
+  AUDIENCE: 'LocationShare.WebApi'
+  SCOPES:
+    - 'LocationShare.WebApi'
 
 SCHEDULER_RPC_CLIENT:
   HOST: localhost
@@ -34,3 +38,6 @@ SCHEDULER_RPC_CLIENT:
 PROCESS_RPC_CLIENT:
   HOST: localhost
   PORT: 7400
+
+NOTIFICATION_CLIENT:
+  HOST: http://localhost:7500

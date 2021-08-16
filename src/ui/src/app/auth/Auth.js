@@ -1,4 +1,3 @@
-import FuseSplashScreen from '@fuse/core/FuseSplashScreen';
 import oidcService from 'app/services/oidcService';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';

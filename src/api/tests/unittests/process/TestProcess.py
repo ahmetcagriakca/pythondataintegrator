@@ -21,7 +21,7 @@ class TestProcess(TestCase):
     def __init__(self, methodName='TestProcess'):
         super(TestProcess, self).__init__(methodName)
 
-        from infrastructor.api.FlaskAppWrapper import FlaskAppWrapper
+        from infrastructure.api.FlaskAppWrapper import FlaskAppWrapper
         IocManager.set_app_wrapper(app_wrapper=FlaskAppWrapper)
         IocManager.initialize()
         self.client = IocManager.app.test_client()

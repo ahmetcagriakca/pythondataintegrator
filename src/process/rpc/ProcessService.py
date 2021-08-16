@@ -1,7 +1,13 @@
 import rpyc
 from rpyc.utils.server import ThreadedServer
 
-from domain.connection.commands.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
+from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
+from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionRequest import CheckDatabaseConnectionRequest
+from domain.connection.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountCommand import \
+    CheckDatabaseTableRowCountCommand
+from domain.connection.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountRequest import \
+    CheckDatabaseTableRowCountRequest
+from infrastructure.cqrs.Dispatcher import Dispatcher
 from models.configs.ProcessRpcServerConfig import ProcessRpcServerConfig
 from rpc.OperationProcess import OperationProcess
 
@@ -28,9 +34,16 @@ class ProcessService(rpyc.Service):
         del operation_process
         return result
 
-    def exposed_check_database_connection(self, connection_name=None, schema=None, table=None, *args, **kwargs):
+    def exposed_check_database_connection(self, connection_name=None, *args, **kwargs):
+        dispatcher: Dispatcher = Dispatcher()
+        req = CheckDatabaseConnectionRequest(ConnectionName=connection_name)
+        check_database_connection_command = CheckDatabaseConnectionCommand(
+            request=req)
+        dispatcher.dispatch(check_database_connection_command)
 
-        check_database_connection_command = CheckDatabaseConnectionCommand()
-        result = check_database_connection_command.execute(connection_name=connection_name, schema=schema, table=table)
-        del check_database_connection_command
-        return result
+    def exposed_check_database_table_row_count(self, connection_name=None, schema=None, table=None, *args, **kwargs):
+        dispatcher: Dispatcher = Dispatcher()
+        req = CheckDatabaseTableRowCountRequest(ConnectionName=connection_name, Schema=schema, Table=table)
+        check_database_count_command = CheckDatabaseTableRowCountCommand(
+            request=req)
+        dispatcher.dispatch(check_database_count_command)
