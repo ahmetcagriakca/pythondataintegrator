@@ -17,7 +17,7 @@ class GetDataOperationJobExecutionLogListSpecifications(IScoped):
 
     def __specified_query(self, query: GetDataOperationJobExecutionLogListQuery) -> Query:
         repository = self.repository_provider.get(Log)
-        specified_query = repository.table.filter_by(JobId=query.request.ExecutionId)
+        specified_query = repository.table.filter_by(JobId=query.request.ExecutionId).order_by(Log.Id)
         return specified_query
 
     def specify(self, query: GetDataOperationJobExecutionLogListQuery) -> Query:

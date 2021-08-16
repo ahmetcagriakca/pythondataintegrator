@@ -64,7 +64,7 @@ function DataOperationJobContent() {
 	const dispatch = useDispatch();
 
 	const filterOptions = createFilterOptions({
-		matchFrom: 'start',
+		matchFrom: 'any',
 		stringify: option => {
 			return option.name
 		},

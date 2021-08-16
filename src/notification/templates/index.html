@@ -8,8 +8,9 @@
 
   <script type="text/javascript" charset="utf-8">
     //Establish connection and emit a message to confirm.
-
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socketHost=location.protocol+'//' + document.domain + ':' + location.port
+    console.log(socketHost);
+    var socket = io.connect(socketHost);
     socket.on('connect', function() {
         socket.emit('notification', {data: 'I\'m connected on own site!'});
     });

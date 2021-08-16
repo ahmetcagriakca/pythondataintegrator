@@ -14,7 +14,7 @@ class GetDataOperationMapping:
         dto.Id = entity.Id
         dto.Name = entity.Name
         dto.DefinitionId = entity.DefinitionId
-        dto.Version = entity.Definition.Version
+        dto.Version = entity.Definition.Version if entity.Definition is not None else None
         dto.IsDeleted = entity.IsDeleted
         dto.CreationDate = entity.CreationDate
         dto.LastUpdatedDate = entity.LastUpdatedDate
@@ -86,6 +86,7 @@ class GetDataOperationMapping:
                                 Database=database)
 
                 data_operation_integrations.append(data_operation_integration)
+        data_operation_integrations.sort(key=lambda x: getattr(x, 'Order'))
         dto.Integrations = data_operation_integrations
         return dto
 

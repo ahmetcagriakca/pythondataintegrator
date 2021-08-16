@@ -19,31 +19,55 @@ export const getOperationJob = createAsyncThunk('dataOperationJobApp/dataOperati
 	}
 });
 
-export const postScheduleCronJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/postScheduleCronJob', async requestData => {
-	const response = await axios.post('/api/Schedule/CronJob', requestData);
-	const data = await response.data;
-	return data;
+export const postScheduleCronJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/postScheduleCronJob', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.post('/api/Schedule/CronJob', params);
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
-export const postScheduleJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/postScheduleJob', async requestData => {
-	const response = await axios.post('/api/Schedule/Job', requestData);
-	const data = await response.data;
-	return data;
+export const postScheduleJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/postScheduleJob', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.post('/api/Schedule/Job', params);
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
-export const deleteScheduleCronJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/deleteScheduleCronJob', async requestData => {
-	const response = await axios.delete('/api/Schedule/CronJob', {
-		data: requestData
-	});
-	const data = await response.data;
-	return data;
+export const deleteScheduleCronJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/deleteScheduleCronJob', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.delete('/api/Schedule/CronJob', {
+			data: params
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
-export const deleteScheduleJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/deleteScheduleJob', async requestData => {
-	const response = await axios.delete('/api/Schedule/Job', {
-		data: requestData
-	});
-	const data = await response.data;
-	return data;
+export const deleteScheduleJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/deleteScheduleJob', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.delete('/api/Schedule/Job', {
+			data: params
+		});
+		const data = await response.data;
+		return data;
+	}
+	finally {
+		extra.dispatch(setLoading(false))
+	}
 });
 
 export const clearDataOperationJob = createAsyncThunk('dataOperationJobApp/dataOperationJob/clearOperation', async params => {

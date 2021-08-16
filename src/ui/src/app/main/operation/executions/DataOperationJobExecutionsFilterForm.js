@@ -21,7 +21,7 @@ function DataOperationJobExecutionsFilterForm(props) {
 	const dispatch = useDispatch();
 	const classes = filterFormStyles();
 	const filterOptions = createFilterOptions({
-		matchFrom: 'start',
+		matchFrom: 'any',
 		stringify: option => {
 			return option.name
 		},

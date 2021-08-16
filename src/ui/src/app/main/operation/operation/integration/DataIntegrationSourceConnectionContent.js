@@ -21,7 +21,7 @@ function DataIntegrationSourceConnectionContent(props) {
 
 	const selectConnectionNames = useSelector(selectConnectionName);
 	const filterOptions = createFilterOptions({
-		matchFrom: 'start',
+		matchFrom: 'any',
 		stringify: option => {
 			return option?.name
 		},
