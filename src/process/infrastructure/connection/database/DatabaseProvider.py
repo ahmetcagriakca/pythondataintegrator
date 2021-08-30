@@ -53,7 +53,14 @@ class DatabaseProvider(IScoped):
                 database_name = connection.Database.DatabaseName
                 config = DatabaseConfig(type=ConnectorTypes.POSTGRESQL.name, host=host, port=port,
                                         database=database_name, username=user, password=password)
-
+            elif connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
+                user = connection_basic_authentication.User
+                password = connection_basic_authentication.Password
+                host = connection_server.Host
+                port = connection_server.Port
+                database_name = connection.Database.DatabaseName
+                config = DatabaseConfig(type=ConnectorTypes.MYSQL.name, host=host, port=port,
+                                        database=database_name, username=user, password=password)
             database_policy = DatabasePolicy(database_config=config)
             database_context: DatabaseContext = DatabaseContext(database_policy=database_policy,
                                                                 sql_logger=self.sql_logger)
