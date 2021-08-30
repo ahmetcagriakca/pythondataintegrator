@@ -48,6 +48,10 @@ def insert_connection_types():
         {
             "ConnectionType": "File",
             "Name": "CSV",
+        },
+        {
+            "ConnectionType": "Database",
+            "Name": "MYSQL",
         }
     ]
     connection_types = []
