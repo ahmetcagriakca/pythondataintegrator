@@ -64,7 +64,7 @@ class IocManager:
         module_finder = ModuleFinder(application_config)
         # controllers and api excluded for api decorator
         api_path=os.path.join('infrastructure','api')
-        module_finder.import_modules(excluded_modules=['controllers', api_path, 'alembic', 'tests'])
+        module_finder.import_modules(excluded_modules=['controllers', api_path,'env', 'alembic', 'tests'])
 
         # Configuration initialize
         IocManager.config_manager = ConfigManager(root_directory)
