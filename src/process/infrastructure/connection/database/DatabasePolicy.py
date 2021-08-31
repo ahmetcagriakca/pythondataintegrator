@@ -3,6 +3,7 @@ from infrastructure.connection.database.connectors.DatabaseConnector import Data
 from infrastructure.connection.database.connectors.MssqlDbConnector import MssqlDbConnector
 from infrastructure.connection.database.connectors.OracleDbConnector import OracleDbConnector
 from infrastructure.connection.database.connectors.PostgreDbConnector import PostgreDbConnector
+from infrastructure.connection.database.connectors.MysqlDbConnector import MysqlDbConnector
 from models.configs.DatabaseConfig import DatabaseConfig
 from models.enums import ConnectorTypes
 
@@ -18,3 +19,5 @@ class DatabasePolicy:
             self.connector: DatabaseConnector = OracleDbConnector(database_config)
         elif database_config.type == ConnectorTypes.POSTGRESQL.name:
             self.connector: DatabaseConnector = PostgreDbConnector(database_config)
+        elif database_config.type == ConnectorTypes.MYSQL.name:
+            self.connector: DatabaseConnector = MysqlDbConnector(database_config)
