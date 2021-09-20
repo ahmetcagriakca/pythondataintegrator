@@ -48,7 +48,7 @@
         "path-to-regexp": "3.2.0",
         "perfect-scrollbar": "1.5.0",
         "postcss-cli": "^8.3.1",
-        "prismjs": "1.22.0",
+        "prismjs": "1.25.0",
         "prop-types": "15.7.2",
         "qs": "6.9.4",
         "raw-loader": "4.0.2",
