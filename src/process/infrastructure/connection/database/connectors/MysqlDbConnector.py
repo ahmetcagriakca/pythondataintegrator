@@ -42,7 +42,7 @@ class MysqlDbConnector(DatabaseConnector):
             raise 
 
     def get_table_count_query(self, query):
-        count_query = f"SELECT COUNT (*)  \"COUNT\" FROM ({query})"
+        count_query = f"SELECT COUNT(*)  as \"COUNT\" FROM ({query})  as count_table"
         return count_query
 
     def get_target_query_indexer(self):
