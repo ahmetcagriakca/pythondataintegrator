@@ -12,7 +12,7 @@ Flask==1.1.4
 Flask_Cors==3.0.9
 Flask-Ext==0.1
 Flask-Injector==0.12.3
-flask-restx==0.4.0
+flask-restx==0.5.0
 Werkzeug==1.0.1
 dataclasses==0.8
 requests==2.26.0

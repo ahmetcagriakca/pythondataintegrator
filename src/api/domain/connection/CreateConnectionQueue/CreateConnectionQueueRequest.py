@@ -12,7 +12,7 @@ class CreateConnectionServerRequest:
 @requestclass
 class CreateConnectionQueueRequest:
     Name: str = None
-    ConnectorTypeName: int = None
+    ConnectorTypeName: str = None
     Servers: List[CreateConnectionServerRequest] = None
     Protocol: str = None
     Mechanism: str = None

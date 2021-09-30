@@ -149,7 +149,7 @@ function DataOperationJsonContent(props) {
 						database: {
 							id: uuid(),
 							schema: dataOperationIntegration.Integration.SourceConnections.Database.Schema,
-							table: dataOperationIntegration.Integration.SourceConnections.Database.Table,
+							tableName: dataOperationIntegration.Integration.SourceConnections.Database.TableName,
 							query: dataOperationIntegration.Integration.SourceConnections.Database.Query
 						}
 					}
@@ -181,7 +181,7 @@ function DataOperationJsonContent(props) {
 						database: {
 							id: uuid(),
 							schema: dataOperationIntegration.Integration.TargetConnections.Database.Schema,
-							table: dataOperationIntegration.Integration.TargetConnections.Database.Table,
+							tableName: dataOperationIntegration.Integration.TargetConnections.Database.TableName,
 							query: dataOperationIntegration.Integration.TargetConnections.Database.Query
 						}
 					}
