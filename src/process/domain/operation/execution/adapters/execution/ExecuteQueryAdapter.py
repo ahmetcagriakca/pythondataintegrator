@@ -38,4 +38,4 @@ class ExecuteQueryAdapter(ExecuteAdapter, IScoped):
         return f"integration run query getting error."
 
     def check_error_raise(self) -> bool:
-        return False
+        return True
