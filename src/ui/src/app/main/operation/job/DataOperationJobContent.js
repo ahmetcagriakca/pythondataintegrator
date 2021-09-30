@@ -22,6 +22,7 @@ import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete
 import { getOperationJob, clearDataOperationJob, postScheduleCronJob, deleteScheduleCronJob, postScheduleJob, deleteScheduleJob } from './store/dataOperationJobSlice'
 import DataOperationJobExecutions from '../executions/DataOperationJobExecutions';
 import { getDataOperationName, selectDataOperationName } from './store/dataOperationNameSlice';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -182,6 +183,10 @@ function DataOperationJobContent() {
 
 
 	const save = event => {
+		if (values.dataOperation === undefined || values.dataOperation === null || values.dataOperation.name === undefined || values.dataOperation.name  === '') {
+			toast.warn('Data Operation required', { position: toast.POSITION.BOTTOM_RIGHT })
+			return
+		}
 		switch (values.type) {
 			case "Execute":
 				{
@@ -202,11 +207,26 @@ function DataOperationJobContent() {
 				break;
 			case "Cron":
 				{
+					if (values.cron === undefined || values.cron === null || values.cron === '') {
+						toast.warn('Cron required', { position: toast.POSITION.BOTTOM_RIGHT })
+						return
+					}
+					if (values.startDate && values.endDate) {
+						if (values.startDate > values.endDate) {
+							toast.warn('End Date must bigger than Start Date', { position: toast.POSITION.BOTTOM_RIGHT })
+							return
+						}
+					}
 					let request = {
 						OperationName: values.dataOperation.name,
-						Cron: values.cron,
-						StartDate: values.startDate,
-						EndDate: values.startDate
+						Cron: values.cron
+					}
+					
+					if (values.startDate !== undefined && values.startDate !== null && values.startDate !== '') {
+						request['StartDate']=values.startDate
+					}
+					if (values.endDate !== undefined && values.endDate !== null && values.endDate !== '') {
+						request['EndDate']=values.endDate
 					}
 					dispatch(postScheduleCronJob(request));
 				}
@@ -362,7 +382,7 @@ function DataOperationJobContent() {
 							style={{ margin: '0 0 0 5px' }}
 							value={values.type}
 							onChange={handleChange('type')}>
-							<FormControlLabel value="Execute" control={<Radio color="primary" />} label="Execute" disabled={disabilityStatus.type} style={{ padding: '0 0 0 5px' }}/>
+							<FormControlLabel value="Execute" control={<Radio color="primary" />} label="Execute" disabled={disabilityStatus.type} style={{ padding: '0 0 0 5px' }} />
 							<FormControlLabel value="Schedule" control={<Radio color="primary" />} label="Schedule" disabled={disabilityStatus.type} />
 							<FormControlLabel value="Cron" control={<Radio color="primary" />} label="Cron" disabled={disabilityStatus.type} />
 						</RadioGroup>
@@ -399,6 +419,7 @@ function DataOperationJobContent() {
 										(
 											<Grid item xs>
 												<DateTimePicker
+													clearable={values.type === 'Cron'}
 													label={values.type === 'Cron' ? "Start Date" : "Run Date"}
 													inputVariant="outlined"
 													format="DD/MM/yyyy HH:mm:sss a"
@@ -410,7 +431,9 @@ function DataOperationJobContent() {
 													disabled={disabilityStatus.startDate}
 													readOnly={readonlyStatus.startDate}
 													value={values.startDate}
-													onChange={handleChange('startDate')}
+													onChange={(value) => {
+														handleChangeValue(null, 'startDate', value);
+													}}
 												/>
 											</Grid>
 										) : ('')
@@ -432,7 +455,9 @@ function DataOperationJobContent() {
 													disabled={disabilityStatus.endDate}
 													readOnly={readonlyStatus.endDate}
 													value={values.endDate}
-													onChange={handleChange('endDate')}
+													onChange={(value) => {
+														handleChangeValue(null, 'endDate', value);
+													}}
 												/>
 											</Grid>
 										) : ('')
