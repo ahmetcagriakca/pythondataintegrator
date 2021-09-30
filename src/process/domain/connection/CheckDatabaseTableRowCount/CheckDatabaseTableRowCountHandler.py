@@ -42,7 +42,8 @@ class CheckDatabaseTableRowCountHandler(ICommandHandler[CheckDatabaseTableRowCou
         table = command.request.Table
         if schema is not None and schema != '' and table is not None and table != '':
             try:
-                count = database_context.get_table_count(f'select * from "{schema}"."{table}"')
+                count_query=database_context.connector.get_table_select_query(selected_rows='1', schema=schema, table=table)
+                count = database_context.get_table_count(query=count_query)
                 count_of_table = f'"{schema}"."{table}" has {count} row'
             except Exception as ex:
                 message = f'{command.request.ConnectionName} "{schema}"."{table}" count of table getting error! Error: {ex}'
