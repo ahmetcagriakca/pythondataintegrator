@@ -32,8 +32,7 @@ class MysqlDbConnector(DatabaseConnector):
 
     def execute_many(self, query, data):
         try:
-            self.cursor.prepare(query)
-            self.cursor.executemany(None, data)
+            self.cursor.executemany(query, data)
             self.connection.commit()
             return self.cursor.rowcount
         except Exception as error:
@@ -46,5 +45,5 @@ class MysqlDbConnector(DatabaseConnector):
         return count_query
 
     def get_target_query_indexer(self):
-        indexer = ':{index}'
+        indexer = '%s'
         return indexer
