@@ -6,6 +6,8 @@ from infrastructure.dependency.scopes import IScoped
 from infrastructure.exceptions.OperationalException import OperationalException
 from models.dao.integration.DataIntegration import DataIntegration
 from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
+from models.dao.connection.Connection import Connection
+from models.enums import ConnectorTypes
 
 
 class DataIntegrationColumnService(IScoped):
@@ -31,7 +33,7 @@ class DataIntegrationColumnService(IScoped):
                                                                      DataIntegrationId=data_integration_id).all()
         return entities
 
-    def get_source_query(self, data_integration: DataIntegration, schema: str, table_name: str):
+    def get_source_query(self, connection:Connection, data_integration: DataIntegration, schema: str, table_name: str):
 
         data_integration_columns = self.data_integration_column_repository.filter_by(IsDeleted=0,
                                                                                      DataIntegration=data_integration)
@@ -40,21 +42,33 @@ class DataIntegrationColumnService(IScoped):
                         data_integration_column.TargetColumnName) for data_integration_column in
                        data_integration_columns]
         selected_rows = ""
-        for column_row in column_rows:
-            selected_rows += f'{"" if column_row == column_rows[0] else ", "}"{column_row[1].strip()}"'
-        query = f'SELECT {selected_rows} FROM "{schema}"."{table_name}"'
+        if connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
+            for column_row in column_rows:
+                selected_rows += f'{"" if column_row == column_rows[0] else ", "}`{column_row[1].strip()}`'
+            query = f'SELECT {selected_rows} FROM `{schema}`.`{table_name}`'
+        
+        else:
+            for column_row in column_rows:
+                selected_rows += f'{"" if column_row == column_rows[0] else ", "}"{column_row[1].strip()}"'
+            query = f'SELECT {selected_rows} FROM "{schema}"."{table_name}"'
         return query
 
-    def get_target_query(self, data_integration: DataIntegration, schema: str, table_name: str):
+    def get_target_query(self, connection:Connection, data_integration: DataIntegration, schema: str, table_name: str):
 
         data_integration_columns = self.data_integration_column_repository.filter_by(IsDeleted=0,
                                                                                      DataIntegration=data_integration)
         insert_row_columns = ""
         insert_row_values = ""
-        for column in data_integration_columns:
-            insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
-            insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
-        query = f'INSERT INTO "{schema}"."{table_name}"({insert_row_columns}) VALUES ({insert_row_values})'
+        if connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
+            for column in data_integration_columns:
+                insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}`{column.TargetColumnName}`'
+                insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
+            query = f'INSERT INTO `{schema}`.`{table_name}`({insert_row_columns}) VALUES ({insert_row_values})'
+        else:
+            for column in data_integration_columns:
+                insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
+                insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
+            query = f'INSERT INTO "{schema}"."{table_name}"({insert_row_columns}) VALUES ({insert_row_values})'
         return query
 
     def insert(self,
