@@ -6,6 +6,7 @@ from infrastructure.cryptography.CryptoService import CryptoService
 from infrastructure.data.RepositoryProvider import RepositoryProvider
 from infrastructure.data.decorators.TransactionHandler import transaction_handler
 from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
 from infrastructure.json.BaseConverter import BaseConverter
 from models.base.connection import ConnectionBase, ConnectionTypeBase, ConnectionDatabaseBase, ConnectionFileBase, \
     ConnectionQueueBase, ConnectionServerBase, ConnectionSecretBase
@@ -228,6 +229,8 @@ class OperationCacheService(IScoped):
             Connection.__table__.select().filter(
                 Connection.IsDeleted == 0,
                 Connection.Id == connection_id)).fetchone()
+        if entity is None:
+            raise OperationalException(f"Connection not found on execution. Connection Id :{connection_id}")
         result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
         return result
 
@@ -236,6 +239,9 @@ class OperationCacheService(IScoped):
             ConnectionType.__table__.select().filter(
                 ConnectionType.IsDeleted == 0,
                 ConnectionType.Id == connection_type_id)).fetchone()
+        if entity is None:
+            raise OperationalException(
+                f"Connection type not found on execution. Connection Type Id :{connection_type_id}")
         result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
         return result
 
@@ -245,6 +251,8 @@ class OperationCacheService(IScoped):
                 ConnectionServer.IsDeleted == 0,
                 ConnectionServer.ConnectionId == connection_id))
 
+        if entities is None:
+            raise OperationalException(f"Connection detail not found on execution. Connection Id :{connection_id}")
         result_list = []
         for entity in entities:
             result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
@@ -257,6 +265,8 @@ class OperationCacheService(IScoped):
                 ConnectionSecret.IsDeleted == 0,
                 ConnectionSecret.ConnectionId == connection_id))
 
+        if entities is None:
+            raise OperationalException(f"Connection detail not found on execution. Connection Id :{connection_id}")
         result_list = []
         for entity in entities:
             result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
