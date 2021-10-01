@@ -12,9 +12,11 @@ class MysqlDbConnector(DatabaseConnector):
         self.cursor = None
 
     def connect(self):
-        self.connection = mysql.connector.connect(user=self.database_config.username, password=self.database_config.password,
-                                           database=self.database_config.database, host=self.database_config.host,
-                                           port=self.database_config.port)
+        self.connection = mysql.connector.connect(user=self.database_config.username,
+                                                  password=self.database_config.password,
+                                                  database=self.database_config.database,
+                                                  host=self.database_config.host,
+                                                  port=self.database_config.port)
         self.cursor = self.connection.cursor()
 
     def disconnect(self):
@@ -38,7 +40,11 @@ class MysqlDbConnector(DatabaseConnector):
         except Exception as error:
             self.connection.rollback()
             self.cursor.close()
-            raise 
+            raise
+
+    def get_truncate_query(self, schema, table):
+        count_query = f'TRUNCATE TABLE `{schema}`.`{table}`'
+        return count_query
 
     def get_table_count_query(self, query):
         count_query = f"SELECT COUNT(*)  as \"COUNT\" FROM ({query})  as count_table"
@@ -50,3 +56,6 @@ class MysqlDbConnector(DatabaseConnector):
     def get_target_query_indexer(self):
         indexer = '%s'
         return indexer
+
+    def get_table_data_query(self, query, first_row, start, end):
+        return f"SELECT * FROM ({query} order by `{first_row}`) ordered_query limit {end - start} offset {start}"

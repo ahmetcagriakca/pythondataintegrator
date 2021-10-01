@@ -43,7 +43,7 @@ class DatabaseAdapter(ConnectionAdapter):
         first_row = self.operation_cache_service.get_first_row(data_integration_id=data_integration_id)
         data = source_context.get_table_data(
             query=source_connection.Database.Query,
-            first_row=f'"{first_row.SourceColumnName}"',
+            first_row=f'{first_row.SourceColumnName}',
             start=paging_modifier.Start,
             end=paging_modifier.End
         )
