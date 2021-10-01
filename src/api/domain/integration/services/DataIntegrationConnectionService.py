@@ -73,6 +73,7 @@ class DataIntegrationConnectionService(IScoped):
                         data.SourceConnections.Database.Query is None or data.SourceConnections.Database.Query == '') \
                         and data.SourceConnections.Database.Schema is not None and data.SourceConnections.Database.Schema != '' and data.SourceConnections.Database.TableName is not None and data.SourceConnections.Database.TableName != '':
                     data.SourceConnections.Database.Query = self.data_integration_column_service.get_source_query(
+                        connection=source,
                         data_integration=data_integration,
                         schema=data.SourceConnections.Database.Schema,
                         table_name=data.SourceConnections.Database.TableName)
@@ -99,6 +100,7 @@ class DataIntegrationConnectionService(IScoped):
         if target.ConnectionType.Id == ConnectionTypes.Database.value:
             if data.TargetConnections.Database.Query is None or data.TargetConnections.Database.Query == '':
                 data.TargetConnections.Database.Query = self.data_integration_column_service.get_target_query(
+                    connection=target,
                     data_integration=data_integration,
                     schema=data.TargetConnections.Database.Schema,
                     table_name=data.TargetConnections.Database.TableName)
@@ -133,6 +135,7 @@ class DataIntegrationConnectionService(IScoped):
                         data.SourceConnections.Database.Query is None or data.SourceConnections.Database.Query == '') \
                         and data.SourceConnections.Database.Schema is not None and data.SourceConnections.Database.Schema != '' and data.SourceConnections.Database.TableName is not None and data.SourceConnections.Database.TableName != '':
                     data.SourceConnections.Database.Query = self.data_integration_column_service.get_source_query(
+                        connection=source,
                         data_integration=data_integration,
                         schema=data.SourceConnections.Database.Schema,
                         table_name=data.SourceConnections.Database.TableName)
@@ -177,6 +180,7 @@ class DataIntegrationConnectionService(IScoped):
         if target.ConnectionType.Id == ConnectionTypes.Database.value:
             if data.TargetConnections.Database.Query is None or data.TargetConnections.Database.Query == '':
                 data.TargetConnections.Database.Query = self.data_integration_column_service.get_target_query(
+                    connection=target,
                     data_integration=data_integration,
                     schema=data.TargetConnections.Database.Schema,
                     table_name=data.TargetConnections.Database.TableName)
