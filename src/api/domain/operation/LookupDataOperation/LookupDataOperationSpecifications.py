@@ -12,7 +12,7 @@ class LookupDataOperationSpecifications(IScoped):
         pass
 
     def __specified_query(self, query: LookupDataOperationQuery, data_query: Query) -> Query:
-        specified_query = data_query.order_by(text('"Id" asc'))
+        specified_query = data_query.order_by(text('"DefinitionId" desc'))
         return specified_query
         
     def specify(self, data_query: Query, query: LookupDataOperationQuery) -> Query:

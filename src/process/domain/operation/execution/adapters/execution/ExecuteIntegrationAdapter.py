@@ -1,8 +1,8 @@
 from injector import inject
 
 from domain.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
+from domain.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategyFactory import ExecuteIntegrationStrategyFactory
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from domain.operation.execution.processes.ExecuteIntegrationProcess import ExecuteIntegrationProcess
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
@@ -18,10 +18,10 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
                  operation_cache_service: OperationCacheService,
                  data_operation_job_execution_integration_service: DataOperationJobExecutionIntegrationService,
                  integration_execution_service: IntegrationExecutionService,
-                 execute_integration_process: ExecuteIntegrationProcess,
+                 execute_integration_strategy_factory: ExecuteIntegrationStrategyFactory,
                  ):
+        self.execute_integration_strategy_factory = execute_integration_strategy_factory
         self.operation_cache_service = operation_cache_service
-        self.execute_integration_process = execute_integration_process
         self.integration_execution_service = integration_execution_service
         self.sql_logger = sql_logger
         self.data_operation_job_execution_integration_service = data_operation_job_execution_integration_service
@@ -89,31 +89,29 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
                             data_operation_job_execution_integration_id: int,
                             data_operation_integration_id: int) -> int:
 
-        data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(data_operation_integration_id=data_operation_integration_id)
+        data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(
+            data_operation_integration_id=data_operation_integration_id)
         limit = data_operation_integration.Limit
         process_count = data_operation_integration.ProcessCount
 
         data_operation_integration_order = data_operation_integration.Order
         data_integration_code = data_operation_integration.DataIntegration.Code
-        if limit is not None and limit > 0:
-            if process_count > 1:
-                self.sql_logger.info(
-                    f"{data_operation_integration_order}-{data_integration_code} - integration will execute parallel. {process_count}-{limit}",
-                    job_id=data_operation_job_execution_id)
-            else:
-                self.sql_logger.info(
-                    f"{data_operation_integration_order}-{data_integration_code} - integration will execute serial. {limit}",
-                    job_id=data_operation_job_execution_id)
 
-            affected_row_count = self.execute_integration_process.start_integration_execution(
-                data_operation_job_execution_id=data_operation_job_execution_id,
-                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-                data_operation_integration_id=data_operation_integration_id)
+        execute_integration_strategy = self.execute_integration_strategy_factory.get(
+            data_operation_integration_id=data_operation_integration_id)
+        strategy_name=type(execute_integration_strategy).__name__
+        self.sql_logger.info(
+            f"{data_operation_integration_order}-{data_integration_code} - integration will execute on {strategy_name}. {process_count}-{limit}",
+            job_id=data_operation_job_execution_id)
+        affected_row_count = execute_integration_strategy.execute(
+            data_operation_job_execution_id=data_operation_job_execution_id,
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+            data_operation_integration_id=data_operation_integration_id)
 
-            self.data_operation_job_execution_integration_service.update_source_data_count(
-                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-                source_data_count=affected_row_count)
-            self.data_operation_job_execution_integration_service.create_event(
-                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-                event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION, affected_row=affected_row_count)
+        self.data_operation_job_execution_integration_service.update_source_data_count(
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+            source_data_count=affected_row_count)
+        self.data_operation_job_execution_integration_service.create_event(
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+            event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION, affected_row=affected_row_count)
         return affected_row_count

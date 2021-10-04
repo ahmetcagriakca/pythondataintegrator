@@ -94,9 +94,13 @@ class DatabaseContext(IScoped):
         datas = self.connector.cursor.fetchall()
         return datas[0][0]
 
-    def get_table_data(self, query, first_row, start, end):
-        data_query = self.connector.get_table_data_query(query=query, first_row=first_row, start=start,
-                                                         end=end)
+    def get_table_data(self, query):
+        data_query = self.connector.get_table_data_query(query=query)
+        return self.fetch(data_query)
+
+    def get_table_data_with_paging(self, query, order_row, start, end):
+        data_query = self.connector.get_table_data_with_paging_query(query=query, order_row=order_row, start=start,
+                                                                     end=end)
         return self.fetch(data_query)
 
     def read_data(self, query: str, columns: [], limit: int):

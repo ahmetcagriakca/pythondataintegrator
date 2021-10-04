@@ -16,6 +16,7 @@ from models.dto.PagingModifier import PagingModifier
 from models.enums.StatusTypes import StatusTypes
 from models.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
     EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY
+from infrastructure.connection.adapters.connection_adapter import ConnectionAdapter
 
 
 class IntegrationExecutionService(IScoped):
@@ -30,6 +31,13 @@ class IntegrationExecutionService(IScoped):
         self.sql_logger = sql_logger
         self.connection_adapter_factory = connection_adapter_factory
 
+    def source_adapter(self, data_integration_id) -> ConnectionAdapter:
+
+        return self.connection_adapter_factory.get_source_adapter(data_integration_id=data_integration_id)
+
+    def target_adapter(self, data_integration_id) -> ConnectionAdapter:
+        return self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
+
     def start_source_data_operation(self,
                                     data_integration_id: int,
                                     data_operation_job_execution_integration_id: int,
@@ -37,14 +45,14 @@ class IntegrationExecutionService(IScoped):
                                     process_count: int,
                                     data_queue: Queue,
                                     data_result_queue: Queue):
-
-        source_adapter = self.connection_adapter_factory.get_source_adapter(data_integration_id=data_integration_id)
-        source_adapter.start_source_data_operation(data_integration_id=data_integration_id,
-                                                   data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-                                                   limit=limit,
-                                                   process_count=process_count,
-                                                   data_queue=data_queue,
-                                                   data_result_queue=data_result_queue)
+        self.source_adapter(data_integration_id=data_integration_id) \
+            .start_source_data_operation(
+            data_integration_id=data_integration_id,
+            data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
+            limit=limit,
+            process_count=process_count,
+            data_queue=data_queue,
+            data_result_queue=data_result_queue)
 
     @staticmethod
     def get_paging_modifiers(data_count, limit):
@@ -62,13 +70,13 @@ class IntegrationExecutionService(IScoped):
             start += limit
         return paging_modifiers
 
-    def start_integration(self,
-                          data_integration_id: int,
-                          limit: int,
-                          data_operation_job_execution_id: int,
-                          data_operation_job_execution_integration_id: int):
-
-        target_adapter = self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
+    def start_integration_with_paging(self,
+                                      data_integration_id: int,
+                                      data_operation_job_execution_id: int,
+                                      data_operation_job_execution_integration_id: int,
+                                      limit: int):
+        target_adapter = self.target_adapter(data_integration_id=data_integration_id)
+        source_adapter = self.source_adapter(data_integration_id=data_integration_id)
         data_count = self.get_source_data_count(
             data_integration_id=data_integration_id,
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id)
@@ -76,8 +84,8 @@ class IntegrationExecutionService(IScoped):
             paging_modifiers = self.get_paging_modifiers(data_count=data_count, limit=limit)
             for paging_modifier in paging_modifiers:
                 start_time = time()
-                source_data = self.get_source_data(data_integration_id=data_integration_id,
-                                                   paging_modifier=paging_modifier)
+                source_data = source_adapter.get_source_data_with_paging(data_integration_id=data_integration_id,
+                                                                         paging_modifier=paging_modifier)
                 # df = DataFrame(source_data)
                 task_id = paging_modifier.Id
                 start = paging_modifier.Start
@@ -93,14 +101,26 @@ class IntegrationExecutionService(IScoped):
                     job_id=data_operation_job_execution_id)
         return data_count
 
+    def start_integration(self,
+                          data_integration_id: int,
+                          data_operation_job_execution_id: int,
+                          data_operation_job_execution_integration_id: int):
+        target_adapter = self.target_adapter(data_integration_id=data_integration_id)
+        source_data = self.source_adapter(data_integration_id=data_integration_id) \
+            .get_source_data(data_integration_id=data_integration_id)
+        prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id,
+                                                    source_data=source_data)
+        target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
+        return len(source_data)
+
     def start_integration_temp(self,
                                data_integration_id: int,
-                               limit: int,
                                data_operation_job_execution_id: int,
-                               data_operation_job_execution_integration_id: int):
+                               data_operation_job_execution_integration_id: int,
+                               limit: int):
 
-        source_adapter = self.connection_adapter_factory.get_source_adapter(data_integration_id=data_integration_id)
-        target_adapter = self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
+        source_adapter = self.source_adapter(data_integration_id=data_integration_id)
+        target_adapter = self.target_adapter(data_integration_id=data_integration_id)
         task_id = 0
         total_data_count = 0
         for data in source_adapter.read_data(data_integration_id=data_integration_id,
@@ -125,34 +145,48 @@ class IntegrationExecutionService(IScoped):
         return total_data_count
 
     @func_set_timeout(1800)
-    def start_execute_integration(self,
-                                  data_integration_id: int,
-                                  data_operation_job_execution_id: int,
-                                  data_operation_job_execution_integration_id: int,
-                                  paging_modifier: PagingModifier,
-                                  source_data: any):
-        if source_data is None:
-            source_data = self.get_source_data(data_integration_id=data_integration_id, paging_modifier=paging_modifier)
-        target_adapter = self.connection_adapter_factory.get_target_adapter(data_integration_id=data_integration_id)
+    def start_execute_integration_with_source_data(self,
+                                                   data_integration_id: int,
+                                                   data_operation_job_execution_id: int,
+                                                   data_operation_job_execution_integration_id: int,
+                                                   source_data: any):
+        target_adapter = self.target_adapter(data_integration_id=data_integration_id)
         prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id, source_data=source_data)
         target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
         return len(source_data)
 
-    def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
-        source_adapter = self.connection_adapter_factory.get_source_adapter(
+    @func_set_timeout(1800)
+    def start_execute_integration_with_paging(self,
+                                              data_integration_id: int,
+                                              data_operation_job_execution_id: int,
+                                              data_operation_job_execution_integration_id: int,
+                                              paging_modifier: PagingModifier):
+        source_data = self.source_adapter(data_integration_id=data_integration_id).get_source_data_with_paging(
+            data_integration_id=data_integration_id, paging_modifier=paging_modifier)
+        target_adapter = self.target_adapter(data_integration_id=data_integration_id)
+        prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id, source_data=source_data)
+        target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
+        return len(source_data)
+
+    @func_set_timeout(1800)
+    def start_execute_integration(self,
+                                  data_integration_id: int,
+                                  data_operation_job_execution_id: int,
+                                  data_operation_job_execution_integration_id: int):
+        source_data = self.source_adapter(data_integration_id=data_integration_id).get_source_data(
             data_integration_id=data_integration_id)
-        source_data = source_adapter.get_source_data(data_integration_id=data_integration_id,
-                                                     paging_modifier=paging_modifier)
-        return source_data
+        target_adapter = self.target_adapter(data_integration_id=data_integration_id)
+        prepared_data = target_adapter.prepare_data(data_integration_id=data_integration_id, source_data=source_data)
+        target_adapter.write_target_data(data_integration_id=data_integration_id, prepared_data=prepared_data)
+        return len(source_data)
 
     def clear_data(self, data_operation_job_execution_integration_id: int, data_integration_id: int):
         is_target_truncate = self.operation_cache_service.get_data_integration_by_id(
             data_integration_id=data_integration_id).IsTargetTruncate
 
         if is_target_truncate:
-            connection_adapter = self.connection_adapter_factory.get_target_adapter(
-                data_integration_id=data_integration_id)
-            truncate_affected_rowcount = connection_adapter.clear_data(data_integration_id)
+            truncate_affected_rowcount = self.target_adapter(data_integration_id=data_integration_id) \
+                .clear_data(data_integration_id=data_integration_id)
 
             self.data_operation_job_execution_integration_service.create_event(
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
@@ -161,9 +195,8 @@ class IntegrationExecutionService(IScoped):
     def get_source_data_count(self,
                               data_operation_job_execution_integration_id: int,
                               data_integration_id: int):
-        source_adapter = self.connection_adapter_factory.get_source_adapter(
-            data_integration_id=data_integration_id)
-        data_count = source_adapter.get_source_data_count(data_integration_id=data_integration_id)
+        data_count = self.source_adapter(data_integration_id=data_integration_id) \
+            .get_source_data_count(data_integration_id=data_integration_id)
         self.data_operation_job_execution_integration_service.create_event(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
             event_code=EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, affected_row=data_count)
@@ -175,9 +208,8 @@ class IntegrationExecutionService(IScoped):
     def execute_query(self,
                       data_operation_job_execution_integration_id: int,
                       data_integration_id: int) -> int:
-        target_adapter = self.connection_adapter_factory.get_target_adapter(
+        affected_rowcount = self.target_adapter(data_integration_id=data_integration_id).do_target_operation(
             data_integration_id=data_integration_id)
-        affected_rowcount = target_adapter.do_target_operation(data_integration_id=data_integration_id)
 
         self.data_operation_job_execution_integration_service.create_event(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,

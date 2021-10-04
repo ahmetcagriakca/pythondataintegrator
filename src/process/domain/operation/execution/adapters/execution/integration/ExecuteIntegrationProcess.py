@@ -6,18 +6,22 @@ from injector import inject
 from pandas import DataFrame, notnull
 import pandas as pd
 
+from domain.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
+    ExecuteIntegrationStrategy
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructure.data.decorators.TransactionHandler import transaction_handler
+from infrastructure.dependency.scopes import IScoped
+from infrastructure.exceptions.OperationalException import OperationalException
 from infrastructure.multi_processing.ProcessManager import ProcessManager
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
 from IocManager import IocManager
 from infrastructure.connection.models.DataQueueTask import DataQueueTask
-from infrastructure.dependency.scopes import IScoped
 from infrastructure.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
 from func_timeout import FunctionTimedOut
 
-class ExecuteIntegrationProcess(IScoped):
+
+class ExecuteIntegrationProcess(ExecuteIntegrationStrategy, IScoped):
     @inject
     def __init__(self,
                  sql_logger: SqlLogger,
@@ -149,12 +153,11 @@ class ExecuteIntegrationProcess(IScoped):
                         self.sql_logger.info(
                             f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task without data",
                             job_id=data_operation_job_execution_id)
-                        data_count = self.integration_execution_service.start_execute_integration(
+                        data_count = self.integration_execution_service.start_execute_integration_with_paging(
                             data_integration_id=data_integration_id,
                             data_operation_job_execution_id=data_operation_job_execution_id,
                             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-                            paging_modifier=paging_modifier,
-                            source_data=data)
+                            paging_modifier=paging_modifier)
                     elif data is not None and len(data) > 0:
                         if data_task.IsDataFrame and data_task.DataTypes is not None:
                             source_data = data.astype(dtype=data_task.DataTypes)
@@ -167,11 +170,10 @@ class ExecuteIntegrationProcess(IScoped):
                         self.sql_logger.info(
                             f"{sub_process_id}-{data_task.Message}:{data_task.Id}-{data_task.Start}-{data_task.End} process got a new task",
                             job_id=data_operation_job_execution_id)
-                        data_count = self.integration_execution_service.start_execute_integration(
+                        data_count = self.integration_execution_service.start_execute_integration_with_source_data(
                             data_integration_id=data_integration_id,
                             data_operation_job_execution_id=data_operation_job_execution_id,
                             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-                            paging_modifier=paging_modifier,
                             source_data=source_data)
                     else:
                         self.sql_logger.info(
@@ -250,18 +252,17 @@ class ExecuteIntegrationProcess(IScoped):
                 total_row_count = total_row_count + result.Result
         return total_row_count
 
-    def start_integration_execution(self,
-                                    data_operation_job_execution_id: int,
-                                    data_operation_job_execution_integration_id: int,
-                                    data_operation_integration_id: int) -> int:
+    def execute(self,
+                data_operation_job_execution_id: int,
+                data_operation_job_execution_integration_id: int,
+                data_operation_integration_id: int) -> int:
         try:
             data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(
                 data_operation_integration_id=data_operation_integration_id)
-            if data_operation_integration.ProcessCount is not None and data_operation_integration.ProcessCount >= 1:
-                process_count = data_operation_integration.ProcessCount
-            else:
-                process_count = 1
             data_integration_id = data_operation_integration.DataIntegrationId
+            if data_operation_integration.ProcessCount is None or data_operation_integration.ProcessCount <= 1:
+                raise OperationalException("Parallel execution process count must bigger than 1")
+            process_count = data_operation_integration.ProcessCount
             limit = data_operation_integration.Limit
 
             try:
@@ -293,11 +294,6 @@ class ExecuteIntegrationProcess(IScoped):
                                                                         data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
                                                                         data_queue=data_queue,
                                                                         data_result_queue=data_result_queue)
-                    # total_row_count = self.integration_execution_service.start_integration(
-                    #     data_integration_id=data_integration_id,
-                    #     limit=limit,
-                    #     data_operation_job_execution_integration_id=data_operation_job_execution_integration_id)
-
             finally:
                 manager.shutdown()
                 del source_data_process_manager
