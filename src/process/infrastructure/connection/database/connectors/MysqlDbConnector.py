@@ -57,5 +57,9 @@ class MysqlDbConnector(DatabaseConnector):
         indexer = '%s'
         return indexer
 
-    def get_table_data_query(self, query, first_row, start, end):
-        return f"SELECT * FROM ({query} order by `{first_row}`) ordered_query limit {end - start} offset {start}"
+    def get_table_data_query(self, query):
+        return f"SELECT * FROM ({query}) base_query"
+
+    def get_table_data_with_paging_query(self, query, order_row, start, end):
+        return f"SELECT * FROM ({query} order by `{order_row}`) ordered_query limit {end - start} offset {start}"
+

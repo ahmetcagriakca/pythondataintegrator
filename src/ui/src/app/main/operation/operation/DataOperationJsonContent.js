@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
 }));
 function DataOperationJsonContent(props) {
 	const classes = useStyles();
-	const { content, setContent, open, setOpen,oldData, oldJsonContent, applyChange } = props;
+	const { content, setContent, open, setOpen, oldData, oldJsonContent, applyChange } = props;
 	const [jsonContent, setJsonContent] = React.useState({});
 	const [error, setError] = React.useState(false);
 	const [hasError, setHasError] = React.useState(false);
@@ -158,9 +158,11 @@ function DataOperationJsonContent(props) {
 					toast.error(dataOperationIntegration.Integration.Code + " source connection not found. Connection Name:" + dataOperationIntegration?.Integration?.SourceConnections?.ConnectionName, { position: toast.POSITION.BOTTOM_RIGHT })
 				}
 				let sourceColumns = dataOperationIntegration?.Integration?.SourceConnections?.Columns?.split(',')
-				for (let index = 0; index < sourceColumns.length; index++) {
-					const element = sourceColumns[index];
-					columns.push({ id: uuid(), sourceColumnName: element, targetColumnName: '' })
+				if (sourceColumns) {
+					for (let index = 0; index < sourceColumns.length; index++) {
+						const element = sourceColumns[index];
+						columns.push({ id: uuid(), sourceColumnName: element, targetColumnName: '' })
+					}
 				}
 			}
 
@@ -191,10 +193,12 @@ function DataOperationJsonContent(props) {
 				}
 				if (columns?.length > 0) {
 					let targetColumns = dataOperationIntegration?.Integration?.TargetConnections?.Columns?.split(',')
-					for (let index = 0; index < columns.length; index++) {
-						const element = columns[index];
-						if (targetColumns?.length > index) {
-							element.targetColumnName = targetColumns[index]
+					if (targetColumns) {
+						for (let index = 0; index < columns.length; index++) {
+							const element = columns[index];
+							if (targetColumns?.length > index) {
+								element.targetColumnName = targetColumns[index]
+							}
 						}
 					}
 

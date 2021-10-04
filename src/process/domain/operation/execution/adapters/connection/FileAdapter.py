@@ -8,7 +8,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructure.connection.adapters.connection_adapter import ConnectionAdapter
 from infrastructure.connection.file.FileProvider import FileProvider
 from infrastructure.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
 from infrastructure.logging.SqlLogger import SqlLogger

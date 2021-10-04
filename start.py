@@ -3,7 +3,6 @@ import subprocess
 from multiprocessing import current_process
 from multiprocessing.context import Process
 
-from flask_restplus import api
 class SubprocessService:
     @staticmethod
     def start(python_executable,application_name,path:str):

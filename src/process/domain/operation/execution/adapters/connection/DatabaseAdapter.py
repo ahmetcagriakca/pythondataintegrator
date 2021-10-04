@@ -5,7 +5,7 @@ from pandas import DataFrame
 
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from infrastructure.connection.database.DatabaseProvider import DatabaseProvider
-from infrastructure.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructure.connection.adapters.connection_adapter import ConnectionAdapter
 from infrastructure.connection.models.DataQueueTask import DataQueueTask
 from models.dto.PagingModifier import PagingModifier
 
@@ -36,14 +36,23 @@ class DatabaseAdapter(ConnectionAdapter):
         data_count = source_context.get_table_count(source_connection.Database.Query)
         return data_count
 
-    def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
+    def get_source_data(self, data_integration_id: int) -> List[any]:
         source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
         source_context = self.database_provider.get_context(connection=source_connection.Connection)
-        first_row = self.operation_cache_service.get_first_row(data_integration_id=data_integration_id)
         data = source_context.get_table_data(
+            query=source_connection.Database.Query
+        )
+        return data
+
+    def get_source_data_with_paging(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
+        source_connection = self.operation_cache_service.get_source_connection(
+            data_integration_id=data_integration_id)
+        source_context = self.database_provider.get_context(connection=source_connection.Connection)
+        order_row = self.operation_cache_service.get_first_row(data_integration_id=data_integration_id)
+        data = source_context.get_table_data_with_paging(
             query=source_connection.Database.Query,
-            first_row=f'{first_row.SourceColumnName}',
+            order_row=f'{order_row.SourceColumnName}',
             start=paging_modifier.Start,
             end=paging_modifier.End
         )

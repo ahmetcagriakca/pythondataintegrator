@@ -3,7 +3,7 @@ from injector import inject
 from domain.operation.execution.adapters.connection.FileAdapter import FileAdapter
 from domain.operation.execution.adapters.connection.QueueAdapter import QueueAdapter
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.connection.adapters.ConnectionAdapter import ConnectionAdapter
+from infrastructure.connection.adapters.connection_adapter import ConnectionAdapter
 from domain.operation.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
 from infrastructure.dependency.scopes import IScoped
 from infrastructure.exceptions.IncompatibleAdapterException import IncompatibleAdapterException

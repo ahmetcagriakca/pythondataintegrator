@@ -17,7 +17,11 @@ class ConnectionAdapter:
         pass
 
     @abstractmethod
-    def get_source_data(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
+    def get_source_data(self, data_integration_id: int) -> List[any]:
+        pass
+
+    @abstractmethod
+    def get_source_data_with_paging(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
         pass
 
     @abstractmethod
