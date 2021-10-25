@@ -23,8 +23,8 @@ class SecretSourceBasicAuthenticationService(IScoped):
         secret_source_basic_authentication = self.secret_source_basic_authentication_repository.first(
             IsDeleted=0, SecretSource=secret_source)
         connection_basic_authentication = ConnectionBasicAuthentication(
-            User=self.crypto_service.decrypt_code(secret_source_basic_authentication.User.encode()).decode('utf-8'),
-            Password=self.crypto_service.decrypt_code(secret_source_basic_authentication.Password.encode()).decode('utf-8'))
+            User=self.crypto_service.decrypt(secret_source_basic_authentication.User),
+            Password=self.crypto_service.decrypt(secret_source_basic_authentication.Password))
 
         return connection_basic_authentication
 
@@ -34,8 +34,8 @@ class SecretSourceBasicAuthenticationService(IScoped):
         """
 
         secret_source_basic_authentication = SecretSourceBasicAuthentication(
-            User=self.crypto_service.encrypt_code(user.encode()).decode(),
-            Password=self.crypto_service.encrypt_code(password.encode()).decode(),
+            User=self.crypto_service.encrypt(user),
+            Password=self.crypto_service.encrypt(password),
             SecretSource=secret_source)
         self.secret_source_basic_authentication_repository.insert(secret_source_basic_authentication)
         return secret_source
@@ -48,8 +48,8 @@ class SecretSourceBasicAuthenticationService(IScoped):
             IsDeleted=0, SecretSource=secret_source)
         if secret_source_basic_authentication is None:
             raise OperationalException("Secret Source Basic Authentication Not Found")
-        secret_source_basic_authentication.User = self.crypto_service.encrypt_code(user.encode()).decode()
-        secret_source_basic_authentication.Password = self.crypto_service.encrypt_code(password.encode()).decode()
+        secret_source_basic_authentication.User = self.crypto_service.encrypt(user)
+        secret_source_basic_authentication.Password = self.crypto_service.encrypt(password)
 
         return secret_source
 

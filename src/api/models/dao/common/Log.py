@@ -1,9 +1,10 @@
-from sqlalchemy import Column, String, Integer, DateTime
 from pdip.dependency.container import DependencyContainer
 from pdip.data import Entity
+from pdip.logging.models.log_data import LogData
+from sqlalchemy import Column, String, Integer, DateTime
 
 
-class Log(Entity, DependencyContainer.Base):
+class Log(LogData, Entity, DependencyContainer.Base):
     __tablename__ = "Log"
     __table_args__ = {"schema": "Common"}
     TypeId = Column(Integer, index=True, unique=False, nullable=False)

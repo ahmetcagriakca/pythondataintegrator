@@ -1,6 +1,6 @@
 from injector import inject
 from sqlalchemy import desc, text
-from domain.common.request_parameter.OrderByParameter import OrderByParameter
+from pdip.api.request_parameter import OrderByParameter
 from pdip.dependency import IScoped
 from pdip.utils import ModuleFinder
 

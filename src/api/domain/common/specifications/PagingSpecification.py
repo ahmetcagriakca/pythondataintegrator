@@ -1,5 +1,5 @@
 from injector import inject
-from domain.common.request_parameter.PagingParameter import PagingParameter
+from pdip.api.request_parameter import PagingParameter
 from pdip.dependency import IScoped
 
 

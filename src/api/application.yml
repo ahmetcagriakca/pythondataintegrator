@@ -9,7 +9,7 @@ DATABASE:
   HOST: localhost
   PORT: 5432
   DATABASE: pdi
-  USERNAME: postgres
+  USER: postgres
   PASSWORD: 123456
 
 API:

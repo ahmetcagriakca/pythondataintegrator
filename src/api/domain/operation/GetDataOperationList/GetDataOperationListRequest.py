@@ -1,7 +1,7 @@
 from typing import Optional
 from pdip.cqrs.decorators import requestclass
-from domain.common.request_parameter.OrderByParameter import OrderByParameter
-from domain.common.request_parameter.PagingParameter import PagingParameter
+from pdip.api.request_parameter import OrderByParameter
+from pdip.api.request_parameter import PagingParameter
 
 
 @requestclass

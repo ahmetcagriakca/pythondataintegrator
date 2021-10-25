@@ -1,5 +1,9 @@
 from typing import List
 from injector import inject
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+from pdip.exceptions import OperationalException
+from pdip.logging.loggers.database import SqlLogger
 
 from domain.connection.CreateConnectionDatabase.CreateConnectionDatabaseRequest import CreateConnectionDatabaseRequest
 from domain.connection.CreateConnectionFile.CreateConnectionFileRequest import CreateConnectionFileRequest
@@ -10,9 +14,6 @@ from domain.connection.services.ConnectionQueueService import ConnectionQueueSer
 from domain.connection.services.ConnectionSecretService import ConnectionSecretService
 from domain.connection.services.ConnectionServerService import ConnectionServerService
 from domain.connection.services.ConnectionTypeService import ConnectionTypeService
-from pdip.data import RepositoryProvider
-from pdip.dependency import IScoped
-from pdip.logging.loggers.database import SqlLogger
 from models.dao.connection.Connection import Connection
 from models.enums.ConnectionTypes import ConnectionTypes
 
