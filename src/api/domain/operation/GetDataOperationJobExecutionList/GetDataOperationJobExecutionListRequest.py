@@ -1,6 +1,6 @@
 from typing import Optional
 
-from infrastructure.cqrs.decorators.requestclass import requestclass
+from pdip.cqrs.decorators import requestclass
 from domain.common.request_parameter.OrderByParameter import OrderByParameter
 from domain.common.request_parameter.PagingParameter import PagingParameter
 

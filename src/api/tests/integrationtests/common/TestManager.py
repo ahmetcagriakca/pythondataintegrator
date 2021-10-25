@@ -1,4 +1,4 @@
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 from tests.integrationtests.common.TestApiClient import TestApiClient
 from tests.integrationtests.common.TestServiceEndpoints import TestServiceEndpoints
 from tests.integrationtests.common.TestServiceScenarios import TestServiceScenarios

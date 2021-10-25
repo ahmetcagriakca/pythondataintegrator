@@ -3,8 +3,8 @@ from domain.dashboard.GetDataOperationWidget.GetDataOperationWidgetMapping impor
 from domain.dashboard.GetDataOperationWidget.GetDataOperationWidgetQuery import GetDataOperationWidgetQuery
 from domain.dashboard.GetDataOperationWidget.GetDataOperationWidgetResponse import GetDataOperationWidgetResponse
 from domain.dashboard.GetDataOperationWidget.GetDataOperationWidgetSpecifications import GetDataOperationWidgetSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.dependency import IScoped
 
 
 class GetDataOperationWidgetQueryHandler(IQueryHandler[GetDataOperationWidgetQuery], IScoped):

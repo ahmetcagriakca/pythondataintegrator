@@ -1,5 +1,5 @@
 from unittest import TestCase
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 from infrastructure.delivery.EmailProvider import EmailProvider
 
 

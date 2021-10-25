@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from domain.connection.services.ConnectionSecretService import ConnectionSecretService
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 from tests.integrationtests.common.TestManager import TestManager
 from tests.integrationtests.connection.testdata.TestConnectionQueueData import TestConnectionQueueData
 

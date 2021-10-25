@@ -1,13 +1,12 @@
 from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.connection.LookupConnectorType.LookupConnectorTypeQuery import LookupConnectorTypeQuery
 from domain.connection.LookupConnectorType.LookupConnectorTypeRequest import LookupConnectorTypeRequest
 from domain.connection.LookupConnectorType.LookupConnectorTypeResponse import LookupConnectorTypeResponse
-from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@controller()
 class LookupConnectorTypeResource(ResourceBase):
     @inject
     def __init__(self,

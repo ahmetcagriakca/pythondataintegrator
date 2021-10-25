@@ -3,8 +3,8 @@ from domain.dashboard.GetConnectionWidget.GetConnectionWidgetMapping import GetC
 from domain.dashboard.GetConnectionWidget.GetConnectionWidgetQuery import GetConnectionWidgetQuery
 from domain.dashboard.GetConnectionWidget.GetConnectionWidgetResponse import GetConnectionWidgetResponse
 from domain.dashboard.GetConnectionWidget.GetConnectionWidgetSpecifications import GetConnectionWidgetSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.dependency import IScoped
 
 
 class GetConnectionWidgetQueryHandler(IQueryHandler[GetConnectionWidgetQuery], IScoped):

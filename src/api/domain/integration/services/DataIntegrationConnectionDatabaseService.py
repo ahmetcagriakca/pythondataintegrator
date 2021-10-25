@@ -2,8 +2,8 @@ from injector import inject
 
 from domain.operation.CreateDataOperation.CreateDataIntegrationConnectionDatabaseRequest import \
     CreateDataIntegrationConnectionDatabaseRequest
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.integration import DataIntegrationConnectionDatabase
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 

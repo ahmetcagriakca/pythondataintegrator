@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from domain.schedule.DeleteJob.DeleteJobRequest import DeleteJobRequest
-from infrastructure.cqrs.ICommand import ICommand
+from pdip.cqrs import ICommand
 
 
 @dataclass

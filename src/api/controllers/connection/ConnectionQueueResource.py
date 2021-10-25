@@ -1,12 +1,11 @@
 from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.connection.CreateConnectionQueue.CreateConnectionQueueCommand import CreateConnectionQueueCommand
 from domain.connection.CreateConnectionQueue.CreateConnectionQueueRequest import CreateConnectionQueueRequest
-from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@controller()
 class ConnectionQueueResource(ResourceBase):
     @inject
     def __init__(self,

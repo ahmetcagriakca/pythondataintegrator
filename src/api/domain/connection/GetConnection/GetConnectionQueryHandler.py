@@ -3,9 +3,9 @@ from domain.connection.GetConnection.GetConnectionMapping import GetConnectionMa
 from domain.connection.GetConnection.GetConnectionQuery import GetConnectionQuery
 from domain.connection.GetConnection.GetConnectionResponse import GetConnectionResponse
 from domain.connection.GetConnection.GetConnectionSpecifications import GetConnectionSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.connection.Connection import Connection
 
 

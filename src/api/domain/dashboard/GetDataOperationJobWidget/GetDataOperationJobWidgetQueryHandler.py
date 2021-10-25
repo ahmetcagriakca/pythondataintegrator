@@ -3,8 +3,8 @@ from domain.dashboard.GetDataOperationJobWidget.GetDataOperationJobWidgetMapping
 from domain.dashboard.GetDataOperationJobWidget.GetDataOperationJobWidgetQuery import GetDataOperationJobWidgetQuery
 from domain.dashboard.GetDataOperationJobWidget.GetDataOperationJobWidgetResponse import GetDataOperationJobWidgetResponse
 from domain.dashboard.GetDataOperationJobWidget.GetDataOperationJobWidgetSpecifications import GetDataOperationJobWidgetSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.dependency import IScoped
 
 
 class GetDataOperationJobWidgetQueryHandler(IQueryHandler[GetDataOperationJobWidgetQuery], IScoped):

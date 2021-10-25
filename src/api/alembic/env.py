@@ -14,10 +14,10 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from infrastructure.utils.Utils import Utils
-from models.configs.ApplicationConfig import ApplicationConfig
-from models.configs.DatabaseConfig import DatabaseConfig
-from infrastructure.utils.ConfigManager import ConfigManager
+from pdip.utils import Utils
+from pdip.configuration.models.application import ApplicationConfig
+from pdip.configuration.models.database import DatabaseConfig
+from pdip.configuration import ConfigManager
 
 root_directory = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
@@ -26,7 +26,7 @@ application_config: ApplicationConfig = config_manager.get(ApplicationConfig)
 database_config: DatabaseConfig = config_manager.get(DatabaseConfig)
 connection_string = Utils.get_connection_string(database_config=database_config)
 
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -69,7 +69,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = IocManager.Base.metadata
+target_metadata = DependencyContainer.Base.metadata
 
 
 # other values from the config, defined by the needs of env.py,

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from domain.schedule.DeleteCronJob.DeleteCronJobRequest import DeleteCronJobRequest
-from infrastructure.cqrs.ICommand import ICommand
+from pdip.cqrs import ICommand
 
 
 @dataclass

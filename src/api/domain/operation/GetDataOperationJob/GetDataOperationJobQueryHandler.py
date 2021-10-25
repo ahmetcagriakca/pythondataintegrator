@@ -3,8 +3,8 @@ from domain.operation.GetDataOperationJob.GetDataOperationJobMapping import GetD
 from domain.operation.GetDataOperationJob.GetDataOperationJobQuery import GetDataOperationJobQuery
 from domain.operation.GetDataOperationJob.GetDataOperationJobResponse import GetDataOperationJobResponse
 from domain.operation.GetDataOperationJob.GetDataOperationJobSpecifications import GetDataOperationJobSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.dependency import IScoped
 
 
 class GetDataOperationJobQueryHandler(IQueryHandler[GetDataOperationJobQuery], IScoped):

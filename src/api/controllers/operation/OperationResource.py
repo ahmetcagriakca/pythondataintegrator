@@ -1,21 +1,19 @@
 from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
 
 from domain.operation.DeleteDataOperation.DeleteDataOperationRequest import DeleteDataOperationRequest
 from domain.operation.GetDataOperation.GetDataOperationQuery import GetDataOperationQuery
 from domain.operation.GetDataOperation.GetDataOperationRequest import GetDataOperationRequest
 from domain.operation.GetDataOperation.GetDataOperationResponse import GetDataOperationResponse
-from infrastructure.api.ResourceBase import ResourceBase
 from domain.operation.CreateDataOperation.CreateDataOperationCommand import CreateDataOperationCommand
 from domain.operation.CreateDataOperation.CreateDataOperationRequest import CreateDataOperationRequest
 from domain.operation.DeleteDataOperation.DeleteDataOperationCommand import DeleteDataOperationCommand
 from domain.operation.GetDataOperationList.GetDataOperationListQuery import GetDataOperationListQuery
 from domain.operation.GetDataOperationList.GetDataOperationListRequest import GetDataOperationListRequest
 from domain.operation.GetDataOperationList.GetDataOperationListResponse import GetDataOperationListResponse
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@controller()
 class OperationByIdResource(ResourceBase):
     @inject
     def __init__(self,
@@ -33,7 +31,6 @@ class OperationByIdResource(ResourceBase):
         return result
 
 
-@controller()
 class OperationResource(ResourceBase):
     @inject
     def __init__(self,

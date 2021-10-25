@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import os
 
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 
 
 class test_dynamic_call:

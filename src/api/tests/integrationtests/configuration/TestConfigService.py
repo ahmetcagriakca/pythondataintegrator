@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 from infrastructure.api.FlaskAppWrapper import FlaskAppWrapper
 from infrastructure.configuration.ConfigService import ConfigService
 from infrastructure.delivery.EmailProvider import EmailProvider

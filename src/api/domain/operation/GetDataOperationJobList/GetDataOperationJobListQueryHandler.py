@@ -4,9 +4,9 @@ from domain.operation.GetDataOperationJobList.GetDataOperationJobListQuery impor
 from domain.operation.GetDataOperationJobList.GetDataOperationJobListResponse import GetDataOperationJobListResponse
 from domain.operation.GetDataOperationJobList.GetDataOperationJobListSpecifications import \
     GetDataOperationJobListSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.operation import DataOperationJob
 
 

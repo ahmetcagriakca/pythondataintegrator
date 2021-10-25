@@ -1,14 +1,13 @@
 from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.schedule.DeleteCronJob.DeleteCronJobCommand import DeleteCronJobCommand
 from domain.schedule.DeleteCronJob.DeleteCronJobRequest import DeleteCronJobRequest
 from domain.schedule.ScheduleCronJob.ScheduleCronJobCommand import ScheduleCronJobCommand
 from domain.schedule.ScheduleCronJob.ScheduleCronJobRequest import ScheduleCronJobRequest
-from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@controller()
 class ScheduleCronJobResource(ResourceBase):
     @inject
     def __init__(self,

@@ -1,6 +1,6 @@
 from injector import inject
 from sqlalchemy.orm import Query
-from infrastructure.dependency.scopes import IScoped
+from pdip.dependency import IScoped
 from domain.operation.GetDataOperation.GetDataOperationQuery import GetDataOperationQuery
 from models.dao.operation import Definition, DataOperation
 

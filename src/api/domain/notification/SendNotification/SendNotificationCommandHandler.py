@@ -3,9 +3,9 @@ import json
 from injector import inject
 import requests
 from domain.notification.SendNotification.SendNotificationCommand import SendNotificationCommand
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.json.DateTimeEncoder import DateTimeEncoder
-from infrastructure.logging.SqlLogger import SqlLogger
+from pdip.cqrs import ICommandHandler
+from pdip.json import DateTimeEncoder
+from pdip.logging.loggers.database import SqlLogger
 from models.configs.NotificationClientConfig import NotificationClientConfig
 
 

@@ -3,9 +3,9 @@ from domain.operation.GetDataOperation.GetDataOperationMapping import GetDataOpe
 from domain.operation.GetDataOperation.GetDataOperationQuery import GetDataOperationQuery
 from domain.operation.GetDataOperation.GetDataOperationResponse import GetDataOperationResponse
 from domain.operation.GetDataOperation.GetDataOperationSpecifications import GetDataOperationSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.operation.DataOperation import DataOperation
 
 

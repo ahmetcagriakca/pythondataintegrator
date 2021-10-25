@@ -5,10 +5,10 @@ from domain.operation.CreateDataOperation.CreateDataOperationRequest import Crea
 from domain.operation.services.DataOperationContactService import DataOperationContactService
 from domain.operation.services.DataOperationIntegrationService import DataOperationIntegrationService
 from domain.operation.services.DefinitionService import DefinitionService
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.OperationalException import OperationalException
-from infrastructure.logging.SqlLogger import SqlLogger
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+from pdip.exceptions import OperationalException
+from pdip.logging.loggers.database import SqlLogger
 from models.dao.operation import DataOperation, Definition
 
 

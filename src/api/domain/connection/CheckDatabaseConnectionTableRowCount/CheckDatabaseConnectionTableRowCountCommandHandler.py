@@ -1,10 +1,10 @@
 from injector import inject
+from pdip.exceptions import OperationalException
 
 from domain.connection.CheckDatabaseConnectionTableRowCount.CheckDatabaseConnectionTableRowCountCommand import \
     CheckDatabaseConnectionTableRowCountCommand
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.exceptions.OperationalException import OperationalException
+from pdip.cqrs import Dispatcher, ICommandHandler
+from pdip.exceptions import OperationalException
 from rpc.ProcessRpcClientService import ProcessRpcClientService
 
 

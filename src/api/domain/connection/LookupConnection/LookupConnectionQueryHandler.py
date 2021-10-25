@@ -3,9 +3,9 @@ from domain.connection.LookupConnection.LookupConnectionMapping import LookupCon
 from domain.connection.LookupConnection.LookupConnectionQuery import LookupConnectionQuery
 from domain.connection.LookupConnection.LookupConnectionResponse import LookupConnectionResponse
 from domain.connection.LookupConnection.LookupConnectionSpecifications import LookupConnectionSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.connection.Connection import Connection
 
 

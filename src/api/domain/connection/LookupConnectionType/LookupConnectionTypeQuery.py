@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from infrastructure.cqrs.IQuery import IQuery
+from pdip.cqrs import IQuery
 from domain.connection.LookupConnectionType.LookupConnectionTypeRequest import LookupConnectionTypeRequest
 from domain.connection.LookupConnectionType.LookupConnectionTypeResponse import LookupConnectionTypeResponse
 

@@ -1,13 +1,12 @@
 from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.operation.LookupDataOperation.LookupDataOperationQuery import LookupDataOperationQuery
 from domain.operation.LookupDataOperation.LookupDataOperationRequest import LookupDataOperationRequest
 from domain.operation.LookupDataOperation.LookupDataOperationResponse import LookupDataOperationResponse
-from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@controller()
 class LookupDataOperationResource(ResourceBase):
     @inject
     def __init__(self,

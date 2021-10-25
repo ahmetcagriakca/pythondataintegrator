@@ -1,5 +1,5 @@
 from typing import List
-from infrastructure.cqrs.decorators.responseclass import responseclass
+from pdip.cqrs.decorators import responseclass
 from domain.common.LookupStatus.LookupStatusDto import LookupStatusDto
 
 

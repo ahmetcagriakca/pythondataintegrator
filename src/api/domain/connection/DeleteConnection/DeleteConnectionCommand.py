@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from domain.connection.DeleteConnection.DeleteConnectionRequest import DeleteConnectionRequest
-from infrastructure.cqrs.ICommand import ICommand
+from pdip.cqrs import ICommand
 
 @dataclass
 class DeleteConnectionCommand(ICommand):

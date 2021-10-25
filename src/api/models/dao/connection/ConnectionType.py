@@ -2,13 +2,13 @@ from typing import List
 
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 from models.dao.connection.Connection import Connection
 from models.dao.connection.ConnectorType import ConnectorType
-from models.dao.Entity import Entity
+from pdip.data import Entity
 
 
-class ConnectionType(Entity, IocManager.Base):
+class ConnectionType(Entity, DependencyContainer.Base):
     __tablename__ = "ConnectionType"
     __table_args__ = {"schema": "Connection"}
     Name = Column(String(100), index=False, unique=True, nullable=False)

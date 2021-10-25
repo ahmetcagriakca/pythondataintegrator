@@ -1,13 +1,12 @@
 from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.common.LookupStatus.LookupStatusQuery import LookupStatusQuery
 from domain.common.LookupStatus.LookupStatusRequest import LookupStatusRequest
 from domain.common.LookupStatus.LookupStatusResponse import LookupStatusResponse
-from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@controller()
 class LookupStatus(ResourceBase):
     @inject
     def __init__(self,

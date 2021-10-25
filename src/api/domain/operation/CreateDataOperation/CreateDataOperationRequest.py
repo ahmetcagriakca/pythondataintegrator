@@ -1,6 +1,6 @@
 from typing import List
 
-from infrastructure.cqrs.decorators.requestclass import requestclass
+from pdip.cqrs.decorators import requestclass
 from domain.operation.CreateDataOperation.CreateDataOperationContactRequest import CreateDataOperationContactRequest
 from domain.operation.CreateDataOperation.CreateDataOperationIntegrationRequest import CreateDataOperationIntegrationRequest
 

@@ -1,11 +1,11 @@
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 
-from IocManager import IocManager
-from models.dao.Entity import Entity
+from pdip.dependency.container import DependencyContainer
+from pdip.data import Entity
 
 
-class OperationEvent(Entity,IocManager.Base):
+class OperationEvent(Entity,DependencyContainer.Base):
     __tablename__ = "OperationEvent"
     __table_args__ = {"schema": "Common"}
     Code = Column(Integer, index=False, unique=True, nullable=False)

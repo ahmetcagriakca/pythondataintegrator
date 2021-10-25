@@ -4,9 +4,9 @@ from domain.connection.services.ConnectionService import ConnectionService
 from domain.notification.SendNotification.SendNotificationCommand import SendNotificationCommand
 from domain.notification.SendNotification.SendNotificationRequest import SendNotificationRequest, \
     NotificationAdditionalData
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
+from pdip.cqrs import Dispatcher
+from pdip.cqrs import ICommandHandler
+from pdip.data import RepositoryProvider
 
 
 class CreateConnectionFileCommandHandler(ICommandHandler[CreateConnectionFileCommand]):

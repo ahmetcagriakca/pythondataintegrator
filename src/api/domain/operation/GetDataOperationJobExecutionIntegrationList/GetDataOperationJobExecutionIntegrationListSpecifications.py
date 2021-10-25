@@ -3,8 +3,8 @@ from sqlalchemy import func
 from sqlalchemy.orm import Query
 
 from domain.common.specifications.OrderBySpecification import OrderBySpecification
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from domain.operation.GetDataOperationJobExecutionIntegrationList.GetDataOperationJobExecutionIntegrationListQuery import \
     GetDataOperationJobExecutionIntegrationListQuery
 from models.dao.common import Status

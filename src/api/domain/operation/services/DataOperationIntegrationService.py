@@ -4,8 +4,8 @@ from injector import inject
 from domain.integration.services.DataIntegrationService import DataIntegrationService
 from domain.operation.CreateDataOperation.CreateDataOperationIntegrationRequest import \
     CreateDataOperationIntegrationRequest
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.operation import DataOperation, DataOperationIntegration, Definition
 
 

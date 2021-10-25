@@ -1,10 +1,10 @@
 import time
 from datetime import datetime
 
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 from domain.operation.services.DataOperationJobService import DataOperationJobService
 from domain.operation.services.DataOperationService import DataOperationService
-from infrastructure.data.RepositoryProvider import RepositoryProvider
+from pdip.data import RepositoryProvider
 from models.dao.aps import ApSchedulerJob
 from models.dao.connection.Connection import Connection
 from models.dao.integration.DataIntegration import DataIntegration

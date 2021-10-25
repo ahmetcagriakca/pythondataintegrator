@@ -3,13 +3,13 @@ from typing import List
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from IocManager import IocManager
-from models.dao.Entity import Entity
+from pdip.dependency.container import DependencyContainer
+from pdip.data import Entity
 from models.dao.connection.ConnectionSecret import ConnectionSecret
 from models.dao.secret.SecretSource import SecretSource
 
 
-class Secret(Entity, IocManager.Base):
+class Secret(Entity, DependencyContainer.Base):
     __tablename__ = "Secret"
     __table_args__ = {"schema": "Secret"}
     SecretTypeId = Column(Integer, ForeignKey('Secret.SecretType.Id'))

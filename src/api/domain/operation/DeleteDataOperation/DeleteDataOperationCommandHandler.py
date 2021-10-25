@@ -5,9 +5,9 @@ from domain.notification.SendNotification.SendNotificationRequest import Notific
     SendNotificationRequest
 from domain.operation.DeleteDataOperation.DeleteDataOperationCommand import DeleteDataOperationCommand
 from domain.operation.services.DataOperationService import DataOperationService
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
+from pdip.cqrs import Dispatcher
+from pdip.cqrs import ICommandHandler
+from pdip.data import RepositoryProvider
 
 
 class DeleteDataOperationCommandHandler(ICommandHandler[DeleteDataOperationCommand]):

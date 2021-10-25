@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from domain.operation.services.DataOperationService import DataOperationService
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 from tests.integrationtests.common.TestManager import TestManager
 from tests.integrationtests.operation.testdata import TestDataOperationDatabaseData
 

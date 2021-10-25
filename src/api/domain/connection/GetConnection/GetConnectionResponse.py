@@ -1,4 +1,4 @@
-from infrastructure.cqrs.decorators.responseclass import responseclass
+from pdip.cqrs.decorators import responseclass
 from domain.connection.GetConnection.GetConnectionDto import GetConnectionDto
 
 

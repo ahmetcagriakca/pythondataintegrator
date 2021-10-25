@@ -1,11 +1,12 @@
 from injector import inject
+from pdip.cqrs import IQueryHandler
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+
 from domain.connection.LookupConnectorType.LookupConnectorTypeMapping import LookupConnectorTypeMapping
 from domain.connection.LookupConnectorType.LookupConnectorTypeQuery import LookupConnectorTypeQuery
 from domain.connection.LookupConnectorType.LookupConnectorTypeResponse import LookupConnectorTypeResponse
 from domain.connection.LookupConnectorType.LookupConnectorTypeSpecifications import LookupConnectorTypeSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
 from models.dao.connection.ConnectorType import ConnectorType
 
 

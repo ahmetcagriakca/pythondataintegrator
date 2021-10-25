@@ -1,9 +1,9 @@
 from injector import inject
 
-from infrastructure.cryptography.CryptoService import CryptoService
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.OperationalException import OperationalException
+from pdip.cryptography import CryptoService
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+from pdip.exceptions import OperationalException
 from models.dao.secret import SecretSource, SecretSourceBasicAuthentication
 from models.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication
 

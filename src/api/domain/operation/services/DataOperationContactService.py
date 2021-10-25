@@ -2,8 +2,8 @@ from typing import List
 from injector import inject
 
 from domain.operation.CreateDataOperation.CreateDataOperationContactRequest import CreateDataOperationContactRequest
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.operation import DataOperation
 from models.dao.operation.DataOperationContact import DataOperationContact
 

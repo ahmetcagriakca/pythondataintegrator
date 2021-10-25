@@ -1,7 +1,7 @@
 from injector import inject
 from sqlalchemy import text
 from sqlalchemy.orm import Query
-from infrastructure.dependency.scopes import IScoped
+from pdip.dependency import IScoped
 from domain.connection.LookupConnectorType.LookupConnectorTypeQuery import LookupConnectorTypeQuery
 
 

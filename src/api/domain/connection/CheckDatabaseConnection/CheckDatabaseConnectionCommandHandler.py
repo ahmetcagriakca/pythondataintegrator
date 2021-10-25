@@ -1,9 +1,9 @@
 from injector import inject
 
 from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.exceptions.OperationalException import OperationalException
+from pdip.cqrs import Dispatcher
+from pdip.cqrs import ICommandHandler
+from pdip.exceptions import OperationalException
 from rpc.ProcessRpcClientService import ProcessRpcClientService
 
 

@@ -4,13 +4,13 @@ from injector import inject
 from domain.notification.SendNotification.SendNotificationCommand import SendNotificationCommand
 from domain.notification.SendNotification.SendNotificationRequest import NotificationAdditionalData, \
     SendNotificationRequest
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.json.DateTimeEncoder import DateTimeEncoder
+from pdip.cqrs import Dispatcher
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+from pdip.json import DateTimeEncoder
 from domain.operation.CreateDataOperation.CreateDataOperationCommand import CreateDataOperationCommand
 from domain.operation.services.DataOperationService import DataOperationService
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
+from pdip.cqrs import ICommandHandler
 
 
 class CreateDataOperationCommandHandler(ICommandHandler[CreateDataOperationCommand], IScoped):

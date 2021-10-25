@@ -1,3 +1,7 @@
+from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.connection.DeleteConnection.DeleteConnectionCommand import DeleteConnectionCommand
 from domain.connection.DeleteConnection.DeleteConnectionRequest import DeleteConnectionRequest
 from domain.connection.GetConnection.GetConnectionQuery import GetConnectionQuery
@@ -6,13 +10,8 @@ from domain.connection.GetConnection.GetConnectionResponse import GetConnectionR
 from domain.connection.GetConnectionList.GetConnectionListQuery import GetConnectionListQuery
 from domain.connection.GetConnectionList.GetConnectionListRequest import GetConnectionListRequest
 from domain.connection.GetConnectionList.GetConnectionListResponse import GetConnectionListResponse
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.api.decorators.Controller import controller
-from injector import inject
 
 
-@controller()
 class ConnectionByIdResource(ResourceBase):
     @inject
     def __init__(self,
@@ -30,7 +29,6 @@ class ConnectionByIdResource(ResourceBase):
         return result
 
 
-@controller()
 class ConnectionResource(ResourceBase):
     @inject
     def __init__(self,

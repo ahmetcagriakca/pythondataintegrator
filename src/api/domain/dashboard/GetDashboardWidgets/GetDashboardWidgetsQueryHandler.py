@@ -11,10 +11,10 @@ from domain.dashboard.GetDataOperationWidget.GetDataOperationWidgetQuery import 
 from domain.dashboard.GetMonthlyExecutionsWidget.GetMonthlyExecutionsWidgetQuery import GetMonthlyExecutionsWidgetQuery
 from domain.dashboard.GetSourceDataAffectedRowWidget.GetSourceDataAffectedRowWidgetQuery import \
     GetSourceDataAffectedRowWidgetQuery
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import Dispatcher
+from pdip.cqrs import IQueryHandler 
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 
 
 class GetDashboardWidgetsQueryHandler(IQueryHandler[GetDashboardWidgetsQuery], IScoped):

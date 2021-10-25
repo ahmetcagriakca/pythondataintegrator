@@ -2,9 +2,9 @@ import os
 from time import time
 from unittest import TestCase
 
-from IocManager import IocManager
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.utils.Utils import Utils
+from pdip.dependency.container import DependencyContainer
+from pdip.data import RepositoryProvider
+from pdip.utils import Utils
 from models.dao.operation import DataOperation
 
 

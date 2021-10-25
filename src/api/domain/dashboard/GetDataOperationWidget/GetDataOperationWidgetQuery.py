@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from infrastructure.cqrs.IQuery import IQuery
+from pdip.cqrs import IQuery
 from domain.dashboard.GetDataOperationWidget.GetDataOperationWidgetRequest import GetDataOperationWidgetRequest
 from domain.dashboard.GetDataOperationWidget.GetDataOperationWidgetResponse import GetDataOperationWidgetResponse
 

@@ -1,4 +1,4 @@
-from infrastructure.cqrs.decorators.dtoclass import dtoclass
+from pdip.cqrs.decorators import dtoclass
 
 
 @dtoclass

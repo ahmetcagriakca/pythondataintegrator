@@ -1,8 +1,8 @@
 from injector import inject
 from sqlalchemy import distinct, func
 from sqlalchemy.orm import Query
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.data.RepositoryProvider import RepositoryProvider
+from pdip.dependency import IScoped
+from pdip.data import RepositoryProvider
 from models.dao.operation.DataOperationJob import DataOperationJob
 from domain.dashboard.GetDataOperationJobWidget.GetDataOperationJobWidgetQuery import GetDataOperationJobWidgetQuery
 

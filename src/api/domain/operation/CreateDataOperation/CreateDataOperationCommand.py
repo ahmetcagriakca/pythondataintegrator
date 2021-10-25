@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from infrastructure.cqrs.ICommand import ICommand
+from pdip.cqrs import ICommand
 from domain.operation.CreateDataOperation.CreateDataOperationRequest import CreateDataOperationRequest
 
 

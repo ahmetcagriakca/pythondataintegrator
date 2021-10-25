@@ -1,9 +1,9 @@
 from injector import inject
 from sqlalchemy import func
 
-from infrastructure.html.HtmlTemplateService import HtmlTemplateService, Pagination
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.html import HtmlTemplateService, Pagination
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.operation import DataOperationJob, DataOperation, DataOperationJobExecution, \
     DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent
 

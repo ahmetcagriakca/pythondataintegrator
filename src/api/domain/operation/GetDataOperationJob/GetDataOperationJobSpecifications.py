@@ -1,8 +1,8 @@
 from injector import inject
 from sqlalchemy.orm import Query
 
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from domain.operation.GetDataOperationJob.GetDataOperationJobQuery import GetDataOperationJobQuery
 from models.dao.aps import ApSchedulerJob
 from models.dao.operation import DataOperation, DataOperationJob

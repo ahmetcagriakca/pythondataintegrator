@@ -1,9 +1,9 @@
 from sqlalchemy import Column, String, Integer, DateTime
-from IocManager import IocManager
-from models.dao.Entity import Entity
+from pdip.dependency.container import DependencyContainer
+from pdip.data import Entity
 
 
-class Log(Entity, IocManager.Base):
+class Log(Entity, DependencyContainer.Base):
     __tablename__ = "Log"
     __table_args__ = {"schema": "Common"}
     TypeId = Column(Integer, index=True, unique=False, nullable=False)

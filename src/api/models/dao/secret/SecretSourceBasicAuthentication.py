@@ -1,11 +1,11 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from IocManager import IocManager
-from models.dao.Entity import Entity
+from pdip.dependency.container import DependencyContainer
+from pdip.data import Entity
 
 
-class SecretSourceBasicAuthentication(Entity, IocManager.Base):
+class SecretSourceBasicAuthentication(Entity, DependencyContainer.Base):
     __tablename__ = "SecretSourceBasicAuthentication"
     __table_args__ = {"schema": "Secret"}
     SecretSourceId = Column(Integer, ForeignKey('Secret.SecretSource.Id'))

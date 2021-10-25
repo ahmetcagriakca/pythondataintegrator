@@ -4,7 +4,7 @@ from sqlalchemy.orm import Query
 from domain.connection.GetConnectionList.GetConnectionListQuery import GetConnectionListQuery
 from domain.common.specifications.OrderBySpecification import OrderBySpecification
 from domain.common.specifications.PagingSpecification import PagingSpecification
-from infrastructure.data.RepositoryProvider import RepositoryProvider
+from pdip.data import RepositoryProvider
 from models.dao.connection import Connection, ConnectionServer, ConnectionDatabase, ConnectionType, ConnectorType
 
 

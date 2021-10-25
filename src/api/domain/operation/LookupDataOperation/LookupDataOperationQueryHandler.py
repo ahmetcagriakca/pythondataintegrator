@@ -1,11 +1,12 @@
 from injector import inject
+from pdip.cqrs import IQueryHandler
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+
 from domain.operation.LookupDataOperation.LookupDataOperationMapping import LookupDataOperationMapping
 from domain.operation.LookupDataOperation.LookupDataOperationQuery import LookupDataOperationQuery
 from domain.operation.LookupDataOperation.LookupDataOperationResponse import LookupDataOperationResponse
 from domain.operation.LookupDataOperation.LookupDataOperationSpecifications import LookupDataOperationSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
 from models.dao.operation.DataOperation import DataOperation
 
 

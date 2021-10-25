@@ -3,8 +3,8 @@ from domain.dashboard.GetMonthlyExecutionsWidget.GetMonthlyExecutionsWidgetMappi
 from domain.dashboard.GetMonthlyExecutionsWidget.GetMonthlyExecutionsWidgetQuery import GetMonthlyExecutionsWidgetQuery
 from domain.dashboard.GetMonthlyExecutionsWidget.GetMonthlyExecutionsWidgetResponse import GetMonthlyExecutionsWidgetResponse
 from domain.dashboard.GetMonthlyExecutionsWidget.GetMonthlyExecutionsWidgetSpecifications import GetMonthlyExecutionsWidgetSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.dependency import IScoped
 
 
 class GetMonthlyExecutionsWidgetQueryHandler(IQueryHandler[GetMonthlyExecutionsWidgetQuery], IScoped):

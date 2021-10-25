@@ -1,14 +1,13 @@
 from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.schedule.DeleteJob.DeleteJobCommand import DeleteJobCommand
 from domain.schedule.DeleteJob.DeleteJobRequest import DeleteJobRequest
 from domain.schedule.ScheduleJob.ScheduleJobCommand import ScheduleJobCommand
 from domain.schedule.ScheduleJob.ScheduleJobRequest import ScheduleJobRequest
-from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@controller()
 class ScheduleJobResource(ResourceBase):
     @inject
     def __init__(self,

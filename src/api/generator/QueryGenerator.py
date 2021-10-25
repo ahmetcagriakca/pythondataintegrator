@@ -5,8 +5,8 @@ from generator.FolderManager import FolderManager
 from generator.domain.DaoGenerateConfig import DaoGenerateConfig
 from generator.domain.Generator import Generator
 from generator.domain.QueryGenerateConfig import QueryGenerateConfig
-from infrastructure.utils.ModuleFinder import ModuleFinder
-from models.configs.ApplicationConfig import ApplicationConfig
+from pdip.utils import ModuleFinder
+from pdip.configuration.models.application import ApplicationConfig
 
 
 class QueryGenerator(Generator):
@@ -51,7 +51,7 @@ class QueryGenerator(Generator):
         request_attr = f'request: {query_name}Request = None'
         content = \
             f'''from dataclasses import dataclass
-from infrastructure.cqrs.IQuery import IQuery
+from pdip.cqrs import IQuery
 {request_namespace}
 {response_namespace}
 
@@ -143,8 +143,8 @@ class {query_name}Response:
         content = ''
         content += 'from injector import inject\n'
         content += 'from sqlalchemy.orm import Query\n'
-        content += 'from infrastructure.dependency.scopes import IScoped\n'
-        content += 'from infrastructure.data.RepositoryProvider import RepositoryProvider\n'
+        content += 'from pdip.dependency import IScoped\n'
+        content += 'from pdip.data import RepositoryProvider\n'
         content += f'{dao.namespace}\n'
 
         content += f'{query_namespace}\n'
@@ -245,8 +245,8 @@ from injector import inject
 {query_namespace}
 {response_namespace}
 {specifications_namespace}
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.dependency import IScoped
 
 
 class {query_name}QueryHandler(IQueryHandler[{query_name}Query], IScoped):

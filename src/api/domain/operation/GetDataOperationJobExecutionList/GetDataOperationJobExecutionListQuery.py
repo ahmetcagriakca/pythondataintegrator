@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from infrastructure.cqrs.IQuery import IQuery
+from pdip.cqrs import IQuery
 from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListRequest import GetDataOperationJobExecutionListRequest
 from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListResponse import GetDataOperationJobExecutionListResponse
 

@@ -1,12 +1,11 @@
-from datetime import date
-
 from injector import inject
 from sqlalchemy import distinct, func
 from sqlalchemy.orm import Query
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from models.dao.connection.Connection import Connection
+from pdip.dependency import IScoped
+from pdip.data import RepositoryProvider
+
 from domain.dashboard.GetConnectionWidget.GetConnectionWidgetQuery import GetConnectionWidgetQuery
+from models.dao.connection.Connection import Connection
 
 
 class GetConnectionWidgetSpecifications(IScoped):

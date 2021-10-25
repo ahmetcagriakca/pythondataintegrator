@@ -7,9 +7,9 @@ from domain.notification.SendNotification.SendNotificationRequest import Notific
 from domain.schedule.DeleteCronJob.DeleteCronJobCommand import DeleteCronJobCommand
 from domain.schedule.DeleteCronJob.DeleteCronJobRequest import DeleteCronJobRequest
 from domain.schedule.ScheduleCronJob.ScheduleCronJobCommand import ScheduleCronJobCommand
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
+from pdip.cqrs import Dispatcher
+from pdip.cqrs import ICommandHandler
+from pdip.data import RepositoryProvider
 
 
 class ScheduleCronJobCommandHandler(ICommandHandler[ScheduleCronJobCommand]):

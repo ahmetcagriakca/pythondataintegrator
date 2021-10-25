@@ -1,2 +1,0 @@
-class OperationalException(Exception):
-    pass

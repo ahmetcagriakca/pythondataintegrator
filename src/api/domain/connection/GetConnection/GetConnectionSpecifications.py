@@ -1,6 +1,6 @@
 from injector import inject
 from sqlalchemy.orm import Query
-from infrastructure.dependency.scopes import IScoped
+from pdip.dependency import IScoped
 from domain.connection.GetConnection.GetConnectionQuery import GetConnectionQuery
 from models.dao.connection import ConnectionDatabase, ConnectionType, ConnectorType, Connection, ConnectionServer
 

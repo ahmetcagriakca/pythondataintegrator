@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from infrastructure.utils.Utils import Utils
+from pdip.utils import Utils
 
 
 class TestUtils(TestCase):

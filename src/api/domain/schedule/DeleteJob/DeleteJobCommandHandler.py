@@ -5,9 +5,9 @@ from domain.notification.SendNotification.SendNotificationCommand import SendNot
 from domain.notification.SendNotification.SendNotificationRequest import NotificationAdditionalData, \
     SendNotificationRequest
 from domain.schedule.DeleteJob.DeleteJobCommand import DeleteJobCommand
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
+from pdip.cqrs import Dispatcher
+from pdip.cqrs import ICommandHandler
+from pdip.data import RepositoryProvider
 
 
 class DeleteJobCommandHandler(ICommandHandler[DeleteJobCommand]):

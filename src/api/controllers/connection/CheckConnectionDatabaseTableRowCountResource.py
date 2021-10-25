@@ -1,15 +1,13 @@
 from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
 
 from domain.connection.CheckDatabaseConnectionTableRowCount.CheckDatabaseConnectionTableRowCountCommand import \
     CheckDatabaseConnectionTableRowCountCommand
 from domain.connection.CheckDatabaseConnectionTableRowCount.CheckDatabaseConnectionTableRowCountRequest import \
     CheckDatabaseConnectionTableRowCountRequest
-from infrastructure.api.ResourceBase import ResourceBase
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
 
 
-@controller()
 class CheckConnectionDatabaseTableRowCountResource(ResourceBase):
     @inject
     def __init__(self,

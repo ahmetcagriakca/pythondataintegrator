@@ -1,6 +1,6 @@
 from typing import List
 
-from infrastructure.cqrs.decorators.responseclass import responseclass
+from pdip.cqrs.decorators import responseclass
 from domain.operation.GetDataOperationJobList.GetDataOperationJobListDto import GetDataOperationJobListDto
 
 

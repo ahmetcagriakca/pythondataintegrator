@@ -1,3 +1,7 @@
+from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionQuery import \
     GetDataOperationJobExecutionQuery
 from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionRequest import \
@@ -10,14 +14,8 @@ from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecut
     GetDataOperationJobExecutionListRequest
 from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListResponse import \
     GetDataOperationJobExecutionListResponse
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
-
-from injector import inject
-from infrastructure.api.ResourceBase import ResourceBase
 
 
-@controller()
 class OperationJobExecutionByIdResource(ResourceBase):
     @inject
     def __init__(self,
@@ -35,7 +33,6 @@ class OperationJobExecutionByIdResource(ResourceBase):
         return result
 
 
-@controller()
 class OperationJobExecutionResource(ResourceBase):
     @inject
     def __init__(self,

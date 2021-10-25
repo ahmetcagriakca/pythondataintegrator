@@ -1,8 +1,8 @@
 from injector import inject
 
 from domain.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.aps import ApSchedulerJob
 from models.dao.operation import DataOperationJob, DataOperation
 

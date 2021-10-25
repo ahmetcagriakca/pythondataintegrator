@@ -1,6 +1,6 @@
 import os, shutil
 
-from models.configs.ApplicationConfig import ApplicationConfig
+from pdip.configuration.models.application import ApplicationConfig
 
 
 class FileManager:

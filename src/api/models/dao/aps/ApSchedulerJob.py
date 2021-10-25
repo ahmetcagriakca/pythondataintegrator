@@ -1,13 +1,13 @@
 from typing import List
 from sqlalchemy.orm import relationship
 from models.dao.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
-from models.dao.Entity import Entity
+from pdip.data import Entity
 from sqlalchemy import Column, String, TEXT, Unicode, DateTime
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 from models.dao.operation.DataOperationJob import DataOperationJob
 
 
-class ApSchedulerJob(Entity, IocManager.Base):
+class ApSchedulerJob(Entity, DependencyContainer.Base):
     __tablename__ = "ApSchedulerJob"
     __table_args__ = {"schema": "Aps"}
 

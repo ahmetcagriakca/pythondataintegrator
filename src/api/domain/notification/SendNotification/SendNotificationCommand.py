@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from domain.notification.SendNotification.SendNotificationRequest import SendNotificationRequest
-from infrastructure.cqrs.ICommand import ICommand
+from pdip.cqrs import ICommand
 
 
 @dataclass

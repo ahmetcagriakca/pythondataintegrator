@@ -3,9 +3,9 @@ from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionM
 from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionQuery import GetDataOperationJobExecutionQuery
 from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionResponse import GetDataOperationJobExecutionResponse
 from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionSpecifications import GetDataOperationJobExecutionSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
 
 

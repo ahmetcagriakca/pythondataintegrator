@@ -1,17 +1,15 @@
+from injector import inject
+from pdip.api.base import ResourceBase
+from pdip.cqrs import Dispatcher
+
 from domain.operation.GetDataOperationJobExecutionLogList.GetDataOperationJobExecutionLogListQuery import \
     GetDataOperationJobExecutionLogListQuery
 from domain.operation.GetDataOperationJobExecutionLogList.GetDataOperationJobExecutionLogListRequest import \
     GetDataOperationJobExecutionLogListRequest
 from domain.operation.GetDataOperationJobExecutionLogList.GetDataOperationJobExecutionLogListResponse import \
     GetDataOperationJobExecutionLogListResponse
-from infrastructure.api.decorators.Controller import controller
-from infrastructure.cqrs.Dispatcher import Dispatcher
-
-from injector import inject
-from infrastructure.api.ResourceBase import ResourceBase
 
 
-@controller()
 class OperationJobExecutionLogResource(ResourceBase):
     @inject
     def __init__(self,

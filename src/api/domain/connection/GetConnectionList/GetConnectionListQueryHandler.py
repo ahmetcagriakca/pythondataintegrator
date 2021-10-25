@@ -3,8 +3,8 @@ from domain.connection.GetConnectionList.GetConnectionListMapping import GetConn
 from domain.connection.GetConnectionList.GetConnectionListQuery import GetConnectionListQuery
 from domain.connection.GetConnectionList.GetConnectionListResponse import GetConnectionListResponse
 from domain.connection.GetConnectionList.GetConnectionListSpecifications import GetConnectionListSpecifications
-from infrastructure.cqrs.IQueryHandler import IQueryHandler
-from infrastructure.dependency.scopes import IScoped
+from pdip.cqrs import IQueryHandler 
+from pdip.dependency import IScoped
 
 
 class GetConnectionListQueryHandler(IQueryHandler[GetConnectionListQuery], IScoped):

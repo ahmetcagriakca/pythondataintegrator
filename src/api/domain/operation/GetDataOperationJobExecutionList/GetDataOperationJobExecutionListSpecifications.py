@@ -2,8 +2,8 @@ from injector import inject
 from sqlalchemy import func
 from sqlalchemy.orm import Query
 
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListQuery import \
     GetDataOperationJobExecutionListQuery
 from domain.common.specifications.OrderBySpecification import OrderBySpecification

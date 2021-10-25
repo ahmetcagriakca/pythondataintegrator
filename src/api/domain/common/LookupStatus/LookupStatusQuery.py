@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from infrastructure.cqrs.IQuery import IQuery
+from pdip.cqrs import IQuery
 from domain.common.LookupStatus.LookupStatusRequest import LookupStatusRequest
 from domain.common.LookupStatus.LookupStatusResponse import LookupStatusResponse
 

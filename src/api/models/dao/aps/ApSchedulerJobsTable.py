@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Float, TEXT, LargeBinary, Unicode
-from IocManager import IocManager
+from pdip.dependency.container import DependencyContainer
 
 
-class ApSchedulerJobsTable(IocManager.Base):
+class ApSchedulerJobsTable(DependencyContainer.Base):
     # TODO: This feels bad man
     __tablename__ = "ApSchedulerJobsTable"
     __table_args__ = {"schema": "Aps"}
