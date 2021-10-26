@@ -1,0 +1,9 @@
+from dataclasses import dataclass
+from pdip.cqrs import ICommand
+
+
+@dataclass
+class StartProcessCommand(ICommand):
+    DataOperationId: int = None
+    JobId: int = None
+    DataOperationJobExecutionId: int = None

@@ -1,28 +1,22 @@
 from queue import Queue
 from typing import List
 from apscheduler.job import Job
-from pdip.configuration.models.application import ApplicationConfig
 from pdip.configuration.models.database import DatabaseConfig
 from pdip.data import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.console import ConsoleLogger
 from pdip.logging.loggers.database import SqlLogger
 
-from scheduler.domain.dao.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
-from scheduler.domain.dao.aps.ApSchedulerEvent import ApSchedulerEvent
-from scheduler.domain.dao.aps.ApSchedulerJob import ApSchedulerJob
+from scheduler.domain.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
+from scheduler.domain.aps.ApSchedulerEvent import ApSchedulerEvent
+from scheduler.domain.aps.ApSchedulerJob import ApSchedulerJob
 
 
 class JobSchedulerService:
     def __init__(self,
                  ):
 
-        self.application_config = DependencyContainer.Instance.get(ApplicationConfig)
         self.database_config = DependencyContainer.Instance.get(DatabaseConfig)
-        self.console_logger = DependencyContainer.Instance.get(ConsoleLogger)
-        self.sql_logger = SqlLogger(application_config=self.application_config,
-                                    database_config=self.database_config,
-                                    console_logger=self.console_logger)
+        self.sql_logger = DependencyContainer.Instance.get(SqlLogger)
         self.repository_provider = RepositoryProvider(database_config=self.database_config,
                                                       database_session_manager=None)
         self.ap_scheduler_job_repository = self.repository_provider.get(ApSchedulerJob)
@@ -40,6 +34,7 @@ class JobSchedulerService:
                 return result
             except Exception as ex:
                 try:
+                    print(ex)
                     args[0].repository_provider.rollback()
                     args[0].repository_provider.reconnect()
                     result = func(*args, **kwargs)

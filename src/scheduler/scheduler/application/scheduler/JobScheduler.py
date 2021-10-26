@@ -12,7 +12,8 @@ from pdip.configuration.models.aps import ApsConfig
 from pdip.configuration.models.database import DatabaseConfig
 from pdip.data import RepositoryProvider
 from pdip.dependency import ISingleton
-from pdip.dependency.container import DependencyContainer
+from sqlalchemy import MetaData
+from sqlalchemy.orm import declarative_base
 
 from scheduler.application.scheduler.JobSchedulerEvent import JobSchedulerEvent
 
@@ -20,24 +21,20 @@ from scheduler.application.scheduler.JobSchedulerEvent import JobSchedulerEvent
 class JobScheduler(ISingleton):
     @inject
     def __init__(self,
-                 repository_provider: RepositoryProvider,
                  database_config: DatabaseConfig,
                  aps_config: ApsConfig,
                  ):
         self.aps_config = aps_config
         self.database_config = database_config
-        self.repository_provider = repository_provider
         self.scheduler: BackgroundScheduler = None
 
     def run(self):
-        self.run_scheduler()
-        print("job_process started")
-
-    def run_scheduler(self):
+        repository_provider = RepositoryProvider(database_config=self.database_config, database_session_manager=None)
+        Base = declarative_base(metadata=MetaData())
         job_stores = {
             'default': SQLAlchemyJobStore(url=self.database_config.connection_string, tablename='ApSchedulerJobsTable',
-                                          engine=self.repository_provider.create().engine,
-                                          metadata=DependencyContainer.Base.metadata,
+                                          engine=repository_provider.create().engine,
+                                          metadata=Base.metadata,
                                           tableschema='Aps')
         }
         executors = {
@@ -73,13 +70,15 @@ class JobScheduler(ISingleton):
 
     def add_job_with_date(self, job_function, run_date, args=None, kwargs=None) -> Job:
         job: Job = self.scheduler.add_job(job_function, 'date', run_date=run_date,
-                                          misfire_grace_time=self.aps_config.default_misfire_grace_time_date_job, args=args,
+                                          misfire_grace_time=self.aps_config.default_misfire_grace_time_date_job,
+                                          args=args,
                                           kwargs=kwargs)
         return job
 
     def add_job_with_cron(self, job_function, cron: CronTrigger, args=None, kwargs=None) -> Job:
         job: Job = self.scheduler.add_job(job_function, cron,
-                                          misfire_grace_time=self.aps_config.default_misfire_grace_time_cron_job, args=args,
+                                          misfire_grace_time=self.aps_config.default_misfire_grace_time_cron_job,
+                                          args=args,
                                           kwargs=kwargs)
         return job
 
