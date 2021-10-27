@@ -1,7 +1,8 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, Text, Boolean
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
 
 
 class Definition(Entity, Base):

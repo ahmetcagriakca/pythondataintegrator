@@ -1,6 +1,7 @@
 from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
 
 
@@ -11,6 +12,7 @@ class ApSchedulerJobEvent(Entity, Base):
     EventId = Column(Integer, ForeignKey('Aps.ApSchedulerEvent.Id'))
     ApSchedulerJob = relationship("ApSchedulerJob", back_populates="JobEvents")
     ApSchedulerEvent = relationship("ApSchedulerEvent", back_populates="JobEvents")
+
     def __init__(self,
                  EventId: int = None,
                  ApSchedulerJobId: str = None,

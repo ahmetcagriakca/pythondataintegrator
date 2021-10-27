@@ -1,11 +1,13 @@
-from scheduler.domain.operation.DataOperationContact import DataOperationContact
-from scheduler.domain.operation.DataOperationJob import DataOperationJob
 from typing import List
+
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
+from scheduler.domain.operation.DataOperationContact import DataOperationContact
 from scheduler.domain.operation.DataOperationIntegration import DataOperationIntegration
+from scheduler.domain.operation.DataOperationJob import DataOperationJob
 
 
 class DataOperation(Entity, Base):

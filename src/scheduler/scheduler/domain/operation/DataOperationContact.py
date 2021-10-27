@@ -1,7 +1,8 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
 
 
 class DataOperationContact(Entity, Base):
@@ -14,7 +15,7 @@ class DataOperationContact(Entity, Base):
     def __init__(self,
                  DataOperationId: int = None,
                  Email: str = None,
-                 DataOperation = None,
+                 DataOperation=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationId: int = DataOperationId

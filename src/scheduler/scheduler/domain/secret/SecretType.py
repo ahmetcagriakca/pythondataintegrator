@@ -1,11 +1,12 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
-from scheduler.domain.secret.Secret import Secret
 from scheduler.domain.secret.AuthenticationType import AuthenticationType
+from scheduler.domain.secret.Secret import Secret
 
 
 class SecretType(Entity, Base):

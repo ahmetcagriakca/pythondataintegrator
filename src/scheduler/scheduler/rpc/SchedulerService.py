@@ -7,9 +7,9 @@ from pdip.dependency.container import DependencyContainer
 from rpyc import Service
 from rpyc.utils.server import ThreadedServer
 
-from scheduler.domain.configs.SchedulerRpcServerConfig import SchedulerRpcServerConfig
 from scheduler.application.scheduler.JobScheduler import JobScheduler
 from scheduler.application.scheduler.JobService import JobService
+from scheduler.domain.configs.SchedulerRpcServerConfig import SchedulerRpcServerConfig
 
 
 class SchedulerService(Service, ISingleton):

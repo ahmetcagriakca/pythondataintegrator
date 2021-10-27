@@ -1,7 +1,8 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
 
 
 class DataIntegrationConnectionQueue(Entity, Base):

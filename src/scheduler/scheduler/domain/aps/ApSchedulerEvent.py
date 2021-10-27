@@ -1,6 +1,6 @@
 from typing import List
-from pdip.data import Entity
 
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 

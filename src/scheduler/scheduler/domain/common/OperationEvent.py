@@ -1,8 +1,8 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 
 from scheduler.domain.base import Base
-from pdip.data import Entity
 
 
 class OperationEvent(Entity, Base):
@@ -12,9 +12,10 @@ class OperationEvent(Entity, Base):
     Name = Column(String(100), index=False, unique=False, nullable=False)
     Description = Column(String(250), index=False, unique=False, nullable=False)
     Class = Column(String(255), nullable=False)
-    
+
     DataOperationJobExecutionEvents = relationship("DataOperationJobExecutionEvent", back_populates="Event")
-    DataOperationJobExecutionIntegrationEvents = relationship("DataOperationJobExecutionIntegrationEvent", back_populates="Event")
+    DataOperationJobExecutionIntegrationEvents = relationship("DataOperationJobExecutionIntegrationEvent",
+                                                              back_populates="Event")
 
     def __init__(self,
                  Code: int = None,

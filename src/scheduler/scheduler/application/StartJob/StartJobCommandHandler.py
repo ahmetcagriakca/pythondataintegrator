@@ -1,13 +1,14 @@
 import time
 from datetime import datetime
+
 from injector import inject
+from pdip.configuration.models.application import ApplicationConfig
 from pdip.configuration.models.database import DatabaseConfig
 from pdip.configuration.services import ConfigService
 from pdip.cqrs import ICommandHandler, Dispatcher
 from pdip.data.decorators import transactionhandler
 from pdip.delivery import EmailProvider
 from pdip.logging.loggers.database import SqlLogger
-from pdip.configuration.models.application import ApplicationConfig
 
 from scheduler.application.CreateExecution.CreateExecutionCommand import CreateExecutionCommand
 from scheduler.application.SendSchedulerErrorMail.SendSchedulerErrorMailCommand import SendSchedulerErrorMailCommand
@@ -54,7 +55,7 @@ class StartJobCommandHandler(ICommandHandler[StartJobCommand]):
                 job_id=data_operation_job_execution_id)
 
             service_command = StartProcessCommand(DataOperationId=command.DataOperationId, JobId=command.JobId,
-                                          DataOperationJobExecutionId=data_operation_job_execution_id)
+                                                  DataOperationJobExecutionId=data_operation_job_execution_id)
             self.dispatcher.dispatch(service_command)
 
             end_datetime = datetime.now()
@@ -64,8 +65,8 @@ class StartJobCommandHandler(ICommandHandler[StartJobCommand]):
                 job_id=data_operation_job_execution_id)
         except Exception as ex:
             service_command = SendSchedulerErrorMailCommand(JobId=command.JobId,
-                                                    DataOperationJobExecutionId=data_operation_job_execution_id,
-                                                    Exception=ex)
+                                                            DataOperationJobExecutionId=data_operation_job_execution_id,
+                                                            Exception=ex)
             self.dispatcher.dispatch(service_command)
             self.logger.info(
                 f"{command.DataOperationId}-{command.JobId} Scheduler getting error. Error:{ex}",

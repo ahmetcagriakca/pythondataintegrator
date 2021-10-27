@@ -1,10 +1,10 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from scheduler.domain.base import Base
-from pdip.data import Entity
 from scheduler.domain.connection.ConnectionSecret import ConnectionSecret
 from scheduler.domain.secret.SecretSource import SecretSource
 
@@ -21,7 +21,7 @@ class Secret(Entity, Base):
     def __init__(self,
                  SecretTypeId: int = None,
                  Name: str = None,
-                 SecretType = None,
+                 SecretType=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.SecretTypeId: int = SecretTypeId

@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Float, TEXT, LargeBinary, Unicode
+
 from scheduler.domain.base import Base
 
 

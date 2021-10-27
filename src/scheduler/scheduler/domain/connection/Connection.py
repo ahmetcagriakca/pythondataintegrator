@@ -1,15 +1,16 @@
 from typing import List
+
 from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from scheduler.domain.base import Base
 
-from scheduler.domain.integration.DataIntegrationConnection import DataIntegrationConnection
-from scheduler.domain.connection.ConnectionQueue import ConnectionQueue
-from scheduler.domain.connection.ConnectionServer import ConnectionServer
-from scheduler.domain.connection.ConnectionSecret import ConnectionSecret
+from scheduler.domain.base import Base
 from scheduler.domain.connection.ConnectionDatabase import ConnectionDatabase
 from scheduler.domain.connection.ConnectionFile import ConnectionFile
+from scheduler.domain.connection.ConnectionQueue import ConnectionQueue
+from scheduler.domain.connection.ConnectionSecret import ConnectionSecret
+from scheduler.domain.connection.ConnectionServer import ConnectionServer
+from scheduler.domain.integration.DataIntegrationConnection import DataIntegrationConnection
 
 
 class Connection(Entity, Base):

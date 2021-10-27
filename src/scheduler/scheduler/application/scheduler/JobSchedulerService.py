@@ -1,14 +1,15 @@
 from queue import Queue
 from typing import List
+
 from apscheduler.job import Job
 from pdip.configuration.models.database import DatabaseConfig
 from pdip.data import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
 from pdip.logging.loggers.database import SqlLogger
 
-from scheduler.domain.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
 from scheduler.domain.aps.ApSchedulerEvent import ApSchedulerEvent
 from scheduler.domain.aps.ApSchedulerJob import ApSchedulerJob
+from scheduler.domain.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
 
 
 class JobSchedulerService:

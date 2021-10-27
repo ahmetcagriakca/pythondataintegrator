@@ -1,12 +1,13 @@
-from scheduler.domain.connection.ConnectionQueue import ConnectionQueue
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
 from scheduler.domain.connection.ConnectionDatabase import ConnectionDatabase
 from scheduler.domain.connection.ConnectionFile import ConnectionFile
-from pdip.data import Entity
+from scheduler.domain.connection.ConnectionQueue import ConnectionQueue
 
 
 class ConnectorType(Entity, Base):
@@ -22,7 +23,7 @@ class ConnectorType(Entity, Base):
     def __init__(self,
                  Name: int = None,
                  ConnectionTypeId: int = None,
-                 ConnectionType = None,
+                 ConnectionType=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Name: int = Name

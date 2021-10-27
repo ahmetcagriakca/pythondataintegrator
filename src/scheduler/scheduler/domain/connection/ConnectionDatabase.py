@@ -1,7 +1,8 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
 
 
 class ConnectionDatabase(Entity, Base):
@@ -22,8 +23,8 @@ class ConnectionDatabase(Entity, Base):
                  Sid: str = None,
                  ServiceName: str = None,
                  DatabaseName: str = None,
-                 Connection = None,
-                 ConnectorType = None,
+                 Connection=None,
+                 ConnectorType=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ConnectionId: str = ConnectionId

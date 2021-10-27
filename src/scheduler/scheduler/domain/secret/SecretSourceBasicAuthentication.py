@@ -1,8 +1,8 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from scheduler.domain.base import Base
-from pdip.data import Entity
 
 
 class SecretSourceBasicAuthentication(Entity, Base):
@@ -17,7 +17,7 @@ class SecretSourceBasicAuthentication(Entity, Base):
                  SecretSourceId: int = None,
                  User: str = None,
                  Password: str = None,
-                 SecretSource = None,
+                 SecretSource=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.SecretSourceId: int = SecretSourceId

@@ -1,1 +1,2 @@
-from scheduler.domain.operation.DataOperationJobExecutionIntegrationEvent import DataOperationJobExecutionIntegrationEvent
+from scheduler.domain.operation.DataOperationJobExecutionIntegrationEvent import \
+    DataOperationJobExecutionIntegrationEvent

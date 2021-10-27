@@ -1,9 +1,11 @@
 from datetime import datetime
 from typing import List
+
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
 from scheduler.domain.operation.DataOperationJobExecution import DataOperationJobExecution
 
 

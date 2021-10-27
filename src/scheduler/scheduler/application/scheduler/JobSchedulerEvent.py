@@ -1,9 +1,9 @@
 from queue import Queue
 
 import jsonpickle
+from pdip.processing import ProcessManager
 
 from scheduler.application.handlers.JobEventHandler import JobEventHandler
-from pdip.processing import ProcessManager
 from scheduler.application.scheduler.JobSchedulerService import JobSchedulerService
 
 

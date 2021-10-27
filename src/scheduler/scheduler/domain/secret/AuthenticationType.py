@@ -1,10 +1,11 @@
-
 from typing import List
-from scheduler.domain.secret.SecretSource import SecretSource
+
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
+from scheduler.domain.secret.SecretSource import SecretSource
 
 
 class AuthenticationType(Entity, Base):
@@ -15,11 +16,12 @@ class AuthenticationType(Entity, Base):
     SecretType = relationship("SecretType", back_populates="AuthenticationTypes")
 
     SecretSources: List[SecretSource] = relationship("SecretSource", back_populates="AuthenticationType")
+
     def __init__(self,
-    
+
                  SecretTypeId: int = None,
                  Name: str = None,
-                 SecretType = None,
+                 SecretType=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.SecretTypeId: int = SecretTypeId

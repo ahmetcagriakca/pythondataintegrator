@@ -1,9 +1,10 @@
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
-from scheduler.domain.base import Base
 from typing import List
 
 from pdip.data import Entity
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
+
+from scheduler.domain.base import Base
 from scheduler.domain.operation.DataOperationJobExecution import DataOperationJobExecution
 from scheduler.domain.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 

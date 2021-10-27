@@ -1,7 +1,8 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
-from pdip.data import Entity
 
 
 class DataIntegrationConnectionFileCsv(Entity, Base):

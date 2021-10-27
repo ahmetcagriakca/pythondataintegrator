@@ -1,11 +1,11 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from scheduler.domain.base import Base
-from pdip.data import Entity
-from scheduler.domain.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
+from scheduler.domain.base import Base
+from scheduler.domain.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
 class DataOperationIntegration(Entity, Base):

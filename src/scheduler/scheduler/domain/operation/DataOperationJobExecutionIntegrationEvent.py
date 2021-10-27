@@ -1,9 +1,10 @@
 from datetime import datetime
+
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from scheduler.domain.base import Base
-from pdip.data import Entity
 
 
 class DataOperationJobExecutionIntegrationEvent(Entity, Base):
@@ -22,9 +23,9 @@ class DataOperationJobExecutionIntegrationEvent(Entity, Base):
                  DataOperationJobExecutionIntegrationId: int = None,
                  EventId: int = None,
                  EventDate: datetime = None,
-                 AffectedRowCount:int = None,
-                 Event:any=None,
-                 DataOperationJobExecutionIntegration:any=None,
+                 AffectedRowCount: int = None,
+                 Event: any = None,
+                 DataOperationJobExecutionIntegration: any = None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationJobExecutionIntegrationId: int = DataOperationJobExecutionIntegrationId

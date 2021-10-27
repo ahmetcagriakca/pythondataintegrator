@@ -1,7 +1,9 @@
+from pdip.configuration.services import ConfigParameterBase
 from pdip.data import Entity
 from sqlalchemy import Column, String
+
 from scheduler.domain.base import Base
-from pdip.configuration.services import ConfigParameterBase
+
 
 class ConfigParameter(ConfigParameterBase, Entity, Base):
     __tablename__ = "ConfigParameter"

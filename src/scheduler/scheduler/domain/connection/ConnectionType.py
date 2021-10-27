@@ -1,11 +1,12 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+
 from scheduler.domain.base import Base
 from scheduler.domain.connection.Connection import Connection
 from scheduler.domain.connection.ConnectorType import ConnectorType
-from pdip.data import Entity
 
 
 class ConnectionType(Entity, Base):
@@ -13,9 +14,9 @@ class ConnectionType(Entity, Base):
     __table_args__ = {"schema": "Connection"}
     Name = Column(String(100), index=False, unique=True, nullable=False)
     Connectors: List[ConnectorType] = relationship("ConnectorType",
-                                                                  back_populates="ConnectionType")
+                                                   back_populates="ConnectionType")
     Connections: List[Connection] = relationship("Connection",
-                                                                  back_populates="ConnectionType")
+                                                 back_populates="ConnectionType")
 
     def __init__(self,
                  Name: int = None,

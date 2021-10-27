@@ -1,11 +1,11 @@
+from queue import Queue
+from traceback import format_exc
+
 from apscheduler.events import EVENT_JOB_MISSED
 from injector import inject
 from pdip.cqrs import Dispatcher
 from pdip.dependency import ISingleton
 from pdip.dependency.container import DependencyContainer
-from queue import Queue
-from traceback import format_exc
-
 from pdip.logging.loggers.database import SqlLogger
 
 from scheduler.application.SendMissMail.SendMissMailCommand import SendMissMailCommand
