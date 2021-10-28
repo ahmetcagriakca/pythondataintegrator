@@ -1,7 +1,7 @@
+from pdip.data import Entity
 from pdip.logging.models import LogData
 from sqlalchemy import Column, String, Integer, DateTime
 
-from pdip.data import Entity
 from process.domain.base import Base
 
 

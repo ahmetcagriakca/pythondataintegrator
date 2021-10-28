@@ -21,7 +21,6 @@ class ProcessService(Service, ISingleton):
     def __init__(self):
         self.process_rpc_server_config = DependencyContainer.Instance.get(ProcessRpcServerConfig)
 
-
     def run(self):
         server = ThreadedServer(ProcessService, port=self.process_rpc_server_config.port,
                                 protocol_config=self.process_rpc_server_config.protocol_config)

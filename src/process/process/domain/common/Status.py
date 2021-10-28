@@ -1,11 +1,11 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from process.domain.base.common.StatusBase import StatusBase
-from pdip.data import Entity
 from process.domain.base import Base
+from process.domain.base.common.StatusBase import StatusBase
 from process.domain.operation import DataOperationJobExecution
 from process.domain.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 

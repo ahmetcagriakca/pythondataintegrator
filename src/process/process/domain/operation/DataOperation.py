@@ -1,12 +1,14 @@
-from process.domain.base.operation.DataOperationBase import DataOperationBase
-from process.domain.operation.DataOperationContact import DataOperationContact
-from process.domain.operation.DataOperationJob import DataOperationJob
 from typing import List
+
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
-from pdip.data import Entity
+from process.domain.base.operation.DataOperationBase import DataOperationBase
+from process.domain.operation.DataOperationContact import DataOperationContact
 from process.domain.operation.DataOperationIntegration import DataOperationIntegration
+from process.domain.operation.DataOperationJob import DataOperationJob
 
 
 class DataOperation(DataOperationBase, Entity, Base):

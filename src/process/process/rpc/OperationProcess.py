@@ -14,9 +14,9 @@ from pdip.data.decorators import transactionhandler
 from pdip.dependency.container import DependencyContainer
 from pdip.logging.loggers.database import SqlLogger
 
+from process.application.operation.execution.services.OperationExecution import OperationExecution
 from process.domain.aps import ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
 from process.domain.operation import DataOperation, DataOperationJob
-from process.application.operation.execution.services.OperationExecution import OperationExecution
 
 
 class OperationProcess:

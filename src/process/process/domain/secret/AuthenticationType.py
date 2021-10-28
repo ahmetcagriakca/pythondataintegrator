@@ -1,12 +1,12 @@
-
 from typing import List
 
-from process.domain.base.secret.AuthenticationTypeBase import AuthenticationTypeBase
-from process.domain.secret.SecretSource import SecretSource
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
-from pdip.data import Entity
+from process.domain.base.secret.AuthenticationTypeBase import AuthenticationTypeBase
+from process.domain.secret.SecretSource import SecretSource
 
 
 class AuthenticationType(AuthenticationTypeBase, Entity, Base):
@@ -17,5 +17,5 @@ class AuthenticationType(AuthenticationTypeBase, Entity, Base):
     SecretType = relationship("SecretType", back_populates="AuthenticationTypes")
     SecretSources: List[SecretSource] = relationship("SecretSource", back_populates="AuthenticationType")
 
-    def __init__(*args,**kwargs):
-        super().__init__(*args,**kwargs)
+    def __init__(*args, **kwargs):
+        super().__init__(*args, **kwargs)

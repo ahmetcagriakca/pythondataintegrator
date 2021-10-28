@@ -1,10 +1,12 @@
 from datetime import datetime
+
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from process.domain.base import Base
-from process.domain.base.operation.DataOperationJobExecutionIntegrationEventBase import DataOperationJobExecutionIntegrationEventBase
-from pdip.data import Entity
+from process.domain.base.operation.DataOperationJobExecutionIntegrationEventBase import \
+    DataOperationJobExecutionIntegrationEventBase
 
 
 class DataOperationJobExecutionIntegrationEvent(DataOperationJobExecutionIntegrationEventBase, Entity, Base):

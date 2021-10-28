@@ -1,11 +1,13 @@
 from datetime import datetime
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, String
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
-from process.domain.base.operation.DataOperationJobExecutionIntegrationBase import DataOperationJobExecutionIntegrationBase
-from pdip.data import Entity
+from process.domain.base.operation.DataOperationJobExecutionIntegrationBase import \
+    DataOperationJobExecutionIntegrationBase
 from process.domain.operation.DataOperationJobExecutionIntegrationEvent import DataOperationJobExecutionIntegrationEvent
 
 

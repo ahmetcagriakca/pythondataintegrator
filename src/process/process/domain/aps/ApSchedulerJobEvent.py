@@ -1,8 +1,9 @@
-from process.domain.base.aps.ApSchedulerJobEventBase import ApSchedulerJobEventBase
 from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
+from process.domain.base.aps.ApSchedulerJobEventBase import ApSchedulerJobEventBase
 
 
 class ApSchedulerJobEvent(ApSchedulerJobEventBase, Entity, Base):

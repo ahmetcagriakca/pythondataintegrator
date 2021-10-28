@@ -1,9 +1,11 @@
 from process.domain.base.operation.DataOperationBase import DataOperationBase
 from process.domain.base.operation.DataOperationContactBase import DataOperationContactBase
 from process.domain.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
+from process.domain.base.operation.DataOperationJobBase import DataOperationJobBase
 from process.domain.base.operation.DataOperationJobExecutionBase import DataOperationJobExecutionBase
 from process.domain.base.operation.DataOperationJobExecutionEventBase import DataOperationJobExecutionEventBase
-from process.domain.base.operation.DataOperationJobExecutionIntegrationBase import DataOperationJobExecutionIntegrationBase
-from process.domain.base.operation.DataOperationJobExecutionIntegrationEventBase import DataOperationJobExecutionIntegrationEventBase
-from process.domain.base.operation.DataOperationJobBase import DataOperationJobBase
+from process.domain.base.operation.DataOperationJobExecutionIntegrationBase import \
+    DataOperationJobExecutionIntegrationBase
+from process.domain.base.operation.DataOperationJobExecutionIntegrationEventBase import \
+    DataOperationJobExecutionIntegrationEventBase
 from process.domain.base.operation.DefinitionBase import DefinitionBase

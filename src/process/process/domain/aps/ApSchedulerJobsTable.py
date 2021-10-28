@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Float, LargeBinary, Unicode
 
-from process.domain.base.aps.ApSchedulerJobsTable import ApSchedulerJobsTableBase
 from process.domain.base import Base
+from process.domain.base.aps.ApSchedulerJobsTable import ApSchedulerJobsTableBase
 
 
 class ApSchedulerJobsTable(ApSchedulerJobsTableBase, Base):

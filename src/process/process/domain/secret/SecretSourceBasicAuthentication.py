@@ -1,9 +1,9 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from process.domain.base import Base
 from process.domain.base.secret.SecretSourceBasicAuthenticationBase import SecretSourceBasicAuthenticationBase
-from pdip.data import Entity
 
 
 class SecretSourceBasicAuthentication(SecretSourceBasicAuthenticationBase, Entity, Base):

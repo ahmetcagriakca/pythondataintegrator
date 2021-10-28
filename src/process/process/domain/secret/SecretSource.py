@@ -1,11 +1,11 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from process.domain.base import Base
 from process.domain.base.secret.SecretSourceBase import SecretSourceBase
-from pdip.data import Entity
 from process.domain.secret.SecretSourceBasicAuthentication import SecretSourceBasicAuthentication
 
 

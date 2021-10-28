@@ -1,9 +1,11 @@
 from datetime import datetime
+
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
 from process.domain.base.operation.DataOperationJobExecutionBase import DataOperationJobExecutionBase
-from pdip.data import Entity
 
 
 class DataOperationJobExecution(DataOperationJobExecutionBase, Entity, Base):
@@ -17,5 +19,7 @@ class DataOperationJobExecution(DataOperationJobExecutionBase, Entity, Base):
     Definition = relationship("Definition", back_populates="DataOperationJobExecutions")
     Status = relationship("Status", back_populates="DataOperationJobExecutions")
     DataOperationJob = relationship("DataOperationJob", back_populates="DataOperationJobExecutions")
-    DataOperationJobExecutionEvents = relationship("DataOperationJobExecutionEvent", back_populates="DataOperationJobExecution")
-    DataOperationJobExecutionIntegrations = relationship("DataOperationJobExecutionIntegration", back_populates="DataOperationJobExecution")
+    DataOperationJobExecutionEvents = relationship("DataOperationJobExecutionEvent",
+                                                   back_populates="DataOperationJobExecution")
+    DataOperationJobExecutionIntegrations = relationship("DataOperationJobExecutionIntegration",
+                                                         back_populates="DataOperationJobExecution")

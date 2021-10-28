@@ -1,14 +1,14 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from process.domain.base.connection.ConnectionBase import ConnectionBase
-from pdip.data import Entity
 from process.domain.base import Base
-from process.domain.connection.ConnectionQueue import ConnectionQueue
+from process.domain.base.connection.ConnectionBase import ConnectionBase
 from process.domain.connection.ConnectionDatabase import ConnectionDatabase
 from process.domain.connection.ConnectionFile import ConnectionFile
+from process.domain.connection.ConnectionQueue import ConnectionQueue
 from process.domain.connection.ConnectionSecret import ConnectionSecret
 from process.domain.connection.ConnectionServer import ConnectionServer
 from process.domain.integration.DataIntegrationConnection import DataIntegrationConnection

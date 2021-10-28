@@ -1,10 +1,11 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
 from process.domain.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
-from pdip.data import Entity
 from process.domain.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
@@ -21,4 +22,3 @@ class DataOperationIntegration(DataOperationIntegrationBase, Entity, Base):
     DataOperationJobExecutionIntegrations: List[DataOperationJobExecutionIntegration] = relationship(
         "DataOperationJobExecutionIntegration",
         back_populates="DataOperationIntegration")
-

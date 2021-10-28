@@ -1,11 +1,11 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from process.domain.base import Base
 from process.domain.base.secret.SecretBase import SecretBase
-from pdip.data import Entity
 from process.domain.connection.ConnectionSecret import ConnectionSecret
 from process.domain.secret.SecretSource import SecretSource
 
@@ -19,5 +19,5 @@ class Secret(SecretBase, Entity, Base):
     SecretSources: List[SecretSource] = relationship("SecretSource", back_populates="Secret")
     ConnectionSecrets: List[ConnectionSecret] = relationship("ConnectionSecret", back_populates="Secret")
 
-    def __init__(*args,**kwargs):
-        super().__init__(*args,**kwargs)
+    def __init__(*args, **kwargs):
+        super().__init__(*args, **kwargs)

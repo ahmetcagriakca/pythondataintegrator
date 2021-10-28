@@ -1,13 +1,14 @@
-from process.domain.base.connection.ConnectorTypeBase import ConnectorTypeBase
-from process.domain.connection.ConnectionQueue import ConnectionQueue
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
+from process.domain.base.connection.ConnectorTypeBase import ConnectorTypeBase
 from process.domain.connection.ConnectionDatabase import ConnectionDatabase
 from process.domain.connection.ConnectionFile import ConnectionFile
-from pdip.data import Entity
+from process.domain.connection.ConnectionQueue import ConnectionQueue
 
 
 class ConnectorType(ConnectorTypeBase, Entity, Base):

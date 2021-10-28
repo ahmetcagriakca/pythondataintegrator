@@ -1,12 +1,12 @@
 from typing import List
 
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 
-from process.domain.base.aps.ApSchedulerEventBase import ApSchedulerEventBase
-from pdip.data import Entity
 from process.domain.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
 from process.domain.base import Base
+from process.domain.base.aps.ApSchedulerEventBase import ApSchedulerEventBase
 
 
 class ApSchedulerEvent(ApSchedulerEventBase, Entity, Base):

@@ -1,8 +1,9 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
 from process.domain.base.connection.ConnectionQueueBase import ConnectionQueueBase
-from pdip.data import Entity
 
 
 class ConnectionQueue(ConnectionQueueBase, Entity, Base):

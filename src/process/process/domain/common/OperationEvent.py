@@ -1,9 +1,9 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 
-from process.domain.base.common.OperationEventBase import OperationEventBase
-from pdip.data import Entity
 from process.domain.base import Base
+from process.domain.base.common.OperationEventBase import OperationEventBase
 
 
 class OperationEvent(OperationEventBase, Entity, Base):

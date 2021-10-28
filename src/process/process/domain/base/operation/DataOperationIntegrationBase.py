@@ -2,7 +2,8 @@ from typing import List
 
 from pdip.data import EntityBase
 
-from process.domain.base.operation.DataOperationJobExecutionIntegrationBase import DataOperationJobExecutionIntegrationBase
+from process.domain.base.operation.DataOperationJobExecutionIntegrationBase import \
+    DataOperationJobExecutionIntegrationBase
 
 
 class DataOperationIntegrationBase(EntityBase):

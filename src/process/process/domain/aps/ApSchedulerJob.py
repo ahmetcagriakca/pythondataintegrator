@@ -1,11 +1,12 @@
 from typing import List
+
+from pdip.data import Entity
+from sqlalchemy import Column, String, Unicode, DateTime
 from sqlalchemy.orm import relationship
 
-from process.domain.base.aps.ApSchedulerJobBase import ApSchedulerJobBase
 from process.domain.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
-from pdip.data import Entity
-from sqlalchemy import Column, String, TEXT, Unicode, DateTime
 from process.domain.base import Base
+from process.domain.base.aps.ApSchedulerJobBase import ApSchedulerJobBase
 from process.domain.operation.DataOperationJob import DataOperationJob
 
 
