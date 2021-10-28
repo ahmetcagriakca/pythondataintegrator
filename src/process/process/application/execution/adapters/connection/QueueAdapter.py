@@ -8,8 +8,8 @@ from pdip.connection.adapters import ConnectionAdapter
 from pdip.connection.queue.base import QueueProvider
 from pdip.exceptions import NotSupportedFeatureException
 
+from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.domain.dto.PagingModifier import PagingModifier
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
 
 
 class QueueAdapter(ConnectionAdapter):

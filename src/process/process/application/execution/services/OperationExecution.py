@@ -1,12 +1,13 @@
 from injector import inject
+from pdip.cqrs import Dispatcher
 from pdip.data.decorators import transactionhandler
 from pdip.dependency import IScoped
 from pdip.logging.loggers.database import SqlLogger
 
-from process.application.operation.commands.CreateExecutionCommand import CreateExecutionCommand
-from process.application.operation.commands.SendDataOperationFinishMailCommand import SendDataOperationFinishMailCommand
-from process.application.operation.execution.services.IntegrationExecution import IntegrationExecution
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.CreateExecution.CreateExecutionCommand import CreateExecutionCommand
+from process.application.SendExecutionFinishMail.SendExecutionFinishMailCommand import SendExecutionFinishMailCommand
+from process.application.execution.services.IntegrationExecution import IntegrationExecution
+from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.application.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
 from process.domain.enums.StatusTypes import StatusTypes
 from process.domain.enums.events import EVENT_EXECUTION_STARTED, EVENT_EXECUTION_FINISHED
@@ -15,15 +16,13 @@ from process.domain.enums.events import EVENT_EXECUTION_STARTED, EVENT_EXECUTION
 class OperationExecution(IScoped):
     @inject
     def __init__(self,
+                 dispatcher: Dispatcher,
                  sql_logger: SqlLogger,
                  operation_cache_service: OperationCacheService,
-                 create_execution_command: CreateExecutionCommand,
                  data_operation_job_execution_service: DataOperationJobExecutionService,
                  integration_execution: IntegrationExecution,
-                 send_data_operation_finish_mail_command: SendDataOperationFinishMailCommand,
                  ):
-        self.send_data_operation_finish_mail_command = send_data_operation_finish_mail_command
-        self.create_execution_command = create_execution_command
+        self.dispatcher = dispatcher
         self.operation_cache_service = operation_cache_service
         self.integration_execution = integration_execution
         self.data_operation_job_execution_service = data_operation_job_execution_service
@@ -44,9 +43,8 @@ class OperationExecution(IScoped):
         try:
             self.operation_cache_service.create(data_operation_id=data_operation_id)
             if data_operation_job_execution_id is None:
-                data_operation_job_execution_id = self.create_execution_command.execute(
-                    data_operation_id=data_operation_id,
-                    job_id=job_id)
+                command = CreateExecutionCommand(DataOperationId=data_operation_id, JobId=job_id)
+                data_operation_job_execution_id = self.dispatcher.dispatch(command)
             data_operation_name = self.operation_cache_service.get_data_operation_name(
                 data_operation_id=data_operation_id)
 
@@ -83,4 +81,5 @@ class OperationExecution(IScoped):
             data_operation_job_execution_id=data_operation_job_execution_id,
             status_id=status.value, is_finished=is_finished)
         if is_finished:
-            self.send_data_operation_finish_mail_command.execute(data_operation_job_execution_id)
+            command = SendExecutionFinishMailCommand(DataOperationJobExecutionId=data_operation_job_execution_id)
+            self.dispatcher.dispatch(command)

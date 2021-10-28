@@ -2,13 +2,13 @@ from injector import inject
 from pdip.dependency import IScoped
 from pdip.logging.loggers.database import SqlLogger
 
-from process.application.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
+from process.application.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
     ExecuteIntegrationStrategy
-from process.application.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.services.IntegrationExecutionService import IntegrationExecutionService
+from process.application.execution.services.OperationCacheService import OperationCacheService
 
 
-class ExecuteIntegrationSerial(ExecuteIntegrationStrategy, IScoped):
+class ExecuteIntegrationLimitOff(ExecuteIntegrationStrategy, IScoped):
     @inject
     def __init__(self,
                  sql_logger: SqlLogger,
@@ -26,12 +26,11 @@ class ExecuteIntegrationSerial(ExecuteIntegrationStrategy, IScoped):
             data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(
                 data_operation_integration_id=data_operation_integration_id)
             data_integration_id = data_operation_integration.DataIntegrationId
-            limit = data_operation_integration.Limit
-            total_row_count = self.integration_execution_service.start_integration_with_paging(
+            total_row_count = self.integration_execution_service.start_integration(
                 data_integration_id=data_integration_id,
                 data_operation_job_execution_id=data_operation_job_execution_id,
-                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-                limit=limit)
+                data_operation_job_execution_integration_id=data_operation_job_execution_integration_id)
+
             return total_row_count
         except Exception as ex:
             self.sql_logger.error(f"Integration getting error.Error:{ex}", job_id=data_operation_job_execution_id)

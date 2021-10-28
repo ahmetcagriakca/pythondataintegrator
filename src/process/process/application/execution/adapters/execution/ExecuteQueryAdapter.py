@@ -1,9 +1,9 @@
 from injector import inject
 from pdip.dependency import IScoped
 
-from process.application.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
-from process.application.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
+from process.application.execution.services.IntegrationExecutionService import IntegrationExecutionService
+from process.application.execution.services.OperationCacheService import OperationCacheService
 
 
 class ExecuteQueryAdapter(ExecuteAdapter, IScoped):

@@ -15,11 +15,11 @@ from pdip.exceptions import OperationalException
 from pdip.logging.loggers.database import SqlLogger
 from pdip.processing import ProcessManager
 
-from process.domain.dto.PagingModifier import PagingModifier
-from process.application.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
+from process.application.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
     ExecuteIntegrationStrategy
-from process.application.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.services.IntegrationExecutionService import IntegrationExecutionService
+from process.application.execution.services.OperationCacheService import OperationCacheService
+from process.domain.dto.PagingModifier import PagingModifier
 
 
 class ExecuteIntegrationProcess(ExecuteIntegrationStrategy, IScoped):

@@ -1,15 +1,15 @@
-from process.application.operation.services.DataOperationJobExecutionIntegrationService import \
-    DataOperationJobExecutionIntegrationService
 from injector import inject
 from pdip.dependency import IScoped
 from pdip.logging.loggers.database import SqlLogger
 
-from process.domain.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION
-from process.application.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
-from process.application.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategyFactory import \
+from process.application.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
+from process.application.execution.adapters.execution.integration.ExecuteIntegrationStrategyFactory import \
     ExecuteIntegrationStrategyFactory
-from process.application.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.services.IntegrationExecutionService import IntegrationExecutionService
+from process.application.execution.services.OperationCacheService import OperationCacheService
+from process.application.operation.services.DataOperationJobExecutionIntegrationService import \
+    DataOperationJobExecutionIntegrationService
+from process.domain.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION
 
 
 class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):

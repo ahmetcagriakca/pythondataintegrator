@@ -8,7 +8,7 @@ from pdip.connection.database.base import DatabaseProvider
 from pdip.connection.models import DataQueueTask
 from pdip.connection.models.enums import ConnectorTypes
 
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.domain.dto.PagingModifier import PagingModifier
 
 

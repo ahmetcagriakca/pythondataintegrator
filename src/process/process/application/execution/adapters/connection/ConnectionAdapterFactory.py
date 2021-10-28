@@ -4,10 +4,10 @@ from pdip.connection.models.enums import ConnectionTypes
 from pdip.dependency import IScoped
 from pdip.exceptions import IncompatibleAdapterException, NotSupportedFeatureException
 
-from process.application.operation.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
-from process.application.operation.execution.adapters.connection.FileAdapter import FileAdapter
-from process.application.operation.execution.adapters.connection.QueueAdapter import QueueAdapter
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
+from process.application.execution.adapters.connection.FileAdapter import FileAdapter
+from process.application.execution.adapters.connection.QueueAdapter import QueueAdapter
+from process.application.execution.services.OperationCacheService import OperationCacheService
 
 
 class ConnectionAdapterFactory(IScoped):

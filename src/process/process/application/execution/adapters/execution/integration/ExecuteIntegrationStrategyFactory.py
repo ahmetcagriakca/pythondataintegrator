@@ -2,15 +2,15 @@ from injector import inject
 from pdip.dependency import IScoped
 from pdip.exceptions import IncompatibleAdapterException
 
-from process.application.operation.execution.adapters.execution.integration.ExecuteIntegrationLimitOff import \
+from process.application.execution.adapters.execution.integration.ExecuteIntegrationLimitOff import \
     ExecuteIntegrationLimitOff
-from process.application.operation.execution.adapters.execution.integration.ExecuteIntegrationProcess import \
+from process.application.execution.adapters.execution.integration.ExecuteIntegrationProcess import \
     ExecuteIntegrationProcess
-from process.application.operation.execution.adapters.execution.integration.ExecuteIntegrationSerial import \
+from process.application.execution.adapters.execution.integration.ExecuteIntegrationSerial import \
     ExecuteIntegrationSerial
-from process.application.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
+from process.application.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
     ExecuteIntegrationStrategy
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.services.OperationCacheService import OperationCacheService
 
 
 class ExecuteIntegrationStrategyFactory(IScoped):

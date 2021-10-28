@@ -12,8 +12,8 @@ from process.application.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountCo
     CheckDatabaseTableRowCountCommand
 from process.application.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountRequest import \
     CheckDatabaseTableRowCountRequest
+from process.application.StartExecution.StartExecutionProcessCommand import StartExecutionProcessCommand
 from process.domain.configs.ProcessRpcServerConfig import ProcessRpcServerConfig
-from process.rpc.OperationProcess import OperationProcess
 
 
 class ProcessService(Service, ISingleton):
@@ -33,11 +33,10 @@ class ProcessService(Service, ISingleton):
 
     def exposed_job_start(self, data_operation_id=None, job_id=None, data_operation_job_execution_id=None, *args,
                           **kwargs):
-        operation_process = OperationProcess()
-        result = operation_process.start_operation_process(data_operation_id=data_operation_id, job_id=job_id,
-                                                           data_operation_job_execution_id=data_operation_job_execution_id)
-        del operation_process
-        return result
+        start_execution_command = StartExecutionProcessCommand(DataOperationId=data_operation_id, JobId=job_id,
+                                                               DataOperationJobExecutionId=data_operation_job_execution_id)
+        dispatcher: Dispatcher = Pdi().get(Dispatcher)
+        dispatcher.dispatch(start_execution_command)
 
     def exposed_check_database_connection(self, connection_name=None, *args, **kwargs):
         dispatcher: Dispatcher = Pdi().get(Dispatcher)

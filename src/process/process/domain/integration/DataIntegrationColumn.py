@@ -1,9 +1,9 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from process.domain.base import Base
 from process.domain.base.integration.DataIntegrationColumnBase import DataIntegrationColumnBase
-from pdip.data import Entity
 
 
 class DataIntegrationColumn(DataIntegrationColumnBase, Entity, Base):

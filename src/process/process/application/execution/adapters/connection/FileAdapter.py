@@ -10,7 +10,7 @@ from pdip.connection.file.base import FileProvider
 from pdip.exceptions import NotSupportedFeatureException
 from pdip.logging.loggers.database import SqlLogger
 
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.domain.dto.PagingModifier import PagingModifier
 
 

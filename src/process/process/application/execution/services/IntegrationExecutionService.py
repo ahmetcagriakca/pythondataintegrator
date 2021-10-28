@@ -9,8 +9,9 @@ from pdip.connection.adapters import ConnectionAdapter
 from pdip.dependency import IScoped
 from pdip.logging.loggers.database import SqlLogger
 
-from process.application.operation.execution.adapters.connection.ConnectionAdapterFactory import ConnectionAdapterFactory
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.adapters.connection.ConnectionAdapterFactory import \
+    ConnectionAdapterFactory
+from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.application.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
 from process.domain.dto.PagingModifier import PagingModifier

@@ -2,10 +2,10 @@ from injector import inject
 from pdip.dependency import IScoped
 from pdip.logging.loggers.database import SqlLogger
 
-from process.application.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
-from process.application.operation.execution.adapters.execution.ExecuteAdapterFactory import ExecuteAdapterFactory
-from process.application.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
+from process.application.execution.adapters.execution.ExecuteAdapterFactory import ExecuteAdapterFactory
+from process.application.execution.services.IntegrationExecutionService import IntegrationExecutionService
+from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.application.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
 from process.domain.enums.StatusTypes import StatusTypes

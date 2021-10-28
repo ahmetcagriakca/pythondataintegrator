@@ -1,37 +1,68 @@
 from injector import inject
 from pdip.configuration.models.application import ApplicationConfig
 from pdip.configuration.services import ConfigService
+from pdip.cqrs import ICommandHandler
 from pdip.data import RepositoryProvider
-from pdip.data.decorators import transactionhandler
 from pdip.delivery import EmailProvider
-from pdip.dependency import IScoped
 from pdip.html import HtmlTemplateService
 from pdip.logging.loggers.database import SqlLogger
 from sqlalchemy import func
 
+from process.application.SendExecutionFinishMail.SendExecutionFinishMailCommand import SendExecutionFinishMailCommand
 from process.domain.integration import DataIntegrationConnection
 from process.domain.operation import DataOperationJobExecution, \
     DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent, DataOperationIntegration
 
 
-class SendDataOperationFinishMailCommand(IScoped):
-
+class SendExecutionFinishMailCommandHandler(ICommandHandler[SendExecutionFinishMailCommand]):
     @inject
     def __init__(self,
+                 sql_logger: SqlLogger,
                  repository_provider: RepositoryProvider,
-                 html_template_service: HtmlTemplateService,
                  config_service: ConfigService,
                  email_provider: EmailProvider,
                  application_config: ApplicationConfig,
-                 sql_logger: SqlLogger
-                 ):
-        super().__init__()
-        self.sql_logger = sql_logger
-        self.application_config: ApplicationConfig = application_config
+                 html_template_service: HtmlTemplateService,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.html_template_service = html_template_service
+        self.application_config = application_config
         self.email_provider = email_provider
         self.config_service = config_service
+        self.sql_logger = sql_logger
         self.repository_provider = repository_provider
-        self.html_template_service = html_template_service
+
+    def handle(self, command: SendExecutionFinishMailCommand):
+        data_operation_job_execution = self.repository_provider.get(DataOperationJobExecution).first(
+            Id=command.DataOperationJobExecutionId)
+        if data_operation_job_execution is None:
+            self.sql_logger.info(f'{command} mail sending execution not found',
+                                 job_id=command.DataOperationJobExecutionId)
+            return
+
+        operation_contacts = []
+        for contact in data_operation_job_execution.DataOperationJob.DataOperation.Contacts:
+            if contact.IsDeleted == 0:
+                operation_contacts.append(contact.Email)
+        self._add_default_contacts(operation_contacts=operation_contacts)
+        if operation_contacts is None:
+            self.sql_logger.error(f'{command.DataOperationJobExecutionId} mail sending contact not found',
+                                  job_id=command.DataOperationJobExecutionId)
+            return
+        data_operation_name = data_operation_job_execution.DataOperationJob.DataOperation.Name
+        subject = f"Execution completed"
+        if data_operation_job_execution.StatusId == 3:
+            subject = subject + " successfully"
+        elif data_operation_job_execution.StatusId == 4:
+            subject = subject + " with error"
+        subject = subject + f": {self.application_config.environment} » {data_operation_name} » {command.DataOperationJobExecutionId}"
+        mail_body = self._render(command.DataOperationJobExecutionId)
+
+        try:
+            self.email_provider.send(operation_contacts, subject, mail_body)
+            self.sql_logger.info(f"Mail Sent successfully.", job_id=command.DataOperationJobExecutionId)
+        except Exception as ex:
+            self.sql_logger.error(f"Error on mail sending. Error:{ex}", job_id=command.DataOperationJobExecutionId)
 
     def _render_job_execution(self, id):
         headers = [
@@ -226,37 +257,3 @@ class SendDataOperationFinishMailCommand(IScoped):
             for default_contact in default_contacts_emails:
                 if default_contact is not None and default_contact != '':
                     operation_contacts.append(default_contact)
-
-    @transactionhandler
-    def execute(self, data_operation_job_execution_id):
-
-        data_operation_job_execution = self.repository_provider.get(DataOperationJobExecution).first(
-            Id=data_operation_job_execution_id)
-        if data_operation_job_execution is None:
-            self.sql_logger.info(f'{data_operation_job_execution_id} mail sending execution not found',
-                                 job_id=data_operation_job_execution_id)
-            return
-
-        operation_contacts = []
-        for contact in data_operation_job_execution.DataOperationJob.DataOperation.Contacts:
-            if contact.IsDeleted == 0:
-                operation_contacts.append(contact.Email)
-        self._add_default_contacts(operation_contacts=operation_contacts)
-        if operation_contacts is None:
-            self.sql_logger.error(f'{data_operation_job_execution_id} mail sending contact not found',
-                                  job_id=data_operation_job_execution_id)
-            return
-        data_operation_name = data_operation_job_execution.DataOperationJob.DataOperation.Name
-        subject = f"Execution completed"
-        if data_operation_job_execution.StatusId == 3:
-            subject = subject + " successfully"
-        elif data_operation_job_execution.StatusId == 4:
-            subject = subject + " with error"
-        subject = subject + f": {self.application_config.environment} » {data_operation_name} » {data_operation_job_execution_id}"
-        mail_body = self._render(data_operation_job_execution_id)
-
-        try:
-            self.email_provider.send(operation_contacts, subject, mail_body)
-            self.sql_logger.info(f"Mail Sent successfully.", job_id=data_operation_job_execution_id)
-        except Exception as ex:
-            self.sql_logger.error(f"Error on mail sending. Error:{ex}", job_id=data_operation_job_execution_id)

@@ -1,8 +1,9 @@
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
 from process.domain.base.integration.DataIntegrationConnectionBase import DataIntegrationConnectionBase
-from pdip.data import Entity
 from process.domain.integration.DataIntegrationConnectionDatabase import DataIntegrationConnectionDatabase
 from process.domain.integration.DataIntegrationConnectionFile import DataIntegrationConnectionFile
 from process.domain.integration.DataIntegrationConnectionQueue import DataIntegrationConnectionQueue
@@ -21,4 +22,4 @@ class DataIntegrationConnection(DataIntegrationConnectionBase, Entity, Base):
     File: DataIntegrationConnectionFile = relationship("DataIntegrationConnectionFile", uselist=False,
                                                        back_populates="DataIntegrationConnection")
     Queue: DataIntegrationConnectionQueue = relationship("DataIntegrationConnectionQueue", uselist=False,
-                                                        back_populates="DataIntegrationConnection")
+                                                         back_populates="DataIntegrationConnection")

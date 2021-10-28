@@ -8,7 +8,7 @@ from pdip.logging.loggers.database import SqlLogger
 from process.application.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
 from process.application.SendNotification.SendNotificationCommand import SendNotificationCommand
 from process.application.SendNotification.SendNotificationRequest import SendNotificationRequest
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.domain.connection import Connection
 
 

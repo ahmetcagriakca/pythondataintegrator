@@ -2,11 +2,11 @@ from injector import inject
 from pdip.dependency import IScoped
 from pdip.exceptions import IncompatibleAdapterException
 
-from process.application.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
-from process.application.operation.execution.adapters.execution.ExecuteIntegrationAdapter import \
+from process.application.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
+from process.application.execution.adapters.execution.ExecuteIntegrationAdapter import \
     ExecuteIntegrationAdapter
-from process.application.operation.execution.adapters.execution.ExecuteQueryAdapter import ExecuteQueryAdapter
-from process.application.operation.execution.services.OperationCacheService import OperationCacheService
+from process.application.execution.adapters.execution.ExecuteQueryAdapter import ExecuteQueryAdapter
+from process.application.execution.services.OperationCacheService import OperationCacheService
 
 
 class ExecuteAdapterFactory(IScoped):

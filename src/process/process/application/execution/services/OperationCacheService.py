@@ -9,21 +9,23 @@ from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
 from pdip.json import BaseConverter
 
-from process.domain.base.connection import ConnectionBase, ConnectionTypeBase, ConnectionDatabaseBase, ConnectionFileBase, \
+from process.domain.base.connection import ConnectionBase, ConnectionTypeBase, ConnectionDatabaseBase, \
+    ConnectionFileBase, \
     ConnectionQueueBase, ConnectionServerBase, ConnectionSecretBase
-from process.domain.base.integration import DataIntegrationBase, DataIntegrationColumnBase, DataIntegrationConnectionBase, \
+from process.domain.base.integration import DataIntegrationBase, DataIntegrationColumnBase, \
+    DataIntegrationConnectionBase, \
     DataIntegrationConnectionDatabaseBase, DataIntegrationConnectionFileBase, DataIntegrationConnectionQueueBase, \
     DataIntegrationConnectionFileCsvBase
 from process.domain.base.operation import DataOperationBase, DataOperationIntegrationBase
 from process.domain.base.secret import SecretBase, SecretSourceBase, SecretSourceBasicAuthenticationBase
 from process.domain.connection import Connection, ConnectionType, ConnectionDatabase, ConnectionFile, ConnectionQueue, \
     ConnectionServer, ConnectionSecret
+from process.domain.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication
 from process.domain.integration import DataIntegration, DataIntegrationColumn, DataIntegrationConnection, \
     DataIntegrationConnectionDatabase, DataIntegrationConnectionFile, DataIntegrationConnectionQueue, \
     DataIntegrationConnectionFileCsv
 from process.domain.operation import DataOperation, DataOperationIntegration
 from process.domain.secret import Secret, SecretSource, SecretSourceBasicAuthentication
-from process.domain.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication
 
 
 class OperationCacheService(IScoped):

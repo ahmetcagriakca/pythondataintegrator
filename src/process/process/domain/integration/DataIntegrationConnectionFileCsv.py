@@ -1,8 +1,9 @@
+from pdip.data import Entity
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
+
 from process.domain.base import Base
 from process.domain.base.integration.DataIntegrationConnectionFileCsvBase import DataIntegrationConnectionFileCsvBase
-from pdip.data import Entity
 
 
 class DataIntegrationConnectionFileCsv(DataIntegrationConnectionFileCsvBase, Entity, Base):

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
+from pdip.cqrs import ICommand
 
 from process.application.SendNotification.SendNotificationRequest import SendNotificationRequest
-from pdip.cqrs import ICommand
 
 
 @dataclass

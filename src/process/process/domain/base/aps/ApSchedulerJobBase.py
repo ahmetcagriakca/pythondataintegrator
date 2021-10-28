@@ -2,7 +2,7 @@ from typing import List
 
 from pdip.data import EntityBase
 
-from process.domain.base.aps import ApSchedulerJobEventBase
+from process.domain.base.aps.ApSchedulerJobEventBase import ApSchedulerJobEventBase
 from process.domain.base.operation.DataOperationJobBase import DataOperationJobBase
 
 

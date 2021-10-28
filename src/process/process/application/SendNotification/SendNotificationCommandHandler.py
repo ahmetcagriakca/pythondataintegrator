@@ -6,8 +6,8 @@ from pdip.cqrs import ICommandHandler
 from pdip.json import DateTimeEncoder
 from pdip.logging.loggers.database import SqlLogger
 
-from process.domain.configs.NotificationClientConfig import NotificationClientConfig
 from process.application.SendNotification.SendNotificationCommand import SendNotificationCommand
+from process.domain.configs.NotificationClientConfig import NotificationClientConfig
 
 
 class SendNotificationCommandHandler(ICommandHandler[SendNotificationCommand]):
