@@ -47,6 +47,5 @@ class StartProcessCommandHandler(ICommandHandler[StartProcessCommand]):
         """
 
         conn = self.connect_rpc()
-        job = conn.root.job_start(command.DataOperationId, command.JobId, command.DataOperationJobExecutionId)
-        return job
+        conn.root.job_start(command.DataOperationId, command.JobId, command.DataOperationJobExecutionId)
 
