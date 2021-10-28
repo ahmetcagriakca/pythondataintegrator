@@ -1,17 +1,16 @@
-import multiprocessing
 import os
 from queue import Queue
 from typing import List
 
-from injector import inject
 import pandas as pd
+from injector import inject
 from pandas import DataFrame
+from pdip.connection.adapters import ConnectionAdapter
+from pdip.connection.file.base import FileProvider
+from pdip.exceptions import NotSupportedFeatureException
+from pdip.logging.loggers.database import SqlLogger
 
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.connection.adapters.connection_adapter import ConnectionAdapter
-from infrastructure.connection.file.FileProvider import FileProvider
-from infrastructure.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
-from infrastructure.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
 
 
@@ -140,7 +139,7 @@ class FileAdapter(ConnectionAdapter):
             data_integration_id=data_integration_id)
 
         source_columns = [(data_integration_column.SourceColumnName) for data_integration_column in
-                              data_integration_columns]
+                          data_integration_columns]
         if isinstance(source_data, pd.DataFrame):
             data = source_data[source_columns]
             prepared_data = data.values.tolist()

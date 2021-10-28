@@ -3,7 +3,7 @@ from models.viewmodels.integration.CreateDataIntegrationConnectionDatabaseModel 
 from models.viewmodels.integration.CreateDataIntegrationConnectionFileModel import \
     CreateDataIntegrationConnectionFileModel
 
-from infrastructure.json.JsonConvert import JsonConvert
+from pdip.json import JsonConvert
 from models.viewmodels.integration.CreateDataIntegrationConnectionQueueModel import \
     CreateDataIntegrationConnectionQueueModel
 

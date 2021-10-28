@@ -2,23 +2,24 @@ import multiprocessing
 import traceback
 from queue import Queue
 from time import time
+
+import pandas as pd
+from func_timeout import FunctionTimedOut
 from injector import inject
 from pandas import DataFrame, notnull
-import pandas as pd
+from pdip.connection.models import DataQueueTask
+from pdip.data.decorators import transactionhandler
+from pdip.dependency import IScoped
+from pdip.dependency.container import DependencyContainer
+from pdip.exceptions import OperationalException
+from pdip.logging.loggers.database import SqlLogger
+from pdip.processing import ProcessManager
 
 from domain.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
     ExecuteIntegrationStrategy
-from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.data.decorators.TransactionHandler import transaction_handler
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.OperationalException import OperationalException
-from infrastructure.multi_processing.ProcessManager import ProcessManager
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
-from IocManager import IocManager
-from infrastructure.connection.models.DataQueueTask import DataQueueTask
-from infrastructure.logging.SqlLogger import SqlLogger
+from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from models.dto.PagingModifier import PagingModifier
-from func_timeout import FunctionTimedOut
 
 
 class ExecuteIntegrationProcess(ExecuteIntegrationStrategy, IScoped):
@@ -40,7 +41,7 @@ class ExecuteIntegrationProcess(ExecuteIntegrationStrategy, IScoped):
                                   process_count: int,
                                   data_queue: Queue,
                                   data_result_queue: Queue):
-        return IocManager.injector.get(ExecuteIntegrationProcess).start_source_data_operation(
+        return DependencyContainer.Instance.get(ExecuteIntegrationProcess).start_source_data_operation(
             sub_process_id=sub_process_id,
             data_integration_id=data_integration_id,
             data_operation_job_execution_id=data_operation_job_execution_id,
@@ -51,7 +52,7 @@ class ExecuteIntegrationProcess(ExecuteIntegrationStrategy, IScoped):
             data_result_queue=data_result_queue,
         )
 
-    @transaction_handler
+    @transactionhandler
     def start_source_data_operation(self, sub_process_id,
                                     data_integration_id: int,
                                     data_operation_job_execution_id: int,
@@ -94,7 +95,7 @@ class ExecuteIntegrationProcess(ExecuteIntegrationStrategy, IScoped):
                                    data_operation_job_execution_integration_id: int,
                                    data_queue: Queue,
                                    data_result_queue: Queue) -> int:
-        return IocManager.injector.get(ExecuteIntegrationProcess).start_execute_data_operation(
+        return DependencyContainer.Instance.get(ExecuteIntegrationProcess).start_execute_data_operation(
             sub_process_id=sub_process_id,
             data_integration_id=data_integration_id,
             data_operation_job_execution_id=data_operation_job_execution_id,
@@ -103,7 +104,7 @@ class ExecuteIntegrationProcess(ExecuteIntegrationStrategy, IScoped):
             data_result_queue=data_result_queue,
         )
 
-    @transaction_handler
+    @transactionhandler
     def start_execute_data_operation_on_process(self,
                                                 sub_process_id: int,
                                                 data_integration_id: int,
@@ -111,7 +112,7 @@ class ExecuteIntegrationProcess(ExecuteIntegrationStrategy, IScoped):
                                                 data_operation_job_execution_integration_id: int,
                                                 data_queue: Queue,
                                                 data_result_queue: Queue) -> int:
-        return IocManager.injector.get(ExecuteIntegrationProcess).start_execute_data_operation(
+        return DependencyContainer.Instance.get(ExecuteIntegrationProcess).start_execute_data_operation(
             sub_process_id=sub_process_id,
             data_integration_id=data_integration_id,
             data_operation_job_execution_id=data_operation_job_execution_id,

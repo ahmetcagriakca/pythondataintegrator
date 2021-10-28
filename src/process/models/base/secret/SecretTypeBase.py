@@ -1,12 +1,11 @@
 from typing import List
 
-from models.base.secret.SecretBase import SecretBase
+from pdip.data import EntityBase
+
 from models.base.secret.AuthenticationTypeBase import AuthenticationTypeBase
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
+from models.base.secret.SecretBase import SecretBase
 
 
-@BaseConverter.register
 class SecretTypeBase(EntityBase):
     def __init__(self,
                  Name: int = None,

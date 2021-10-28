@@ -1,9 +1,10 @@
 from typing import List
+
 from injector import inject
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 
 from domain.integration.services.DataIntegrationService import DataIntegrationService
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
 from models.dao.operation import DataOperation, DataOperationIntegration, Definition
 from models.viewmodels.operation.CreateDataOperationIntegrationModel import CreateDataOperationIntegrationModel
 

@@ -1,11 +1,10 @@
 from typing import List
 
-from models.base.aps.ApSchedulerJobEventBase import ApSchedulerJobEventBase
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
+from pdip.data import EntityBase
+
+from .ApSchedulerJobEventBase import ApSchedulerJobEventBase
 
 
-@BaseConverter.register
 class ApSchedulerEventBase(EntityBase):
     def __init__(self,
                  Code: int = None,

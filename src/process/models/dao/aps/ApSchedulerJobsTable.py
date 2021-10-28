@@ -1,9 +1,10 @@
-from sqlalchemy import Column, Float, TEXT, LargeBinary, Unicode
-from IocManager import IocManager
+from sqlalchemy import Column, Float, LargeBinary, Unicode
+
 from models.base.aps.ApSchedulerJobsTable import ApSchedulerJobsTableBase
+from models.dao.base import Base
 
 
-class ApSchedulerJobsTable(ApSchedulerJobsTableBase,IocManager.Base):
+class ApSchedulerJobsTable(ApSchedulerJobsTableBase, Base):
     # TODO: This feels bad man
     __tablename__ = "ApSchedulerJobsTable"
     __table_args__ = {"schema": "Aps"}

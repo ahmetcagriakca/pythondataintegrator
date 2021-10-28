@@ -1,8 +1,7 @@
-import multiprocessing
 from abc import ABC, abstractmethod
+
 from injector import inject
-from infrastructure.multi_processing.ProcessManager import ProcessManager
-from infrastructure.dependency.scopes import IScoped
+from pdip.dependency import IScoped
 
 
 class ExecuteIntegrationStrategy(ABC, IScoped):

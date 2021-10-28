@@ -1,11 +1,11 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.integration.DataIntegrationConnectionQueueBase import DataIntegrationConnectionQueueBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 
 
-class DataIntegrationConnectionQueue(DataIntegrationConnectionQueueBase,Entity, IocManager.Base):
+class DataIntegrationConnectionQueue(DataIntegrationConnectionQueueBase, Entity, Base):
     __tablename__ = "DataIntegrationConnectionQueue"
     __table_args__ = {"schema": "Integration"}
     DataIntegrationConnectionId = Column(Integer, ForeignKey('Integration.DataIntegrationConnection.Id'))

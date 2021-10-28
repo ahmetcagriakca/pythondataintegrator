@@ -1,14 +1,14 @@
 from injector import inject
+from pdip.connection.database.base import DatabaseProvider
+from pdip.connection.models.enums import ConnectorTypes
+from pdip.cqrs import Dispatcher, ICommandHandler
+from pdip.data import RepositoryProvider
+from pdip.logging.loggers.database import SqlLogger
 
 from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
 from domain.notification.SendNotification.SendNotificationCommand import SendNotificationCommand
 from domain.notification.SendNotification.SendNotificationRequest import SendNotificationRequest
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.connection.database.DatabaseProvider import DatabaseProvider
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.connection import Connection
 
 
@@ -16,10 +16,10 @@ class CheckDatabaseConnectionHandler(ICommandHandler[CheckDatabaseConnectionComm
     @inject
     def __init__(self,
                  dispatcher: Dispatcher,
-                 sql_logger:SqlLogger,
+                 sql_logger: SqlLogger,
                  repository_provider: RepositoryProvider,
-                 operation_cache_service:OperationCacheService,
-                 database_provider:DatabaseProvider,
+                 operation_cache_service: OperationCacheService,
+                 database_provider: DatabaseProvider,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.database_provider = database_provider
@@ -33,7 +33,16 @@ class CheckDatabaseConnectionHandler(ICommandHandler[CheckDatabaseConnectionComm
         if connection is None:
             return "Connection not found!"
         self.operation_cache_service.initialize_connection(connection.Id)
-        database_context = self.database_provider.get_context(connection=connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=connection.ConnectionId)
+
+        database_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(connection.Database.ConnectorTypeId), host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password, database=connection.Database.DatabaseName,
+            service_name=connection.Database.ServiceName, sid=connection.Database.Sid)
         database_context.connector.connect()
         self.notify(message=f'{command.request.ConnectionName} connected successfully.')
 

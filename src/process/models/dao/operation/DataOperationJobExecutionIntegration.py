@@ -3,13 +3,13 @@ from typing import List
 
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, String
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.operation.DataOperationJobExecutionIntegrationBase import DataOperationJobExecutionIntegrationBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 from models.dao.operation.DataOperationJobExecutionIntegrationEvent import DataOperationJobExecutionIntegrationEvent
 
 
-class DataOperationJobExecutionIntegration(DataOperationJobExecutionIntegrationBase,Entity, IocManager.Base):
+class DataOperationJobExecutionIntegration(DataOperationJobExecutionIntegrationBase, Entity, Base):
     __tablename__ = "DataOperationJobExecutionIntegration"
     __table_args__ = {"schema": "Operation"}
     DataOperationJobExecutionId = Column(Integer, ForeignKey('Operation.DataOperationJobExecution.Id'))

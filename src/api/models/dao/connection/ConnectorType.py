@@ -3,13 +3,13 @@ from typing import List
 
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from models.dao.connection.ConnectionDatabase import ConnectionDatabase
 from models.dao.connection.ConnectionFile import ConnectionFile
 from pdip.data import Entity
 
 
-class ConnectorType(Entity, DependencyContainer.Base):
+class ConnectorType(Entity, Base):
     __tablename__ = "ConnectorType"
     __table_args__ = {"schema": "Connection"}
     ConnectionTypeId = Column(Integer, ForeignKey('Connection.ConnectionType.Id'))

@@ -1,22 +1,22 @@
 from queue import Queue
 from time import time
-from typing import List
 
+import pandas as pd
 from func_timeout import func_set_timeout
 from injector import inject
 from pandas import notnull
-import pandas as pd
+from pdip.connection.adapters import ConnectionAdapter
+from pdip.dependency import IScoped
+from pdip.logging.loggers.database import SqlLogger
+
 from domain.operation.execution.adapters.connection.ConnectionAdapterFactory import ConnectionAdapterFactory
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.logging.SqlLogger import SqlLogger
 from models.dto.PagingModifier import PagingModifier
 from models.enums.StatusTypes import StatusTypes
 from models.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
     EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY
-from infrastructure.connection.adapters.connection_adapter import ConnectionAdapter
 
 
 class IntegrationExecutionService(IScoped):

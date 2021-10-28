@@ -1,12 +1,12 @@
 from typing import List
-from models.base.EntityBase import EntityBase
+
+from pdip.data import EntityBase
+
 from models.base.operation.DataOperationContactBase import DataOperationContactBase
-from models.base.operation.DataOperationJobBase import DataOperationJobBase
 from models.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
-from infrastructure.json.BaseConverter import BaseConverter
+from models.base.operation.DataOperationJobBase import DataOperationJobBase
 
 
-@BaseConverter.register
 class DataOperationBase(EntityBase):
     def __init__(self,
                  DefinitionId: int = None,

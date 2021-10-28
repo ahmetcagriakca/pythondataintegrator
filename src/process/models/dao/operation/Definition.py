@@ -1,11 +1,11 @@
 from sqlalchemy import Column, String, Integer, Text, Boolean
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.operation.DefinitionBase import DefinitionBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 
 
-class Definition(DefinitionBase, Entity, IocManager.Base):
+class Definition(DefinitionBase, Entity, Base):
     __tablename__ = "Definition"
     __table_args__ = {"schema": "Operation"}
     Name = Column(String(100), index=False, unique=False, nullable=False)

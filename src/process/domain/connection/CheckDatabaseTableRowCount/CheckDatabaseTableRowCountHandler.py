@@ -1,15 +1,15 @@
 from injector import inject
+from pdip.connection.database.base import DatabaseProvider
+from pdip.connection.models.enums import ConnectorTypes
+from pdip.cqrs import Dispatcher, ICommandHandler
+from pdip.data import RepositoryProvider
+from pdip.logging.loggers.database import SqlLogger
 
 from domain.connection.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountCommand import \
     CheckDatabaseTableRowCountCommand
 from domain.notification.SendNotification.SendNotificationCommand import SendNotificationCommand
 from domain.notification.SendNotification.SendNotificationRequest import SendNotificationRequest
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.connection.database.DatabaseProvider import DatabaseProvider
-from infrastructure.cqrs.Dispatcher import Dispatcher
-from infrastructure.cqrs.ICommandHandler import ICommandHandler
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.connection import Connection
 
 
@@ -34,7 +34,16 @@ class CheckDatabaseTableRowCountHandler(ICommandHandler[CheckDatabaseTableRowCou
         if connection is None:
             return "Connection not found!"
         self.operation_cache_service.initialize_connection(connection.Id)
-        database_context = self.database_provider.get_context(connection=connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=connection.ConnectionId)
+
+        database_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(connection.Database.ConnectorTypeId), host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password, database=connection.Database.DatabaseName,
+            service_name=connection.Database.ServiceName, sid=connection.Database.Sid)
         database_context.connector.connect()
         database_context.connector.disconnect()
         count_of_table = ''
@@ -42,7 +51,8 @@ class CheckDatabaseTableRowCountHandler(ICommandHandler[CheckDatabaseTableRowCou
         table = command.request.Table
         if schema is not None and schema != '' and table is not None and table != '':
             try:
-                count_query=database_context.connector.get_table_select_query(selected_rows='1', schema=schema, table=table)
+                count_query = database_context.connector.get_table_select_query(selected_rows='1', schema=schema,
+                                                                                table=table)
                 count = database_context.get_table_count(query=count_query)
                 count_of_table = f'"{schema}"."{table}" has {count} row'
             except Exception as ex:

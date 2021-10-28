@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from pdip.cqrs import ICommand
 
-from domain.connection.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountRequest import CheckDatabaseTableRowCountRequest
-from infrastructure.cqrs.ICommand import ICommand
+from domain.connection.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountRequest import \
+    CheckDatabaseTableRowCountRequest
 
 
 @dataclass

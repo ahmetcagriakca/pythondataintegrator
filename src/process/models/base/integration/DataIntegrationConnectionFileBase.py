@@ -1,9 +1,8 @@
-from models.base.EntityBase import EntityBase
+from pdip.data import EntityBase
+
 from models.base.integration.DataIntegrationConnectionFileCsvBase import DataIntegrationConnectionFileCsvBase
-from infrastructure.json.BaseConverter import BaseConverter
 
 
-@BaseConverter.register
 class DataIntegrationConnectionFileBase(EntityBase):
 
     def __init__(self,
@@ -11,7 +10,7 @@ class DataIntegrationConnectionFileBase(EntityBase):
                  Folder: str = None,
                  FileName: str = None,
                  DataIntegrationConnection=None,
-                 Csv:DataIntegrationConnectionFileCsvBase=None,
+                 Csv: DataIntegrationConnectionFileCsvBase = None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataIntegrationConnectionId: int = DataIntegrationConnectionId

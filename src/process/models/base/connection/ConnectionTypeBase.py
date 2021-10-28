@@ -1,11 +1,11 @@
 from typing import List
+
+from pdip.data import EntityBase
+
 from models.base.connection.ConnectionBase import ConnectionBase
 from models.base.connection.ConnectorTypeBase import ConnectorTypeBase
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
 
 
-@BaseConverter.register
 class ConnectionTypeBase(EntityBase):
 
     def __init__(self,

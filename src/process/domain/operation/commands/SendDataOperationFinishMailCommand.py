@@ -1,14 +1,14 @@
 from injector import inject
+from pdip.configuration.models.application import ApplicationConfig
+from pdip.configuration.services import ConfigService
+from pdip.data import RepositoryProvider
+from pdip.data.decorators import transactionhandler
+from pdip.delivery import EmailProvider
+from pdip.dependency import IScoped
+from pdip.html import HtmlTemplateService
+from pdip.logging.loggers.database import SqlLogger
 from sqlalchemy import func
 
-from infrastructure.configuration.ConfigService import ConfigService
-from infrastructure.data.decorators.TransactionHandler import transaction_handler
-from infrastructure.delivery.EmailProvider import EmailProvider
-from infrastructure.html.HtmlTemplateService import HtmlTemplateService, Pagination
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.logging.SqlLogger import SqlLogger
-from models.configs.ApplicationConfig import ApplicationConfig
 from models.dao.integration import DataIntegrationConnection
 from models.dao.operation import DataOperationJobExecution, \
     DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent, DataOperationIntegration
@@ -227,7 +227,7 @@ class SendDataOperationFinishMailCommand(IScoped):
                 if default_contact is not None and default_contact != '':
                     operation_contacts.append(default_contact)
 
-    @transaction_handler
+    @transactionhandler
     def execute(self, data_operation_job_execution_id):
 
         data_operation_job_execution = self.repository_provider.get(DataOperationJobExecution).first(

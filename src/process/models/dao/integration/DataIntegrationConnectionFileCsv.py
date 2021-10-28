@@ -1,11 +1,11 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.integration.DataIntegrationConnectionFileCsvBase import DataIntegrationConnectionFileCsvBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 
 
-class DataIntegrationConnectionFileCsv(DataIntegrationConnectionFileCsvBase,Entity, IocManager.Base):
+class DataIntegrationConnectionFileCsv(DataIntegrationConnectionFileCsvBase, Entity, Base):
     __tablename__ = "DataIntegrationConnectionFileCsv"
     __table_args__ = {"schema": "Integration"}
     DataIntegrationConnectionFileId = Column(Integer, ForeignKey('Integration.DataIntegrationConnectionFile.Id'))

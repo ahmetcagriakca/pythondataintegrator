@@ -1,4 +1,6 @@
 from injector import inject
+from pdip.dependency import IScoped
+from pdip.logging.loggers.database import SqlLogger
 
 from domain.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
 from domain.operation.execution.adapters.execution.ExecuteAdapterFactory import ExecuteAdapterFactory
@@ -6,8 +8,6 @@ from domain.operation.execution.services.IntegrationExecutionService import Inte
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.logging.SqlLogger import SqlLogger
 from models.enums.StatusTypes import StatusTypes
 from models.enums.events import EVENT_EXECUTION_INTEGRATION_STARTED, EVENT_EXECUTION_INTEGRATION_FINISHED
 

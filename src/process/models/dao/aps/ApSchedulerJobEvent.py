@@ -1,11 +1,11 @@
 from models.base.aps.ApSchedulerJobEventBase import ApSchedulerJobEventBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 
 
-class ApSchedulerJobEvent(ApSchedulerJobEventBase,Entity, IocManager.Base):
+class ApSchedulerJobEvent(ApSchedulerJobEventBase, Entity, Base):
     __tablename__ = "ApSchedulerJobEvent"
     __table_args__ = {"schema": "Aps"}
     ApSchedulerJobId = Column(Integer, ForeignKey('Aps.ApSchedulerJob.Id'))

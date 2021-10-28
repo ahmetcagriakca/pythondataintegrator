@@ -1,11 +1,11 @@
 from datetime import datetime
 
 from injector import inject
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+from pdip.exceptions import OperationalException
+from pdip.logging.loggers.database import SqlLogger
 
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.OperationalException import OperationalException
-from infrastructure.logging.SqlLogger import SqlLogger
 from models.dao.common import Status, OperationEvent
 from models.dao.operation import DataOperationJob, DataOperationJobExecution, DataOperationJobExecutionEvent, \
     DataOperation
@@ -35,7 +35,7 @@ class CreateExecutionCommand(IScoped):
         if data_operation is None:
             error = f'{data_operation_id}-{job_id} Data operation not found'
             self.sql_logger.error(error)
-            return OperationalException(error)
+            raise OperationalException(error)
 
         data_operation_job = self.get_data_operation_job_by_operation_and_job_id(
             data_operation_id=data_operation_id,
@@ -43,13 +43,11 @@ class CreateExecutionCommand(IScoped):
         if data_operation_job is None:
             error = f'{data_operation_id}-{job_id} Data operation job not found'
             self.sql_logger.error(error)
-            return OperationalException(error)
+            raise OperationalException(error)
+        return data_operation_job
 
     def execute(self, data_operation_id: int, job_id: int):
-        self.check(data_operation_id, job_id)
-        data_operation_job = self.get_data_operation_job_by_operation_and_job_id(
-            data_operation_id=data_operation_id,
-            job_id=job_id)
+        data_operation_job = self.check(data_operation_id, job_id)
         status = self.repository_provider.get(Status).first(Id=1)
         data_operation_job_execution = DataOperationJobExecution(
             DataOperationJob=data_operation_job,

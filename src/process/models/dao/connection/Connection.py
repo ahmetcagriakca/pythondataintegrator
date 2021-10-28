@@ -1,18 +1,20 @@
-from models.base.connection.ConnectionBase import ConnectionBase
-from models.dao.connection import ConnectionQueue
-from models.dao.connection.ConnectionServer import ConnectionServer
-from models.dao.connection.ConnectionSecret import ConnectionSecret
-from models.dao.connection.ConnectionDatabase import ConnectionDatabase
-from models.dao.connection.ConnectionFile import ConnectionFile
 from typing import List
+
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
-from models.dao.Entity import Entity
+
+from models.base.connection.ConnectionBase import ConnectionBase
+from pdip.data import Entity
+from models.dao.base import Base
+from models.dao.connection.ConnectionQueue import ConnectionQueue
+from models.dao.connection.ConnectionDatabase import ConnectionDatabase
+from models.dao.connection.ConnectionFile import ConnectionFile
+from models.dao.connection.ConnectionSecret import ConnectionSecret
+from models.dao.connection.ConnectionServer import ConnectionServer
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 
 
-class Connection(ConnectionBase,Entity, IocManager.Base):
+class Connection(ConnectionBase, Entity, Base):
     __tablename__ = "Connection"
     __table_args__ = {"schema": "Connection"}
     Name = Column(String(100), index=True, unique=False, nullable=False)

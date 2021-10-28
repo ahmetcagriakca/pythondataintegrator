@@ -1,12 +1,14 @@
 from asyncio import Queue
 from typing import List
+
 from injector import inject
 from pandas import DataFrame
+from pdip.connection.adapters import ConnectionAdapter
+from pdip.connection.database.base import DatabaseProvider
+from pdip.connection.models import DataQueueTask
+from pdip.connection.models.enums import ConnectorTypes
 
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.connection.database.DatabaseProvider import DatabaseProvider
-from infrastructure.connection.adapters.connection_adapter import ConnectionAdapter
-from infrastructure.connection.models.DataQueueTask import DataQueueTask
 from models.dto.PagingModifier import PagingModifier
 
 
@@ -22,7 +24,19 @@ class DatabaseAdapter(ConnectionAdapter):
     def clear_data(self, data_integration_id) -> int:
         target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
-        target_context = self.database_provider.get_context(connection=target_connection.Connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=target_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=target_connection.ConnectionId)
+
+        target_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(target_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=target_connection.Connection.Database.DatabaseName,
+            service_name=target_connection.Connection.Database.ServiceName,
+            sid=target_connection.Connection.Database.Sid)
         truncate_affected_rowcount = target_context.truncate_table(schema=target_connection.Database.Schema,
                                                                    table=target_connection.Database.TableName)
         return truncate_affected_rowcount
@@ -31,15 +45,38 @@ class DatabaseAdapter(ConnectionAdapter):
         source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
 
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+
         source_context = self.database_provider.get_context(
-            connection=source_connection.Connection)
+            connector_type=ConnectorTypes(source_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=source_connection.Connection.Database.DatabaseName,
+            service_name=source_connection.Connection.Database.ServiceName,
+            sid=source_connection.Connection.Database.Sid)
         data_count = source_context.get_table_count(source_connection.Database.Query)
         return data_count
 
     def get_source_data(self, data_integration_id: int) -> List[any]:
         source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
-        source_context = self.database_provider.get_context(connection=source_connection.Connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+
+        source_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(source_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=source_connection.Connection.Database.DatabaseName,
+            service_name=source_connection.Connection.Database.ServiceName,
+            sid=source_connection.Connection.Database.Sid)
         data = source_context.get_table_data(
             query=source_connection.Database.Query
         )
@@ -48,7 +85,19 @@ class DatabaseAdapter(ConnectionAdapter):
     def get_source_data_with_paging(self, data_integration_id: int, paging_modifier: PagingModifier) -> List[any]:
         source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
-        source_context = self.database_provider.get_context(connection=source_connection.Connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+
+        source_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(source_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=source_connection.Connection.Database.DatabaseName,
+            service_name=source_connection.Connection.Database.ServiceName,
+            sid=source_connection.Connection.Database.Sid)
         order_row = self.operation_cache_service.get_first_row(data_integration_id=data_integration_id)
         data = source_context.get_table_data_with_paging(
             query=source_connection.Database.Query,
@@ -83,7 +132,19 @@ class DatabaseAdapter(ConnectionAdapter):
                                          data_result_queue: Queue):
         source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
-        source_context = self.database_provider.get_context(connection=source_connection.Connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+
+        source_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(source_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=source_connection.Connection.Database.DatabaseName,
+            service_name=source_connection.Connection.Database.ServiceName,
+            sid=source_connection.Connection.Database.Sid)
         source_context.get_unpredicted_data(query=source_connection.Database.Query,
                                             columns=None,
                                             limit=limit,
@@ -98,7 +159,19 @@ class DatabaseAdapter(ConnectionAdapter):
 
         source_connection = self.operation_cache_service.get_source_connection(
             data_integration_id=data_integration_id)
-        source_context = self.database_provider.get_context(connection=source_connection.Connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=source_connection.ConnectionId)
+
+        source_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(source_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=source_connection.Connection.Database.DatabaseName,
+            service_name=source_connection.Connection.Database.ServiceName,
+            sid=source_connection.Connection.Database.Sid)
         return source_context.read_data(query=source_connection.Database.Query,
                                         columns=None,
                                         limit=limit)
@@ -165,7 +238,19 @@ class DatabaseAdapter(ConnectionAdapter):
         target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
 
-        target_context = self.database_provider.get_context(connection=target_connection.Connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=target_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=target_connection.ConnectionId)
+
+        target_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(target_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=target_connection.Connection.Database.DatabaseName,
+            service_name=target_connection.Connection.Database.ServiceName,
+            sid=target_connection.Connection.Database.Sid)
 
         data_integration_columns = self.operation_cache_service.get_columns_by_integration_id(
             data_integration_id=data_integration_id)
@@ -182,7 +267,19 @@ class DatabaseAdapter(ConnectionAdapter):
         target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
 
-        target_context = self.database_provider.get_context(connection=target_connection.Connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=target_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=target_connection.ConnectionId)
+
+        target_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(target_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=target_connection.Connection.Database.DatabaseName,
+            service_name=target_connection.Connection.Database.ServiceName,
+            sid=target_connection.Connection.Database.Sid)
 
         prepared_target_query = self.prepare_target_query(data_integration_id=data_integration_id)
         # rows insert to database
@@ -192,7 +289,19 @@ class DatabaseAdapter(ConnectionAdapter):
     def do_target_operation(self, data_integration_id: int) -> int:
         target_connection = self.operation_cache_service.get_target_connection(
             data_integration_id=data_integration_id)
-        target_context = self.database_provider.get_context(connection=target_connection.Connection)
+        connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
+            connection_id=target_connection.ConnectionId)
+        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
+            connection_id=target_connection.ConnectionId)
+
+        target_context = self.database_provider.get_context(
+            connector_type=ConnectorTypes(target_connection.Connection.Database.ConnectorTypeId),
+            host=connection_server.Host,
+            port=connection_server.Port, user=connection_basic_authentication.User,
+            password=connection_basic_authentication.Password,
+            database=target_connection.Connection.Database.DatabaseName,
+            service_name=target_connection.Connection.Database.ServiceName,
+            sid=target_connection.Connection.Database.Sid)
 
         affected_rowcount = target_context.execute(query=target_connection.Database.Query)
 

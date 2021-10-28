@@ -1,11 +1,11 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.operation.DataOperationContactBase import DataOperationContactBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 
 
-class DataOperationContact(DataOperationContactBase,Entity, IocManager.Base):
+class DataOperationContact(DataOperationContactBase, Entity, Base):
     __tablename__ = "DataOperationContact"
     __table_args__ = {"schema": "Operation"}
     DataOperationId = Column(Integer, ForeignKey('Operation.DataOperation.Id'))

@@ -1,14 +1,13 @@
 from injector import inject
+from pdip.connection.adapters import ConnectionAdapter
+from pdip.connection.models.enums import ConnectionTypes
+from pdip.dependency import IScoped
+from pdip.exceptions import IncompatibleAdapterException, NotSupportedFeatureException
 
+from domain.operation.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
 from domain.operation.execution.adapters.connection.FileAdapter import FileAdapter
 from domain.operation.execution.adapters.connection.QueueAdapter import QueueAdapter
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.connection.adapters.connection_adapter import ConnectionAdapter
-from domain.operation.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.IncompatibleAdapterException import IncompatibleAdapterException
-from infrastructure.exceptions.NotSupportedFeatureException import NotSupportedFeatureException
-from models.enums import ConnectionTypes
 
 
 class ConnectionAdapterFactory(IScoped):

@@ -1,17 +1,18 @@
 from typing import List
 
 from injector import inject
+from pdip.connection.models.enums import ConnectionTypes
+
 from domain.connection.services.ConnectionService import ConnectionService
 from domain.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
 from domain.integration.services.DataIntegrationConnectionDatabaseService import \
     DataIntegrationConnectionDatabaseService
 from domain.integration.services.DataIntegrationConnectionFileService import DataIntegrationConnectionFileService
 from domain.integration.services.DataIntegrationConnectionQueueService import DataIntegrationConnectionQueueService
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.OperationalException import OperationalException
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+from pdip.exceptions import OperationalException
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
-from models.enums import ConnectionTypes
 from models.viewmodels.integration.CreateDataIntegrationModel import CreateDataIntegrationModel
 from models.dao.integration.DataIntegration import DataIntegration
 

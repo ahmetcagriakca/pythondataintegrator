@@ -1,13 +1,12 @@
 from datetime import datetime
 from typing import List
 
+from pdip.data import EntityBase
+
 from models.base.operation.DataOperationJobExecutionIntegrationEventBase import \
     DataOperationJobExecutionIntegrationEventBase
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
 
 
-@BaseConverter.register
 class DataOperationJobExecutionIntegrationBase(EntityBase):
 
     def __init__(self,

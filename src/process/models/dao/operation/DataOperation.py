@@ -4,12 +4,12 @@ from models.dao.operation.DataOperationJob import DataOperationJob
 from typing import List
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
-from models.dao.Entity import Entity
+from models.dao.base import Base
+from pdip.data import Entity
 from models.dao.operation.DataOperationIntegration import DataOperationIntegration
 
 
-class DataOperation(DataOperationBase,Entity, IocManager.Base):
+class DataOperation(DataOperationBase, Entity, Base):
     __tablename__ = "DataOperation"
     __table_args__ = {"schema": "Operation"}
     DefinitionId = Column(Integer, ForeignKey('Operation.Definition.Id'))

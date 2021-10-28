@@ -1,8 +1,6 @@
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
+from pdip.data import EntityBase
 
 
-@BaseConverter.register
 class ConnectionDatabaseBase(EntityBase):
 
     def __init__(self,
@@ -13,8 +11,8 @@ class ConnectionDatabaseBase(EntityBase):
                  Sid: str = None,
                  ServiceName: str = None,
                  DatabaseName: str = None,
-                 Connection = None,
-                 ConnectorType = None,
+                 Connection=None,
+                 ConnectorType=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ConnectionId: str = ConnectionId

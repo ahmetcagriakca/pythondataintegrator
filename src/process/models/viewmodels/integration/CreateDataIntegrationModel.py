@@ -1,5 +1,5 @@
 from models.viewmodels.integration.CreateDataIntegrationConnectionModel import CreateDataIntegrationConnectionModel
-from infrastructure.json.JsonConvert import JsonConvert
+from pdip.json import JsonConvert
 
 
 @JsonConvert.register

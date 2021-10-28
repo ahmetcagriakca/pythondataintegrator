@@ -1,8 +1,9 @@
 from typing import List
-from injector import inject
 
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from injector import inject
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+
 from models.dao.operation import DataOperation
 from models.dao.operation.DataOperationContact import DataOperationContact
 from models.viewmodels.operation.CreateDataOperationContactModel import CreateDataOperationContactModel

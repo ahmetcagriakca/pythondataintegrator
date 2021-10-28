@@ -1,14 +1,15 @@
 from typing import List
 
-from models.base.aps.ApSchedulerEventBase import ApSchedulerEventBase
-from models.dao.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
-from models.dao.Entity import Entity
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+
+from models.base.aps.ApSchedulerEventBase import ApSchedulerEventBase
+from pdip.data import Entity
+from models.dao.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
+from models.dao.base import Base
 
 
-class ApSchedulerEvent(ApSchedulerEventBase,Entity, IocManager.Base):
+class ApSchedulerEvent(ApSchedulerEventBase, Entity, Base):
     __tablename__ = "ApSchedulerEvent"
     __table_args__ = {"schema": "Aps"}
 

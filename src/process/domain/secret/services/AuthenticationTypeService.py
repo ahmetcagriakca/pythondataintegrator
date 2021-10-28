@@ -1,7 +1,7 @@
 from injector import inject
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
 from models.dao.secret import AuthenticationType
 
 

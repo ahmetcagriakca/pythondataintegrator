@@ -2,12 +2,12 @@ from typing import List
 
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
-class DataOperationIntegration(Entity, DependencyContainer.Base):
+class DataOperationIntegration(Entity, Base):
     __tablename__ = "DataOperationIntegration"
     __table_args__ = {"schema": "Operation"}
     DataOperationId = Column(Integer, ForeignKey('Operation.DataOperation.Id'))

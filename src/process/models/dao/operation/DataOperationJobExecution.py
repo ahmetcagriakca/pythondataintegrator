@@ -1,12 +1,12 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.operation.DataOperationJobExecutionBase import DataOperationJobExecutionBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 
 
-class DataOperationJobExecution(DataOperationJobExecutionBase,Entity, IocManager.Base):
+class DataOperationJobExecution(DataOperationJobExecutionBase, Entity, Base):
     __tablename__ = "DataOperationJobExecution"
     __table_args__ = {"schema": "Operation"}
     DefinitionId = Column(Integer, ForeignKey('Operation.Definition.Id'))

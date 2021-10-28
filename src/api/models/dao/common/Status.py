@@ -3,13 +3,13 @@ from typing import List
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 from models.dao.operation import DataOperationJobExecution
 from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
-class Status(Entity, DependencyContainer.Base):
+class Status(Entity, Base):
     __tablename__ = "Status"
     __table_args__ = {"schema": "Common"}
     Name = Column(String(100), index=False, unique=False, nullable=False)

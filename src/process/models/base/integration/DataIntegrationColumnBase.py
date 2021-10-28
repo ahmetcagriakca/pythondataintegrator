@@ -1,12 +1,10 @@
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
+from pdip.data import EntityBase
 
 
-@BaseConverter.register
 class DataIntegrationColumnBase(EntityBase):
 
     def __init__(self,
-                 DataIntegrationId:int=None,
+                 DataIntegrationId: int = None,
                  ResourceType: str = None,
                  SourceColumnName: str = None,
                  TargetColumnName: str = None,

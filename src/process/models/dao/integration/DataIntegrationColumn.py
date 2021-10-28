@@ -1,12 +1,12 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.integration.DataIntegrationColumnBase import DataIntegrationColumnBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 
 
-class DataIntegrationColumn(DataIntegrationColumnBase,Entity, IocManager.Base):
+class DataIntegrationColumn(DataIntegrationColumnBase, Entity, Base):
     __tablename__ = "DataIntegrationColumn"
     __table_args__ = {"schema": "Integration"}
     DataIntegrationId = Column(Integer, ForeignKey('Integration.DataIntegration.Id'))

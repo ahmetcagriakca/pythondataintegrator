@@ -1,10 +1,10 @@
 from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 
 
-class ApSchedulerJobEvent(Entity, DependencyContainer.Base):
+class ApSchedulerJobEvent(Entity, Base):
     __tablename__ = "ApSchedulerJobEvent"
     __table_args__ = {"schema": "Aps"}
     ApSchedulerJobId = Column(Integer, ForeignKey('Aps.ApSchedulerJob.Id'))

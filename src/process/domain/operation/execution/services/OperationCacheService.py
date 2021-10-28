@@ -1,13 +1,14 @@
 from typing import List
 
 from injector import inject
+from pdip.connection.models.enums import ConnectionTypes
+from pdip.cryptography import CryptoService
+from pdip.data import RepositoryProvider
+from pdip.data.decorators import transactionhandler
+from pdip.dependency import IScoped
+from pdip.exceptions import OperationalException
+from pdip.json import BaseConverter
 
-from infrastructure.cryptography.CryptoService import CryptoService
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.data.decorators.TransactionHandler import transaction_handler
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.OperationalException import OperationalException
-from infrastructure.json.BaseConverter import BaseConverter
 from models.base.connection import ConnectionBase, ConnectionTypeBase, ConnectionDatabaseBase, ConnectionFileBase, \
     ConnectionQueueBase, ConnectionServerBase, ConnectionSecretBase
 from models.base.integration import DataIntegrationBase, DataIntegrationColumnBase, DataIntegrationConnectionBase, \
@@ -15,7 +16,6 @@ from models.base.integration import DataIntegrationBase, DataIntegrationColumnBa
     DataIntegrationConnectionFileCsvBase
 from models.base.operation import DataOperationBase, DataOperationIntegrationBase
 from models.base.secret import SecretBase, SecretSourceBase, SecretSourceBasicAuthenticationBase
-
 from models.dao.connection import Connection, ConnectionType, ConnectionDatabase, ConnectionFile, ConnectionQueue, \
     ConnectionServer, ConnectionSecret
 from models.dao.integration import DataIntegration, DataIntegrationColumn, DataIntegrationConnection, \
@@ -24,18 +24,6 @@ from models.dao.integration import DataIntegration, DataIntegrationColumn, DataI
 from models.dao.operation import DataOperation, DataOperationIntegration
 from models.dao.secret import Secret, SecretSource, SecretSourceBasicAuthentication
 from models.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication
-from models.enums import ConnectionTypes
-import datetime
-import json
-
-
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            encoded_object = obj.isoformat()
-        else:
-            encoded_object = json.JSONEncoder.default(self, obj)
-        return encoded_object
 
 
 class OperationCacheService(IScoped):
@@ -51,6 +39,21 @@ class OperationCacheService(IScoped):
         self.data_integrations: List[DataIntegrationBase] = []
         self.data_integration_connections: List[DataIntegrationConnectionBase] = []
         self.connections: List[Connection] = []
+
+    def load_entity(self, cls, entity):
+        converter = BaseConverter(cls=cls)
+        json_str = converter.ToJSON(entity)
+        result = converter.FromJSON(json_str)
+        return result
+
+    def load_entities(self, cls, entities):
+        converter = BaseConverter(cls=cls)
+        result_list = []
+        for entity in entities:
+            json_str = converter.ToJSON(entity)
+            result = converter.FromJSON(json_str)
+            result_list.append(result)
+        return result_list
 
     def get_data_operation_name(self, data_operation_id):
         data_operation_name = self.data_operation.Name
@@ -108,9 +111,9 @@ class OperationCacheService(IScoped):
             connection.ConnectionSecrets[0].Secret.SecretSources[0].SecretSourceBasicAuthentications[0]
 
         connection_basic_authentication = ConnectionBasicAuthentication(
-            User=self.crypto_service.decrypt_code(secret_source_basic_authentication.User.encode()).decode('utf-8'),
-            Password=self.crypto_service.decrypt_code(secret_source_basic_authentication.Password.encode()).decode(
-                'utf-8'))
+            User=self.crypto_service.decrypt(secret_source_basic_authentication.User),
+            Password=self.crypto_service.decrypt(secret_source_basic_authentication.Password)
+        )
         return connection_basic_authentication
 
     def get_connection_server_by_connection_id(self, connection_id: int) -> ConnectionServer:
@@ -132,7 +135,7 @@ class OperationCacheService(IScoped):
             DataOperation.__table__.select().filter(
                 DataOperation.IsDeleted == 0,
                 DataOperation.Id == data_operation_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=DataOperationBase, entity=entity)
         return result
 
     def get_data_operation_integration(self, data_operation_integration_id) -> DataOperationIntegrationBase:
@@ -141,7 +144,7 @@ class OperationCacheService(IScoped):
                 DataOperationIntegration.IsDeleted == 0,
                 DataOperationIntegration.Id == data_operation_integration_id)).fetchone()
 
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=DataOperationIntegrationBase, entity=entity)
         return result
 
     def get_data_operation_integrations(self, data_operation_id) -> List[DataOperationIntegrationBase]:
@@ -149,11 +152,7 @@ class OperationCacheService(IScoped):
             DataOperationIntegration.__table__.select().filter(
                 DataOperationIntegration.IsDeleted == 0,
                 DataOperationIntegration.DataOperationId == data_operation_id).order_by(DataOperationIntegration.Order))
-
-        result_list = []
-        for entity in entities:
-            result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
-            result_list.append(result)
+        result_list = self.load_entities(cls=DataOperationIntegrationBase, entities=entities)
         return result_list
 
     def get_data_integration(self, data_integration_id) -> DataIntegrationBase:
@@ -162,7 +161,7 @@ class OperationCacheService(IScoped):
 
                 DataIntegration.IsDeleted == 0,
                 DataIntegration.Id == data_integration_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=DataIntegrationBase, entity=entity)
         return result
 
     def get_data_integration_columns(self, data_integration_id) -> List[DataIntegrationColumnBase]:
@@ -171,22 +170,16 @@ class OperationCacheService(IScoped):
                 DataIntegrationColumn.IsDeleted == 0,
                 DataIntegrationColumn.DataIntegrationId == data_integration_id))
 
-        result_list = []
-        for entity in entities:
-            result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
-            result_list.append(result)
+        result_list = self.load_entities(cls=DataIntegrationColumnBase, entities=entities)
         return result_list
 
-    def get_data_integration_connections(self, data_integration_id) -> List[DataIntegrationConnection]:
+    def get_data_integration_connections(self, data_integration_id) -> List[DataIntegrationConnectionBase]:
         entities = self.repository_provider.create().session.execute(
             DataIntegrationConnection.__table__.select().filter(
                 DataIntegrationConnection.IsDeleted == 0,
                 DataIntegrationConnection.DataIntegrationId == data_integration_id))
 
-        result_list = []
-        for entity in entities:
-            result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
-            result_list.append(result)
+        result_list = self.load_entities(cls=DataIntegrationConnectionBase, entities=entities)
         return result_list
 
     def get_data_integration_connection_database(self,
@@ -195,7 +188,7 @@ class OperationCacheService(IScoped):
             DataIntegrationConnectionDatabase.__table__.select().filter(
                 DataIntegrationConnectionDatabase.IsDeleted == 0,
                 DataIntegrationConnectionDatabase.DataIntegrationConnectionId == data_integration_connection_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=DataIntegrationConnectionDatabaseBase, entity=entity)
         return result
 
     def get_data_integration_connection_file(self, data_integration_connection_id) -> DataIntegrationConnectionFileBase:
@@ -203,7 +196,7 @@ class OperationCacheService(IScoped):
             DataIntegrationConnectionFile.__table__.select().filter(
                 DataIntegrationConnectionFile.IsDeleted == 0,
                 DataIntegrationConnectionFile.DataIntegrationConnectionId == data_integration_connection_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=DataIntegrationConnectionFileBase, entity=entity)
         return result
 
     def get_data_integration_connection_file_csv(self,
@@ -212,7 +205,7 @@ class OperationCacheService(IScoped):
             DataIntegrationConnectionFileCsv.__table__.select().filter(
                 DataIntegrationConnectionFileCsv.IsDeleted == 0,
                 DataIntegrationConnectionFileCsv.DataIntegrationConnectionId == data_integration_connection_file_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=DataIntegrationConnectionFileCsvBase, entity=entity)
         return result
 
     def get_data_integration_connection_queue(self,
@@ -221,7 +214,7 @@ class OperationCacheService(IScoped):
             DataIntegrationConnectionQueue.__table__.select().filter(
                 DataIntegrationConnectionQueue.IsDeleted == 0,
                 DataIntegrationConnectionQueue.DataIntegrationConnectionId == data_integration_connection_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=DataIntegrationConnectionQueueBase, entity=entity)
         return result
 
     def get_connection(self, connection_id) -> ConnectionBase:
@@ -231,7 +224,7 @@ class OperationCacheService(IScoped):
                 Connection.Id == connection_id)).fetchone()
         if entity is None:
             raise OperationalException(f"Connection not found on execution. Connection Id :{connection_id}")
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=ConnectionBase, entity=entity)
         return result
 
     def get_connection_type(self, connection_type_id) -> ConnectionTypeBase:
@@ -242,7 +235,7 @@ class OperationCacheService(IScoped):
         if entity is None:
             raise OperationalException(
                 f"Connection type not found on execution. Connection Type Id :{connection_type_id}")
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=ConnectionTypeBase, entity=entity)
         return result
 
     def get_connection_servers(self, connection_id) -> List[ConnectionServerBase]:
@@ -253,10 +246,7 @@ class OperationCacheService(IScoped):
 
         if entities is None:
             raise OperationalException(f"Connection detail not found on execution. Connection Id :{connection_id}")
-        result_list = []
-        for entity in entities:
-            result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
-            result_list.append(result)
+        result_list = self.load_entities(cls=ConnectionServerBase, entities=entities)
         return result_list
 
     def get_connection_secrets(self, connection_id) -> List[ConnectionSecretBase]:
@@ -267,10 +257,7 @@ class OperationCacheService(IScoped):
 
         if entities is None:
             raise OperationalException(f"Connection detail not found on execution. Connection Id :{connection_id}")
-        result_list = []
-        for entity in entities:
-            result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
-            result_list.append(result)
+        result_list = self.load_entities(cls=ConnectionSecretBase, entities=entities)
         return result_list
 
     def get_connection_database(self, connection_id) -> ConnectionDatabaseBase:
@@ -278,7 +265,7 @@ class OperationCacheService(IScoped):
             ConnectionDatabase.__table__.select().filter(
                 ConnectionDatabase.IsDeleted == 0,
                 ConnectionDatabase.ConnectionId == connection_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=ConnectionDatabaseBase, entity=entity)
         return result
 
     def get_connection_file(self, connection_id) -> ConnectionFileBase:
@@ -286,7 +273,7 @@ class OperationCacheService(IScoped):
             ConnectionFile.__table__.select().filter(
                 ConnectionFile.IsDeleted == 0,
                 ConnectionFile.ConnectionId == connection_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=ConnectionFileBase, entity=entity)
         return result
 
     def get_connection_queue(self, connection_id) -> ConnectionQueueBase:
@@ -294,7 +281,7 @@ class OperationCacheService(IScoped):
             ConnectionQueue.__table__.select().filter(
                 ConnectionQueue.IsDeleted == 0,
                 ConnectionQueue.ConnectionId == connection_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=ConnectionQueueBase, entity=entity)
         return result
 
     def get_secret(self, secret_id) -> SecretBase:
@@ -302,15 +289,7 @@ class OperationCacheService(IScoped):
             Secret.__table__.select().filter(
                 Secret.IsDeleted == 0,
                 Secret.Id == secret_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
-        return result
-
-    def get_secret(self, secret_id) -> SecretBase:
-        entity = self.repository_provider.create().session.execute(
-            Secret.__table__.select().filter(
-                Secret.IsDeleted == 0,
-                Secret.Id == secret_id)).fetchone()
-        result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
+        result = self.load_entity(cls=SecretBase, entity=entity)
         return result
 
     def get_secret_sources(self, secret_id) -> List[SecretSourceBase]:
@@ -318,11 +297,7 @@ class OperationCacheService(IScoped):
             SecretSource.__table__.select().filter(
                 SecretSource.IsDeleted == 0,
                 SecretSource.SecretId == secret_id))
-
-        result_list = []
-        for entity in entities:
-            result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
-            result_list.append(result)
+        result_list = self.load_entities(cls=SecretSourceBase, entities=entities)
         return result_list
 
     def get_secret_source_basic_authentications(self, secret_source_id) -> List[SecretSourceBasicAuthenticationBase]:
@@ -330,11 +305,7 @@ class OperationCacheService(IScoped):
             SecretSourceBasicAuthentication.__table__.select().filter(
                 SecretSourceBasicAuthentication.IsDeleted == 0,
                 SecretSourceBasicAuthentication.SecretSourceId == secret_source_id))
-
-        result_list = []
-        for entity in entities:
-            result = BaseConverter.FromJSON(json.dumps(dict(entity), cls=DateTimeEncoder))
-            result_list.append(result)
+        result_list = self.load_entities(cls=SecretSourceBasicAuthenticationBase, entities=entities)
         return result_list
 
     def initialize_connection(self, connection_id):
@@ -399,15 +370,15 @@ class OperationCacheService(IScoped):
         self.data_operation_integrations.append(data_operation_integration)
         return data_operation_integration
 
-    @transaction_handler
+    @transactionhandler
     def create_data_operation_integration(self, data_operation_integration_id):
         self.get_data_operation_integration(data_operation_integration_id=data_operation_integration_id)
 
-    @transaction_handler
+    @transactionhandler
     def create_data_integration(self, data_integration_id):
         self.initialize_data_integation(data_integration_id=data_integration_id)
 
-    @transaction_handler
+    @transactionhandler
     def create(self, data_operation_id):
 
         self.data_operation = self.get_data_operation(data_operation_id=data_operation_id)

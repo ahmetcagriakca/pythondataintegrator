@@ -2,13 +2,13 @@ from datetime import datetime
 from typing import List
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.operation.DataOperationJobBase import DataOperationJobBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 from models.dao.operation.DataOperationJobExecution import DataOperationJobExecution
 
 
-class DataOperationJob(DataOperationJobBase,Entity, IocManager.Base):
+class DataOperationJob(DataOperationJobBase, Entity, Base):
     __tablename__ = "DataOperationJob"
     __table_args__ = {"schema": "Operation"}
     DataOperationId = Column(Integer, ForeignKey('Operation.DataOperation.Id'))

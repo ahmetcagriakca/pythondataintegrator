@@ -3,7 +3,7 @@ from injector import inject
 from domain.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.dependency.scopes import IScoped
+from pdip.dependency import IScoped
 
 
 class ExecuteQueryAdapter(ExecuteAdapter, IScoped):

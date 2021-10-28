@@ -1,10 +1,11 @@
+from pdip.logging.models import LogData
 from sqlalchemy import Column, String, Integer, DateTime
-from IocManager import IocManager
-from models.base.common.LogBase import LogBase
-from models.dao.Entity import Entity
+
+from pdip.data import Entity
+from models.dao.base import Base
 
 
-class Log(LogBase,Entity, IocManager.Base):
+class Log(LogData, Entity, Base):
     __tablename__ = "Log"
     __table_args__ = {"schema": "Common"}
     TypeId = Column(Integer, index=True, unique=False, nullable=False)

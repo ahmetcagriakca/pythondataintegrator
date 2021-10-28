@@ -2,11 +2,11 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 
 
-class DataOperationJobExecutionIntegrationEvent(Entity, DependencyContainer.Base):
+class DataOperationJobExecutionIntegrationEvent(Entity, Base):
     __tablename__ = "DataOperationJobExecutionIntegrationEvent"
     __table_args__ = {"schema": "Operation"}
     DataOperationJobExecutionIntegrationId = Column(Integer,

@@ -1,4 +1,4 @@
-from models.configs.BaseConfig import BaseConfig
+from pdip.configuration.models.base import BaseConfig
 
 
 class ProcessRpcServerConfig(BaseConfig):

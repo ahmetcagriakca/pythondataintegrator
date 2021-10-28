@@ -6,12 +6,12 @@ from models.dao.connection.ConnectionFile import ConnectionFile
 from typing import List
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 
 
-class Connection(Entity, DependencyContainer.Base):
+class Connection(Entity, Base):
     __tablename__ = "Connection"
     __table_args__ = {"schema": "Connection"}
     Name = Column(String(100), index=True, unique=False, nullable=False)

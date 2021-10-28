@@ -1,14 +1,12 @@
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
+from pdip.data import EntityBase
 
 
-@BaseConverter.register
 class DataOperationContactBase(EntityBase):
 
     def __init__(self,
                  DataOperationId: int = None,
                  Email: str = None,
-                 DataOperation = None,
+                 DataOperation=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationId: int = DataOperationId

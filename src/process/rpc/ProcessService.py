@@ -1,4 +1,9 @@
-import rpyc
+from injector import inject
+from pdip.base import Pdi
+from pdip.cqrs import Dispatcher
+from pdip.dependency import ISingleton
+from pdip.dependency.container import DependencyContainer
+from rpyc import Service
 from rpyc.utils.server import ThreadedServer
 
 from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
@@ -7,18 +12,19 @@ from domain.connection.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountComm
     CheckDatabaseTableRowCountCommand
 from domain.connection.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountRequest import \
     CheckDatabaseTableRowCountRequest
-from infrastructure.cqrs.Dispatcher import Dispatcher
 from models.configs.ProcessRpcServerConfig import ProcessRpcServerConfig
 from rpc.OperationProcess import OperationProcess
 
 
-class ProcessService(rpyc.Service):
+class ProcessService(Service, ISingleton):
+    @inject
     def __init__(self):
-        pass
+        self.process_rpc_server_config = DependencyContainer.Instance.get(ProcessRpcServerConfig)
 
-    def initialize(self, process_rpc_server_config: ProcessRpcServerConfig):
-        protocol_config = process_rpc_server_config.protocol_config  # {'allow_public_attrs': True, 'sync_request_timeout': 60}
-        server = ThreadedServer(ProcessService, port=process_rpc_server_config.port, protocol_config=protocol_config)
+
+    def run(self):
+        server = ThreadedServer(ProcessService, port=self.process_rpc_server_config.port,
+                                protocol_config=self.process_rpc_server_config.protocol_config)
         try:
             server.start()
         except (KeyboardInterrupt, SystemExit):
@@ -35,14 +41,15 @@ class ProcessService(rpyc.Service):
         return result
 
     def exposed_check_database_connection(self, connection_name=None, *args, **kwargs):
-        dispatcher: Dispatcher = Dispatcher()
+        dispatcher: Dispatcher = Pdi().get(Dispatcher)
+
         req = CheckDatabaseConnectionRequest(ConnectionName=connection_name)
         check_database_connection_command = CheckDatabaseConnectionCommand(
             request=req)
         dispatcher.dispatch(check_database_connection_command)
 
     def exposed_check_database_table_row_count(self, connection_name=None, schema=None, table=None, *args, **kwargs):
-        dispatcher: Dispatcher = Dispatcher()
+        dispatcher: Dispatcher = Pdi().get(Dispatcher)
         req = CheckDatabaseTableRowCountRequest(ConnectionName=connection_name, Schema=schema, Table=table)
         check_database_count_command = CheckDatabaseTableRowCountCommand(
             request=req)

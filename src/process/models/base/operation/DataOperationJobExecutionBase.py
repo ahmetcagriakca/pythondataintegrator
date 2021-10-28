@@ -1,9 +1,8 @@
 from datetime import datetime
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
+
+from pdip.data import EntityBase
 
 
-@BaseConverter.register
 class DataOperationJobExecutionBase(EntityBase):
 
     def __init__(self,
@@ -14,7 +13,7 @@ class DataOperationJobExecutionBase(EntityBase):
                  StartDate: datetime = None,
                  EndDate: datetime = None,
                  Status=None,
-                 Definition = None,
+                 Definition=None,
                  DataOperationJob=None,
                  DataOperationJobExecutionEvents=[],
                  DataOperationJobExecutionIntegrations=[],

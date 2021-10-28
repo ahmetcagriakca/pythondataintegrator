@@ -1,10 +1,10 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 
 
-class ConnectionQueue(Entity, DependencyContainer.Base):
+class ConnectionQueue(Entity, Base):
     __tablename__ = "ConnectionQueue"
     __table_args__ = {"schema": "Connection"}
     ConnectionId = Column(Integer, ForeignKey('Connection.Connection.Id'))

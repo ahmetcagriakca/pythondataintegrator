@@ -29,7 +29,6 @@ class SchedulerService(Service, ISingleton):
             self.job_scheduler.shutdown()
 
     def exposed_add_job_with_cron(self, cron, start_date, end_date, *args, **kwargs):
-
         trigger = CronTrigger.from_crontab(cron)
         if start_date is not None:
             trigger.start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()

@@ -1,7 +1,3 @@
-from infrastructure.json.BaseConverter import BaseConverter
-
-
-@BaseConverter.register
 class ApSchedulerJobsTableBase:
     def __init__(self,
                  id: str = None,

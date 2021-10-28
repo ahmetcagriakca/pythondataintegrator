@@ -1,11 +1,11 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.connection.ConnectionSecretBase import ConnectionSecretBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 
 
-class ConnectionSecret(ConnectionSecretBase,Entity, IocManager.Base):
+class ConnectionSecret(ConnectionSecretBase, Entity, Base):
     __tablename__ = "ConnectionSecret"
     __table_args__ = {"schema": "Connection"}
     ConnectionId = Column(Integer, ForeignKey('Connection.Connection.Id'))

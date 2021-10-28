@@ -1,10 +1,10 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 
 
-class DataIntegrationConnectionFileCsv(Entity, DependencyContainer.Base):
+class DataIntegrationConnectionFileCsv(Entity, Base):
     __tablename__ = "DataIntegrationConnectionFileCsv"
     __table_args__ = {"schema": "Integration"}
     DataIntegrationConnectionFileId = Column(Integer, ForeignKey('Integration.DataIntegrationConnectionFile.Id'))

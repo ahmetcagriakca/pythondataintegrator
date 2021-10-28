@@ -2,8 +2,8 @@ from typing import List
 
 from injector import inject
 
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.connection import ConnectionServer
 from models.dao.connection.Connection import Connection
 

@@ -1,12 +1,7 @@
-from IocManager import IocManager
-from rpc.ProcessService import ProcessService
-
-
-def start():
-    IocManager.set_process_service(process_service=ProcessService)
-    IocManager.initialize()
-    IocManager.run()
-
-
 if __name__ == "__main__":
-    start()
+    from pdip.base import Pdi
+    from rpc.ProcessService import ProcessService
+
+    pdi = Pdi()
+    process_service = pdi.get(ProcessService)
+    process_service.run()

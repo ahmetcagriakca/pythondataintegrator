@@ -1,14 +1,14 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.integration.DataIntegrationConnectionBase import DataIntegrationConnectionBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 from models.dao.integration.DataIntegrationConnectionDatabase import DataIntegrationConnectionDatabase
 from models.dao.integration.DataIntegrationConnectionFile import DataIntegrationConnectionFile
 from models.dao.integration.DataIntegrationConnectionQueue import DataIntegrationConnectionQueue
 
 
-class DataIntegrationConnection(DataIntegrationConnectionBase,Entity, IocManager.Base):
+class DataIntegrationConnection(DataIntegrationConnectionBase, Entity, Base):
     __tablename__ = "DataIntegrationConnection"
     __table_args__ = {"schema": "Integration"}
     DataIntegrationId = Column(Integer, ForeignKey('Integration.DataIntegration.Id'))

@@ -2,13 +2,13 @@ from typing import List
 
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 from models.dao.operation.DataOperationJobExecutionIntegration import DataOperationJobExecutionIntegration
 
 
-class DataOperationIntegration(DataOperationIntegrationBase,Entity, IocManager.Base):
+class DataOperationIntegration(DataOperationIntegrationBase, Entity, Base):
     __tablename__ = "DataOperationIntegration"
     __table_args__ = {"schema": "Operation"}
     DataOperationId = Column(Integer, ForeignKey('Operation.DataOperation.Id'))

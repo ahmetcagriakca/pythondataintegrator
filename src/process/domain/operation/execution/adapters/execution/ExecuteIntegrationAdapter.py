@@ -1,13 +1,14 @@
 from injector import inject
+from pdip.dependency import IScoped
+from pdip.logging.loggers.database import SqlLogger
 
 from domain.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
-from domain.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategyFactory import ExecuteIntegrationStrategyFactory
+from domain.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategyFactory import \
+    ExecuteIntegrationStrategyFactory
 from domain.operation.execution.services.IntegrationExecutionService import IntegrationExecutionService
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
 from domain.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.logging.SqlLogger import SqlLogger
 from models.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION
 
 
@@ -99,7 +100,7 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
 
         execute_integration_strategy = self.execute_integration_strategy_factory.get(
             data_operation_integration_id=data_operation_integration_id)
-        strategy_name=type(execute_integration_strategy).__name__
+        strategy_name = type(execute_integration_strategy).__name__
         self.sql_logger.info(
             f"{data_operation_integration_order}-{data_integration_code} - integration will execute on {strategy_name}. {process_count}-{limit}",
             job_id=data_operation_job_execution_id)

@@ -3,14 +3,14 @@ from typing import List
 from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 from models.dao.integration.DataIntegrationColumn import DataIntegrationColumn
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.dao.operation.DataOperationIntegration import DataOperationIntegration
 
 
-class DataIntegration(Entity, DependencyContainer.Base):
+class DataIntegration(Entity, Base):
     __tablename__ = "DataIntegration"
     __table_args__ = {"schema": "Integration"}
     DefinitionId = Column(Integer, ForeignKey('Operation.Definition.Id'))

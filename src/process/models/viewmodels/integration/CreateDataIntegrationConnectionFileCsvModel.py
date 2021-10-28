@@ -1,4 +1,4 @@
-from infrastructure.json.JsonConvert import JsonConvert
+from pdip.json import JsonConvert
 
 
 @JsonConvert.register

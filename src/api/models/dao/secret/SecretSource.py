@@ -4,12 +4,12 @@ from pdip.data import Entity
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 
 from models.dao.secret.SecretSourceBasicAuthentication import SecretSourceBasicAuthentication
 
 
-class SecretSource(Entity, DependencyContainer.Base):
+class SecretSource(Entity, Base):
     __tablename__ = "SecretSource"
     __table_args__ = {"schema": "Secret"}
     SecretId = Column(Integer, ForeignKey('Secret.Secret.Id'))

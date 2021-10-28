@@ -1,9 +1,9 @@
 from datetime import datetime
-from injector import inject
 
-from infrastructure.data.Repository import Repository
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from injector import inject
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+
 from models.dao.common import OperationEvent
 from models.dao.common.Status import Status
 from models.dao.operation import DataOperationJobExecution, DataOperationJobExecutionIntegration, \
@@ -20,8 +20,7 @@ class DataOperationJobExecutionIntegrationService(IScoped):
         self.repository_provider = repository_provider
         self.data_operation_job_execution_repository = repository_provider.get(DataOperationJobExecution)
         self.status_repository = repository_provider.get(Status)
-        self.operation_event_repository: Repository[OperationEvent] = repository_provider.get(OperationEvent)
-
+        self.operation_event_repository = repository_provider.get(OperationEvent)
         self.data_operation_integration_repository = repository_provider.get(
             DataOperationIntegration)
         self.data_operation_job_execution_integration_repository = repository_provider.get(

@@ -3,11 +3,11 @@ from typing import List
 from models.dao.secret.SecretSource import SecretSource
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 
 
-class AuthenticationType(Entity, DependencyContainer.Base):
+class AuthenticationType(Entity, Base):
     __tablename__ = "AuthenticationType"
     __table_args__ = {"schema": "Secret"}
     SecretTypeId = Column(Integer, ForeignKey('Secret.SecretType.Id'))

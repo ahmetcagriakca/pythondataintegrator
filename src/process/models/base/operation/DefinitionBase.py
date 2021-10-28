@@ -1,8 +1,6 @@
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
+from pdip.data import EntityBase
 
 
-@BaseConverter.register
 class DefinitionBase(EntityBase):
 
     def __init__(self,
@@ -10,9 +8,9 @@ class DefinitionBase(EntityBase):
                  Version: int = None,
                  Content: str = None,
                  IsActive: bool = None,
-                 DataOperations = [],
-                 DataIntegrations = [],
-                 DataOperationJobExecutions = [],
+                 DataOperations=[],
+                 DataIntegrations=[],
+                 DataOperationJobExecutions=[],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationJobExecutions = DataOperationJobExecutions

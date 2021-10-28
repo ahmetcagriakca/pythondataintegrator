@@ -1,8 +1,8 @@
 from injector import inject
 
 from domain.integration.services.DataIntegrationConnectionFileCsvService import DataIntegrationConnectionFileCsvService
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
 from models.dao.integration import DataIntegrationConnectionFile
 from models.dao.integration.DataIntegrationConnection import DataIntegrationConnection
 from models.viewmodels.integration.CreateDataIntegrationConnectionFileModel import \

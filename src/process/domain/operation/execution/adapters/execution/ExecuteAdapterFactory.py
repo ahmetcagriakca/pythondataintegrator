@@ -1,11 +1,11 @@
 from injector import inject
+from pdip.dependency import IScoped
+from pdip.exceptions import IncompatibleAdapterException
 
 from domain.operation.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
 from domain.operation.execution.adapters.execution.ExecuteIntegrationAdapter import ExecuteIntegrationAdapter
 from domain.operation.execution.adapters.execution.ExecuteQueryAdapter import ExecuteQueryAdapter
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.IncompatibleAdapterException import IncompatibleAdapterException
 
 
 class ExecuteAdapterFactory(IScoped):

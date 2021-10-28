@@ -1,10 +1,10 @@
 from sqlalchemy import Column, String, Integer, Text, Boolean
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 
 
-class Definition(Entity, DependencyContainer.Base):
+class Definition(Entity, Base):
     __tablename__ = "Definition"
     __table_args__ = {"schema": "Operation"}
     Name = Column(String(100), index=False, unique=False, nullable=False)

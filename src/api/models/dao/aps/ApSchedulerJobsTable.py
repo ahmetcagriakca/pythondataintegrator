@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Float, TEXT, LargeBinary, Unicode
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 
 
-class ApSchedulerJobsTable(DependencyContainer.Base):
+class ApSchedulerJobsTable(Base):
     # TODO: This feels bad man
     __tablename__ = "ApSchedulerJobsTable"
     __table_args__ = {"schema": "Aps"}

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
+from pdip.cqrs import ICommand
 
 from domain.connection.CheckDatabaseConnection.CheckDatabaseConnectionRequest import CheckDatabaseConnectionRequest
-from infrastructure.cqrs.ICommand import ICommand
 
 
 @dataclass

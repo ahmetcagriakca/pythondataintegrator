@@ -1,14 +1,12 @@
-from models.base.EntityBase import EntityBase
-from infrastructure.json.BaseConverter import BaseConverter
+from pdip.data import EntityBase
 
 
-@BaseConverter.register
 class SecretSourceBasicAuthenticationBase(EntityBase):
     def __init__(self,
                  SecretSourceId: int = None,
                  User: str = None,
                  Password: str = None,
-                 SecretSource = None,
+                 SecretSource=None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.SecretSourceId: int = SecretSourceId

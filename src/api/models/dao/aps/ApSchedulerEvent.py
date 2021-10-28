@@ -3,10 +3,10 @@ from models.dao.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
 from pdip.data import Entity
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 
 
-class ApSchedulerEvent(Entity, DependencyContainer.Base):
+class ApSchedulerEvent(Entity, Base):
     __tablename__ = "ApSchedulerEvent"
     __table_args__ = {"schema": "Aps"}
 

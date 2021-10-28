@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import List
-from models.base.EntityBase import EntityBase
+
+from pdip.data import EntityBase
+
 from models.base.operation.DataOperationJobExecutionBase import DataOperationJobExecutionBase
-from infrastructure.json.BaseConverter import BaseConverter
 
 
-@BaseConverter.register
 class DataOperationJobBase(EntityBase):
 
     def __init__(self,
@@ -16,7 +16,7 @@ class DataOperationJobBase(EntityBase):
                  Cron: str = None,
                  DataOperation=None,
                  ApSchedulerJob=None,
-                 DataOperationJobExecutions: List[DataOperationJobExecutionBase]=[],
+                 DataOperationJobExecutions: List[DataOperationJobExecutionBase] = [],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationJobExecutions = DataOperationJobExecutions

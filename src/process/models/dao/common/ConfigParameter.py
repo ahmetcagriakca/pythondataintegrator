@@ -1,10 +1,11 @@
-from models.base.common.ConfigParameterBase import ConfigParameterBase
-from models.dao.Entity import Entity
+from pdip.configuration.services import ConfigParameterBase
 from sqlalchemy import Column, String
-from IocManager import IocManager
+
+from pdip.data import Entity
+from models.dao.base import Base
 
 
-class ConfigParameter(ConfigParameterBase,Entity, IocManager.Base):
+class ConfigParameter(ConfigParameterBase, Entity, Base):
     __tablename__ = "ConfigParameter"
     __table_args__ = {"schema": "Common"}
 

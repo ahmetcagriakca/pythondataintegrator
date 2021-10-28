@@ -2,14 +2,14 @@ from typing import List
 
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from IocManager import IocManager
+from models.dao.base import Base
 from models.base.secret.SecretTypeBase import SecretTypeBase
-from models.dao.Entity import Entity
+from pdip.data import Entity
 from models.dao.secret.Secret import Secret
 from models.dao.secret.AuthenticationType import AuthenticationType
 
 
-class SecretType(SecretTypeBase,Entity, IocManager.Base):
+class SecretType(SecretTypeBase, Entity, Base):
     __tablename__ = "SecretType"
     __table_args__ = {"schema": "Secret"}
     Name = Column(String(100), index=False, unique=True, nullable=False)

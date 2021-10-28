@@ -1,9 +1,9 @@
 from pdip.data import Entity
 from sqlalchemy import Column, String
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 
 
-class ConfigParameter(Entity, DependencyContainer.Base):
+class ConfigParameter(Entity, Base):
     __tablename__ = "ConfigParameter"
     __table_args__ = {"schema": "Common"}
 

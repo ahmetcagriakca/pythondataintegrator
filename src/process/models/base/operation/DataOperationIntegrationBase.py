@@ -1,10 +1,10 @@
 from typing import List
-from models.base.EntityBase import EntityBase
+
+from pdip.data import EntityBase
+
 from models.base.operation.DataOperationJobExecutionIntegrationBase import DataOperationJobExecutionIntegrationBase
-from infrastructure.json.BaseConverter import BaseConverter
 
 
-@BaseConverter.register
 class DataOperationIntegrationBase(EntityBase):
 
     def __init__(self,
@@ -15,7 +15,7 @@ class DataOperationIntegrationBase(EntityBase):
                  ProcessCount: int = None,
                  DataOperation=None,
                  DataIntegration=None,
-                 DataOperationJobExecutionIntegrations: List[DataOperationJobExecutionIntegrationBase]=[],
+                 DataOperationJobExecutionIntegrations: List[DataOperationJobExecutionIntegrationBase] = [],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationJobExecutionIntegrations = DataOperationJobExecutionIntegrations

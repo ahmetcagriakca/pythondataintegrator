@@ -1,4 +1,6 @@
 from injector import inject
+from pdip.dependency import IScoped
+from pdip.exceptions import IncompatibleAdapterException
 
 from domain.operation.execution.adapters.execution.integration.ExecuteIntegrationLimitOff import \
     ExecuteIntegrationLimitOff
@@ -8,8 +10,6 @@ from domain.operation.execution.adapters.execution.integration.ExecuteIntegratio
 from domain.operation.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \
     ExecuteIntegrationStrategy
 from domain.operation.execution.services.OperationCacheService import OperationCacheService
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.IncompatibleAdapterException import IncompatibleAdapterException
 
 
 class ExecuteIntegrationStrategyFactory(IScoped):

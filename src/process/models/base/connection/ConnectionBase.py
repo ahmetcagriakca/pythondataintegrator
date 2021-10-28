@@ -1,27 +1,27 @@
+from typing import List
+
+from pdip.data import EntityBase
+
 from models.base.connection import ConnectionQueueBase
-from models.base.connection.ConnectionServerBase import ConnectionServerBase
-from models.base.connection.ConnectionSecretBase import ConnectionSecretBase
 from models.base.connection.ConnectionDatabaseBase import ConnectionDatabaseBase
 from models.base.connection.ConnectionFileBase import ConnectionFileBase
-from typing import List
-from models.base.EntityBase import EntityBase
+from models.base.connection.ConnectionSecretBase import ConnectionSecretBase
+from models.base.connection.ConnectionServerBase import ConnectionServerBase
 from models.base.integration.DataIntegrationConnectionBase import DataIntegrationConnectionBase
-from infrastructure.json.BaseConverter import BaseConverter
 
 
-@BaseConverter.register
 class ConnectionBase(EntityBase):
 
     def __init__(self,
                  Name: str = None,
                  ConnectionTypeId: int = None,
                  ConnectionType=None,
-                 Database: ConnectionDatabaseBase=None,
-                 File: ConnectionFileBase=None,
-                 Queue: ConnectionQueueBase=None,
-                 ConnectionSecrets: List[ConnectionSecretBase]=[],
-                 ConnectionServers: List[ConnectionServerBase]=[],
-                 DataIntegrationConnections: List[DataIntegrationConnectionBase]=[],
+                 Database: ConnectionDatabaseBase = None,
+                 File: ConnectionFileBase = None,
+                 Queue: ConnectionQueueBase = None,
+                 ConnectionSecrets: List[ConnectionSecretBase] = [],
+                 ConnectionServers: List[ConnectionServerBase] = [],
+                 DataIntegrationConnections: List[DataIntegrationConnectionBase] = [],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataIntegrationConnections = DataIntegrationConnections

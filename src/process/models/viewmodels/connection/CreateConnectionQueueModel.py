@@ -1,6 +1,6 @@
 from typing import List
 
-from infrastructure.json.JsonConvert import JsonConvert
+from pdip.json import JsonConvert
 from models.viewmodels.connection.CreateConnectionServerModel import CreateConnectionServerModel
 
 

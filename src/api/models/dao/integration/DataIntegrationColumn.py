@@ -1,11 +1,11 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from pdip.dependency.container import DependencyContainer
+from models.dao.base import Base
 from pdip.data import Entity
 
 
-class DataIntegrationColumn(Entity, DependencyContainer.Base):
+class DataIntegrationColumn(Entity, Base):
     __tablename__ = "DataIntegrationColumn"
     __table_args__ = {"schema": "Integration"}
     DataIntegrationId = Column(Integer, ForeignKey('Integration.DataIntegration.Id'))

@@ -1,9 +1,9 @@
 from typing import List
 from injector import inject
 
-from infrastructure.data.RepositoryProvider import RepositoryProvider
-from infrastructure.dependency.scopes import IScoped
-from infrastructure.exceptions.OperationalException import OperationalException
+from pdip.data import RepositoryProvider
+from pdip.dependency import IScoped
+from pdip.exceptions import OperationalException
 from models.dao.connection.ConnectionType import ConnectionType
 
 
