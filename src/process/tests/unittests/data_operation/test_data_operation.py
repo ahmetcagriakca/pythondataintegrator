@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from pdip.base import Pdi
 
-from domain.operation.commands.SendDataOperationFinishMailCommand import SendDataOperationFinishMailCommand
+from process.application.operation.commands.SendDataOperationFinishMailCommand import SendDataOperationFinishMailCommand
 
 
 class TestDataOperation(TestCase):
@@ -34,8 +34,8 @@ class TestDataOperation(TestCase):
 
     def test_start_operation(self):
         start = time()
-        from domain.operation.execution.services.OperationExecution import OperationExecution
-        from domain.operation.commands.CreateExecutionCommand import CreateExecutionCommand
+        from process.application.operation.execution.services.OperationExecution import OperationExecution
+        from process.application.operation.commands.CreateExecutionCommand import CreateExecutionCommand
         data_operation_id = 61
         job_id = 675
         execution_id = self.pdi.get(CreateExecutionCommand).execute(data_operation_id=data_operation_id,
