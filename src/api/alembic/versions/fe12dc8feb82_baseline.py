@@ -1,12 +1,12 @@
 """baseline
 
 Revision ID: fe12dc8feb82
-Revises: 
+Revises:
 Create Date: 2021-01-19 23:42:00.695822
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 revision = 'fe12dc8feb82'
 down_revision = None
@@ -15,8 +15,8 @@ depends_on = None
 
 
 def insert_connection_types():
-    from models.dao.connection.ConnectionType import ConnectionType
-    from models.dao.connection.ConnectorType import ConnectorType
+    from pdi.domain.connection.ConnectionType import ConnectionType
+    from pdi.domain.connection.ConnectorType import ConnectorType
     bind = op.get_bind()
     from sqlalchemy import orm
     session = orm.Session(bind=bind)
@@ -70,8 +70,8 @@ def insert_connection_types():
 
 
 def insert_ap_scheduler_event_datas():
-    from models.dao.aps.ApSchedulerEvent import ApSchedulerEvent
-    from models.enums.apschedulerevents import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN, \
+    from pdi.domain.aps.ApSchedulerEvent import ApSchedulerEvent
+    from pdi.domain.enums.apschedulerevents import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN, \
         EVENT_SCHEDULER_PAUSED, EVENT_SCHEDULER_RESUMED, EVENT_EXECUTOR_ADDED, EVENT_EXECUTOR_REMOVED, \
         EVENT_JOBSTORE_ADDED, EVENT_JOBSTORE_REMOVED, EVENT_ALL_JOBS_REMOVED, EVENT_JOB_ADDED, EVENT_JOB_REMOVED, \
         EVENT_JOB_MODIFIED, EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, EVENT_JOB_MISSED, EVENT_JOB_SUBMITTED, \
@@ -194,7 +194,7 @@ def insert_ap_scheduler_event_datas():
 
 
 def insert_statuses():
-    from models.dao.common.Status import Status
+    from pdi.domain.common.Status import Status
     bind = op.get_bind()
     from sqlalchemy import orm
     session = orm.Session(bind=bind)
@@ -232,13 +232,13 @@ def insert_statuses():
 
 
 def insert_operation_event_datas():
-    from models.enums.events import EVENT_EXECUTION_INITIALIZED, EVENT_EXECUTION_FINISHED, EVENT_EXECUTION_STARTED, \
+    from pdi.domain.enums.events import EVENT_EXECUTION_INITIALIZED, EVENT_EXECUTION_FINISHED, EVENT_EXECUTION_STARTED, \
         EVENT_EXECUTION_INTEGRATION_INITIALIZED, EVENT_EXECUTION_INTEGRATION_STARTED, \
         EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, \
         EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
         EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION, \
         EVENT_EXECUTION_INTEGRATION_FINISHED
-    from models.dao.common.OperationEvent import OperationEvent
+    from pdi.domain.common.OperationEvent import OperationEvent
     bind = op.get_bind()
     from sqlalchemy import orm
     session = orm.Session(bind=bind)

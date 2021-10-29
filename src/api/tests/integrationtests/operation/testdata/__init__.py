@@ -1,5 +1,2 @@
 from tests.integrationtests.operation.testdata.TestDataOperationDatabaseData import TestDataOperationDatabaseData
 from tests.integrationtests.operation.testdata.TestScheduleJobDatabaseData import TestScheduleJobData
-
-
-

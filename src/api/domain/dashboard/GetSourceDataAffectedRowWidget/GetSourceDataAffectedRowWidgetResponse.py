@@ -1,7 +1,0 @@
-from pdip.cqrs.decorators import responseclass
-from domain.dashboard.GetSourceDataAffectedRowWidget.GetSourceDataAffectedRowWidgetDto import GetSourceDataAffectedRowWidgetDto
-
-
-@responseclass
-class GetSourceDataAffectedRowWidgetResponse:
-	Data: GetSourceDataAffectedRowWidgetDto = None

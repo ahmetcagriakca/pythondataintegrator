@@ -1,9 +1,0 @@
-from dataclasses import dataclass
-from pdip.cqrs import IQuery
-from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListRequest import GetDataOperationJobExecutionListRequest
-from domain.operation.GetDataOperationJobExecutionList.GetDataOperationJobExecutionListResponse import GetDataOperationJobExecutionListResponse
-
-
-@dataclass
-class GetDataOperationJobExecutionListQuery(IQuery[GetDataOperationJobExecutionListResponse]):
-    request: GetDataOperationJobExecutionListRequest = None

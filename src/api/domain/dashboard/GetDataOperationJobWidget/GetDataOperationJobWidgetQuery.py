@@ -1,9 +1,0 @@
-from dataclasses import dataclass
-from pdip.cqrs import IQuery
-from domain.dashboard.GetDataOperationJobWidget.GetDataOperationJobWidgetRequest import GetDataOperationJobWidgetRequest
-from domain.dashboard.GetDataOperationJobWidget.GetDataOperationJobWidgetResponse import GetDataOperationJobWidgetResponse
-
-
-@dataclass
-class GetDataOperationJobWidgetQuery(IQuery[GetDataOperationJobWidgetResponse]):
-    request: GetDataOperationJobWidgetRequest = None

@@ -1,7 +1,0 @@
-from pdip.cqrs.decorators import responseclass
-from domain.operation.GetDataOperationJobExecution.GetDataOperationJobExecutionDto import GetDataOperationJobExecutionDto
-
-
-@responseclass
-class GetDataOperationJobExecutionResponse:
-	Data: GetDataOperationJobExecutionDto = None

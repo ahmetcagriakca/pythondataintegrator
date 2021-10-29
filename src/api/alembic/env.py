@@ -36,29 +36,16 @@ from pdip.dependency.container import DependencyContainer
 
 
 # connection
-from models.dao.aps import ApSchedulerJob, ApSchedulerJobEvent, ApSchedulerJobsTable, ApSchedulerEvent
 
 # connection
-from models.dao.connection import Connection, ConnectionDatabase, ConnectorType, ConnectionType, ConnectionFile, \
-    ConnectionSecret, ConnectionQueue, ConnectionServer
-
 
 # integration
-from models.dao.integration import DataIntegration, DataIntegrationConnection, \
-    DataIntegrationColumn, DataIntegrationConnectionDatabase, DataIntegrationConnectionFile, \
-    DataIntegrationConnectionFileCsv,DataIntegrationConnectionQueue
 
 # common
-from models.dao.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent
 
 # operation
-from models.dao.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
-    DataOperationJobExecutionEvent, DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent, \
-    DataOperationJob, DataOperationContact, Definition
 
 # secret
-from models.dao.secret import Secret, SecretType, SecretSourceBasicAuthentication, SecretSource, AuthenticationType
-
 
 config = context.config
 

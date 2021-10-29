@@ -15,4 +15,3 @@ class TestConnectionFileData:
         "User": "test",
         "Password": "test"
     }
-
