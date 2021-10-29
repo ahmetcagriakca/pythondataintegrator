@@ -58,6 +58,8 @@ class JobOperationService(IScoped):
         data_operation_jobs: List[
             DataOperationJob] = self.data_operation_job_service.get_all_cron_jobs_by_data_operation_id(
             data_operation_id=data_operation_id).all()
+        if data_operation_jobs is None or len(data_operation_jobs) == 0:
+            raise OperationalException("Cron Job not found.")
         for data_operation_job in data_operation_jobs:
             self.delete_job(data_operation_job_id=data_operation_job.Id,
                             ap_scheduler_job_id=data_operation_job.ApSchedulerJobId)
@@ -83,21 +85,6 @@ class JobOperationService(IScoped):
             args=(None, data_operation_id,))
         return ap_scheduler_job
 
-    def get_cron_job(self, data_operation_id: int):
-        data_operation_jobs: List[DataOperationJob] = self.data_operation_job_service.get_all_by_data_operation_id(
-            data_operation_id=data_operation_id).all()
-        if data_operation_jobs is None or len(data_operation_jobs) == 0:
-            return None
-        found_cron_job: DataOperationJob = None
-        for data_operation_job in data_operation_jobs:
-            if data_operation_job.Cron is not None:
-                found_cron_job = data_operation_job
-                break
-        if found_cron_job is None:
-            return None
-        else:
-            return found_cron_job
-
     def create_job_with_cron(self, operation_name: str, cron: str, start_date: datetime = None,
                              end_date: datetime = None) -> DataOperationJob:
 
@@ -107,11 +94,15 @@ class JobOperationService(IScoped):
         if data_operation is None:
             raise OperationalException("Data operation not found")
 
-        if start_date is not None and start_date != '':
+        if isinstance(start_date, datetime):
+            job_start_date = start_date
+        elif start_date is not None and start_date != '':
             job_start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
         else:
             job_start_date = datetime.now().astimezone()
-        if end_date is not None and end_date != '':
+        if isinstance(end_date, datetime):
+            job_start_date = start_date
+        elif end_date is not None and end_date != '':
             job_end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone()
         else:
             job_end_date = None
@@ -166,15 +157,14 @@ class JobOperationService(IScoped):
         return data_operation_job
 
     def delete_scheduler_cron_job(self, data_operation_name):
-        data_operation = self.data_operation_service.get_by_name(name=data_operation_name)
-        if data_operation is None:
-            raise OperationalException("Data operation not found")
-
-        check = self.check_cron_initialized_jobs_by_data_operation_id(data_operation_id=data_operation.Id)
-        if not check:
+        data_operation_jobs: List[
+            DataOperationJob] = self.data_operation_job_service.get_all_cron_jobs_by_data_operation_name(
+            data_operation_name=data_operation_name).all()
+        if data_operation_jobs is None or len(data_operation_jobs) == 0:
             raise OperationalException("Cron Job not found.")
-
-        data_operation_jobs = self.delete_existing_cron_jobs(data_operation_id=data_operation.Id)
+        for data_operation_job in data_operation_jobs:
+            self.delete_job(data_operation_job_id=data_operation_job.DataOperationJob.Id,
+                            ap_scheduler_job_id=data_operation_job.DataOperationJob.ApSchedulerJobId)
         return data_operation_jobs
 
     def delete_scheduler_date_job(self, data_operation_job_id):

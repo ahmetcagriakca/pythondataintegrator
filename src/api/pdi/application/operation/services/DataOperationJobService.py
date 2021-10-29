@@ -1,3 +1,5 @@
+from typing import List
+
 from injector import inject
 from pdip.data import RepositoryProvider
 from pdip.dependency import IScoped
@@ -19,15 +21,17 @@ class DataOperationJobService(IScoped):
         entity = self.data_operation_job_repository.first(IsDeleted=0, Id=id)
         return entity
 
-    def get_all_by_data_operation_id(self, data_operation_id: int) -> DataOperationJob:
-        entities = self.data_operation_job_repository.filter_by(IsDeleted=0,
-                                                                DataOperationId=data_operation_id)
+    def get_all_cron_jobs(self) -> List[DataOperationJob]:
+        entities = self.data_operation_job_repository.table \
+            .filter(DataOperationJob.IsDeleted == 0) \
+            .filter(DataOperationJob.Cron is not None) \
+            .filter(DataOperationJob.Cron != '')
         return entities
 
     def check_existing_cron_jobs_by_data_operation_id(self, data_operation_id: int) -> DataOperationJob:
         query = self.data_operation_job_repository.table \
             .filter(DataOperationJob.IsDeleted == 0) \
-            .filter(DataOperationJob.Cron != None) \
+            .filter(DataOperationJob.Cron is not None) \
             .filter(DataOperationJob.Cron != '') \
             .filter(DataOperationJob.DataOperationId == data_operation_id)
         return query.count() > 0
@@ -35,9 +39,18 @@ class DataOperationJobService(IScoped):
     def get_all_cron_jobs_by_data_operation_id(self, data_operation_id: int) -> DataOperationJob:
         entities = self.data_operation_job_repository.table \
             .filter(DataOperationJob.IsDeleted == 0) \
-            .filter(DataOperationJob.Cron != None) \
+            .filter(DataOperationJob.Cron is not None) \
             .filter(DataOperationJob.Cron != '') \
             .filter(DataOperationJob.DataOperationId == data_operation_id)
+        return entities
+
+    def get_all_cron_jobs_by_data_operation_name(self, data_operation_name: int) -> DataOperationJob:
+        entities = self.repository_provider.query(DataOperationJob, DataOperation) \
+            .filter(DataOperation.Id == DataOperationJob.DataOperationId) \
+            .filter(DataOperationJob.IsDeleted == 0) \
+            .filter(DataOperationJob.Cron is not None) \
+            .filter(DataOperationJob.Cron != '') \
+            .filter(DataOperation.Name == data_operation_name)
         return entities
 
     def get_by_job_id(self, job_id: int) -> DataOperationJob:

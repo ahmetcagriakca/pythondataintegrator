@@ -28,8 +28,8 @@ class DeleteCronJobCommandHandler(ICommandHandler[DeleteCronJobCommand]):
         self.repository_provider.commit()
         for data_operation_job in data_operation_jobs:
             self.notify(
-                message=f'{data_operation_job.DataOperation.Name} operation, job {data_operation_job.Id} removed',
-                id=data_operation_job.Id)
+                message=f'{data_operation_job.DataOperation.Name} operation, job {data_operation_job.DataOperationJob.Id} removed',
+                id=data_operation_job.DataOperationJob.Id)
 
     def notify(self, message: str, id: int):
         data_list = []
