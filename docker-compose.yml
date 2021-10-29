@@ -27,7 +27,7 @@ services:
       - TZ=Europe/Istanbul
 
   pdi-api:
-    image: ${REGISTRY:-pythondataintegrator}/api:${TAG}
+    image: ${REGISTRY:-pythondataintegrator}/api:${TAG:-latest}
     build: 
       context: src/api/
       dockerfile: Dockerfile
