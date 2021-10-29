@@ -35,17 +35,32 @@ from pdip.dependency.container import DependencyContainer
 # module_list, module_attr_list = Utils.get_modules(folders)
 
 
-# connection
 
 # connection
+from pdi.domain.aps import ApSchedulerJob, ApSchedulerJobEvent, ApSchedulerJobsTable, ApSchedulerEvent
+
+# connection
+from pdi.domain.connection import Connection, ConnectionDatabase, ConnectorType, ConnectionType, ConnectionFile, \
+    ConnectionSecret, ConnectionQueue, ConnectionServer
+
 
 # integration
+from pdi.domain.integration import DataIntegration, DataIntegrationConnection, \
+    DataIntegrationColumn, DataIntegrationConnectionDatabase, DataIntegrationConnectionFile, \
+    DataIntegrationConnectionFileCsv,DataIntegrationConnectionQueue
 
 # common
+from pdi.domain.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent
 
 # operation
+from pdi.domain.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
+    DataOperationJobExecutionEvent, DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent, \
+    DataOperationJob, DataOperationContact, Definition
 
 # secret
+from pdi.domain.secret import Secret, SecretType, SecretSourceBasicAuthentication, SecretSource, AuthenticationType
+
+
 
 config = context.config
 
