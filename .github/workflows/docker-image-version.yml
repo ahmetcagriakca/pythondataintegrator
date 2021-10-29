@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image versioning CI
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       uses: docker/setup-buildx-action@v1
     
     - name: Build image version set
-      run: version.sh
+      run: ./version.sh
     
     - name: Build the docker-compose
       run: docker-compose -f "docker-compose.yml" up -d --build
