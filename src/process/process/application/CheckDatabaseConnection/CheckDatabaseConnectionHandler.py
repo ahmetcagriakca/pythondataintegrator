@@ -34,9 +34,9 @@ class CheckDatabaseConnectionHandler(ICommandHandler[CheckDatabaseConnectionComm
             return "Connection not found!"
         self.operation_cache_service.initialize_connection(connection.Id)
         connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
-            connection_id=connection.ConnectionId)
+            connection_id=connection.Id)
         connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
-            connection_id=connection.ConnectionId)
+            connection_id=connection.Id)
 
         database_context = self.database_provider.get_context(
             connector_type=ConnectorTypes(connection.Database.ConnectorTypeId), host=connection_server.Host,

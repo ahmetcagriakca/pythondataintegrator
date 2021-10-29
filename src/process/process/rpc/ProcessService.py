@@ -12,7 +12,7 @@ from process.application.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountCo
     CheckDatabaseTableRowCountCommand
 from process.application.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountRequest import \
     CheckDatabaseTableRowCountRequest
-from process.application.StartExecution.StartExecutionProcessCommand import StartExecutionProcessCommand
+from process.application.StartExecutionProcess.StartExecutionProcessCommand import StartExecutionProcessCommand
 from process.domain.configs.ProcessRpcServerConfig import ProcessRpcServerConfig
 
 

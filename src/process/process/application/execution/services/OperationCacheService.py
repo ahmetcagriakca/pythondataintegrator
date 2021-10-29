@@ -43,7 +43,10 @@ class OperationCacheService(IScoped):
         self.connections: List[Connection] = []
 
     def load_entity(self, cls, entity):
+        if entity is None:
+            raise OperationalException(f"{cls.__name__} enitity is null")
         converter = BaseConverter(cls=cls)
+
         json_str = converter.ToJSON(entity)
         result = converter.FromJSON(json_str)
         return result
