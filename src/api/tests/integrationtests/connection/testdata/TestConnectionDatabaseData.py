@@ -19,4 +19,3 @@ class TestConnectionDatabaseData:
         "User": "test",
         "Password": "test"
     }
-

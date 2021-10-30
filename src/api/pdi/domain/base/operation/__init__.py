@@ -1,0 +1,11 @@
+from pdi.domain.base.operation.DataOperationBase import DataOperationBase
+from pdi.domain.base.operation.DataOperationContactBase import DataOperationContactBase
+from pdi.domain.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
+from pdi.domain.base.operation.DataOperationJobBase import DataOperationJobBase
+from pdi.domain.base.operation.DataOperationJobExecutionBase import DataOperationJobExecutionBase
+from pdi.domain.base.operation.DataOperationJobExecutionEventBase import DataOperationJobExecutionEventBase
+from pdi.domain.base.operation.DataOperationJobExecutionIntegrationBase import \
+    DataOperationJobExecutionIntegrationBase
+from pdi.domain.base.operation.DataOperationJobExecutionIntegrationEventBase import \
+    DataOperationJobExecutionIntegrationEventBase
+from pdi.domain.base.operation.DefinitionBase import DefinitionBase

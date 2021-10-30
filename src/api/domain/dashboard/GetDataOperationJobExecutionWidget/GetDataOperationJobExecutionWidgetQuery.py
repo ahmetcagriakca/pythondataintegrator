@@ -1,9 +1,0 @@
-from dataclasses import dataclass
-from infrastructure.cqrs.IQuery import IQuery
-from domain.dashboard.GetDataOperationJobExecutionWidget.GetDataOperationJobExecutionWidgetRequest import GetDataOperationJobExecutionWidgetRequest
-from domain.dashboard.GetDataOperationJobExecutionWidget.GetDataOperationJobExecutionWidgetResponse import GetDataOperationJobExecutionWidgetResponse
-
-
-@dataclass
-class GetDataOperationJobExecutionWidgetQuery(IQuery[GetDataOperationJobExecutionWidgetResponse]):
-    request: GetDataOperationJobExecutionWidgetRequest = None
