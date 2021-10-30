@@ -6,7 +6,7 @@ from models.configs.DatabaseConfig import DatabaseConfig
 class MssqlDbConnector(DatabaseConnector):
     def __init__(self, database_config: DatabaseConfig):
         self.database_config: DatabaseConfig = database_config
-        self.database_config.driver = 'ODBC Driver 17 for SQL Server'
+        self.database_config.driver = pyodbc.drivers()[0]
         # ;Client_CSet=UTF-8;Server_CSet=WINDOWS-1251
         self.connection_string = 'DRIVER={%s};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s' % (
             self.database_config.driver, self.database_config.host, self.database_config.database,
