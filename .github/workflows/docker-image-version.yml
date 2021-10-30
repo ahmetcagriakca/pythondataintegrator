@@ -1,0 +1,41 @@
+name: Docker Image versioning CI
+
+on:
+  push:
+    branches: [ main ]
+
+    paths:
+    - .github/workflows/docker-image-version.yml
+
+jobs:
+
+  build-for-version:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1
+    
+    - name: "Set environmental variables"
+      run: |
+        echo "TAG=0.1.0" >> $GITHUB_ENV
+
+    - name: Show TAG 
+      run: echo $TAG
+    
+    - name: Build the docker-compose
+      run: docker-compose -f "docker-compose.yml" up -d --build
+      
+    - name: push images
+      if: github.event_name != 'pull_request'
+      run: docker-compose -f "docker-compose.yml" push

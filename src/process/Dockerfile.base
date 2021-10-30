@@ -1,0 +1,35 @@
+# Python runtime with pyodbc to connect to SQL Server# Python runtime with pyodbc to connect to SQL Server
+# Python runtime with pyodbc to connect to SQL Server# Python runtime with pyodbc to connect to SQL Server
+FROM  python:3.9.7
+
+## Mssql client installation
+
+# install FreeTDS and dependencies
+RUN apt-get update \
+ && apt-get install unixodbc -y \
+ && apt-get install unixodbc-dev -y \
+ && apt-get install freetds-dev -y \
+ && apt-get install freetds-bin -y \
+ && apt-get install tdsodbc -y \
+ && apt-get install --reinstall build-essential -y
+# populate "ocbcinst.ini" as this is where ODBC driver config sits
+RUN echo "[FreeTDS]\n\
+Description = FreeTDS Driver\n\
+Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so\n\
+Setup = /usr/lib/x86_64-linux-gnu/odbc/libtdsS.so" >> /etc/odbcinst.ini
+
+RUN pip install pyodbc
+
+# Oracle installation
+WORKDIR /opt/oracle
+# install instantclient for oracle
+RUN apt install -y wget unzip libaio1 alien
+
+RUN wget https://download.oracle.com/otn_software/linux/instantclient/19800/oracle-instantclient19.8-basiclite-19.8.0.0.0-1.x86_64.rpm?xd_co_f=ad019b31-76ea-48dd-a744-e6b838b7a809 -O oracle-instantclient19.8-basiclite-19.8.0.0.0-1.x86_64.rpm
+RUN alien -i oracle-instantclient19.8-basiclite-19.8.0.0.0-1.x86_64.rpm
+# RUN dpkg -i oracle-instantclient19.8-basiclite-19.8.0.0.0-1.x86_64.deb
+# RUN rpm -ivh oracle-instantclient19.8-basiclite-19.8.0.0.0-1.x86_64.rpm?xd_co_f=ad019b31-76ea-48dd-a744-e6b838b7a809
+
+RUN echo export LD_LIBRARY_PATH=/usr/lib/oracle/19.8/client64/lib/ >> /etc/bashrc
+RUN echo export ORACLE_HOME=/usr/lib/oracle/19.8/client64 >> /et
+RUN pip install cx_Oracle
