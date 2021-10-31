@@ -45,9 +45,9 @@ services:
       - PROCESS_RPC_CLIENT_HOST=pdi-process
       - NOTIFICATION_CLIENT_HOST=http://pdi-notification:7500
       - TZ=Europe/Istanbul
+      - UPGRADE_DATABASE=True
     depends_on:
       - postgresql
-      - pdi-scheduler
 
   pdi-process:
     image: ${REGISTRY:-pythondataintegrator}/process:${TAG:-latest}
