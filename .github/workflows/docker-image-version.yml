@@ -28,7 +28,7 @@ jobs:
     
     - name: "Set environmental variables"
       run: |
-        echo "TAG=0.2.0" >> $GITHUB_ENV
+        echo "TAG=0.3.0" >> $GITHUB_ENV
 
     - name: Show TAG 
       run: echo $TAG
