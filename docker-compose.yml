@@ -5,7 +5,7 @@ services:
     restart: always
     image: postgres
     ports:
-      - "5433:5432"
+      - "5432:5432"
     environment:
       - DEBUG=false
       - POSTGRES_USER=postgres
@@ -45,7 +45,7 @@ services:
       - PROCESS_RPC_CLIENT_HOST=pdi-process
       - NOTIFICATION_CLIENT_HOST=http://pdi-notification:7500
       - TZ=Europe/Istanbul
-      - UPGRADE_DATABASE=True
+      - UPGRADE_DATABASE=true
     depends_on:
       - postgresql
 
@@ -88,6 +88,7 @@ services:
       - TZ=Europe/Istanbul
     depends_on:
       - postgresql
+      - pdi-api
       - pdi-process
   
   pdi-ui:

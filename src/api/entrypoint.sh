@@ -1,7 +1,5 @@
-if [ -z "$UPGRADE_DATABASE" ]
+if [ "$UPGRADE_DATABASE"=="true" ]
 then
-    echo "UPGRADE_DATABASE not defined"
-else 
     alembic upgrade head
 fi
-python3 app.py
+python app.py

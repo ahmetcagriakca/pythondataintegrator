@@ -11,7 +11,7 @@ class SecretSourceBase(EntityBase):
                  AuthenticationTypeId: int = None,
                  Secret=None,
                  AuthenticationType=None,
-                 SecretSourceBasicAuthentications: List[SecretSourceBasicAuthenticationBase] = None,
+                 SecretSourceBasicAuthentications: List[SecretSourceBasicAuthenticationBase] = [],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.SecretId: int = SecretId

@@ -87,9 +87,9 @@ function DataIntegrationColumnsData(props) {
 		}
 	};
 
-	const deleteRow = (event, index) => {
+	const deleteRow = (event, index,rowIndex) => {
 		let tempRows = [...rows];
-		tempRows.splice(index, 1)
+		tempRows.splice(rowIndex, 1)
 		setRows(tempRows);
 		changeApply(tempRows);
 	}
@@ -132,7 +132,7 @@ function DataIntegrationColumnsData(props) {
 														key={'cellColumnDeleteAction' + row?.id}
 														size="small"
 														aria-label="expand row"
-														onClick={event => deleteRow(event, rowIndex)}>
+														onClick={event => deleteRow(event,row, rowIndex)}>
 														<Icon className="text-16 arrow-icon" style={{ color: 'red' }}>
 															remove_circle
 														</Icon>

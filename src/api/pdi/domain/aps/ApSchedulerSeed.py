@@ -1,9 +1,9 @@
 from pdip.data import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.console import ConsoleLogger
 from pdip.logging.loggers.database import SqlLogger
 
 from pdi.domain.aps.ApSchedulerEvent import ApSchedulerEvent
+from pdip.data import Seed
 from pdi.domain.enums.apschedulerevents import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN, \
     EVENT_SCHEDULER_PAUSED, EVENT_SCHEDULER_RESUMED, EVENT_EXECUTOR_ADDED, EVENT_EXECUTOR_REMOVED, \
     EVENT_JOBSTORE_ADDED, EVENT_JOBSTORE_REMOVED, EVENT_ALL_JOBS_REMOVED, EVENT_JOB_ADDED, EVENT_JOB_REMOVED, \
@@ -11,7 +11,7 @@ from pdi.domain.enums.apschedulerevents import EVENT_SCHEDULER_STARTED, EVENT_SC
     EVENT_JOB_MAX_INSTANCES
 
 
-class ApSchedulerSeed:
+class ApSchedulerSeed(Seed):
 
     def seed(self):
         try:
@@ -94,18 +94,6 @@ class ApSchedulerSeed:
                         "Class": "JobEvent"
                     },
                     {
-                        "Code": EVENT_JOB_SUBMITTED,
-                        "Name": "EVENT_JOB_SUBMITTED",
-                        "Description": "A job was submitted to its executor to be run",
-                        "Class": "JobSubmissionEvent"
-                    },
-                    {
-                        "Code": EVENT_JOB_MAX_INSTANCES,
-                        "Name": "EVENT_JOB_MAX_INSTANCES",
-                        "Description": "A job being submitted to its executor was not accepted by the executor because the job has already reached its maximum concurrently executing instances",
-                        "Class": "JobSubmissionEvent"
-                    },
-                    {
                         "Code": EVENT_JOB_EXECUTED,
                         "Name": "EVENT_JOB_EXECUTED",
                         "Description": "A job was executed successfully",
@@ -122,6 +110,18 @@ class ApSchedulerSeed:
                         "Name": "EVENT_JOB_MISSED",
                         "Description": "A job’s execution was missed",
                         "Class": "JobExecutionEvent"
+                    },
+                    {
+                        "Code": EVENT_JOB_SUBMITTED,
+                        "Name": "EVENT_JOB_SUBMITTED",
+                        "Description": "A job was submitted to its executor to be run",
+                        "Class": "JobSubmissionEvent"
+                    },
+                    {
+                        "Code": EVENT_JOB_MAX_INSTANCES,
+                        "Name": "EVENT_JOB_MAX_INSTANCES",
+                        "Description": "A job being submitted to its executor was not accepted by the executor because the job has already reached its maximum concurrently executing instances",
+                        "Class": "JobSubmissionEvent"
                     }
                 ]
                 for eventJson in events_list:
@@ -129,7 +129,9 @@ class ApSchedulerSeed:
                                              Description=eventJson["Description"],
                                              Class=eventJson["Class"])
                     ap_scheduler_event_repository.insert(event)
-                repository_provider.commit()
+                    repository_provider.commit()
         except Exception as ex:
             logger = DependencyContainer.Instance.get(SqlLogger)
             logger.exception(ex, "ApScheduler seeds getting error")
+        finally:
+            repository_provider.close()

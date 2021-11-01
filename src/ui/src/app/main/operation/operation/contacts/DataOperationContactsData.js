@@ -83,9 +83,9 @@ function DataOperationContactsData(props) {
 		}
 	};
 
-	const deleteRow = (event, index) => {
+	const deleteRow = (event, item,rowIndex) => {
 		let tempRows = [...rows];
-		tempRows.splice(index, 1)
+		tempRows.splice(rowIndex, 1)
 		setRows(tempRows);
 		changeApply(tempRows);
 	}

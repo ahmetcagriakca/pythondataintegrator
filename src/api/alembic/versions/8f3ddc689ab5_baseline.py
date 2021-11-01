@@ -1,8 +1,8 @@
 """baseline
 
-Revision ID: a34a6987b70e
+Revision ID: 8f3ddc689ab5
 Revises: 
-Create Date: 2021-10-31 12:00:59.455916
+Create Date: 2021-10-31 21:12:44.780989
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a34a6987b70e'
+revision = '8f3ddc689ab5'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -513,8 +513,8 @@ def upgrade():
     op.create_table('SecretSourceBasicAuthentication',
     sa.Column('Id', sa.Integer(), nullable=False),
     sa.Column('SecretSourceId', sa.Integer(), nullable=True),
-    sa.Column('User', sa.String(length=100), nullable=False),
-    sa.Column('Password', sa.String(length=100), nullable=False),
+    sa.Column('User', sa.Text(), nullable=False),
+    sa.Column('Password', sa.Text(), nullable=False),
     sa.Column('CreatedByUserId', sa.Integer(), nullable=False),
     sa.Column('CreationDate', sa.DateTime(), nullable=False),
     sa.Column('LastUpdatedUserId', sa.Integer(), nullable=True),
@@ -652,4 +652,3 @@ def downgrade():
     op.execute('DROP SCHEMA "Integration"')
     op.execute('DROP SCHEMA "Operation"')
     op.execute('DROP SCHEMA "Secret"')
-
