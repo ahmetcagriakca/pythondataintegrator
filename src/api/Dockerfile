@@ -1,5 +1,6 @@
 FROM  python:3.9.7
-
+RUN     apt-get update
+RUN     apt-get install dos2unix
 RUN     mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 RUN     pip install  --upgrade pip
@@ -12,6 +13,7 @@ RUN     date
 
 COPY    . /usr/src/app
 # # openshift set running user 
+RUN dos2unix entrypoint.sh
 
 USER    1001
 ENV FLASK_APP=app.py

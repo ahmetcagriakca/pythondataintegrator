@@ -1,9 +1,9 @@
-
-
 if __name__ == "__main__":
     from pdip.base import Pdi
     from pdip.api.app import FlaskAppWrapper
-    from pdi.domain.aps.ApSchedulerSeed import ApSchedulerSeed
-    pdi = Pdi(excluded_modules=["alembic", "tests","venv"])
-    ApSchedulerSeed().seed()
+    from pdip.data import SeedRunner
+
+    pdi = Pdi(excluded_modules=["alembic", "tests", "venv"])
+
+    pdi.get(SeedRunner).run()
     pdi.get(FlaskAppWrapper).run()
