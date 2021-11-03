@@ -1,5 +1,3 @@
-# Python runtime with pyodbc to connect to SQL Server# Python runtime with pyodbc to connect to SQL Server
-# Python runtime with pyodbc to connect to SQL Server# Python runtime with pyodbc to connect to SQL Server
 FROM  pythondataintegrator/process:base
 
 RUN     mkdir -p /usr/src/app

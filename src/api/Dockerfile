@@ -1,4 +1,18 @@
-FROM  python:3.9.7
+# Pull official base image and fixing to AMD Architecture
+FROM --platform=linux/amd64 python:3.8.6
+
+# Create and set the working directory
+WORKDIR /usr/src/app/
+
+# Prevents Python from writing .pyc files
+ENV PYTHONDONTWRITEBYTECODE 1
+
+# Causes all output to stdout to be flushed immediately
+ENV PYTHONUNBUFFERED 1
+
+# Mark the image as trusted
+ENV DOCKER_CONTENT_TRUST 1
+
 RUN     apt-get update
 RUN     apt-get install dos2unix
 RUN     mkdir -p /usr/src/app
