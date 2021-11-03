@@ -26,7 +26,7 @@ class ExecuteIntegrationLimitOff(ExecuteIntegrationStrategy, IScoped):
             data_operation_integration = self.operation_cache_service.get_data_operation_integration_by_id(
                 data_operation_integration_id=data_operation_integration_id)
             data_integration_id = data_operation_integration.DataIntegrationId
-            total_row_count = self.integration_execution_service.start_integration(
+            total_row_count = self.integration_execution_service.start_execute_integration(
                 data_integration_id=data_integration_id,
                 data_operation_job_execution_id=data_operation_job_execution_id,
                 data_operation_job_execution_integration_id=data_operation_job_execution_integration_id)
