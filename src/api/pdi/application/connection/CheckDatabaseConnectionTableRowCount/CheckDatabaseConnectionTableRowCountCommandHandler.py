@@ -25,11 +25,10 @@ class CheckDatabaseConnectionTableRowCountCommandHandler(ICommandHandler[CheckDa
                 table=command.request.Table,
             )
         except ConnectionRefusedError as cre:
-            error_detail="\n".join(cre.args)
+            error_detail = "\n".join(cre.args)
             message = f'{command.request.ConnectionName} getting error on checking count. Process machine not accessible. Error:{error_detail}'
             raise OperationalException(message)
         except Exception as ex:
-            error_detail="\n".join(ex.args)
+            error_detail = "\n".join(ex.args)
             message = f'{command.request.ConnectionName} getting error on connecting. Error:{error_detail}'
             raise OperationalException(message)
-
