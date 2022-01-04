@@ -7,12 +7,12 @@ import pandas as pd
 from func_timeout import FunctionTimedOut
 from injector import inject
 from pandas import DataFrame, notnull
-from pdip.connection.models import DataQueueTask
 from pdip.data.decorators import transactionhandler
 from pdip.dependency import IScoped
 from pdip.dependency.container import DependencyContainer
 from pdip.exceptions import OperationalException
-from pdip.logging.loggers.database import SqlLogger
+from pdip.integrator.connection.domain.task import DataQueueTask
+from pdip.logging.loggers.sql import SqlLogger
 from pdip.processing import ProcessManager
 
 from process.application.execution.adapters.execution.integration.ExecuteIntegrationStrategy import \

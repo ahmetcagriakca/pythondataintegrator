@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from injector import inject
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 
 from process.domain.common import OperationEvent

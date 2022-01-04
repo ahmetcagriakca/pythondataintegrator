@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pdip.data import EntityBase
+from pdip.data.domain import EntityBase
 
 
 class DataOperationJobExecutionEventBase(EntityBase):

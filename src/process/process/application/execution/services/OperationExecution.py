@@ -2,7 +2,7 @@ from injector import inject
 from pdip.cqrs import Dispatcher
 from pdip.data.decorators import transactionhandler
 from pdip.dependency import IScoped
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.CreateExecution.CreateExecutionCommand import CreateExecutionCommand
 from process.application.SendExecutionFinishMail.SendExecutionFinishMailCommand import SendExecutionFinishMailCommand

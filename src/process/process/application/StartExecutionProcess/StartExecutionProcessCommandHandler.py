@@ -11,10 +11,10 @@ from injector import inject
 from pdip.base import Pdi
 from pdip.configuration.models.application import ApplicationConfig
 from pdip.cqrs import Dispatcher, ICommandHandler
-from pdip.data import RepositoryProvider
 from pdip.data.decorators import transactionhandler
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.StartExecutionProcess.StartExecutionProcessCommand import StartExecutionProcessCommand
 from process.application.execution.services.OperationExecution import OperationExecution

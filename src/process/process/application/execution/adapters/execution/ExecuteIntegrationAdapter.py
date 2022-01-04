@@ -1,6 +1,6 @@
 from injector import inject
 from pdip.dependency import IScoped
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
 from process.application.execution.adapters.execution.integration.ExecuteIntegrationStrategyFactory import \

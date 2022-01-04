@@ -5,9 +5,9 @@ import pandas as pd
 from func_timeout import func_set_timeout
 from injector import inject
 from pandas import notnull
-from pdip.connection.adapters import ConnectionAdapter
 from pdip.dependency import IScoped
-from pdip.logging.loggers.database import SqlLogger
+from pdip.integrator.connection.base import ConnectionAdapter
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.execution.adapters.connection.ConnectionAdapterFactory import \
     ConnectionAdapterFactory

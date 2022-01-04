@@ -2,10 +2,10 @@ from datetime import datetime
 
 from injector import inject
 from pdip.cqrs import ICommandHandler
-from pdip.data import RepositoryProvider
 from pdip.data.decorators import transactionhandler
+from pdip.data.repository import RepositoryProvider
 from pdip.exceptions import OperationalException
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.CreateExecution.CreateExecutionCommand import CreateExecutionCommand
 from process.domain.common.OperationEvent import OperationEvent
@@ -19,11 +19,11 @@ from process.domain.operation.DataOperationJobExecutionEvent import DataOperatio
 class CreateExecutionCommandHandler(ICommandHandler[CreateExecutionCommand]):
     @inject
     def __init__(self,
-                 sql_logger: SqlLogger,
+                 logger: SqlLogger,
                  repository_provider: RepositoryProvider,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.sql_logger = sql_logger
+        self.logger = logger
         self.repository_provider = repository_provider
 
     @transactionhandler
@@ -66,7 +66,7 @@ class CreateExecutionCommandHandler(ICommandHandler[CreateExecutionCommand]):
         data_operation = self.get_data_operation_by_id(id=data_operation_id)
         if data_operation is None:
             error = f'{data_operation_id}-{job_id} Data operation not found'
-            self.sql_logger.error(error)
+            self.logger.error(error)
             return OperationalException(error)
 
         data_operation_job = self.get_data_operation_job_by_operation_and_job_id(
@@ -74,5 +74,5 @@ class CreateExecutionCommandHandler(ICommandHandler[CreateExecutionCommand]):
             job_id=job_id)
         if data_operation_job is None:
             error = f'{data_operation_id}-{job_id} Data operation job not found'
-            self.sql_logger.error(error)
+            self.logger.error(error)
             return OperationalException(error)

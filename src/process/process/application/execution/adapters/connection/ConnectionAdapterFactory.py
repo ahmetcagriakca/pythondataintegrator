@@ -1,8 +1,8 @@
 from injector import inject
-from pdip.connection.adapters import ConnectionAdapter
-from pdip.connection.models.enums import ConnectionTypes
 from pdip.dependency import IScoped
 from pdip.exceptions import IncompatibleAdapterException, NotSupportedFeatureException
+from pdip.integrator.connection.base import ConnectionAdapter
+from pdip.integrator.connection.domain.enums import ConnectionTypes
 
 from process.application.execution.adapters.connection.DatabaseAdapter import DatabaseAdapter
 from process.application.execution.adapters.connection.FileAdapter import FileAdapter

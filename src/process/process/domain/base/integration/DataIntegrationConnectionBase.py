@@ -1,4 +1,4 @@
-from pdip.data import EntityBase
+from pdip.data.domain import EntityBase
 
 from process.domain.base.integration.DataIntegrationConnectionDatabaseBase import DataIntegrationConnectionDatabaseBase
 from process.domain.base.integration.DataIntegrationConnectionFileBase import DataIntegrationConnectionFileBase

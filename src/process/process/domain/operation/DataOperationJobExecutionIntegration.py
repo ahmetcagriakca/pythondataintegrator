@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from pdip.data import Entity
+from pdip.data.domain import Entity
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, String
 from sqlalchemy.orm import relationship
 

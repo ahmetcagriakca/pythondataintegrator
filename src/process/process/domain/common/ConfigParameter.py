@@ -1,5 +1,5 @@
 from pdip.configuration.services import ConfigParameterBase
-from pdip.data import Entity
+from pdip.data.domain import Entity
 from sqlalchemy import Column, String
 
 from process.domain.base import Base

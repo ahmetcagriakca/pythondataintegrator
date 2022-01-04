@@ -1,9 +1,9 @@
 from injector import inject
-from pdip.connection.database.base import DatabaseProvider
-from pdip.connection.models.enums import ConnectorTypes
 from pdip.cqrs import Dispatcher, ICommandHandler
-from pdip.data import RepositoryProvider
-from pdip.logging.loggers.database import SqlLogger
+from pdip.data.repository import RepositoryProvider
+from pdip.integrator.connection.domain.enums import ConnectorTypes
+from pdip.integrator.connection.types.sql.base import SqlProvider
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountCommand import \
     CheckDatabaseTableRowCountCommand
@@ -20,10 +20,10 @@ class CheckDatabaseTableRowCountHandler(ICommandHandler[CheckDatabaseTableRowCou
                  logger: SqlLogger,
                  repository_provider: RepositoryProvider,
                  operation_cache_service: OperationCacheService,
-                 database_provider: DatabaseProvider,
+                 sql_provider: SqlProvider,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.database_provider = database_provider
+        self.sql_provider = sql_provider
         self.logger = logger
         self.operation_cache_service = operation_cache_service
         self.repository_provider = repository_provider
@@ -40,7 +40,7 @@ class CheckDatabaseTableRowCountHandler(ICommandHandler[CheckDatabaseTableRowCou
             connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
                 connection_id=connection.Id)
 
-            database_context = self.database_provider.get_context(
+            database_context = self.sql_provider.get_context(
                 connector_type=ConnectorTypes(connection.Database.ConnectorTypeId), host=connection_server.Host,
                 port=connection_server.Port, user=connection_basic_authentication.User,
                 password=connection_basic_authentication.Password, database=connection.Database.DatabaseName,

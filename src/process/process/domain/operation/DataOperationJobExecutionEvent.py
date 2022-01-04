@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pdip.data import Entity
+from pdip.data.domain import Entity
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 

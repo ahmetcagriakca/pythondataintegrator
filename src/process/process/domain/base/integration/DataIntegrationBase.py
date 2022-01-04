@@ -1,6 +1,6 @@
 from typing import List
 
-from pdip.data import EntityBase
+from pdip.data.domain import EntityBase
 
 from process.domain.base.integration.DataIntegrationColumnBase import DataIntegrationColumnBase
 from process.domain.base.integration.DataIntegrationConnectionBase import DataIntegrationConnectionBase

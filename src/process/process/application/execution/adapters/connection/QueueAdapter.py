@@ -4,9 +4,8 @@ from typing import List
 import pandas as pd
 from injector import inject
 from pandas import DataFrame
-from pdip.connection.adapters import ConnectionAdapter
-from pdip.connection.queue.base import QueueProvider
 from pdip.exceptions import NotSupportedFeatureException
+from pdip.integrator.connection.base import ConnectionAdapter
 
 from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.domain.dto.PagingModifier import PagingModifier
@@ -15,11 +14,9 @@ from process.domain.dto.PagingModifier import PagingModifier
 class QueueAdapter(ConnectionAdapter):
     @inject
     def __init__(self,
-                 queue_provider: QueueProvider,
                  operation_cache_service: OperationCacheService,
                  ):
         self.operation_cache_service = operation_cache_service
-        self.queue_provider = queue_provider
 
     def clear_data(self, data_integration_id) -> int:
         target_connection = self.operation_cache_service.get_target_connection(
