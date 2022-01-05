@@ -10,7 +10,7 @@ from process.application.execution.services.IntegrationExecution import Integrat
 from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.application.operation.services.DataOperationJobExecutionService import DataOperationJobExecutionService
 from process.domain.enums.StatusTypes import StatusTypes
-from process.domain.enums.events import EVENT_EXECUTION_STARTED, EVENT_EXECUTION_FINISHED
+from pdip.integrator.domain.enums.events import EVENT_EXECUTION_STARTED, EVENT_EXECUTION_FINISHED
 
 
 class OperationExecution(IScoped):

@@ -23,7 +23,7 @@ class ExecuteOperationInitializeCommandHandler(ICommandHandler[ExecuteOperationI
         try:
 
             message = f'{command.request.Operation.Id}-{command.request.Operation.Name} initialized.'
-            self.logger.info(message)
+            self.logger.info(message,job_id=command.request.Operation.Execution.Id)
         except Exception as ex:
             self.logger.exception(ex, str(ex))
             raise Exception(str(ex))

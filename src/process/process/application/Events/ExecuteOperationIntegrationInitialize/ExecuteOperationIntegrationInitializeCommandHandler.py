@@ -23,7 +23,7 @@ class ExecuteOperationIntegrationInitializeCommandHandler(
     def handle(self, command: ExecuteOperationIntegrationInitializeCommand):
         try:
             message = f'{command.request.OperationIntegration.Id}-{command.request.OperationIntegration.Order}-{command.request.OperationIntegration.Name}-{command.request.Message}'
-            self.logger.info(message)
+            self.logger.info(message,job_id=command.request.OperationIntegration.Execution.OperationExecutionId)
         except Exception as ex:
             self.logger.exception(ex, str(ex))
             raise Exception(str(ex))

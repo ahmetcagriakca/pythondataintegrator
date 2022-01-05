@@ -14,10 +14,13 @@ from pdip.cqrs import Dispatcher, ICommandHandler
 from pdip.data.decorators import transactionhandler
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
+from pdip.integrator.base import Integrator
 from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.StartExecutionProcess.StartExecutionProcessCommand import StartExecutionProcessCommand
 from process.application.execution.services.OperationExecution import OperationExecution
+from process.application.integrator.OperationConverter import OperationConverter
+from process.application.integrator.ProcessIntegratorEventManager import ProcessIntegratorEventManager
 from process.domain.aps import ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
 from process.domain.operation import DataOperation, DataOperationJob
 
@@ -79,6 +82,7 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
             self.logger.info(
                 f"{command.DataOperationId}-{command.JobId}-{data_operation.Name} Execution Create finished. Start :{start_datetime} - End :{end_datetime} - ElapsedTime :{end - start}",
                 job_id=command.DataOperationJobExecutionId)
+            operation_process.join()
         except Exception as ex:
             self.logger.exception(ex,
                                   f"{command.DataOperationId}-{command.JobId} Execution Create getting error. ",
@@ -124,9 +128,12 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
         self.logger.info(f"{data_operation_id}-{job_id} Data Operations Started",
                          job_id=data_operation_job_execution_id)
         try:
-            DependencyContainer.Instance.get(OperationExecution).start(data_operation_id=data_operation_id,
-                                                                       job_id=job_id,
-                                                                       data_operation_job_execution_id=data_operation_job_execution_id)
+
+            operation_converter = DependencyContainer.Instance.get(OperationConverter)
+            process_integrator_event_manager = DependencyContainer.Instance.get(ProcessIntegratorEventManager)
+            operation = operation_converter.convert(data_operation_id=data_operation_id)
+            integrator = Integrator(integrator_event_manager=process_integrator_event_manager)
+            integrator.integrate(operation, execution_id=data_operation_job_execution_id)
             self.logger.info(
                 f"{data_operation_id}-{job_id} Data Operations Finished",
                 job_id=data_operation_job_execution_id)

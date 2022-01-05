@@ -9,7 +9,7 @@ from process.application.execution.services.OperationCacheService import Operati
 from process.application.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
 from process.domain.enums.StatusTypes import StatusTypes
-from process.domain.enums.events import EVENT_EXECUTION_INTEGRATION_STARTED, EVENT_EXECUTION_INTEGRATION_FINISHED
+from pdip.integrator.domain.enums.events import EVENT_EXECUTION_INTEGRATION_STARTED, EVENT_EXECUTION_INTEGRATION_FINISHED
 
 
 class IntegrationExecution(IScoped):
