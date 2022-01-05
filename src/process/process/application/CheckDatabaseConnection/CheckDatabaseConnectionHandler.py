@@ -52,6 +52,8 @@ class CheckDatabaseConnectionHandler(ICommandHandler[CheckDatabaseConnectionComm
         except Exception as ex:
             self.logger.exception(ex, str(ex))
             raise Exception(str(ex))
+        finally:
+            self.repository_provider.close()
 
     def notify(self, message: str):
         send_notification_request = SendNotificationRequest(Message=message,

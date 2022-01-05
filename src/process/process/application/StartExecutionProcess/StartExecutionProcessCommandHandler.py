@@ -43,12 +43,12 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
         :param data_operation_id: Data Operation Id
         :return:
         """
+        repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
         try:
             start = time.time()
             start_datetime = datetime.now()
-
             application_config = DependencyContainer.Instance.get(ApplicationConfig)
-            data_operation_query = DependencyContainer.Instance.get(RepositoryProvider).get(
+            data_operation_query = repository_provider.get(
                 DataOperation).filter_by(
                 Id=command.DataOperationId)
             data_operation = data_operation_query.first()
@@ -82,13 +82,15 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
             self.logger.info(
                 f"{command.DataOperationId}-{command.JobId}-{data_operation.Name} Execution Create finished. Start :{start_datetime} - End :{end_datetime} - ElapsedTime :{end - start}",
                 job_id=command.DataOperationJobExecutionId)
-            operation_process.join()
+            if command.WaitToFinish:
+                operation_process.join()
         except Exception as ex:
             self.logger.exception(ex,
                                   f"{command.DataOperationId}-{command.JobId} Execution Create getting error. ",
                                   job_id=command.DataOperationJobExecutionId)
             raise
         finally:
+            repository_provider.close()
             if manager is not None:
                 manager.shutdown()
 
