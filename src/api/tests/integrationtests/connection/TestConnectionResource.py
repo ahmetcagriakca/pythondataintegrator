@@ -1,6 +1,6 @@
 # from unittest import TestCase
 #
-# from pdip.data import RepositoryProvider
+# from pdip.data.repository import RepositoryProvider
 #
 # from pdi.domain.connection.Connection import Connection
 # from pdi.domain.connection.ConnectionDatabase import ConnectionDatabase

@@ -1,7 +1,7 @@
 from injector import inject
 from pdip.cqrs import Dispatcher
 from pdip.cqrs import ICommandHandler
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 
 from pdi.application.job.services.JobOperationService import JobOperationService
 from pdi.application.notification.SendNotification.SendNotificationCommand import SendNotificationCommand

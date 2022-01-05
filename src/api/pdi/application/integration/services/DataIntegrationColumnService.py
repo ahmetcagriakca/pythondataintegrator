@@ -1,10 +1,10 @@
 from typing import List
 
 from injector import inject
-from pdip.connection.models.enums import ConnectorTypes
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
+from pdip.integrator.connection.domain.enums import ConnectorTypes
 
 from pdi.domain.connection.Connection import Connection
 from pdi.domain.integration.DataIntegration import DataIntegration

@@ -1,7 +1,7 @@
 from typing import List
 
 from injector import inject
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
 

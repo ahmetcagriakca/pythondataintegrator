@@ -1,5 +1,5 @@
 from injector import inject
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from sqlalchemy import distinct, func
 from sqlalchemy.orm import Query

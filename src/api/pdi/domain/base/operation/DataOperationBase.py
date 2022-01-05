@@ -1,6 +1,6 @@
 from typing import List
 
-from pdip.data import EntityBase
+from pdip.data.domain import EntityBase
 
 from pdi.domain.base.operation.DataOperationContactBase import DataOperationContactBase
 from pdi.domain.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase

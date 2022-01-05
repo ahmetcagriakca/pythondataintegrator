@@ -3,7 +3,7 @@ import json
 from injector import inject
 from pdip.cqrs import Dispatcher
 from pdip.cqrs import ICommandHandler
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.json import DateTimeEncoder
 

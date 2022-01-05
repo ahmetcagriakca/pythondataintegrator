@@ -1,6 +1,6 @@
 from injector import inject
 from pdip.cryptography import CryptoService
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
 

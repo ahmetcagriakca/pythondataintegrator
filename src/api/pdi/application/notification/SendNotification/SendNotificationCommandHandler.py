@@ -4,7 +4,7 @@ import requests
 from injector import inject
 from pdip.cqrs import ICommandHandler
 from pdip.json import DateTimeEncoder
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from pdi.application.notification.SendNotification.SendNotificationCommand import SendNotificationCommand
 from pdi.domain.configs.NotificationClientConfig import NotificationClientConfig

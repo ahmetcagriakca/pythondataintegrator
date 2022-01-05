@@ -3,7 +3,7 @@ from datetime import datetime
 import rpyc
 from injector import inject
 from pdip.dependency import IScoped
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from pdi.domain.aps.ApSchedulerJob import ApSchedulerJob
 from pdi.domain.configs.SchedulerRpcClientConfig import SchedulerRpcClientConfig

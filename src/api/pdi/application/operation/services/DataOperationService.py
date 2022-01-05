@@ -1,10 +1,10 @@
 from typing import List
 
 from injector import inject
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from pdi.application.operation.CreateDataOperation.CreateDataOperationRequest import CreateDataOperationRequest
 from pdi.application.operation.services.DataOperationContactService import DataOperationContactService

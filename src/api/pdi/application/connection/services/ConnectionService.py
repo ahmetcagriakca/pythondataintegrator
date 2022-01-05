@@ -1,11 +1,12 @@
 from typing import List
 
 from injector import inject
-from pdip.connection.models.enums import ConnectionTypes
-from pdip.data import RepositoryProvider
+from pdip.integrator.connection.domain.enums import ConnectionTypes
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
-from pdip.logging.loggers.database import SqlLogger
+from pdip.integrator.connection.domain.enums import ConnectionTypes
+from pdip.logging.loggers.sql import SqlLogger
 
 from pdi.application.connection.CreateConnectionDatabase.CreateConnectionDatabaseRequest import \
     CreateConnectionDatabaseRequest
@@ -70,7 +71,7 @@ class ConnectionService(IScoped):
         connection = self.get_by_name(name=request.Name)
         if connection is None:
             connection = self.create_connection(name=request.Name,
-                                                connection_type_name=ConnectionTypes.Database.name)
+                                                connection_type_name=ConnectionTypes.Sql.name)
             self.connection_secret_service.create(connection=connection, user=request.User,
                                                   password=request.Password)
             self.connection_server_service.create(connection=connection, host=request.Host, port=request.Port)

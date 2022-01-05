@@ -1,8 +1,8 @@
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
-from pdip.data import Seed
+from pdip.data.seed import Seed
 from pdi.domain.connection import ConnectionType, ConnectorType
 
 
