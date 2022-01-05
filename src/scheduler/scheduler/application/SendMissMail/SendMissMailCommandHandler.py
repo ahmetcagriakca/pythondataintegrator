@@ -2,9 +2,9 @@ from injector import inject
 from pdip.configuration.models.database import DatabaseConfig
 from pdip.configuration.services import ConfigService
 from pdip.cqrs import ICommandHandler
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.delivery import EmailProvider
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 from pdip.configuration.models.application import ApplicationConfig
 
 from scheduler.application.SendMissMail.SendMissMailCommand import SendMissMailCommand

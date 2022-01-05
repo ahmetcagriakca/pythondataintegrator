@@ -2,9 +2,9 @@ from datetime import datetime
 from injector import inject
 from pdip.configuration.models.database import DatabaseConfig
 from pdip.cqrs import ICommandHandler
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.exceptions import OperationalException
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from scheduler.application.CreateExecution.CreateExecutionCommand import CreateExecutionCommand
 from scheduler.domain.common.Status import Status

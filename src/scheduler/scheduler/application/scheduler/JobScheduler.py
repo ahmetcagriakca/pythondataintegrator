@@ -10,7 +10,7 @@ from apscheduler.triggers.cron import CronTrigger
 from injector import inject
 from pdip.configuration.models.aps import ApsConfig
 from pdip.configuration.models.database import DatabaseConfig
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import ISingleton
 from sqlalchemy import MetaData
 from sqlalchemy.orm import declarative_base

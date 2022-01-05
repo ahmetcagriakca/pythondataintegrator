@@ -1,4 +1,4 @@
-from pdip.data import Entity
+from pdip.data.domain import Entity
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 

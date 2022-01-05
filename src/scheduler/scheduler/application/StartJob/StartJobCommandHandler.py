@@ -8,7 +8,7 @@ from pdip.configuration.services import ConfigService
 from pdip.cqrs import ICommandHandler, Dispatcher
 from pdip.data.decorators import transactionhandler
 from pdip.delivery import EmailProvider
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from scheduler.application.CreateExecution.CreateExecutionCommand import CreateExecutionCommand
 from scheduler.application.SendSchedulerErrorMail.SendSchedulerErrorMailCommand import SendSchedulerErrorMailCommand

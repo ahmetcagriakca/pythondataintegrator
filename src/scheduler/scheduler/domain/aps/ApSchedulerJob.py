@@ -1,6 +1,6 @@
 from typing import List
 
-from pdip.data import Entity
+from pdip.data.domain import Entity
 from sqlalchemy import Column, String, TEXT, Unicode, DateTime
 from sqlalchemy.orm import relationship
 

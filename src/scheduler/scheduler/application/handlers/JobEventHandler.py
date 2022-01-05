@@ -6,7 +6,7 @@ from injector import inject
 from pdip.cqrs import Dispatcher
 from pdip.dependency import ISingleton
 from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from scheduler.application.SendMissMail.SendMissMailCommand import SendMissMailCommand
 

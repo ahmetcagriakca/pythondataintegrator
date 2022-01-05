@@ -1,5 +1,5 @@
-from pdip.data import Entity
-from pdip.logging.models import LogData
+from pdip.data.domain import Entity
+from pdip.logging.domain import LogData
 from sqlalchemy import Column, String, Integer, DateTime
 
 from scheduler.domain.base import Base
