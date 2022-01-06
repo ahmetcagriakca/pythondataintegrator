@@ -31,7 +31,7 @@ function ConnectionsRow(props) {
 		history.push('/'.concat(path));
 	}
 	const handleClick = (event, row) => {
-		GotoComponent('connection/' + row.id)
+		GotoComponent('connection/sql/' + row.id)
 	};
 	const checkDatabaseConnectionAction = (event, row) => {
 		dispatch(checkDatabaseConnection({ConnectionName:row.name}))

@@ -3,15 +3,15 @@ from pdip.cqrs import Dispatcher
 from pdip.cqrs import ICommandHandler
 from pdip.data.repository import RepositoryProvider
 
-from pdi.application.connection.CreateConnectionDatabase.CreateConnectionDatabaseCommand import \
-    CreateConnectionDatabaseCommand
+from pdi.application.connection.CreateConnectionSql.CreateConnectionSqlCommand import \
+    CreateConnectionSqlCommand
 from pdi.application.connection.services.ConnectionService import ConnectionService
 from pdi.application.notification.SendNotification.SendNotificationCommand import SendNotificationCommand
 from pdi.application.notification.SendNotification.SendNotificationRequest import SendNotificationRequest, \
     NotificationAdditionalData
 
 
-class CreateConnectionDatabaseCommandHandler(ICommandHandler[CreateConnectionDatabaseCommand]):
+class CreateConnectionSqlCommandHandler(ICommandHandler[CreateConnectionSqlCommand]):
     @inject
     def __init__(self,
                  dispatcher: Dispatcher,
@@ -23,7 +23,7 @@ class CreateConnectionDatabaseCommandHandler(ICommandHandler[CreateConnectionDat
         self.dispatcher = dispatcher
         self.connection_service = connection_service
 
-    def handle(self, command: CreateConnectionDatabaseCommand):
+    def handle(self, command: CreateConnectionSqlCommand):
         check_existing = self.connection_service.check_connection_name(command.request.Name)
         connection = self.connection_service.create_connection_database(command.request)
         self.repository_provider.commit()

@@ -2,7 +2,7 @@ from pdip.cqrs.decorators import requestclass
 
 
 @requestclass
-class CreateConnectionDatabaseRequest:
+class CreateConnectionSqlRequest:
     Name: str = None
     ConnectorTypeName: str = None
     Host: str = None

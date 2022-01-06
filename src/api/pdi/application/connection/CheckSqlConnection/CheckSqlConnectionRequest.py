@@ -2,5 +2,5 @@ from pdip.cqrs.decorators import requestclass
 
 
 @requestclass
-class CheckDatabaseConnectionRequest:
+class CheckSqlConnectionRequest:
     ConnectionName: str = None

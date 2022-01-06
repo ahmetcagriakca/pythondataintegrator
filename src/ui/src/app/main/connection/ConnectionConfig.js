@@ -12,12 +12,12 @@ const ConnectionConfig = {
 			component: React.lazy(() => import('./connections/Connections'))
 		},
 		{
-			path: '/connection/:id',
-			component: React.lazy(() => import('./connection/Connection'))
+			path: '/connection/sql/:id',
+			component: React.lazy(() => import('./connectionSql/ConnectionSql'))
 		},
 		{
-			path: '/connection',
-			component: React.lazy(() => import('./connection/Connection'))
+			path: '/connection/sql',
+			component: React.lazy(() => import('./connectionSql/ConnectionSql'))
 		}
 	]
 };

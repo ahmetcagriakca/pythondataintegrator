@@ -1,13 +1,14 @@
 from injector import inject
-from pdip.cqrs import Dispatcher, ICommandHandler
+from pdip.cqrs import Dispatcher
+from pdip.cqrs import ICommandHandler
 from pdip.exceptions import OperationalException
 
-from pdi.application.connection.CheckDatabaseConnectionTableRowCount.CheckDatabaseConnectionTableRowCountCommand import \
-    CheckDatabaseConnectionTableRowCountCommand
+from pdi.application.connection.CheckSqlConnection.CheckSqlConnectionCommand import \
+    CheckSqlConnectionCommand
 from pdi.application.rpc.clients.ProcessRpcClientService import ProcessRpcClientService
 
 
-class CheckDatabaseConnectionTableRowCountCommandHandler(ICommandHandler[CheckDatabaseConnectionTableRowCountCommand]):
+class CheckSqlConnectionCommandHandler(ICommandHandler[CheckSqlConnectionCommand]):
     @inject
     def __init__(self,
                  dispatcher: Dispatcher,
@@ -17,16 +18,13 @@ class CheckDatabaseConnectionTableRowCountCommandHandler(ICommandHandler[CheckDa
         self.dispatcher = dispatcher
         self.process_rpc_client_service = process_rpc_client_service
 
-    def handle(self, command: CheckDatabaseConnectionTableRowCountCommand):
+    def handle(self, command: CheckSqlConnectionCommand):
         try:
-            self.process_rpc_client_service.call_check_database_table_row_count(
-                connection_name=command.request.ConnectionName,
-                schema=command.request.Schema,
-                table=command.request.Table,
-            )
+            self.process_rpc_client_service.call_check_sql_connection(
+                connection_name=command.request.ConnectionName)
         except ConnectionRefusedError as cre:
             error_detail = "\n".join(cre.args)
-            message = f'{command.request.ConnectionName} getting error on checking count. Process machine not accessible. Error:{error_detail}'
+            message = f'{command.request.ConnectionName} getting error on checking count. Process machine is not accessible. Error:{error_detail}'
             raise OperationalException(message)
         except Exception as ex:
             error_detail = "\n".join(ex.args)
