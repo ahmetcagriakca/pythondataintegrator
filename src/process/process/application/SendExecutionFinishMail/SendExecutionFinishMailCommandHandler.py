@@ -2,6 +2,7 @@ from injector import inject
 from pdip.configuration.models.application import ApplicationConfig
 from pdip.configuration.services import ConfigService
 from pdip.cqrs import ICommandHandler
+from pdip.data.decorators import transactionhandler
 from pdip.data.repository import RepositoryProvider
 from pdip.delivery import EmailProvider
 from pdip.html import HtmlTemplateService
@@ -32,42 +33,38 @@ class SendExecutionFinishMailCommandHandler(ICommandHandler[SendExecutionFinishM
         self.logger = logger
         self.repository_provider = repository_provider
 
+    @transactionhandler
     def handle(self, command: SendExecutionFinishMailCommand):
+        data_operation_job_execution = self.repository_provider.get(DataOperationJobExecution).first(
+            Id=command.DataOperationJobExecutionId)
+        if data_operation_job_execution is None:
+            self.logger.info(f'{command} mail sending execution not found',
+                             job_id=command.DataOperationJobExecutionId)
+            return
+
+        operation_contacts = []
+        for contact in data_operation_job_execution.DataOperationJob.DataOperation.Contacts:
+            if contact.IsDeleted == 0:
+                operation_contacts.append(contact.Email)
+        self._add_default_contacts(operation_contacts=operation_contacts)
+        if operation_contacts is None:
+            self.logger.error(f'{command.DataOperationJobExecutionId} mail sending contact not found',
+                              job_id=command.DataOperationJobExecutionId)
+            return
+        data_operation_name = data_operation_job_execution.DataOperationJob.DataOperation.Name
+        subject = f"Execution completed"
+        if data_operation_job_execution.StatusId == 3:
+            subject = subject + " successfully"
+        elif data_operation_job_execution.StatusId == 4:
+            subject = subject + " with error"
+        subject = subject + f": {self.application_config.environment} » {data_operation_name} » {command.DataOperationJobExecutionId}"
+        mail_body = self._render(command.DataOperationJobExecutionId)
+
         try:
-
-            data_operation_job_execution = self.repository_provider.get(DataOperationJobExecution).first(
-                Id=command.DataOperationJobExecutionId)
-            if data_operation_job_execution is None:
-                self.logger.info(f'{command} mail sending execution not found',
-                                 job_id=command.DataOperationJobExecutionId)
-                return
-
-            operation_contacts = []
-            for contact in data_operation_job_execution.DataOperationJob.DataOperation.Contacts:
-                if contact.IsDeleted == 0:
-                    operation_contacts.append(contact.Email)
-            self._add_default_contacts(operation_contacts=operation_contacts)
-            if operation_contacts is None:
-                self.logger.error(f'{command.DataOperationJobExecutionId} mail sending contact not found',
-                                  job_id=command.DataOperationJobExecutionId)
-                return
-            data_operation_name = data_operation_job_execution.DataOperationJob.DataOperation.Name
-            subject = f"Execution completed"
-            if data_operation_job_execution.StatusId == 3:
-                subject = subject + " successfully"
-            elif data_operation_job_execution.StatusId == 4:
-                subject = subject + " with error"
-            subject = subject + f": {self.application_config.environment} » {data_operation_name} » {command.DataOperationJobExecutionId}"
-            mail_body = self._render(command.DataOperationJobExecutionId)
-
-            try:
-                self.email_provider.send(operation_contacts, subject, mail_body)
-                self.logger.info(f"Mail Sent successfully.", job_id=command.DataOperationJobExecutionId)
-            except Exception as ex:
-                self.logger.error(f"Error on mail sending. Error:{ex}", job_id=command.DataOperationJobExecutionId)
-
-        finally:
-            self.repository_provider.close()
+            self.email_provider.send(operation_contacts, subject, mail_body)
+            self.logger.info(f"Mail Sent successfully.", job_id=command.DataOperationJobExecutionId)
+        except Exception as ex:
+            self.logger.error(f"Error on mail sending. Error:{ex}", job_id=command.DataOperationJobExecutionId)
 
     def _render_job_execution(self, id):
         headers = [
@@ -100,7 +97,7 @@ class SendExecutionFinishMailCommandHandler(ICommandHandler[SendExecutionFinishM
             max_id = self.repository_provider.query(
                 func.max(DataOperationJobExecutionIntegration.Id)) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id)
-            result=max_id.all()[0][0]
+            result = max_id.all()[0][0]
             error_integration = self.repository_provider.get(DataOperationJobExecutionIntegration).first(Id=result)
             error_log = ''
             if error_integration is not None and error_integration.Log is not None:

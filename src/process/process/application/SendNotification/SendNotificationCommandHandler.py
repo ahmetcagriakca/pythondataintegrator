@@ -3,6 +3,7 @@ import json
 import requests
 from injector import inject
 from pdip.cqrs import ICommandHandler
+from pdip.data.decorators import transactionhandler
 from pdip.json import DateTimeEncoder
 from pdip.logging.loggers.sql import SqlLogger
 
@@ -20,6 +21,7 @@ class SendNotificationCommandHandler(ICommandHandler[SendNotificationCommand]):
         self.notification_client_config = notification_client_config
         self.logger = logger
 
+    @transactionhandler
     def handle(self, command: SendNotificationCommand):
         try:
             url = f'{self.notification_client_config.host}/notify'

@@ -4,7 +4,6 @@ from pdip.data.decorators import transactionhandler
 from pdip.dependency import IScoped
 from pdip.logging.loggers.sql import SqlLogger
 
-from process.application.CreateExecution.CreateExecutionCommand import CreateExecutionCommand
 from process.application.SendExecutionFinishMail.SendExecutionFinishMailCommand import SendExecutionFinishMailCommand
 from process.application.execution.services.IntegrationExecution import IntegrationExecution
 from process.application.execution.services.OperationCacheService import OperationCacheService
@@ -42,9 +41,6 @@ class OperationExecution(IScoped):
         data_operation_name = f'{data_operation_id}'
         try:
             self.operation_cache_service.create(data_operation_id=data_operation_id)
-            if data_operation_job_execution_id is None:
-                command = CreateExecutionCommand(DataOperationId=data_operation_id, JobId=job_id)
-                data_operation_job_execution_id = self.dispatcher.dispatch(command)
             data_operation_name = self.operation_cache_service.get_data_operation_name(
                 data_operation_id=data_operation_id)
 
