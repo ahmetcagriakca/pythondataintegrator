@@ -13,11 +13,12 @@ from scheduler.domain.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
 
 
 class JobSchedulerService:
-    def __init__(self,
-                 ):
+    def __init__(
+            self
+    ):
 
-        self.database_config = DependencyContainer.Instance.get(DatabaseConfig)
         self.sql_logger = DependencyContainer.Instance.get(SqlLogger)
+        self.database_config = DependencyContainer.Instance.get(DatabaseConfig)
         self.repository_provider = RepositoryProvider(database_config=self.database_config,
                                                       database_session_manager=None)
         self.ap_scheduler_job_repository = self.repository_provider.get(ApSchedulerJob)
