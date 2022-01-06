@@ -1,6 +1,6 @@
 from typing import List
 
-from pdip.data import EntityBase
+from pdip.data.domain import EntityBase
 
 from pdi.domain.base.secret.AuthenticationTypeBase import AuthenticationTypeBase
 from pdi.domain.base.secret.SecretBase import SecretBase

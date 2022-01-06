@@ -1,8 +1,8 @@
-from pdip.data import RepositoryProvider
-from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from injector import inject
+from pdip.data.repository import RepositoryProvider
+from pdip.data.seed import Seed
+from pdip.logging.loggers.sql import SqlLogger
 
-from pdip.data import Seed
 from pdi.domain.common.OperationEvent import OperationEvent
 from pdi.domain.enums.events import EVENT_EXECUTION_INITIALIZED, EVENT_EXECUTION_FINISHED, EVENT_EXECUTION_STARTED, \
     EVENT_EXECUTION_INTEGRATION_INITIALIZED, EVENT_EXECUTION_INTEGRATION_STARTED, \
@@ -13,10 +13,18 @@ from pdi.domain.enums.events import EVENT_EXECUTION_INITIALIZED, EVENT_EXECUTION
 
 
 class OperationEventSeed(Seed):
+    @inject
+    def __init__(
+            self,
+            repository_provider: RepositoryProvider,
+            logger: SqlLogger,
+    ):
+        self.logger = logger
+        self.repository_provider = repository_provider
+
     def seed(self):
         try:
-            repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
-            operation_event_repository = repository_provider.get(OperationEvent)
+            operation_event_repository = self.repository_provider.get(OperationEvent)
             check_count = operation_event_repository.table.count()
             if check_count is None or check_count == 0:
                 events_list = [
@@ -86,9 +94,8 @@ class OperationEventSeed(Seed):
                                            Description=eventJson["Description"],
                                            Class=eventJson["Class"])
                     operation_event_repository.insert(event)
-                    repository_provider.commit()
+                    self.repository_provider.commit()
         except Exception as ex:
-            logger = DependencyContainer.Instance.get(SqlLogger)
-            logger.exception(ex, "ApScheduler seeds getting error")
+            self.logger.exception(ex, "ApScheduler seeds getting error")
         finally:
-            repository_provider.close()
+            self.repository_provider.close()

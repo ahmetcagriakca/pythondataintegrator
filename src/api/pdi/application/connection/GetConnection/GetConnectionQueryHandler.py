@@ -1,6 +1,6 @@
 from injector import inject
 from pdip.cqrs import IQueryHandler
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 
 from pdi.application.connection.GetConnection.GetConnectionMapping import GetConnectionMapping

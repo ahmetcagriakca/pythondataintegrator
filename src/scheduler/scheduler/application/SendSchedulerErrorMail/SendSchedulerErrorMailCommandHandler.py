@@ -1,12 +1,12 @@
 from injector import inject
-from pdip.configuration.models.database import DatabaseConfig
+from pdip.configuration.models.application import ApplicationConfig
 from pdip.configuration.services import ConfigService
 from pdip.cqrs import ICommandHandler
-from pdip.data import RepositoryProvider
+from pdip.data.decorators import transactionhandler
+from pdip.data.repository import RepositoryProvider
 from pdip.delivery import EmailProvider
 from pdip.exceptions import OperationalException
-from pdip.logging.loggers.database import SqlLogger
-from pdip.configuration.models.application import ApplicationConfig
+from pdip.logging.loggers.sql import SqlLogger
 
 from scheduler.application.SendSchedulerErrorMail.SendSchedulerErrorMailCommand import SendSchedulerErrorMailCommand
 from scheduler.domain.operation.DataOperationJob import DataOperationJob
@@ -15,24 +15,23 @@ from scheduler.domain.operation.DataOperationJob import DataOperationJob
 class SendSchedulerErrorMailCommandHandler(ICommandHandler[SendSchedulerErrorMailCommand]):
     @inject
     def __init__(self,
-                 database_config: DatabaseConfig,
-                 sql_logger: SqlLogger,
+                 logger: SqlLogger,
                  email_provider: EmailProvider,
                  application_config: ApplicationConfig,
                  config_service: ConfigService,
+                 repository_provider: RepositoryProvider,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.repository_provider = repository_provider
         self.config_service = config_service
         self.application_config = application_config
         self.email_provider = email_provider
-        self.sql_logger = sql_logger
-        self.database_config = database_config
+        self.logger = logger
 
+    @transactionhandler
     def handle(self, command: SendSchedulerErrorMailCommand):
         try:
-            repository_provider = RepositoryProvider(database_config=self.database_config,
-                                                     database_session_manager=None)
-            data_operation_job_repository = repository_provider.get(DataOperationJob)
+            data_operation_job_repository = self.repository_provider.get(DataOperationJob)
             data_operation_job = data_operation_job_repository.first(JobId=command.JobId)
             if data_operation_job is None:
                 raise OperationalException("Job definition not found")
@@ -56,7 +55,6 @@ class SendSchedulerErrorMailCommandHandler(ICommandHandler[SendSchedulerErrorMai
             try:
                 self.email_provider.send(operation_contacts, subject, body)
             except Exception as ex:
-                self.sql_logger.error(f"Scheduler  mail sending. Error:{ex}",
-                                      job_id=command.DataOperationJobExecutionId)
+                self.logger.error(f"Scheduler  mail sending. Error:{ex}", job_id=command.DataOperationJobExecutionId)
         except Exception as ex:
-            self.sql_logger.error(f"Scheduler getting error. Error:{ex}", job_id=command.DataOperationJobExecutionId)
+            self.logger.error(f"Scheduler getting error. Error:{ex}", job_id=command.DataOperationJobExecutionId)

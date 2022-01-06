@@ -1,12 +1,12 @@
 from typing import List
 
 from injector import inject
-from pdip.connection.models.enums import ConnectionTypes
 from pdip.cryptography import CryptoService
-from pdip.data import RepositoryProvider
 from pdip.data.decorators import transactionhandler
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
+from pdip.integrator.connection.domain.enums import ConnectionTypes
 from pdip.json import BaseConverter
 
 from process.domain.base.connection import ConnectionBase, ConnectionTypeBase, ConnectionDatabaseBase, \
@@ -321,7 +321,7 @@ class OperationCacheService(IScoped):
         connection = self.get_connection(connection_id=connection_id)
         connection.ConnectionServers = self.get_connection_servers(connection_id=connection_id)
         connection.ConnectionType = self.get_connection_type(connection_type_id=connection.ConnectionTypeId)
-        if connection.ConnectionTypeId == ConnectionTypes.Database.value:
+        if connection.ConnectionTypeId == ConnectionTypes.Sql.value:
             connection.Database = self.get_connection_database(connection_id=connection_id)
         if connection.ConnectionTypeId == ConnectionTypes.File.value:
             connection.File = self.get_connection_file(connection_id=connection_id)
@@ -350,7 +350,7 @@ class OperationCacheService(IScoped):
         for data_integration_connection in data_integration.Connections:
             data_integration_connection.Connection = self.initialize_connection(
                 connection_id=data_integration_connection.ConnectionId)
-            if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Database.value:
+            if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Sql.value:
                 data_integration_connection.Database = self.get_data_integration_connection_database(
                     data_integration_connection_id=data_integration_connection.Id)
             if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.File.value:

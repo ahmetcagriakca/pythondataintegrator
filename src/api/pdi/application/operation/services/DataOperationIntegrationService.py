@@ -1,7 +1,7 @@
 from typing import List
 
 from injector import inject
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 
 from pdi.application.integration.services.DataIntegrationService import DataIntegrationService

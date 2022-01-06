@@ -1,7 +1,7 @@
 import json
 
 from injector import inject
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.html import HtmlTemplateService, Pagination
 

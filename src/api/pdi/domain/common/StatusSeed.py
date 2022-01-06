@@ -1,16 +1,24 @@
-from pdip.data import RepositoryProvider
-from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from injector import inject
+from pdip.data.repository import RepositoryProvider
+from pdip.data.seed import Seed
+from pdip.logging.loggers.sql import SqlLogger
 
-from pdip.data import Seed
 from pdi.domain.common import Status
 
 
 class StatusSeed(Seed):
+    @inject
+    def __init__(
+            self,
+            repository_provider: RepositoryProvider,
+            logger: SqlLogger,
+    ):
+        self.logger = logger
+        self.repository_provider = repository_provider
+
     def seed(self):
         try:
-            repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
-            status_repository = repository_provider.get(Status)
+            status_repository = self.repository_provider.get(Status)
             check_count = status_repository.table.count()
             if check_count is None or check_count == 0:
                 status_list = [
@@ -42,9 +50,6 @@ class StatusSeed(Seed):
                         Description=status_json["Description"]
                     )
                     status_repository.insert(status)
-                    repository_provider.commit()
+                    self.repository_provider.commit()
         except Exception as ex:
-            logger = DependencyContainer.Instance.get(SqlLogger)
-            logger.exception(ex, "ApScheduler seeds getting error")
-        finally:
-            repository_provider.close()
+            self.logger.exception(ex, "ApScheduler seeds getting error")

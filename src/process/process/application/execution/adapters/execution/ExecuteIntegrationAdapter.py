@@ -1,6 +1,6 @@
 from injector import inject
 from pdip.dependency import IScoped
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.execution.adapters.execution.ExecuteAdapter import ExecuteAdapter
 from process.application.execution.adapters.execution.integration.ExecuteIntegrationStrategyFactory import \
@@ -9,7 +9,7 @@ from process.application.execution.services.IntegrationExecutionService import I
 from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.application.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
-from process.domain.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION
+from pdip.integrator.domain.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_SOURCE
 
 
 class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
@@ -114,5 +114,5 @@ class ExecuteIntegrationAdapter(ExecuteAdapter, IScoped):
             source_data_count=affected_row_count)
         self.data_operation_job_execution_integration_service.create_event(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-            event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_OPERATION, affected_row=affected_row_count)
+            event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_SOURCE, affected_row=affected_row_count)
         return affected_row_count

@@ -2,9 +2,10 @@ from injector import inject
 from pdip.configuration.models.database import DatabaseConfig
 from pdip.configuration.services import ConfigService
 from pdip.cqrs import ICommandHandler
-from pdip.data import RepositoryProvider
+from pdip.data.decorators import transactionhandler
+from pdip.data.repository import RepositoryProvider
 from pdip.delivery import EmailProvider
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 from pdip.configuration.models.application import ApplicationConfig
 
 from scheduler.application.SendMissMail.SendMissMailCommand import SendMissMailCommand
@@ -16,7 +17,7 @@ class SendMissMailCommandHandler(ICommandHandler[SendMissMailCommand]):
     @inject
     def __init__(self,
                  database_config: DatabaseConfig,
-                 sql_logger: SqlLogger,
+                 logger: SqlLogger,
                  email_provider: EmailProvider,
                  application_config: ApplicationConfig,
                  config_service: ConfigService,
@@ -25,9 +26,10 @@ class SendMissMailCommandHandler(ICommandHandler[SendMissMailCommand]):
         self.config_service = config_service
         self.application_config = application_config
         self.email_provider = email_provider
-        self.sql_logger = sql_logger
+        self.logger = logger
         self.database_config = database_config
 
+    @transactionhandler
     def handle(self, command: SendMissMailCommand):
         try:
             repository_provider = RepositoryProvider(database_config=self.database_config,
@@ -51,7 +53,7 @@ class SendMissMailCommandHandler(ICommandHandler[SendMissMailCommand]):
                         if default_contact is not None and default_contact != '':
                             operation_contacts.append(default_contact)
                 if operation_contacts is None:
-                    self.sql_logger.info(f'{data_operation_job.DataOperation.Name} mail sending contact not found')
+                    self.logger.info(f'{data_operation_job.DataOperation.Name} mail sending contact not found')
                     return
 
                 data_operation_name = data_operation_job.DataOperation.Name
@@ -78,6 +80,6 @@ class SendMissMailCommandHandler(ICommandHandler[SendMissMailCommand]):
                 try:
                     self.email_provider.send(operation_contacts, subject, body)
                 except Exception as ex:
-                    self.sql_logger.error(f"Error on mail sending. Error:{ex}")
+                    self.logger.error(f"Error on mail sending. Error:{ex}")
         except Exception as ex:
-            self.sql_logger.error(f"Miss mail sending getting error. Error:{ex}")
+            self.logger.error(f"Miss mail sending getting error. Error:{ex}")

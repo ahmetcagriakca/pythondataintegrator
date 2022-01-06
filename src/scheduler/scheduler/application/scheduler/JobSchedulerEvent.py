@@ -1,6 +1,7 @@
 from queue import Queue
 
 import jsonpickle
+from pdip.logging.loggers.console import ConsoleLogger
 from pdip.processing import ProcessManager
 
 from scheduler.application.handlers.JobEventHandler import JobEventHandler
@@ -17,7 +18,7 @@ class JobSchedulerEvent:
 
     @staticmethod
     def create_event_handler():
-        JobSchedulerEvent.process_manager = ProcessManager()
+        JobSchedulerEvent.process_manager = ProcessManager(logger=ConsoleLogger())
         JobSchedulerEvent.job_event_queue = JobSchedulerEvent.process_manager.create_queue()
         process_kwargs = {
             "event_queue": JobSchedulerEvent.job_event_queue,

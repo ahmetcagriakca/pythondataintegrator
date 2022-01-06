@@ -11,13 +11,15 @@ from injector import inject
 from pdip.base import Pdi
 from pdip.configuration.models.application import ApplicationConfig
 from pdip.cqrs import Dispatcher, ICommandHandler
-from pdip.data import RepositoryProvider
 from pdip.data.decorators import transactionhandler
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from pdip.integrator.base import Integrator
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.StartExecutionProcess.StartExecutionProcessCommand import StartExecutionProcessCommand
-from process.application.execution.services.OperationExecution import OperationExecution
+from process.application.integrator.OperationConverter import OperationConverter
+from process.application.integrator.ProcessIntegratorEventManager import ProcessIntegratorEventManager
 from process.domain.aps import ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
 from process.domain.operation import DataOperation, DataOperationJob
 
@@ -27,11 +29,11 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
     def __init__(self,
                  dispatcher: Dispatcher,
                  logger: SqlLogger,
-                 repository_provider: RepositoryProvider,
+                 # repository_provider: RepositoryProvider,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logger
-        self.repository_provider = repository_provider
+        # self.repository_provider = repository_provider
         self.dispatcher = dispatcher
 
     def handle(self, command: StartExecutionProcessCommand):
@@ -40,20 +42,16 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
         :param data_operation_id: Data Operation Id
         :return:
         """
+        default_message = f'{command.DataOperationId}-{command.JobId}'
         try:
             start = time.time()
             start_datetime = datetime.now()
-
             application_config = DependencyContainer.Instance.get(ApplicationConfig)
-            data_operation_query = DependencyContainer.Instance.get(RepositoryProvider).get(
-                DataOperation).filter_by(
-                Id=command.DataOperationId)
-            data_operation = data_operation_query.first()
-            if data_operation is None:
-                raise Exception('Operation Not Found')
 
+            data_operation_name = self.get_data_operation_name(data_operation_id=command.DataOperationId)
+            default_message += f'-{data_operation_name}'
             self.logger.info(
-                f"{command.DataOperationId}-{command.JobId}-{data_operation.Name} Execution Create started",
+                f"{default_message} Execution Create started",
                 job_id=command.DataOperationJobExecutionId)
 
             manager = multiprocessing.Manager()
@@ -69,7 +67,7 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
                 if operation_process.is_alive():
                     result = process_queue.get(timeout=60)
                     self.logger.info(
-                        f"{command.DataOperationId}-{command.JobId}-{data_operation.Name} Execution running on {operation_process.pid}. Process Message:{result}",
+                        f"{default_message} Execution running on {operation_process.pid}. Process Message:{result}",
                         job_id=command.DataOperationJobExecutionId)
                     process_queue.task_done()
                     break
@@ -77,16 +75,29 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
             end_datetime = datetime.now()
             end = time.time()
             self.logger.info(
-                f"{command.DataOperationId}-{command.JobId}-{data_operation.Name} Execution Create finished. Start :{start_datetime} - End :{end_datetime} - ElapsedTime :{end - start}",
+                f"{default_message} Execution Create finished. Start :{start_datetime} - End :{end_datetime} - ElapsedTime :{end - start}",
                 job_id=command.DataOperationJobExecutionId)
+            if command.WaitToFinish:
+                operation_process.join()
         except Exception as ex:
             self.logger.exception(ex,
-                                  f"{command.DataOperationId}-{command.JobId} Execution Create getting error. ",
+                                  f"{default_message} Execution Create getting error. ",
                                   job_id=command.DataOperationJobExecutionId)
             raise
         finally:
             if manager is not None:
                 manager.shutdown()
+
+
+    @transactionhandler
+    def get_data_operation_name(self, data_operation_id):
+        repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
+        data_operation_query = repository_provider.get(
+            DataOperation).filter_by(
+            Id=data_operation_id)
+        data_operation = data_operation_query.first()
+        if data_operation is None:
+            raise Exception('Operation Not Found')
 
     @staticmethod
     def start_process(root_directory: str, data_operation_id: int, job_id: int,
@@ -99,7 +110,8 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
 
     def check_removed_job(self, ap_scheduler_job_id):
         EVENT_JOB_REMOVED = 2 ** 10
-        job_detail_query = self.repository_provider.query(
+        repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
+        job_detail_query = repository_provider.query(
             ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
         ) \
             .filter(ApSchedulerJobEvent.ApSchedulerJobId == ApSchedulerJob.Id) \
@@ -108,11 +120,12 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
             .filter(ApSchedulerJob.Id == ap_scheduler_job_id)
         job_detail = job_detail_query.first()
         if job_detail is not None:
-            data_operation_job = self.repository_provider.get(
+            data_operation_job = repository_provider.get(
                 DataOperationJob).first(IsDeleted=0,
                                         ApSchedulerJobId=job_detail.ApSchedulerJob.Id)
             if data_operation_job is not None:
-                self.repository_provider.get(DataOperationJob).delete_by_id(data_operation_job.Id)
+                repository_provider.get(DataOperationJob).delete_by_id(data_operation_job.Id)
+        DependencyContainer.Instance.get(RepositoryProvider).commit()
 
     @transactionhandler
     def start(self, data_operation_id: int, job_id: int, data_operation_job_execution_id: int,
@@ -124,9 +137,12 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
         self.logger.info(f"{data_operation_id}-{job_id} Data Operations Started",
                          job_id=data_operation_job_execution_id)
         try:
-            DependencyContainer.Instance.get(OperationExecution).start(data_operation_id=data_operation_id,
-                                                                       job_id=job_id,
-                                                                       data_operation_job_execution_id=data_operation_job_execution_id)
+
+            operation_converter = DependencyContainer.Instance.get(OperationConverter)
+            process_integrator_event_manager = DependencyContainer.Instance.get(ProcessIntegratorEventManager)
+            operation = operation_converter.convert(data_operation_id=data_operation_id)
+            integrator = Integrator(integrator_event_manager=process_integrator_event_manager)
+            integrator.integrate(operation, execution_id=data_operation_job_execution_id, ap_scheduler_job_id=job_id)
             self.logger.info(
                 f"{data_operation_id}-{job_id} Data Operations Finished",
                 job_id=data_operation_job_execution_id)

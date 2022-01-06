@@ -3,10 +3,10 @@ from typing import List
 
 from injector import inject
 from pandas import DataFrame
-from pdip.connection.adapters import ConnectionAdapter
-from pdip.connection.database.base import DatabaseProvider
-from pdip.connection.models import DataQueueTask
-from pdip.connection.models.enums import ConnectorTypes
+from pdip.integrator.connection.base import ConnectionAdapter
+from pdip.integrator.connection.domain.enums import ConnectorTypes
+from pdip.integrator.connection.domain.task import DataQueueTask
+from pdip.integrator.connection.types.sql.base import SqlProvider
 
 from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.domain.dto.PagingModifier import PagingModifier
@@ -16,7 +16,7 @@ class DatabaseAdapter(ConnectionAdapter):
     @inject
     def __init__(self,
                  operation_cache_service: OperationCacheService,
-                 database_provider: DatabaseProvider,
+                 database_provider: SqlProvider,
                  ):
         self.operation_cache_service = operation_cache_service
         self.database_provider = database_provider

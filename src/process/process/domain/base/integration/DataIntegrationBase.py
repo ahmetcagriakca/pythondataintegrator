@@ -1,10 +1,9 @@
 from typing import List
 
-from pdip.data import EntityBase
+from pdip.data.domain import EntityBase
 
 from process.domain.base.integration.DataIntegrationColumnBase import DataIntegrationColumnBase
 from process.domain.base.integration.DataIntegrationConnectionBase import DataIntegrationConnectionBase
-from process.domain.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
 
 
 class DataIntegrationBase(EntityBase):
@@ -16,7 +15,7 @@ class DataIntegrationBase(EntityBase):
                  Definition=None,
                  Columns: List[DataIntegrationColumnBase] = [],
                  Connections: List[DataIntegrationConnectionBase] = [],
-                 DataOperationIntegrations: List[DataOperationIntegrationBase] = [],
+                 DataOperationIntegrations = [],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationIntegrations = DataOperationIntegrations

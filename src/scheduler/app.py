@@ -4,7 +4,7 @@ if __name__ == "__main__":
     from scheduler.application.scheduler.JobScheduler import JobScheduler
     from scheduler.rpc.SchedulerService import SchedulerService
 
-    pdi = Pdi()
+    pdi = Pdi(excluded_modules=["tests", "venv"])
     job_scheduler = pdi.get(JobScheduler)
     job_scheduler.run()
     scheduler_service = pdi.get(SchedulerService)

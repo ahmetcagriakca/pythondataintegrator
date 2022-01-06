@@ -2,10 +2,11 @@ from injector import inject
 from pdip.configuration.models.application import ApplicationConfig
 from pdip.configuration.services import ConfigService
 from pdip.cqrs import ICommandHandler
-from pdip.data import RepositoryProvider
+from pdip.data.decorators import transactionhandler
+from pdip.data.repository import RepositoryProvider
 from pdip.delivery import EmailProvider
 from pdip.html import HtmlTemplateService
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 from sqlalchemy import func
 
 from process.application.SendExecutionFinishMail.SendExecutionFinishMailCommand import SendExecutionFinishMailCommand
@@ -17,7 +18,7 @@ from process.domain.operation import DataOperationJobExecution, \
 class SendExecutionFinishMailCommandHandler(ICommandHandler[SendExecutionFinishMailCommand]):
     @inject
     def __init__(self,
-                 sql_logger: SqlLogger,
+                 logger: SqlLogger,
                  repository_provider: RepositoryProvider,
                  config_service: ConfigService,
                  email_provider: EmailProvider,
@@ -29,15 +30,16 @@ class SendExecutionFinishMailCommandHandler(ICommandHandler[SendExecutionFinishM
         self.application_config = application_config
         self.email_provider = email_provider
         self.config_service = config_service
-        self.sql_logger = sql_logger
+        self.logger = logger
         self.repository_provider = repository_provider
 
+    @transactionhandler
     def handle(self, command: SendExecutionFinishMailCommand):
         data_operation_job_execution = self.repository_provider.get(DataOperationJobExecution).first(
             Id=command.DataOperationJobExecutionId)
         if data_operation_job_execution is None:
-            self.sql_logger.info(f'{command} mail sending execution not found',
-                                 job_id=command.DataOperationJobExecutionId)
+            self.logger.info(f'{command} mail sending execution not found',
+                             job_id=command.DataOperationJobExecutionId)
             return
 
         operation_contacts = []
@@ -46,8 +48,8 @@ class SendExecutionFinishMailCommandHandler(ICommandHandler[SendExecutionFinishM
                 operation_contacts.append(contact.Email)
         self._add_default_contacts(operation_contacts=operation_contacts)
         if operation_contacts is None:
-            self.sql_logger.error(f'{command.DataOperationJobExecutionId} mail sending contact not found',
-                                  job_id=command.DataOperationJobExecutionId)
+            self.logger.error(f'{command.DataOperationJobExecutionId} mail sending contact not found',
+                              job_id=command.DataOperationJobExecutionId)
             return
         data_operation_name = data_operation_job_execution.DataOperationJob.DataOperation.Name
         subject = f"Execution completed"
@@ -60,9 +62,9 @@ class SendExecutionFinishMailCommandHandler(ICommandHandler[SendExecutionFinishM
 
         try:
             self.email_provider.send(operation_contacts, subject, mail_body)
-            self.sql_logger.info(f"Mail Sent successfully.", job_id=command.DataOperationJobExecutionId)
+            self.logger.info(f"Mail Sent successfully.", job_id=command.DataOperationJobExecutionId)
         except Exception as ex:
-            self.sql_logger.error(f"Error on mail sending. Error:{ex}", job_id=command.DataOperationJobExecutionId)
+            self.logger.error(f"Error on mail sending. Error:{ex}", job_id=command.DataOperationJobExecutionId)
 
     def _render_job_execution(self, id):
         headers = [
@@ -95,7 +97,8 @@ class SendExecutionFinishMailCommandHandler(ICommandHandler[SendExecutionFinishM
             max_id = self.repository_provider.query(
                 func.max(DataOperationJobExecutionIntegration.Id)) \
                 .filter(DataOperationJobExecutionIntegration.DataOperationJobExecutionId == data.Id)
-            error_integration = self.repository_provider.get(DataOperationJobExecutionIntegration).first(Id=max_id)
+            result = max_id.all()[0][0]
+            error_integration = self.repository_provider.get(DataOperationJobExecutionIntegration).first(Id=result)
             error_log = ''
             if error_integration is not None and error_integration.Log is not None:
                 error_log = error_integration.Log.replace('\n', '<br />').replace('\t',

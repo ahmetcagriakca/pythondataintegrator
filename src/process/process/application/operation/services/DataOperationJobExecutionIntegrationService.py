@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from injector import inject
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 
 from process.domain.common import OperationEvent
 from process.domain.common.Status import Status
-from process.domain.enums.events import EVENT_EXECUTION_INTEGRATION_INITIALIZED
+from pdip.integrator.domain.enums.events import EVENT_EXECUTION_INTEGRATION_INITIALIZED
 from process.domain.operation import DataOperationJobExecution, DataOperationJobExecutionIntegration, \
     DataOperationJobExecutionIntegrationEvent, DataOperationIntegration
 
@@ -55,7 +55,9 @@ class DataOperationJobExecutionIntegrationService(IScoped):
 
     def update_status(self,
                       data_operation_job_execution_integration_id: int = None,
-                      status_id: int = None, is_finished: bool = False):
+                      status_id: int = None,
+                      is_finished: bool = False
+                      ):
         data_operation_job_execution_integration = self.data_operation_job_execution_integration_repository.first(
             Id=data_operation_job_execution_integration_id)
         status = self.status_repository.first(Id=status_id)

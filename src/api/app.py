@@ -1,7 +1,7 @@
 if __name__ == "__main__":
     from pdip.base import Pdi
     from pdip.api.app import FlaskAppWrapper
-    from pdip.data import SeedRunner
+    from pdip.data.seed import SeedRunner
 
     pdi = Pdi(excluded_modules=["alembic", "tests", "venv"])
 

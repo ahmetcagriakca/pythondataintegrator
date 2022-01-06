@@ -1,8 +1,8 @@
 from typing import List
 
 from injector import inject
-from pdip.connection.models.enums import ConnectionTypes
-from pdip.data import RepositoryProvider
+from pdip.integrator.connection.domain.enums import ConnectionTypes
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.html import HtmlTemplateService, Pagination
 
@@ -99,7 +99,7 @@ class ConnectionDetailPage(IScoped):
             source_query = ''
             if source_connections is not None and len(source_connections) > 0:
                 source_connection = source_connections[0]
-                if source_connection.Connection.ConnectionType.Name == ConnectionTypes.Database.name:
+                if source_connection.Connection.ConnectionType.Name == ConnectionTypes.Sql.name:
                     source_schema_and_table = ''
                     if source_connection.Database.Schema is not None and source_connection.Database.Schema != '':
                         source_schema_and_table = f' ({source_connection.Database.Schema}.{source_connection.Database.TableName})'
@@ -111,7 +111,7 @@ class ConnectionDetailPage(IScoped):
             target_query = ''
             if target_connections is not None and len(target_connections) > 0:
                 target_connection = target_connections[0]
-                if target_connection.Connection.ConnectionType.Name == ConnectionTypes.Database.name:
+                if target_connection.Connection.ConnectionType.Name == ConnectionTypes.Sql.name:
                     target_schema_and_table = ''
                     if target_connection.Database.Schema is not None and target_connection.Database.Schema != '':
                         target_schema_and_table = f' ({target_connection.Database.Schema}.{target_connection.Database.TableName})'

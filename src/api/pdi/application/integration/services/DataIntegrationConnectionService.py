@@ -1,8 +1,8 @@
 from typing import List
 
 from injector import inject
-from pdip.connection.models.enums import ConnectionTypes
-from pdip.data import RepositoryProvider
+from pdip.integrator.connection.domain.enums import ConnectionTypes
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
 
@@ -71,7 +71,7 @@ class DataIntegrationConnectionService(IScoped):
                     f"{data_integration.Code} - {data.SourceConnections.ConnectionName} source connection not found")
             source_connection = DataIntegrationConnection(
                 SourceOrTarget=0, DataIntegration=data_integration, Connection=source)
-            if source.ConnectionType.Id == ConnectionTypes.Database.value:
+            if source.ConnectionType.Id == ConnectionTypes.Sql.value:
                 if source_connection is not None \
                         and (
                         data.SourceConnections.Database.Query is None or data.SourceConnections.Database.Query == '') \
@@ -103,7 +103,7 @@ class DataIntegrationConnectionService(IScoped):
                 f"{data_integration.Code} - {data.TargetConnections.ConnectionName} target connection not found")
         target_connection = DataIntegrationConnection(
             SourceOrTarget=1, DataIntegration=data_integration, Connection=target)
-        if target.ConnectionType.Id == ConnectionTypes.Database.value:
+        if target.ConnectionType.Id == ConnectionTypes.Sql.value:
             if data.TargetConnections.Database.Query is None or data.TargetConnections.Database.Query == '':
                 data.TargetConnections.Database.Query = self.data_integration_column_service.get_target_query(
                     connection=target,
@@ -137,7 +137,7 @@ class DataIntegrationConnectionService(IScoped):
                 raise OperationalException(
                     f"{data_integration.Code} - {data.SourceConnections.ConnectionName} source connection not found")
             source_connection.Connection = source
-            if source.ConnectionType.Id == ConnectionTypes.Database.value:
+            if source.ConnectionType.Id == ConnectionTypes.Sql.value:
                 if (
                         data.SourceConnections.Database.Query is None or data.SourceConnections.Database.Query == '') \
                         and data.SourceConnections.Database.Schema is not None and data.SourceConnections.Database.Schema != '' and data.SourceConnections.Database.TableName is not None and data.SourceConnections.Database.TableName != '':
@@ -186,7 +186,7 @@ class DataIntegrationConnectionService(IScoped):
             raise OperationalException(
                 f"{data_integration.Code} - {data.TargetConnections.ConnectionName} target connection not found")
         target_connection.Connection = target
-        if target.ConnectionType.Id == ConnectionTypes.Database.value:
+        if target.ConnectionType.Id == ConnectionTypes.Sql.value:
             if data.TargetConnections.Database.Query is None or data.TargetConnections.Database.Query == '':
                 data.TargetConnections.Database.Query = self.data_integration_column_service.get_target_query(
                     connection=target,

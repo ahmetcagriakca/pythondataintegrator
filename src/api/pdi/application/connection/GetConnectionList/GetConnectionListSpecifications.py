@@ -1,7 +1,7 @@
 from injector import inject
 from pdip.api.specifications import OrderBySpecification
 from pdip.api.specifications import PagingSpecification
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from sqlalchemy.orm import Query
 
 from pdi.application.connection.GetConnectionList.GetConnectionListQuery import GetConnectionListQuery

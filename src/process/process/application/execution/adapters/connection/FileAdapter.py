@@ -5,10 +5,9 @@ from typing import List
 import pandas as pd
 from injector import inject
 from pandas import DataFrame
-from pdip.connection.adapters import ConnectionAdapter
-from pdip.connection.file.base import FileProvider
 from pdip.exceptions import NotSupportedFeatureException
-from pdip.logging.loggers.database import SqlLogger
+from pdip.integrator.connection.base import ConnectionAdapter
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.execution.services.OperationCacheService import OperationCacheService
 from process.domain.dto.PagingModifier import PagingModifier
@@ -18,12 +17,10 @@ class FileAdapter(ConnectionAdapter):
     @inject
     def __init__(self,
                  sql_logger: SqlLogger,
-                 file_provider: FileProvider,
                  operation_cache_service: OperationCacheService,
                  ):
         self.operation_cache_service = operation_cache_service
         self.sql_logger = sql_logger
-        self.file_provider = file_provider
 
     def clear_data(self, data_integration_id) -> int:
         target_connection = self.operation_cache_service.get_target_connection(

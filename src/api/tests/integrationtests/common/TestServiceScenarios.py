@@ -1,7 +1,7 @@
 # import time
 # from datetime import datetime
 #
-# from pdip.data import RepositoryProvider
+# from pdip.data.repository import RepositoryProvider
 #
 # from pdi.application.operation import DataOperationJobService
 # from pdi.application.operation.services.DataOperationService import DataOperationService

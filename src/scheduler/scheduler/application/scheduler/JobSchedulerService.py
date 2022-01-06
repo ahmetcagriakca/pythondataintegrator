@@ -3,9 +3,9 @@ from typing import List
 
 from apscheduler.job import Job
 from pdip.configuration.models.database import DatabaseConfig
-from pdip.data import RepositoryProvider
+from pdip.data.repository import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from pdip.logging.loggers.sql import SqlLogger
 
 from scheduler.domain.aps.ApSchedulerEvent import ApSchedulerEvent
 from scheduler.domain.aps.ApSchedulerJob import ApSchedulerJob
@@ -13,11 +13,12 @@ from scheduler.domain.aps.ApSchedulerJobEvent import ApSchedulerJobEvent
 
 
 class JobSchedulerService:
-    def __init__(self,
-                 ):
+    def __init__(
+            self
+    ):
 
-        self.database_config = DependencyContainer.Instance.get(DatabaseConfig)
         self.sql_logger = DependencyContainer.Instance.get(SqlLogger)
+        self.database_config = DependencyContainer.Instance.get(DatabaseConfig)
         self.repository_provider = RepositoryProvider(database_config=self.database_config,
                                                       database_session_manager=None)
         self.ap_scheduler_job_repository = self.repository_provider.get(ApSchedulerJob)

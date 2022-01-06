@@ -1,6 +1,6 @@
 from typing import List
 
-from pdip.data import EntityBase
+from pdip.data.domain import EntityBase
 
 from pdi.domain.base.connection.ConnectionDatabaseBase import ConnectionDatabaseBase
 from pdi.domain.base.connection.ConnectionFileBase import ConnectionFileBase

@@ -1,16 +1,24 @@
-from pdip.data import RepositoryProvider
-from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from injector import inject
+from pdip.data.repository import RepositoryProvider
+from pdip.data.seed import Seed
+from pdip.logging.loggers.sql import SqlLogger
 
-from pdip.data import Seed
 from pdi.domain.common import ConfigParameter
 
 
 class ConfigParameterSeed(Seed):
+    @inject
+    def __init__(
+            self,
+            repository_provider: RepositoryProvider,
+            logger: SqlLogger,
+    ):
+        self.logger = logger
+        self.repository_provider = repository_provider
+
     def seed(self):
         try:
-            repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
-            config_parameter_repository = repository_provider.get(ConfigParameter)
+            config_parameter_repository = self.repository_provider.get(ConfigParameter)
             check_count = config_parameter_repository.table.count()
             if check_count is None or check_count == 0:
                 configurations = [
@@ -61,9 +69,6 @@ class ConfigParameterSeed(Seed):
                     config_parameter = ConfigParameter(Name=configJson["Name"], Type=configJson["Type"],
                                                        Value=configJson["Value"], Description=configJson["Description"])
                     config_parameter_repository.insert(config_parameter)
-                    repository_provider.commit()
+                    self.repository_provider.commit()
         except Exception as ex:
-            logger = DependencyContainer.Instance.get(SqlLogger)
-            logger.exception(ex, "ApScheduler seeds getting error")
-        finally:
-            repository_provider.close()
+            self.logger.exception(ex, "ApScheduler seeds getting error")

@@ -1,6 +1,6 @@
 from typing import List
 
-from pdip.connection.models.enums import ConnectionTypes
+from pdip.integrator.connection.domain.enums import ConnectionTypes
 
 from pdi.application.operation.GetDataOperation.GetDataOperationDto import GetDataOperationDto, DataOperationContactDto, \
     DataOperationIntegrationDto, DataIntegrationDto, DataIntegrationColumnDto, ConnectionDto, ConnectionDatabaseDto, \
@@ -61,7 +61,7 @@ class GetDataOperationMapping:
                             IsDeleted=data_integration_connection.Connection.IsDeleted
                         )
                         database = None
-                        if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Database.value:
+                        if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Sql.value:
                             connection.Database = ConnectionDatabaseDto(
                                 Id=data_integration_connection.Connection.Database.Id,
                                 Sid=data_integration_connection.Connection.Database.Sid,

@@ -1,9 +1,9 @@
-from pdip.data import RepositoryProvider
-from pdip.dependency.container import DependencyContainer
-from pdip.logging.loggers.database import SqlLogger
+from injector import inject
+from pdip.data.repository import RepositoryProvider
+from pdip.data.seed import Seed
+from pdip.logging.loggers.sql import SqlLogger
 
 from pdi.domain.aps.ApSchedulerEvent import ApSchedulerEvent
-from pdip.data import Seed
 from pdi.domain.enums.apschedulerevents import EVENT_SCHEDULER_STARTED, EVENT_SCHEDULER_SHUTDOWN, \
     EVENT_SCHEDULER_PAUSED, EVENT_SCHEDULER_RESUMED, EVENT_EXECUTOR_ADDED, EVENT_EXECUTOR_REMOVED, \
     EVENT_JOBSTORE_ADDED, EVENT_JOBSTORE_REMOVED, EVENT_ALL_JOBS_REMOVED, EVENT_JOB_ADDED, EVENT_JOB_REMOVED, \
@@ -12,11 +12,18 @@ from pdi.domain.enums.apschedulerevents import EVENT_SCHEDULER_STARTED, EVENT_SC
 
 
 class ApSchedulerSeed(Seed):
+    @inject
+    def __init__(
+            self,
+            repository_provider: RepositoryProvider,
+            logger: SqlLogger,
+    ):
+        self.logger = logger
+        self.repository_provider = repository_provider
 
     def seed(self):
         try:
-            repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
-            ap_scheduler_event_repository = repository_provider.get(ApSchedulerEvent)
+            ap_scheduler_event_repository = self.repository_provider.get(ApSchedulerEvent)
             check_count = ap_scheduler_event_repository.table.count()
             if check_count is None or check_count == 0:
 
@@ -129,9 +136,6 @@ class ApSchedulerSeed(Seed):
                                              Description=eventJson["Description"],
                                              Class=eventJson["Class"])
                     ap_scheduler_event_repository.insert(event)
-                    repository_provider.commit()
+                    self.repository_provider.commit()
         except Exception as ex:
-            logger = DependencyContainer.Instance.get(SqlLogger)
-            logger.exception(ex, "ApScheduler seeds getting error")
-        finally:
-            repository_provider.close()
+            self.logger.exception(ex, "ApScheduler seeds getting error")

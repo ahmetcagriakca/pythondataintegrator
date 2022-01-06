@@ -5,9 +5,9 @@ import pandas as pd
 from func_timeout import func_set_timeout
 from injector import inject
 from pandas import notnull
-from pdip.connection.adapters import ConnectionAdapter
 from pdip.dependency import IScoped
-from pdip.logging.loggers.database import SqlLogger
+from pdip.integrator.connection.base import ConnectionAdapter
+from pdip.logging.loggers.sql import SqlLogger
 
 from process.application.execution.adapters.connection.ConnectionAdapterFactory import \
     ConnectionAdapterFactory
@@ -16,8 +16,8 @@ from process.application.operation.services.DataOperationJobExecutionIntegration
     DataOperationJobExecutionIntegrationService
 from process.domain.dto.PagingModifier import PagingModifier
 from process.domain.enums.StatusTypes import StatusTypes
-from process.domain.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
-    EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY
+from pdip.integrator.domain.enums.events import EVENT_EXECUTION_INTEGRATION_EXECUTE_TRUNCATE, \
+    EVENT_EXECUTION_INTEGRATION_GET_SOURCE_DATA_COUNT, EVENT_EXECUTION_INTEGRATION_EXECUTE_TARGET
 
 
 class IntegrationExecutionService(IScoped):
@@ -170,7 +170,7 @@ class IntegrationExecutionService(IScoped):
 
         self.data_operation_job_execution_integration_service.create_event(
             data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
-            event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_QUERY, affected_row=affected_rowcount)
+            event_code=EVENT_EXECUTION_INTEGRATION_EXECUTE_TARGET, affected_row=affected_rowcount)
         # self.data_operation_job_execution_integration_service.update_source_data_count(
         #     data_operation_job_execution_integration_id=data_operation_job_execution_integration_id,
         #     source_data_count=affected_rowcount)
