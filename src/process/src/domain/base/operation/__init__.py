@@ -1,0 +1,11 @@
+from src.domain.base.operation.DataOperationBase import DataOperationBase
+from src.domain.base.operation.DataOperationContactBase import DataOperationContactBase
+from src.domain.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
+from src.domain.base.operation.DataOperationJobBase import DataOperationJobBase
+from src.domain.base.operation.DataOperationJobExecutionBase import DataOperationJobExecutionBase
+from src.domain.base.operation.DataOperationJobExecutionEventBase import DataOperationJobExecutionEventBase
+from src.domain.base.operation.DataOperationJobExecutionIntegrationBase import \
+    DataOperationJobExecutionIntegrationBase
+from src.domain.base.operation.DataOperationJobExecutionIntegrationEventBase import \
+    DataOperationJobExecutionIntegrationEventBase
+from src.domain.base.operation.DefinitionBase import DefinitionBase
