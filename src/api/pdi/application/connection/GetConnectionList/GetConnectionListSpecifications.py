@@ -2,10 +2,12 @@ from injector import inject
 from pdip.api.specifications import OrderBySpecification
 from pdip.api.specifications import PagingSpecification
 from pdip.data.repository import RepositoryProvider
+from sqlalchemy import or_
 from sqlalchemy.orm import Query
 
 from pdi.application.connection.GetConnectionList.GetConnectionListQuery import GetConnectionListQuery
 from pdi.domain.connection import Connection, ConnectionServer, ConnectionDatabase, ConnectionType, ConnectorType
+from pdi.domain.connection.ConnectionBigData import ConnectionBigData
 
 
 class GetConnectionListSpecifications:
@@ -25,8 +27,10 @@ class GetConnectionListSpecifications:
         specified_query = data_query \
             .join(ConnectionType, ConnectionType.Id == Connection.ConnectionTypeId) \
             .join(ConnectionServer, ConnectionServer.ConnectionId == Connection.Id) \
-            .join(ConnectionDatabase, ConnectionDatabase.ConnectionId == Connection.Id) \
-            .join(ConnectorType, ConnectorType.Id == ConnectionDatabase.ConnectorTypeId)
+            .join(ConnectionDatabase, ConnectionDatabase.ConnectionId == Connection.Id, isouter=True) \
+            .join(ConnectionBigData, ConnectionBigData.ConnectionId == Connection.Id, isouter=True) \
+            .join(ConnectorType, or_(ConnectorType.Id == ConnectionDatabase.ConnectorTypeId,
+                                     ConnectorType.Id == ConnectionBigData.ConnectorTypeId))
         if query.request.Id is not None:
             specified_query = specified_query.filter(Connection.Id == query.request.Id)
         if query.request.ConnectionTypeId is not None:

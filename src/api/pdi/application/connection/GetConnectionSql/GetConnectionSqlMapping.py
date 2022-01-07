@@ -1,7 +1,5 @@
 from typing import List
 
-from pdip.integrator.connection.domain.enums import ConnectionTypes
-
 from pdi.application.connection.GetConnectionSql.GetConnectionSqlDto import GetConnectionSqlDto, GetConnectionTypeDto, \
     GetConnectorTypeDto
 from pdi.domain.connection.Connection import Connection
@@ -19,18 +17,12 @@ class GetConnectionSqlMapping:
         dto.CreationDate = entity.CreationDate
         dto.IsDeleted = entity.IsDeleted
 
-        if ConnectionTypes(entity.ConnectionType.Id) == ConnectionTypes.Sql:
-            dto.ConnectorType = GetConnectorTypeDto(Id=entity.Database.ConnectorType.Id,
-                                                    Name=entity.Database.ConnectorType.Name,
-                                                    ConnectionTypeId=entity.Database.ConnectorType.ConnectionTypeId)
-            dto.Sid = entity.Database.Sid
-            dto.ServiceName = entity.Database.ServiceName
-            dto.DatabaseName = entity.Database.DatabaseName
-        elif ConnectionTypes(entity.ConnectionType.Id) == ConnectionTypes.BigData:
-            dto.ConnectorType = GetConnectorTypeDto(Id=entity.BigData.ConnectorType.Id,
-                                                    Name=entity.BigData.ConnectorType.Name,
-                                                    ConnectionTypeId=entity.BigData.ConnectorType.ConnectionTypeId)
-            dto.DatabaseName = entity.BigData.DatabaseName
+        dto.ConnectorType = GetConnectorTypeDto(Id=entity.Database.ConnectorType.Id,
+                                                Name=entity.Database.ConnectorType.Name,
+                                                ConnectionTypeId=entity.Database.ConnectorType.ConnectionTypeId)
+        dto.Sid = entity.Database.Sid
+        dto.ServiceName = entity.Database.ServiceName
+        dto.DatabaseName = entity.Database.DatabaseName
         return dto
 
     @staticmethod

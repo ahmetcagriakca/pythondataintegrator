@@ -1,9 +1,11 @@
 from injector import inject
 from pdip.dependency import IScoped
+from sqlalchemy import or_
 from sqlalchemy.orm import Query
 
 from pdi.application.connection.GetConnection.GetConnectionQuery import GetConnectionQuery
 from pdi.domain.connection import ConnectionDatabase, ConnectionType, ConnectorType, Connection, ConnectionServer
+from pdi.domain.connection.ConnectionBigData import ConnectionBigData
 
 
 class GetConnectionSpecifications(IScoped):
@@ -16,8 +18,10 @@ class GetConnectionSpecifications(IScoped):
         specified_query = data_query \
             .join(ConnectionType, ConnectionType.Id == Connection.ConnectionTypeId) \
             .join(ConnectionServer, ConnectionServer.ConnectionId == Connection.Id) \
-            .join(ConnectionDatabase, ConnectionDatabase.ConnectionId == Connection.Id) \
-            .join(ConnectorType, ConnectorType.Id == ConnectionDatabase.ConnectorTypeId)
+            .join(ConnectionDatabase, ConnectionDatabase.ConnectionId == Connection.Id, isouter=True) \
+            .join(ConnectionBigData, ConnectionBigData.ConnectionId == Connection.Id, isouter=True) \
+            .join(ConnectorType, or_(ConnectorType.Id == ConnectionDatabase.ConnectorTypeId,
+                                     ConnectorType.Id == ConnectionBigData.ConnectorTypeId))
         specified_query = specified_query.filter(Connection.Id == query.request.Id)
         return specified_query
 

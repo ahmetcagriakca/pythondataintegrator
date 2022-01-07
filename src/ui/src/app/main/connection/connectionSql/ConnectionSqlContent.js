@@ -38,7 +38,7 @@ function ConnectionSqlContent() {
 	const [values, setValues] = React.useState({
 		id: null,
 		name: '',
-		connectionType: null,
+		connectionType: { id: 1, name: 'SQL' },
 		connectorType: null,
 		host: '',
 		port: null,
@@ -60,7 +60,6 @@ function ConnectionSqlContent() {
 
 
 	const connection = useSelector(({ connectionSqlApp }) => {
-		debugger;
 		return connectionSqlApp.connectionSql.data
 	});
 
@@ -93,11 +92,22 @@ function ConnectionSqlContent() {
 
 	useEffect(() => {
 		if (connection && connection != null) {
-			setValues(connection);
+			if (connection !== undefined) {
+				let data= { ...connection }
+
+				data.connectionType = { id: 1, name: 'SQL' }
+				setValues(data);
+			}
+			else {
+				let data = { ...values }
+				data.connectionType = { id: 1, name: 'SQL' }
+				setValues(data);
+			}
 			setDisabilityStatus({
 				id: true,
 				name: ((connection.id && connection.id !== null) || connection.isDeleted === 1) ? true : false,
-				connectionType: ((connection.id && connection.id !== null) || connection.isDeleted === 1) ? true : false,
+				connectionType: true,
+				// connectionType: ((connection.id && connection.id !== null) || connection.isDeleted === 1) ? true : false,
 				connectorType: (connection.isDeleted === 1) ? true : false,
 				host: (connection.isDeleted === 1),
 				port: (connection.isDeleted === 1),
@@ -114,7 +124,8 @@ function ConnectionSqlContent() {
 			setReadonlyStatus({
 				id: true,
 				name: ((connection.id && connection.id !== null)) ? true : false,
-				connectionType: ((connection.id && connection.id !== null)) ? true : false,
+				connectionType: true,
+				// connectionType: ((connection.id && connection.id !== null)) ? true : false,
 				connectorType: false,
 				host: false,
 				port: false,
@@ -444,6 +455,7 @@ function ConnectionSqlContent() {
 						<TextField
 							id="outlined-basic"
 							label='Password'
+							fullWidth={true}
 							type={values.showPassword ? 'text' : 'password'}
 							InputProps={{
 								endAdornment: (
@@ -469,13 +481,7 @@ function ConnectionSqlContent() {
 							onChange={handleChange('password')}
 						/>
 					</Grid>
-					<Grid item xs>
-					</Grid>
-					<Grid item xs>
-					</Grid>
 				</Grid>
-
-
 				{
 					values.isDeleted !== 1 ?
 						(
@@ -591,9 +597,9 @@ function ConnectionSqlContent() {
 					</Box>
 				</DialogContent>
 				<DialogActions>
-					<Button 
+					<Button
 						onClick={checkCountAction}
-s						variant="contained"
+						s variant="contained"
 						color="secondary"
 						size="large">
 						Check

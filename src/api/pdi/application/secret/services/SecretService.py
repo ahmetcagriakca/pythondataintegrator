@@ -23,8 +23,8 @@ class SecretService(IScoped):
         self.secret_type_service = secret_type_service
         self.secret_source_service = secret_source_service
 
-    def create_secret(self, name: str, type: str) -> Secret:
-        secret_type = self.secret_type_service.get_by_name(name=type)
+    def create_secret(self, name: str, type_id: str) -> Secret:
+        secret_type = self.secret_type_service.get_by_id(id=type_id)
         secret = Secret(Name=name, SecretType=secret_type)
         return secret
 
@@ -40,7 +40,7 @@ class SecretService(IScoped):
         """
         Create File connection
         """
-        secret = self.create_secret(name=name, type=SecretTypes.Source.name)
+        secret = self.create_secret(name=name, type_id=SecretTypes.Source.value)
         self.secret_source_service.create_basic_authentication(secret=secret, user=user, password=password)
         return secret
 
@@ -55,9 +55,44 @@ class SecretService(IScoped):
             self.secret_source_service.update_basic_authentication(secret=secret, user=user, password=password)
         return secret
 
+    def create_kerberos_authentication(self, name: str, principal: str, password: str, krb_realm: str, krb_fqdn: str,
+                                       krb_service_name: str) -> Secret:
+        """
+        Create File connection
+        """
+        secret = self.create_secret(name=name, type_id=SecretTypes.Source.value)
+        self.secret_source_service.create_kerberos_authentication(
+            secret=secret,
+            principal=principal,
+            password=password,
+            krb_realm=krb_realm,
+            krb_fqdn=krb_fqdn,
+            krb_service_name=krb_service_name
+        )
+        return secret
+
+    def update_kerberos_authentication(self, id: int, principal: str, password: str, krb_realm: str, krb_fqdn: str,
+                                       krb_service_name: str) -> Secret:
+        """
+        Create File connection
+        """
+        secret = self.secret_repository.first(IsDeleted=0, Id=id)
+        if secret is None:
+            raise OperationalException("Secret Not Found")
+        else:
+            self.secret_source_service.update_kerberos_authentication(
+                secret=secret,
+                principal=principal,
+                password=password,
+                krb_realm=krb_realm,
+                krb_fqdn=krb_fqdn,
+                krb_service_name=krb_service_name
+            )
+        return secret
+
     def delete_secret(self, id: int):
         """
-        Delete Database connection
+        Delete secret
         """
         secret = self.secret_repository.first(Id=id, IsDeleted=0)
         if secret is None:

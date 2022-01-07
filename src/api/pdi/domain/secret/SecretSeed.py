@@ -1,9 +1,10 @@
 from injector import inject
 from pdip.data.repository import RepositoryProvider
 from pdip.data.seed import Seed
+from pdip.integrator.connection.domain.authentication.type import AuthenticationTypes
 from pdip.logging.loggers.sql import SqlLogger
 
-from pdi.domain.enums import SecretTypes, AuthenticationTypes
+from pdi.domain.enums import SecretTypes
 from pdi.domain.secret import SecretType, AuthenticationType
 
 
@@ -40,6 +41,10 @@ class SecretSeed(Seed):
                     {
                         "SecretType": SecretTypes.Source.name,
                         "Name": AuthenticationTypes.BasicAuthentication.name,
+                    },
+                    {
+                        "SecretType": SecretTypes.Source.name,
+                        "Name": AuthenticationTypes.Kerberos.name,
                     },
                 ]
                 for authentication_type_json in authentication_type_list:

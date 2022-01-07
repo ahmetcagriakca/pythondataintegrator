@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship
 from pdi.domain.base import Base
 from pdi.domain.base.secret.SecretSourceBase import SecretSourceBase
 from pdi.domain.secret.SecretSourceBasicAuthentication import SecretSourceBasicAuthentication
+from pdi.domain.secret.SecretSourceKerberosAuthentication import SecretSourceKerberosAuthentication
 
 
 class SecretSource(SecretSourceBase, Entity, Base):
@@ -18,3 +19,5 @@ class SecretSource(SecretSourceBase, Entity, Base):
     AuthenticationType = relationship("AuthenticationType", back_populates="SecretSources")
     SecretSourceBasicAuthentications: List[SecretSourceBasicAuthentication] = relationship(
         "SecretSourceBasicAuthentication", back_populates="SecretSource")
+    SecretSourceKerberosAuthentications: List[SecretSourceKerberosAuthentication] = relationship(
+        "SecretSourceKerberosAuthentication", back_populates="SecretSource")

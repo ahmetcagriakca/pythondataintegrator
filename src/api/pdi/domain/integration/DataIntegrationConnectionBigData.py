@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 
 from pdi.domain.base import Base
 from pdi.domain.base.integration.DataIntegrationConnectionBigDataBase import DataIntegrationConnectionBigDataBase
-from pdi.domain.base.integration.DataIntegrationConnectionDatabaseBase import DataIntegrationConnectionDatabaseBase
 
 
 class DataIntegrationConnectionBigData(DataIntegrationConnectionBigDataBase, Entity, Base):

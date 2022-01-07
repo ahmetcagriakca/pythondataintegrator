@@ -12,7 +12,7 @@ import Box from '@material-ui/core/Box';
 import TableContainer from '@material-ui/core/TableContainer';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter, useParams } from 'react-router-dom';
-import { getConnections, selectConnections,checkDatabaseConnection } from './store/connectionsSlice';
+import { getConnections, selectConnections, checkSqlConnection, checkBigDataConnection } from './store/connectionsSlice';
 import CustomPagination from '../../common/components/CustomPagination';
 import EnhancedTableHead from '../../common/components/EnhancedTableHead';
 import StyledTableRow from '../../common/components/StyledTableRow';
@@ -31,12 +31,20 @@ function ConnectionsRow(props) {
 		history.push('/'.concat(path));
 	}
 	const handleClick = (event, row) => {
-		GotoComponent('connection/sql/' + row.id)
+		if (row.connectionType.id === 1) {
+			GotoComponent('connection/sql/' + row.id)
+		}
+		else if (row.connectionType.id === 4) {
+			GotoComponent('connection/bigdata/' + row.id)
+		}
 	};
-	const checkDatabaseConnectionAction = (event, row) => {
-		dispatch(checkDatabaseConnection({ConnectionName:row.name}))
+	const checkSqlConnectionAction = (event, row) => {
+		dispatch(checkSqlConnection({ ConnectionName: row.name }))
 	};
-	
+	const checkBigDataConnectionAction = (event, row) => {
+		dispatch(checkBigDataConnection({ ConnectionName: row.name }))
+	};
+
 	return (
 		<React.Fragment>
 			<StyledTableRow
@@ -69,7 +77,24 @@ function ConnectionsRow(props) {
 										key={'cellColumnDeleteAction' + row?.id}
 										size="small"
 										aria-label="expand row"
-										onClick={event => checkDatabaseConnectionAction(event, row)}>
+										onClick={event => checkSqlConnectionAction(event, row)}>
+										<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
+											check_circle_outline
+										</Icon>
+									</IconButton>
+								</Tooltip>
+
+							) : ('')
+					}
+					{
+						row.connectionType.id === 2 ?
+							(
+								<Tooltip title="Check Connection">
+									<IconButton
+										key={'cellColumnDeleteAction' + row?.id}
+										size="small"
+										aria-label="expand row"
+										onClick={event => checkBigDataConnectionAction(event, row)}>
 										<Icon className="text-16 arrow-icon" style={{ color: 'green' }}>
 											check_circle_outline
 										</Icon>
@@ -130,7 +155,10 @@ function ConnectionsRow(props) {
 											</TableRow >
 										</TableBody>
 									</Table>
-								) : (
+								) : ('')
+							}
+							{
+								row.connectionType.id === 2 ? (
 									<Table>
 										<TableHead>
 											<TableRow >
@@ -145,7 +173,45 @@ function ConnectionsRow(props) {
 											</TableRow >
 										</TableBody>
 									</Table>
-								)
+								) : ('')
+							}
+							{
+								row.connectionType.id === 3 ? (
+									<Table>
+										<TableHead>
+											<TableRow >
+												<TableCell align={'left'} padding={'normal'} > Host </TableCell>
+												<TableCell align={'left'} padding={'normal'} > Port </TableCell>
+											</TableRow>
+										</TableHead>
+										<TableBody>
+											<TableRow >
+												<TableCell align="left">{row.host}</TableCell>
+												<TableCell align="left">{row.port}</TableCell>
+											</TableRow >
+										</TableBody>
+									</Table>
+								) : ('')
+							}
+							{
+								row.connectionType.id === 4 ? (
+									<Table>
+										<TableHead>
+											<TableRow >
+												<TableCell align={'left'} padding={'normal'} > Host </TableCell>
+												<TableCell align={'left'} padding={'normal'} > Port </TableCell>
+												<TableCell align={'left'} padding={'normal'} > Database Name </TableCell>
+											</TableRow>
+										</TableHead>
+										<TableBody>
+											<TableRow >
+												<TableCell align="left">{row.host}</TableCell>
+												<TableCell align="left">{row.port}</TableCell>
+												<TableCell align="left">{row.databaseName}</TableCell>
+											</TableRow >
+										</TableBody>
+									</Table>
+								) : ('')
 							}
 						</Box>
 					</Collapse>

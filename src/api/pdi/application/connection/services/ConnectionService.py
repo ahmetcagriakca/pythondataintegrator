@@ -1,18 +1,21 @@
 from typing import List
 
 from injector import inject
-from pdip.integrator.connection.domain.enums import ConnectionTypes
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
+from pdip.integrator.connection.domain.authentication.type import AuthenticationTypes
 from pdip.integrator.connection.domain.enums import ConnectionTypes
 from pdip.logging.loggers.sql import SqlLogger
 
-from pdi.application.connection.CreateConnectionDatabase.CreateConnectionDatabaseRequest import \
-    CreateConnectionDatabaseRequest
+from pdi.application.connection.CreateConnectionBigData.CreateConnectionBigDataRequest import \
+    CreateConnectionBigDataRequest
+from pdi.application.connection.CreateConnectionSql.CreateConnectionSqlRequest import \
+    CreateConnectionSqlRequest
 from pdi.application.connection.CreateConnectionFile.CreateConnectionFileRequest import CreateConnectionFileRequest
 from pdi.application.connection.CreateConnectionQueue.CreateConnectionQueueRequest import CreateConnectionQueueRequest
-from pdi.application.connection.services.ConnectionDatabaseService import ConnectionDatabaseService
+from pdi.application.connection.services.ConnectionBigDataService import ConnectionBigDataService
+from pdi.application.connection.services.ConnectionSqlService import ConnectionSqlService
 from pdi.application.connection.services.ConnectionFileService import ConnectionFileService
 from pdi.application.connection.services.ConnectionQueueService import ConnectionQueueService
 from pdi.application.connection.services.ConnectionSecretService import ConnectionSecretService
@@ -28,12 +31,14 @@ class ConnectionService(IScoped):
                  repository_provider: RepositoryProvider,
                  sql_logger: SqlLogger,
                  connection_type_service: ConnectionTypeService,
-                 connection_database_service: ConnectionDatabaseService,
+                 connection_database_service: ConnectionSqlService,
+                 connection_big_data_service: ConnectionBigDataService,
                  connection_file_service: ConnectionFileService,
                  connection_queue_service: ConnectionQueueService,
                  connection_secret_service: ConnectionSecretService,
                  connection_server_service: ConnectionServerService
                  ):
+        self.connection_big_data_service = connection_big_data_service
         self.repository_provider = repository_provider
         self.connection_queue_service = connection_queue_service
         self.connection_server_service = connection_server_service
@@ -59,34 +64,89 @@ class ConnectionService(IScoped):
         connection = self.get_by_name(name=name)
         return connection is not None
 
-    def create_connection(self, name: str, connection_type_name: str) -> Connection:
-        connection_type = self.connection_type_service.get_by_name(name=connection_type_name)
+    def create_connection(self, name: str, connection_type_id: str) -> Connection:
+        connection_type = self.connection_type_service.get_by_id(id=connection_type_id)
         connection = Connection(Name=name, ConnectionType=connection_type)
         return connection
 
-    def create_connection_database(self, request: CreateConnectionDatabaseRequest) -> Connection:
+    def create_connection_database(self, request: CreateConnectionSqlRequest) -> Connection:
         """
         Create File connection
         """
         connection = self.get_by_name(name=request.Name)
         if connection is None:
             connection = self.create_connection(name=request.Name,
-                                                connection_type_name=ConnectionTypes.Sql.name)
-            self.connection_secret_service.create(connection=connection, user=request.User,
-                                                  password=request.Password)
+                                                connection_type_id=ConnectionTypes.Sql.value)
+            self.connection_secret_service.create_basic_authentication(connection=connection, user=request.User,
+                                                                       password=request.Password)
             self.connection_server_service.create(connection=connection, host=request.Host, port=request.Port)
             self.connection_database_service.create(connection=connection,
-                                                    connector_type_name=request.ConnectorTypeName, sid=request.Sid,
+                                                    connector_type_id=request.ConnectorTypeId, sid=request.Sid,
                                                     service_name=request.ServiceName,
                                                     database_name=request.DatabaseName)
             self.connection_repository.insert(connection)
         else:
-            self.connection_secret_service.update(connection=connection, user=request.User,
-                                                  password=request.Password)
+            self.connection_secret_service.update_basic_authentication(connection=connection, user=request.User,
+                                                                       password=request.Password)
             self.connection_server_service.update(connection=connection, host=request.Host, port=request.Port)
             self.connection_database_service.update(connection=connection,
-                                                    connector_type_name=request.ConnectorTypeName, sid=request.Sid,
+                                                    connector_type_id=request.ConnectorTypeId, sid=request.Sid,
                                                     service_name=request.ServiceName,
+                                                    database_name=request.DatabaseName)
+        return connection
+
+    def create_connection_big_data(self, request: CreateConnectionBigDataRequest) -> Connection:
+        """
+        Create File connection
+        """
+        connection = self.get_by_name(name=request.Name)
+        if connection is None:
+            connection = self.create_connection(name=request.Name,
+                                                connection_type_id=ConnectionTypes.BigData.value)
+            if AuthenticationTypes(request.AuthenticationType) == AuthenticationTypes.BasicAuthentication:
+                self.connection_secret_service.create_basic_authentication(
+                    connection=connection,
+                    user=request.User,
+                    password=request.Password
+                )
+            elif AuthenticationTypes(request.AuthenticationType) == AuthenticationTypes.Kerberos:
+                self.connection_secret_service.create_kerberos_authentication(
+                    connection=connection,
+                    principal=request.User,
+                    password=request.Password,
+                    krb_realm=request.KrbRealm,
+                    krb_fqdn=request.KrbFqdn,
+                    krb_service_name=request.KrbServiceName
+                )
+            self.connection_server_service.create(connection=connection, host=request.Host, port=request.Port)
+            self.connection_big_data_service.create(
+                connection=connection,
+                connector_type_id=request.ConnectorTypeId,
+                ssl=request.Ssl,
+                use_only_sspi=request.UseOnlySspi,
+                database_name=request.DatabaseName
+            )
+            self.connection_repository.insert(connection)
+        else:
+            if AuthenticationTypes(request.AuthenticationType) == AuthenticationTypes.BasicAuthentication:
+                self.connection_secret_service.update_basic_authentication(
+                    connection=connection,
+                    user=request.User,
+                    password=request.Password
+                )
+            elif AuthenticationTypes(request.AuthenticationType) == AuthenticationTypes.Kerberos:
+                self.connection_secret_service.update_kerberos_authentication(
+                    connection=connection,
+                    principal=request.User,
+                    password=request.Password,
+                    krb_realm=request.KrbRealm,
+                    krb_fqdn=request.KrbFqdn,
+                    krb_service_name=request.KrbServiceName
+                )
+            self.connection_server_service.update(connection=connection, host=request.Host, port=request.Port)
+            self.connection_big_data_service.update(connection=connection,
+                                                    connector_type_id=request.ConnectorTypeId, ssl=request.Ssl,
+                                                    use_only_sspi=request.UseOnlySspi,
                                                     database_name=request.DatabaseName)
         return connection
 
@@ -97,17 +157,17 @@ class ConnectionService(IScoped):
         connection = self.get_by_name(name=request.Name)
         if connection is None:
             connection = self.create_connection(name=request.Name,
-                                                connection_type_name=ConnectionTypes.File.name)
-            self.connection_secret_service.create(connection=connection, user=request.User,
-                                                  password=request.Password)
+                                                connection_type_id=ConnectionTypes.File.value)
+            self.connection_secret_service.create_basic_authentication(connection=connection, user=request.User,
+                                                                       password=request.Password)
             self.connection_server_service.create(connection=connection, host=request.Host, port=request.Port)
-            self.connection_file_service.create(connection=connection, connector_type_name=request.ConnectorTypeName)
+            self.connection_file_service.create(connection=connection, connector_type_id=request.ConnectorTypeId)
             self.connection_repository.insert(connection)
         else:
-            self.connection_secret_service.update(connection=connection, user=request.User,
-                                                  password=request.Password)
+            self.connection_secret_service.update_basic_authentication(connection=connection, user=request.User,
+                                                                       password=request.Password)
             self.connection_server_service.update(connection=connection, host=request.Host, port=request.Port)
-            self.connection_file_service.update(connection=connection, connector_type_name=request.ConnectorTypeName)
+            self.connection_file_service.update(connection=connection, connector_type_id=request.ConnectorTypeId)
 
         return connection
 
@@ -118,17 +178,17 @@ class ConnectionService(IScoped):
         connection = self.get_by_name(name=request.Name)
         if connection is None:
             connection = self.create_connection(name=request.Name,
-                                                connection_type_name=ConnectionTypes.Queue.name)
-            self.connection_secret_service.create(connection=connection, user=request.User,
-                                                  password=request.Password)
+                                                connection_type_id=ConnectionTypes.Queue.value)
+            self.connection_secret_service.create_basic_authentication(connection=connection, user=request.User,
+                                                                       password=request.Password)
             for server in request.Servers:
                 self.connection_server_service.create(connection=connection, host=server.Host, port=server.Port)
-            self.connection_queue_service.create(connection=connection, connector_type_name=request.ConnectorTypeName,
+            self.connection_queue_service.create(connection=connection, connector_type_id=request.ConnectorTypeId,
                                                  protocol=request.Protocol, mechanism=request.Mechanism)
             connection = self.connection_repository.first(Id=connection.Id)
         else:
-            self.connection_secret_service.update(connection=connection, user=request.User,
-                                                  password=request.Password)
+            self.connection_secret_service.update_basic_authentication(connection=connection, user=request.User,
+                                                                       password=request.Password)
 
             for server in request.Servers:
                 connection_server = self.connection_server_service.get_by_server_info(connection_id=connection.Id,
@@ -146,7 +206,7 @@ class ConnectionService(IScoped):
                 if check is None or len(check) == 0:
                     self.connection_server_service.delete(id=connection_server.Id)
 
-            self.connection_queue_service.update(connection=connection, connector_type_name=request.ConnectorTypeName,
+            self.connection_queue_service.update(connection=connection, connector_type_id=request.ConnectorTypeId,
                                                  protocol=request.Protocol, mechanism=request.Mechanism)
         return connection
 

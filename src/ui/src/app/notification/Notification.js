@@ -34,8 +34,14 @@ const Notification = () => {
 			let type = getAdditionalDataValue(notification.AdditionalData, 'Type')
 			let routePath = ''
 			switch (type) {
-				case 'Connection':
-					routePath = 'connection'
+				case 'ConnectionSql':
+					routePath = 'connection/sql'
+					if (id && id !== null) {
+						routePath += '/' + id
+					}
+					break;
+				case 'ConnectionBigData':
+					routePath = 'connection/bigdata'
 					if (id && id !== null) {
 						routePath += '/' + id
 					}
@@ -62,9 +68,20 @@ const Notification = () => {
 	};
 	const actionSelector = (action, type, id) => {
 		switch (type) {
-			case 'Connection':
+			case 'ConnectionSql':
 				{
-					let path = '/connection'
+					let path = '/connection/sql'
+					if (action !== 1) {
+						path += '/' + id
+					}
+					if ((window.location.pathname === path)) {
+						dispatch(getConnection({ id: id }))
+					}
+					break;
+				}
+			case 'ConnectionBigData':
+				{
+					let path = '/connection/bigdata'
 					if (action !== 1) {
 						path += '/' + id
 					}

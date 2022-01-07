@@ -19,7 +19,6 @@ const snackbarSlice = createSlice({
 	initialState,
 	reducers: {
 		setSnackbar: (state = initialState, action) => {
-			debugger;
 			switch (action.type) {
 				case SET_SNACKBAR:
 					// const {  } = action;

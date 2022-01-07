@@ -31,6 +31,9 @@ class ConnectionSeed(Seed):
                     },
                     {
                         "Name": "Queue",
+                    },
+                    {
+                        "Name": "BigData",
                     }
                 ]
                 for connection_type_json in connection_type_list:
@@ -69,6 +72,10 @@ class ConnectionSeed(Seed):
                     {
                         "ConnectionType": "Database",
                         "Name": "MYSQL",
+                    },
+                    {
+                        "ConnectionType": "Database",
+                        "Name": "Impala",
                     }
                 ]
                 for connector_type_json in connector_type_list:

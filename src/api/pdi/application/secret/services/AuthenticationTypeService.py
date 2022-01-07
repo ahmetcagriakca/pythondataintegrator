@@ -20,3 +20,10 @@ class AuthenticationTypeService(IScoped):
         """
         entity = self.authentication_type_repository.first(IsDeleted=0, Name=name)
         return entity
+
+    def get_by_id(self, id) -> AuthenticationType:
+        """
+        Get secret type
+        """
+        entity = self.authentication_type_repository.first(IsDeleted=0, Id=id)
+        return entity

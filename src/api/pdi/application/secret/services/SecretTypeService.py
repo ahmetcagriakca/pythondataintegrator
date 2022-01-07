@@ -20,3 +20,10 @@ class SecretTypeService(IScoped):
         """
         entity = self.secret_type_repository.first(IsDeleted=0, Name=name)
         return entity
+
+    def get_by_id(self, id) -> SecretType:
+        """
+        Get secret type
+        """
+        entity = self.secret_type_repository.first(IsDeleted=0, Id=id)
+        return entity

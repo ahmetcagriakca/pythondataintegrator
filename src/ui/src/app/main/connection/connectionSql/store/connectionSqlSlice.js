@@ -22,7 +22,7 @@ export const postConnectionSql = createAsyncThunk('connectionSqlApp/connection/p
 		extra.dispatch(setLoading(true))
 		const response = await axios.post('/api/Connection/Sql', {
 			Name: params.name,
-			ConnectorTypeName: params.connectorType.name,
+			ConnectorTypeId: params.connectorType.id,
 			Host: params.host,
 			Port: params.port,
 			Sid: params.sid,

@@ -25,7 +25,7 @@ class ConnectionSecretService(IScoped):
         connection_basic_authentication = self.secret_service.get_basic_authentication(id=connection_secret.SecretId)
         return connection_basic_authentication
 
-    def create(self, connection: Connection, user: str, password: str) -> ConnectionSecret:
+    def create_basic_authentication(self, connection: Connection, user: str, password: str) -> ConnectionSecret:
         """
         Create ConnectionSecret
         """
@@ -38,7 +38,7 @@ class ConnectionSecretService(IScoped):
         self.connection_secret_repository.insert(connection_secret)
         return connection_secret
 
-    def update(self, connection: Connection, user: str, password: str) -> ConnectionSecret:
+    def update_basic_authentication(self, connection: Connection, user: str, password: str) -> ConnectionSecret:
         """
         Update ConnectionSecret
         """
@@ -50,6 +50,50 @@ class ConnectionSecretService(IScoped):
         if connection_secret is None:
             raise OperationalException("Connection Secret Not Found")
         self.secret_service.update_basic_authentication(id=connection_secret.SecretId, user=user, password=password)
+
+        return connection_secret
+
+    def create_kerberos_authentication(self, connection: Connection, principal: str, password: str, krb_realm: str,
+                                       krb_fqdn: str, krb_service_name: str) -> ConnectionSecret:
+        """
+        Create ConnectionSecret
+        """
+        if principal is None or principal == '':
+            raise OperationalException("Principal cannot be null")
+        if password is None or password == '':
+            raise OperationalException("Password cannot be null")
+        secret = self.secret_service.create_kerberos_authentication(
+            name=connection.Name,
+            principal=principal,
+            password=password,
+            krb_realm=krb_realm,
+            krb_fqdn=krb_fqdn,
+            krb_service_name=krb_service_name
+        )
+        connection_secret = ConnectionSecret(Connection=connection, Secret=secret)
+        self.connection_secret_repository.insert(connection_secret)
+        return connection_secret
+
+    def update_kerberos_authentication(self, connection: Connection, principal: str, password: str, krb_realm: str,
+                                       krb_fqdn: str, krb_service_name: str) -> ConnectionSecret:
+        """
+        Update ConnectionSecret
+        """
+        if principal is None or principal == '':
+            raise OperationalException("Principal cannot be null")
+        if password is None or password == '':
+            raise OperationalException("Password cannot be null")
+        connection_secret = self.connection_secret_repository.first(IsDeleted=0, Connection=connection)
+        if connection_secret is None:
+            raise OperationalException("Connection Secret Not Found")
+        self.secret_service.update_kerberos_authentication(
+            id=connection_secret.SecretId,
+            principal=principal,
+            password=password,
+            krb_realm=krb_realm,
+            krb_fqdn=krb_fqdn,
+            krb_service_name=krb_service_name
+        )
 
         return connection_secret
 

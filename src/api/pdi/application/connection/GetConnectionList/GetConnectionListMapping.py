@@ -1,5 +1,7 @@
 from typing import List
 
+from pdip.integrator.connection.domain.enums import ConnectionTypes
+
 from pdi.application.connection.GetConnectionList.GetConnectionListDto import GetConnectionListDto, GetConnectorTypeDto, \
     GetConnectionTypeDto
 from pdi.domain.connection import Connection
@@ -12,15 +14,25 @@ class GetConnectionListMapping:
         dto.Id = entity.Id
         dto.Name = entity.Name
         dto.ConnectionType = GetConnectionTypeDto(Id=entity.ConnectionType.Id, Name=entity.ConnectionType.Name)
-        dto.ConnectorType = GetConnectorTypeDto(Id=entity.Database.ConnectorType.Id,
-                                                Name=entity.Database.ConnectorType.Name)
         dto.Host = entity.ConnectionServers[0].Host
         dto.Port = entity.ConnectionServers[0].Port
-        dto.Sid = entity.Database.Sid
-        dto.ServiceName = entity.Database.ServiceName
-        dto.DatabaseName = entity.Database.DatabaseName
-        dto.CreationDate = entity.Database.CreationDate
+        dto.CreationDate = entity.CreationDate
         dto.IsDeleted = entity.IsDeleted
+        if ConnectionTypes(entity.ConnectionType.Id) == ConnectionTypes.Sql:
+            dto.ConnectorType = GetConnectorTypeDto(
+                Id=entity.Database.ConnectorType.Id,
+                Name=entity.Database.ConnectorType.Name
+            )
+            dto.Sid = entity.Database.Sid
+            dto.ServiceName = entity.Database.ServiceName
+            dto.DatabaseName = entity.Database.DatabaseName
+        elif ConnectionTypes(entity.ConnectionType.Id) == ConnectionTypes.BigData:
+            dto.ConnectorType = GetConnectorTypeDto(
+                Id=entity.BigData.ConnectorType.Id,
+                Name=entity.BigData.ConnectorType.Name
+            )
+            dto.DatabaseName = entity.BigData.DatabaseName
+
         return dto
 
     @staticmethod

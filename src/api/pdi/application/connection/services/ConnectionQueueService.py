@@ -19,16 +19,16 @@ class ConnectionQueueService(IScoped):
         self.connection_queue_repository = repository_provider.get(ConnectionQueue)
         self.connector_type_service = connector_type_service
 
-    def create(self, connection: Connection, connector_type_name: str, protocol: str,
+    def create(self, connection: Connection, connector_type_id: str, protocol: str,
                mechanism: str) -> ConnectionQueue:
         """
         Create Queue connection
         """
-        connector_type = self.connector_type_service.get_by_name(name=connector_type_name)
+        connector_type = self.connector_type_service.get_by_id(name=connector_type_id)
         if connector_type is None:
-            raise OperationalException(f"{connector_type_name} not found")
+            raise OperationalException(f"{connector_type_id} not found")
         if connector_type.ConnectionTypeId != connection.ConnectionTypeId:
-            raise OperationalException(f"{connector_type_name} incompatible with {connection.ConnectionType.Name}")
+            raise OperationalException(f"{connector_type_id} incompatible with {connection.ConnectionType.Name}")
         connection_queue = ConnectionQueue(Connection=connection,
                                            ConnectorType=connector_type,
                                            Protocol=protocol,
@@ -37,7 +37,7 @@ class ConnectionQueueService(IScoped):
         self.connection_queue_repository.insert(connection_queue)
         return connection_queue
 
-    def update(self, connection: Connection, connector_type_name: str, protocol: str,
+    def update(self, connection: Connection, connector_type_id: str, protocol: str,
                mechanism: str) -> ConnectionQueue:
         """
         Update Queue connection
@@ -45,12 +45,12 @@ class ConnectionQueueService(IScoped):
 
         connection_queue = self.connection_queue_repository.first(ConnectionId=connection.Id)
 
-        connector_type = self.connector_type_service.get_by_name(name=connector_type_name)
+        connector_type = self.connector_type_service.get_by_id(id=connector_type_id)
         if connector_type is None:
-            raise OperationalException(f"{connector_type_name} not found")
+            raise OperationalException(f"{connector_type_id} not found")
 
         if connector_type.ConnectionTypeId != connection.ConnectionTypeId:
-            raise OperationalException(f"{connector_type_name} incompatible with {connection.ConnectionType.Name}")
+            raise OperationalException(f"{connector_type_id} incompatible with {connection.ConnectionType.Name}")
         connection_queue.ConnectorType = connector_type
         connection_queue.Protocol = protocol
         connection_queue.Mechanism = mechanism
