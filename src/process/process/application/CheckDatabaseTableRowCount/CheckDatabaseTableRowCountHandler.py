@@ -10,7 +10,7 @@ from process.application.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountCo
     CheckDatabaseTableRowCountCommand
 from process.application.SendNotification.SendNotificationCommand import SendNotificationCommand
 from process.application.SendNotification.SendNotificationRequest import SendNotificationRequest
-from process.application.execution.services.OperationCacheService import OperationCacheService
+from process.application.integrator.OperationCacheService import OperationCacheService
 from process.domain.connection import Connection
 
 

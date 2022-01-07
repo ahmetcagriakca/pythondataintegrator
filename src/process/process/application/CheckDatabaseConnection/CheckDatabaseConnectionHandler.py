@@ -1,5 +1,3 @@
-import sys
-
 from injector import inject
 from pdip.cqrs import Dispatcher, ICommandHandler
 from pdip.data.decorators import transactionhandler
@@ -11,7 +9,7 @@ from pdip.logging.loggers.sql import SqlLogger
 from process.application.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
 from process.application.SendNotification.SendNotificationCommand import SendNotificationCommand
 from process.application.SendNotification.SendNotificationRequest import SendNotificationRequest
-from process.application.execution.services.OperationCacheService import OperationCacheService
+from process.application.integrator.OperationCacheService import OperationCacheService
 from process.domain.connection import Connection
 
 

@@ -7,7 +7,7 @@ from pdip.integrator.integration.domain.base import IntegrationConnectionSqlBase
     IntegrationConnectionBase, IntegrationBase
 from pdip.integrator.operation.domain import OperationIntegrationBase, OperationBase
 
-from process.application.execution.services.OperationCacheService import OperationCacheService
+from process.application.integrator.OperationCacheService import OperationCacheService
 from process.domain.base.operation import DataOperationBase
 
 
@@ -84,9 +84,7 @@ class OperationConverter:
                         ConnectionName=connection.Name,
                         ConnectionType=ConnectionTypes(connection.ConnectionType.Id)
                     )
-
                     if operation_integration.Integration.TargetConnections.ConnectionType == ConnectionTypes.Sql:
-
                         connection_basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
                             connection_id=connection.Id)
                         connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
