@@ -1,8 +1,8 @@
 if __name__ == "__main__":
     from pdip.base import Pdi
 
-    from scheduler.application.scheduler.JobScheduler import JobScheduler
-    from scheduler.rpc.SchedulerService import SchedulerService
+    from src.application.scheduler.JobScheduler import JobScheduler
+    from src.rpc.SchedulerService import SchedulerService
 
     pdi = Pdi(excluded_modules=["tests", "venv"])
     job_scheduler = pdi.get(JobScheduler)
