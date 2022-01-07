@@ -5,7 +5,7 @@ import { setLoading } from 'app/loading/store/loadingSlice';
 export const getConnectionSql = createAsyncThunk('connectionSqlApp/connection/getConnectionSql', async (params, extra) => {
 	try {
 		extra.dispatch(setLoading(true))
-		const response = await axios.get('/api/Connection/ById', {
+		const response = await axios.get('/api/Connection/SqlById', {
 			params: {
 				Id: params.id,
 			}
