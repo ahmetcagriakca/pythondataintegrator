@@ -183,13 +183,21 @@ function DataOperationContent() {
 				sourceConnections = {
 					ConnectionName: dataIntegration.sourceConnection.connection.name
 				}
-				if (dataIntegration?.targetConnection?.connection?.connectionTypeId === 1) {
+				if (dataIntegration?.sourceConnection?.connection?.connectionTypeId === 1) {
 					let database = {
 						Schema: dataIntegration.sourceConnection.database.schema,
 						TableName: dataIntegration.sourceConnection.database.tableName,
 						Query: dataIntegration.sourceConnection.database.query,
 					}
 					sourceConnections['Database'] = database
+				}
+				if (dataIntegration?.sourceConnection?.connection?.connectionTypeId === 4) {
+					let bigData = {
+						Schema: dataIntegration.sourceConnection.bigData.schema,
+						TableName: dataIntegration.sourceConnection.bigData.tableName,
+						Query: dataIntegration.sourceConnection.bigData.query,
+					}
+					sourceConnections['BigData'] = bigData
 				}
 				if (sourceColumns?.length > 0) {
 					sourceConnections['Columns'] = sourceColumns.join()
@@ -211,6 +219,15 @@ function DataOperationContent() {
 						Query: dataIntegration.targetConnection.database.query,
 					}
 					targetConnections['Database'] = database
+				}
+
+				if (dataIntegration?.targetConnection?.connection?.connectionTypeId === 4) {
+					let bigData = {
+						Schema: dataIntegration.targetConnection.bigData.schema,
+						TableName: dataIntegration.targetConnection.bigData.tableName,
+						Query: dataIntegration.targetConnection.bigData.query,
+					}
+					targetConnections['BigData'] = bigData
 				}
 				if (targetColumns?.length > 0) {
 					targetConnections['Columns'] = targetColumns.join()

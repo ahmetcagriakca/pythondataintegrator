@@ -4,7 +4,8 @@ from pdip.integrator.connection.domain.enums import ConnectionTypes
 
 from pdi.application.operation.GetDataOperation.GetDataOperationDto import GetDataOperationDto, DataOperationContactDto, \
     DataOperationIntegrationDto, DataIntegrationDto, DataIntegrationColumnDto, ConnectionDto, ConnectionDatabaseDto, \
-    ConnectorTypeDto, ConnectionTypeDto, DataIntegrationConnectionDatabaseDto, DataIntegrationConnectionDto
+    ConnectorTypeDto, ConnectionTypeDto, DataIntegrationConnectionDatabaseDto, DataIntegrationConnectionDto, \
+    ConnectionBigDataDto, DataIntegrationConnectionBigDataDto
 from pdi.domain.operation.DataOperation import DataOperation
 
 
@@ -48,11 +49,18 @@ class GetDataOperationMapping:
                             Id=data_integration_connection.Connection.ConnectionType.Id,
                             Name=data_integration_connection.Connection.ConnectionType.Name
                         )
-                        connector_type = ConnectorTypeDto(
-                            Id=data_integration_connection.Connection.Database.ConnectorType.Id,
-                            Name=data_integration_connection.Connection.Database.ConnectorType.Name,
-                            ConnectionTypeId=data_integration_connection.Connection.Database.ConnectorType.ConnectionTypeId
-                        )
+                        if connection_type.Id == ConnectionTypes.Sql.value:
+                            connector_type = ConnectorTypeDto(
+                                Id=data_integration_connection.Connection.Database.ConnectorType.Id,
+                                Name=data_integration_connection.Connection.Database.ConnectorType.Name,
+                                ConnectionTypeId=data_integration_connection.Connection.Database.ConnectorType.ConnectionTypeId
+                            )
+                        elif connection_type.Id == ConnectionTypes.BigData.value:
+                            connector_type = ConnectorTypeDto(
+                                Id=data_integration_connection.Connection.BigData.ConnectorType.Id,
+                                Name=data_integration_connection.Connection.BigData.ConnectorType.Name,
+                                ConnectionTypeId=data_integration_connection.Connection.BigData.ConnectorType.ConnectionTypeId
+                            )
                         connection = ConnectionDto(
                             Id=data_integration_connection.Connection.Id,
                             Name=data_integration_connection.Connection.Name,
@@ -61,6 +69,7 @@ class GetDataOperationMapping:
                             IsDeleted=data_integration_connection.Connection.IsDeleted
                         )
                         database = None
+                        big_data = None
                         if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Sql.value:
                             connection.Database = ConnectionDatabaseDto(
                                 Id=data_integration_connection.Connection.Database.Id,
@@ -74,17 +83,32 @@ class GetDataOperationMapping:
                                 Schema=data_integration_connection.Database.Schema,
                                 TableName=data_integration_connection.Database.TableName,
                                 Query=data_integration_connection.Database.Query)
+                        elif data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.BigData.value:
+                            connection.BigData = ConnectionBigDataDto(
+                                Id=data_integration_connection.Connection.BigData.Id,
+                                DatabaseName=data_integration_connection.Connection.BigData.DatabaseName,
+                                ConnectorType=connector_type
+                            )
+                            big_data = DataIntegrationConnectionBigDataDto(
+                                Id=data_integration_connection.BigData.Id,
+                                Schema=data_integration_connection.BigData.Schema,
+                                TableName=data_integration_connection.BigData.TableName,
+                                Query=data_integration_connection.BigData.Query)
 
                         if data_integration_connection.SourceOrTarget == 0:
                             data_operation_integration.Integration.SourceConnection = DataIntegrationConnectionDto(
                                 Id=data_integration_connection.Id,
                                 Connection=connection,
-                                Database=database)
+                                Database=database,
+                                BigData=big_data
+                            )
                         elif data_integration_connection.SourceOrTarget == 1:
                             data_operation_integration.Integration.TargetConnection = DataIntegrationConnectionDto(
                                 Id=data_integration_connection.Id,
                                 Connection=connection,
-                                Database=database)
+                                Database=database,
+                                BigData=big_data
+                            )
 
                 data_operation_integrations.append(data_operation_integration)
         data_operation_integrations.sort(key=lambda x: getattr(x, 'Order'))

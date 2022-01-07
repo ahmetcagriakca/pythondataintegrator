@@ -16,6 +16,11 @@ class ConnectorTypeDto:
     Name: str = None
     ConnectionTypeId: int = None
 
+@dtoclass
+class ConnectionBigDataDto:
+    Id: int = None
+    DatabaseName: str = None
+    ConnectorType: ConnectorTypeDto = None
 
 @dtoclass
 class ConnectionDatabaseDto:
@@ -31,9 +36,18 @@ class ConnectionDto:
     Id: int = None
     Name: str = None
     Database: ConnectionDatabaseDto = None
+    BigData: ConnectionBigDataDto = None
     ConnectionType: ConnectionTypeDto = None
     ConnectionTypeId: int = None
     IsDeleted: int = None
+
+
+@dtoclass
+class DataIntegrationConnectionBigDataDto:
+    Id: int = None
+    Schema: str = None
+    TableName: str = None
+    Query: str = None
 
 
 @dtoclass
@@ -49,6 +63,7 @@ class DataIntegrationConnectionDto:
     Id: int = None
     Connection: ConnectionDto = None
     Database: DataIntegrationConnectionDatabaseDto = None
+    BigData: DataIntegrationConnectionBigDataDto = None
 
 
 @dtoclass

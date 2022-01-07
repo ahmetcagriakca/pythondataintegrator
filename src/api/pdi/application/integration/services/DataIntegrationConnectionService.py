@@ -1,13 +1,15 @@
 from typing import List
 
 from injector import inject
-from pdip.integrator.connection.domain.enums import ConnectionTypes
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
+from pdip.integrator.connection.domain.enums import ConnectionTypes
 
 from pdi.application.connection.services.ConnectionService import ConnectionService
 from pdi.application.integration.services.DataIntegrationColumnService import DataIntegrationColumnService
+from pdi.application.integration.services.DataIntegrationConnectionBigDataService import \
+    DataIntegrationConnectionBigDataService
 from pdi.application.integration.services.DataIntegrationConnectionDatabaseService import \
     DataIntegrationConnectionDatabaseService
 from pdi.application.integration.services.DataIntegrationConnectionFileService import \
@@ -24,11 +26,13 @@ class DataIntegrationConnectionService(IScoped):
     def __init__(self,
                  data_integration_column_service: DataIntegrationColumnService,
                  data_integration_connection_database_service: DataIntegrationConnectionDatabaseService,
+                 data_integration_connection_big_data_service: DataIntegrationConnectionBigDataService,
                  data_integration_connection_file_service: DataIntegrationConnectionFileService,
                  data_integration_connection_queue_service: DataIntegrationConnectionQueueService,
                  connection_service: ConnectionService,
                  repository_provider: RepositoryProvider,
                  ):
+        self.data_integration_connection_big_data_service = data_integration_connection_big_data_service
         self.repository_provider = repository_provider
         self.data_integration_connection_repository = repository_provider.get(DataIntegrationConnection)
         self.data_integration_connection_queue_service = data_integration_connection_queue_service
@@ -83,6 +87,18 @@ class DataIntegrationConnectionService(IScoped):
                         table_name=data.SourceConnections.Database.TableName)
                 self.data_integration_connection_database_service.insert(data_integration_connection=source_connection,
                                                                          data=data.SourceConnections.Database)
+            elif source.ConnectionType.Id == ConnectionTypes.BigData.value:
+                if source_connection is not None \
+                        and (
+                        data.SourceConnections.BigData.Query is None or data.SourceConnections.BigData.Query == '') \
+                        and data.SourceConnections.BigData.Schema is not None and data.SourceConnections.BigData.Schema != '' and data.SourceConnections.BigData.TableName is not None and data.SourceConnections.BigData.TableName != '':
+                    data.SourceConnections.BigData.Query = self.data_integration_column_service.get_source_query(
+                        connection=source,
+                        data_integration=data_integration,
+                        schema=data.SourceConnections.BigData.Schema,
+                        table_name=data.SourceConnections.BigData.TableName)
+                self.data_integration_connection_big_data_service.insert(data_integration_connection=source_connection,
+                                                                         data=data.SourceConnections.BigData)
             elif source.ConnectionType.Id == ConnectionTypes.File.value:
                 self.data_integration_connection_file_service.insert(data_integration_connection=source_connection,
                                                                      data=data.SourceConnections.File)
@@ -112,6 +128,15 @@ class DataIntegrationConnectionService(IScoped):
                     table_name=data.TargetConnections.Database.TableName)
             self.data_integration_connection_database_service.insert(data_integration_connection=target_connection,
                                                                      data=data.TargetConnections.Database)
+        elif target.ConnectionType.Id == ConnectionTypes.BigData.value:
+            if data.TargetConnections.BigData.Query is None or data.TargetConnections.BigData.Query == '':
+                data.TargetConnections.BigData.Query = self.data_integration_column_service.get_target_query(
+                    connection=target,
+                    data_integration=data_integration,
+                    schema=data.TargetConnections.BigData.Schema,
+                    table_name=data.TargetConnections.BigData.TableName)
+            self.data_integration_connection_big_data_service.insert(data_integration_connection=target_connection,
+                                                                     data=data.TargetConnections.BigData)
         elif target.ConnectionType.Id == ConnectionTypes.File.value:
             self.data_integration_connection_file_service.insert(data_integration_connection=target_connection,
                                                                  data=data.TargetConnections.File)
@@ -154,6 +179,23 @@ class DataIntegrationConnectionService(IScoped):
                     self.data_integration_connection_database_service.insert(
                         data_integration_connection=source_connection,
                         data=data.SourceConnections.Database)
+            elif source.ConnectionType.Id == ConnectionTypes.BigData.value:
+                if (
+                        data.SourceConnections.BigData.Query is None or data.SourceConnections.BigData.Query == '') \
+                        and data.SourceConnections.BigData.Schema is not None and data.SourceConnections.BigData.Schema != '' and data.SourceConnections.BigData.TableName is not None and data.SourceConnections.BigData.TableName != '':
+                    data.SourceConnections.BigData.Query = self.data_integration_column_service.get_source_query(
+                        connection=source,
+                        data_integration=data_integration,
+                        schema=data.SourceConnections.BigData.Schema,
+                        table_name=data.SourceConnections.BigData.TableName)
+                if source_connection.BigData is not None:
+                    self.data_integration_connection_big_data_service.update(
+                        data_integration_connection=source_connection,
+                        data=data.SourceConnections.BigData)
+                else:
+                    self.data_integration_connection_big_data_service.insert(
+                        data_integration_connection=source_connection,
+                        data=data.SourceConnections.BigData)
             elif source.ConnectionType.Id == ConnectionTypes.File.value:
                 if source_connection.File is not None:
                     self.data_integration_connection_file_service.update(
@@ -199,7 +241,19 @@ class DataIntegrationConnectionService(IScoped):
             else:
                 self.data_integration_connection_database_service.insert(data_integration_connection=target_connection,
                                                                          data=data.TargetConnections.Database)
-
+        elif target.ConnectionType.Id == ConnectionTypes.BigData.value:
+            if data.TargetConnections.BigData.Query is None or data.TargetConnections.BigData.Query == '':
+                data.TargetConnections.BigData.Query = self.data_integration_column_service.get_target_query(
+                    connection=target,
+                    data_integration=data_integration,
+                    schema=data.TargetConnections.BigData.Schema,
+                    table_name=data.TargetConnections.BigData.TableName)
+            if target_connection.BigData is not None:
+                self.data_integration_connection_big_data_service.update(data_integration_connection=target_connection,
+                                                                         data=data.TargetConnections.BigData)
+            else:
+                self.data_integration_connection_big_data_service.insert(data_integration_connection=target_connection,
+                                                                         data=data.TargetConnections.BigData)
         elif target.ConnectionType.Id == ConnectionTypes.File.value:
             if target_connection.File is not None:
                 self.data_integration_connection_file_service.update(
@@ -229,6 +283,8 @@ class DataIntegrationConnectionService(IScoped):
         if data_integration_connection is not None:
             if data_integration_connection.Database is not None:
                 self.data_integration_connection_database_service.delete(id=data_integration_connection.Database.Id)
+            if data_integration_connection.BigData is not None:
+                self.data_integration_connection_big_data_service.delete(id=data_integration_connection.BigData.Id)
             if data_integration_connection.File is not None:
                 self.data_integration_connection_file_service.delete(id=data_integration_connection.File.Id)
             if data_integration_connection.Queue is not None:

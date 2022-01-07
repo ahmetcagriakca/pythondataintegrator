@@ -4,7 +4,7 @@ from injector import inject
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
-from pdip.integrator.connection.domain.enums import ConnectorTypes
+from pdip.integrator.connection.domain.enums import ConnectorTypes, ConnectionTypes
 
 from pdi.domain.connection.Connection import Connection
 from pdi.domain.integration.DataIntegration import DataIntegration
@@ -43,15 +43,20 @@ class DataIntegrationColumnService(IScoped):
                         data_integration_column.TargetColumnName) for data_integration_column in
                        data_integration_columns]
         selected_rows = ""
-        if connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
-            for column_row in column_rows:
-                selected_rows += f'{"" if column_row == column_rows[0] else ", "}`{column_row[1].strip()}`'
-            query = f'SELECT {selected_rows} FROM `{schema}`.`{table_name}`'
+        if connection.ConnectionType.Id == ConnectionTypes.Sql.value:
+            if connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
+                for column_row in column_rows:
+                    selected_rows += f'{"" if column_row == column_rows[0] else ", "}`{column_row[1].strip()}`'
+                query = f'SELECT {selected_rows} FROM `{schema}`.`{table_name}`'
 
-        else:
+            else:
+                for column_row in column_rows:
+                    selected_rows += f'{"" if column_row == column_rows[0] else ", "}"{column_row[1].strip()}"'
+                query = f'SELECT {selected_rows} FROM "{schema}"."{table_name}"'
+        elif connection.ConnectionType.Id == ConnectionTypes.BigData.value:
             for column_row in column_rows:
-                selected_rows += f'{"" if column_row == column_rows[0] else ", "}"{column_row[1].strip()}"'
-            query = f'SELECT {selected_rows} FROM "{schema}"."{table_name}"'
+                selected_rows += f'{"" if column_row == column_rows[0] else ", "}{column_row[1].strip()}'
+            query = f'SELECT {selected_rows} FROM {schema}.{table_name}'
         return query
 
     def get_target_query(self, connection: Connection, data_integration: DataIntegration, schema: str, table_name: str):
@@ -60,16 +65,22 @@ class DataIntegrationColumnService(IScoped):
                                                                                      DataIntegration=data_integration)
         insert_row_columns = ""
         insert_row_values = ""
-        if connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
+        if connection.ConnectionType.Id == ConnectionTypes.Sql.value:
+            if connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
+                for column in data_integration_columns:
+                    insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}`{column.TargetColumnName}`'
+                    insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
+                query = f'INSERT INTO `{schema}`.`{table_name}`({insert_row_columns}) VALUES ({insert_row_values})'
+            else:
+                for column in data_integration_columns:
+                    insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
+                    insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
+                query = f'INSERT INTO "{schema}"."{table_name}"({insert_row_columns}) VALUES ({insert_row_values})'
+        elif connection.ConnectionType.Id == ConnectionTypes.BigData.value:
             for column in data_integration_columns:
-                insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}`{column.TargetColumnName}`'
+                insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}{column.TargetColumnName}'
                 insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
-            query = f'INSERT INTO `{schema}`.`{table_name}`({insert_row_columns}) VALUES ({insert_row_values})'
-        else:
-            for column in data_integration_columns:
-                insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
-                insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
-            query = f'INSERT INTO "{schema}"."{table_name}"({insert_row_columns}) VALUES ({insert_row_values})'
+            query = f'INSERT INTO {schema}.{table_name}({insert_row_columns}) VALUES ({insert_row_values})'
         return query
 
     def insert(self,

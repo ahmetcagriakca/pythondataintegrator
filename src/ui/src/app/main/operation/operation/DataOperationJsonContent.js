@@ -151,6 +151,12 @@ function DataOperationJsonContent(props) {
 							schema: dataOperationIntegration.Integration.SourceConnections.Database.Schema,
 							tableName: dataOperationIntegration.Integration.SourceConnections.Database.TableName,
 							query: dataOperationIntegration.Integration.SourceConnections.Database.Query
+						},
+						bigData: {
+							id: uuid(),
+							schema: dataOperationIntegration.Integration.SourceConnections.BigData.Schema,
+							tableName: dataOperationIntegration.Integration.SourceConnections.BigData.TableName,
+							query: dataOperationIntegration.Integration.SourceConnections.BigData.Query
 						}
 					}
 				}
@@ -185,6 +191,12 @@ function DataOperationJsonContent(props) {
 							schema: dataOperationIntegration.Integration.TargetConnections.Database.Schema,
 							tableName: dataOperationIntegration.Integration.TargetConnections.Database.TableName,
 							query: dataOperationIntegration.Integration.TargetConnections.Database.Query
+						},
+						bigData: {
+							id: uuid(),
+							schema: dataOperationIntegration.Integration.TargetConnections.BigData.Schema,
+							tableName: dataOperationIntegration.Integration.TargetConnections.BigData.TableName,
+							query: dataOperationIntegration.Integration.TargetConnections.BigData.Query
 						}
 					}
 				}
