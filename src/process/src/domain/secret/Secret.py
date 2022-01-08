@@ -18,6 +18,3 @@ class Secret(SecretBase, Entity, Base):
     SecretType = relationship("SecretType", back_populates="Secrets")
     SecretSources: List[SecretSource] = relationship("SecretSource", back_populates="Secret")
     ConnectionSecrets: List[ConnectionSecret] = relationship("ConnectionSecret", back_populates="Secret")
-
-    def __init__(*args, **kwargs):
-        super().__init__(*args, **kwargs)

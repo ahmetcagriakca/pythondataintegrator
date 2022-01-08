@@ -2,7 +2,6 @@ from typing import List
 
 from pdip.data.domain import EntityBase
 
-from src.domain.base.integration import DataIntegrationBase
 from src.domain.base.operation.DataOperationJobExecutionIntegrationBase import \
     DataOperationJobExecutionIntegrationBase
 
@@ -16,7 +15,7 @@ class DataOperationIntegrationBase(EntityBase):
                  Limit: int = None,
                  ProcessCount: int = None,
                  DataOperation=None,
-                 DataIntegration: DataIntegrationBase = None,
+                 DataIntegration=None,
                  DataOperationJobExecutionIntegrations: List[DataOperationJobExecutionIntegrationBase] = [],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)

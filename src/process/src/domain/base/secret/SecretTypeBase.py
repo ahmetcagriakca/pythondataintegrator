@@ -8,11 +8,11 @@ from src.domain.base.secret.SecretBase import SecretBase
 
 class SecretTypeBase(EntityBase):
     def __init__(self,
-                 Name: int = None,
-                 Secrets: List[SecretBase] = None,
-                 AuthenticationTypes: List[AuthenticationTypeBase] = None,
+                 Name: str = None,
+                 Secrets: List[SecretBase] = [],
+                 AuthenticationTypes: List[AuthenticationTypeBase] = [],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Name: int = Name
-        self.Secrets: List[SecretBase] = Secrets
-        self.AuthenticationTypes: List[AuthenticationTypeBase] = AuthenticationTypes
+        self.Secrets = Secrets
+        self.AuthenticationTypes = AuthenticationTypes

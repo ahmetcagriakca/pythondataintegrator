@@ -1,5 +1,6 @@
 from pdip.data.domain import EntityBase
 
+from src.domain.base.integration.DataIntegrationConnectionBigDataBase import DataIntegrationConnectionBigDataBase
 from src.domain.base.integration.DataIntegrationConnectionDatabaseBase import DataIntegrationConnectionDatabaseBase
 from src.domain.base.integration.DataIntegrationConnectionFileBase import DataIntegrationConnectionFileBase
 from src.domain.base.integration.DataIntegrationConnectionQueueBase import DataIntegrationConnectionQueueBase
@@ -14,6 +15,7 @@ class DataIntegrationConnectionBase(EntityBase):
                  DataIntegration=None,
                  Connection=None,
                  Database: DataIntegrationConnectionDatabaseBase = None,
+                 BigData: DataIntegrationConnectionBigDataBase = None,
                  File: DataIntegrationConnectionFileBase = None,
                  Queue: DataIntegrationConnectionQueueBase = None,
                  *args, **kwargs):
@@ -24,5 +26,6 @@ class DataIntegrationConnectionBase(EntityBase):
         self.DataIntegration = DataIntegration
         self.Connection = Connection
         self.Database = Database
+        self.BigData = BigData
         self.File = File
         self.Queue = Queue

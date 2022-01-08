@@ -16,6 +16,3 @@ class SecretType(SecretTypeBase, Entity, Base):
     Name = Column(String(100), index=False, unique=True, nullable=False)
     Secrets: List[Secret] = relationship("Secret", back_populates="SecretType")
     AuthenticationTypes: List[AuthenticationType] = relationship("AuthenticationType", back_populates="SecretType")
-
-    def __init__(*args, **kwargs):
-        super().__init__(*args, **kwargs)

@@ -4,6 +4,7 @@ from pdip.data.domain import EntityBase
 
 from src.domain.base.integration.DataIntegrationColumnBase import DataIntegrationColumnBase
 from src.domain.base.integration.DataIntegrationConnectionBase import DataIntegrationConnectionBase
+from src.domain.base.operation.DataOperationIntegrationBase import DataOperationIntegrationBase
 
 
 class DataIntegrationBase(EntityBase):
@@ -15,7 +16,7 @@ class DataIntegrationBase(EntityBase):
                  Definition=None,
                  Columns: List[DataIntegrationColumnBase] = [],
                  Connections: List[DataIntegrationConnectionBase] = [],
-                 DataOperationIntegrations = [],
+                 DataOperationIntegrations: List[DataOperationIntegrationBase] = [],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.DataOperationIntegrations = DataOperationIntegrations

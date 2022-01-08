@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 
 from src.domain.base import Base
 from src.domain.base.integration.DataIntegrationConnectionBase import DataIntegrationConnectionBase
+from src.domain.integration.DataIntegrationConnectionBigData import DataIntegrationConnectionBigData
 from src.domain.integration.DataIntegrationConnectionDatabase import DataIntegrationConnectionDatabase
 from src.domain.integration.DataIntegrationConnectionFile import DataIntegrationConnectionFile
 from src.domain.integration.DataIntegrationConnectionQueue import DataIntegrationConnectionQueue
@@ -18,6 +19,8 @@ class DataIntegrationConnection(DataIntegrationConnectionBase, Entity, Base):
     Connection = relationship("Connection", back_populates="DataIntegrationConnections")
     DataIntegration = relationship("DataIntegration", back_populates="Connections")
     Database: DataIntegrationConnectionDatabase = relationship("DataIntegrationConnectionDatabase", uselist=False,
+                                                               back_populates="DataIntegrationConnection")
+    BigData: DataIntegrationConnectionBigData = relationship("DataIntegrationConnectionBigData", uselist=False,
                                                                back_populates="DataIntegrationConnection")
     File: DataIntegrationConnectionFile = relationship("DataIntegrationConnectionFile", uselist=False,
                                                        back_populates="DataIntegrationConnection")

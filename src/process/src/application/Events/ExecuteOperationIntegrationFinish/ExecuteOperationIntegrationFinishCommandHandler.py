@@ -1,5 +1,6 @@
 from injector import inject
 from pdip.cqrs import ICommandHandler, Dispatcher
+from pdip.integrator.domain.enums import StatusTypes
 from pdip.integrator.domain.enums.events import EVENT_EXECUTION_INTEGRATION_FINISHED
 from pdip.logging.loggers.sql import SqlLogger
 
@@ -7,7 +8,6 @@ from src.application.Events.ExecuteOperationIntegrationFinish.ExecuteOperationIn
     ExecuteOperationIntegrationFinishCommand
 from src.application.operation.services.DataOperationJobExecutionIntegrationService import \
     DataOperationJobExecutionIntegrationService
-from src.domain.enums.StatusTypes import StatusTypes
 
 
 class ExecuteOperationIntegrationFinishCommandHandler(ICommandHandler[ExecuteOperationIntegrationFinishCommand]):

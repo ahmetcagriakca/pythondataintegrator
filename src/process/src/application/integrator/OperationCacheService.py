@@ -6,26 +6,30 @@ from pdip.data.decorators import transactionhandler
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
+from pdip.integrator.connection.domain.authentication.basic import BasicAuthentication
+from pdip.integrator.connection.domain.authentication.kerberos import KerberosAuthentication
+from pdip.integrator.connection.domain.authentication.type import AuthenticationTypes
 from pdip.integrator.connection.domain.enums import ConnectionTypes
 from pdip.json import BaseConverter
 
 from src.domain.base.connection import ConnectionBase, ConnectionTypeBase, ConnectionDatabaseBase, \
     ConnectionFileBase, \
     ConnectionQueueBase, ConnectionServerBase, ConnectionSecretBase
+from src.domain.base.connection.ConnectionBigDataBase import ConnectionBigDataBase
 from src.domain.base.integration import DataIntegrationBase, DataIntegrationColumnBase, \
     DataIntegrationConnectionBase, \
     DataIntegrationConnectionDatabaseBase, DataIntegrationConnectionFileBase, DataIntegrationConnectionQueueBase, \
     DataIntegrationConnectionFileCsvBase
 from src.domain.base.operation import DataOperationBase, DataOperationIntegrationBase
 from src.domain.base.secret import SecretBase, SecretSourceBase, SecretSourceBasicAuthenticationBase
+from src.domain.base.secret.SecretSourceKerberosAuthenticationBase import SecretSourceKerberosAuthenticationBase
 from src.domain.connection import Connection, ConnectionType, ConnectionDatabase, ConnectionFile, ConnectionQueue, \
-    ConnectionServer, ConnectionSecret
-from src.domain.dto.ConnectionBasicAuthentication import ConnectionBasicAuthentication
+    ConnectionServer, ConnectionSecret, ConnectionBigData
 from src.domain.integration import DataIntegration, DataIntegrationColumn, DataIntegrationConnection, \
     DataIntegrationConnectionDatabase, DataIntegrationConnectionFile, DataIntegrationConnectionQueue, \
-    DataIntegrationConnectionFileCsv
+    DataIntegrationConnectionFileCsv, DataIntegrationConnectionBigData
 from src.domain.operation import DataOperation, DataOperationIntegration
-from src.domain.secret import Secret, SecretSource, SecretSourceBasicAuthentication
+from src.domain.secret import Secret, SecretSource, SecretSourceBasicAuthentication, SecretSourceKerberosAuthentication
 
 
 class OperationCacheService(IScoped):
@@ -110,14 +114,36 @@ class OperationCacheService(IScoped):
         columns = self.get_columns_by_integration_id(data_integration_id)
         return columns[0]
 
-    def get_connection_basic_authentication_by_connection_id(self, connection_id: int) -> ConnectionBasicAuthentication:
+    def get_connection_authentication_type(self, connection_id: int) -> AuthenticationTypes:
+        connection = self.get_connection_by_id(connection_id=connection_id)
+        authentication_type_id: SecretSourceBasicAuthentication = \
+            connection.ConnectionSecrets[0].Secret.SecretSources[0].AuthenticationTypeId
+
+        return AuthenticationTypes(authentication_type_id)
+
+    def get_connection_basic_authentication_by_connection_id(self, connection_id: int) -> BasicAuthentication:
         connection = self.get_connection_by_id(connection_id=connection_id)
         secret_source_basic_authentication: SecretSourceBasicAuthentication = \
             connection.ConnectionSecrets[0].Secret.SecretSources[0].SecretSourceBasicAuthentications[0]
 
-        connection_basic_authentication = ConnectionBasicAuthentication(
+        connection_basic_authentication = BasicAuthentication(
             User=self.crypto_service.decrypt(secret_source_basic_authentication.User),
             Password=self.crypto_service.decrypt(secret_source_basic_authentication.Password)
+        )
+        return connection_basic_authentication
+
+    def get_connection_kerberos_authentication_by_connection_id(self,
+                                                                connection_id: int) -> KerberosAuthentication:
+        connection = self.get_connection_by_id(connection_id=connection_id)
+        secret_source_kerberos_authentication: SecretSourceKerberosAuthentication = \
+            connection.ConnectionSecrets[0].Secret.SecretSources[0].SecretSourceKerberosAuthentications[0]
+
+        connection_basic_authentication = KerberosAuthentication(
+            Principal=self.crypto_service.decrypt(secret_source_kerberos_authentication.Principal),
+            Password=self.crypto_service.decrypt(secret_source_kerberos_authentication.Password),
+            KrbRealm=secret_source_kerberos_authentication.KrbRealm,
+            KrbFqdn=secret_source_kerberos_authentication.KrbFqdn,
+            KrbServiceName=secret_source_kerberos_authentication.KrbServiceName,
         )
         return connection_basic_authentication
 
@@ -194,6 +220,15 @@ class OperationCacheService(IScoped):
                 DataIntegrationConnectionDatabase.IsDeleted == 0,
                 DataIntegrationConnectionDatabase.DataIntegrationConnectionId == data_integration_connection_id)).fetchone()
         result = self.load_entity(cls=DataIntegrationConnectionDatabaseBase, entity=entity)
+        return result
+
+    def get_data_integration_connection_big_data(self,
+                                                 data_integration_connection_id) -> DataIntegrationConnectionBigData:
+        entity = self.repository_provider.create().session.execute(
+            DataIntegrationConnectionBigData.__table__.select().filter(
+                DataIntegrationConnectionBigData.IsDeleted == 0,
+                DataIntegrationConnectionBigData.DataIntegrationConnectionId == data_integration_connection_id)).fetchone()
+        result = self.load_entity(cls=DataIntegrationConnectionBigData, entity=entity)
         return result
 
     def get_data_integration_connection_file(self, data_integration_connection_id) -> DataIntegrationConnectionFileBase:
@@ -273,6 +308,14 @@ class OperationCacheService(IScoped):
         result = self.load_entity(cls=ConnectionDatabaseBase, entity=entity)
         return result
 
+    def get_connection_big_data(self, connection_id) -> ConnectionBigDataBase:
+        entity = self.repository_provider.create().session.execute(
+            ConnectionBigData.__table__.select().filter(
+                ConnectionBigData.IsDeleted == 0,
+                ConnectionBigData.ConnectionId == connection_id)).fetchone()
+        result = self.load_entity(cls=ConnectionBigDataBase, entity=entity)
+        return result
+
     def get_connection_file(self, connection_id) -> ConnectionFileBase:
         entity = self.repository_provider.create().session.execute(
             ConnectionFile.__table__.select().filter(
@@ -313,6 +356,15 @@ class OperationCacheService(IScoped):
         result_list = self.load_entities(cls=SecretSourceBasicAuthenticationBase, entities=entities)
         return result_list
 
+    def get_secret_source_kerberos_authentications(self, secret_source_id) -> List[
+        SecretSourceKerberosAuthenticationBase]:
+        entities = self.repository_provider.create().session.execute(
+            SecretSourceKerberosAuthentication.__table__.select().filter(
+                SecretSourceKerberosAuthentication.IsDeleted == 0,
+                SecretSourceKerberosAuthentication.SecretSourceId == secret_source_id))
+        result_list = self.load_entities(cls=SecretSourceKerberosAuthenticationBase, entities=entities)
+        return result_list
+
     def initialize_connection(self, connection_id):
         connection = self.get_connection_by_id(connection_id=connection_id)
         if connection is not None:
@@ -323,18 +375,27 @@ class OperationCacheService(IScoped):
         connection.ConnectionType = self.get_connection_type(connection_type_id=connection.ConnectionTypeId)
         if connection.ConnectionTypeId == ConnectionTypes.Sql.value:
             connection.Database = self.get_connection_database(connection_id=connection_id)
-        if connection.ConnectionTypeId == ConnectionTypes.File.value:
+        elif connection.ConnectionTypeId == ConnectionTypes.BigData.value:
+            connection.BigData = self.get_connection_big_data(connection_id=connection_id)
+        elif connection.ConnectionTypeId == ConnectionTypes.File.value:
             connection.File = self.get_connection_file(connection_id=connection_id)
-        if connection.ConnectionTypeId == ConnectionTypes.Queue.value:
+        elif connection.ConnectionTypeId == ConnectionTypes.Queue.value:
             connection.Queue = self.get_connection_queue(connection_id=connection_id)
-
+        else:
+            raise Exception(f"{connection.ConnectionTypeId} connection type not founded")
         connection.ConnectionSecrets = self.get_connection_secrets(connection_id=connection_id)
         for connection_secret in connection.ConnectionSecrets:
             connection_secret.Secret = self.get_secret(secret_id=connection_secret.SecretId)
             connection_secret.Secret.SecretSources = self.get_secret_sources(secret_id=connection_secret.SecretId)
             for secret_source in connection_secret.Secret.SecretSources:
-                secret_source.SecretSourceBasicAuthentications = self.get_secret_source_basic_authentications(
-                    secret_source_id=secret_source.Id)
+                if secret_source.AuthenticationTypeId == AuthenticationTypes.BasicAuthentication.value:
+                    secret_source.SecretSourceBasicAuthentications = self.get_secret_source_basic_authentications(
+                        secret_source_id=secret_source.Id)
+                elif secret_source.AuthenticationTypeId == AuthenticationTypes.Kerberos.value:
+                    secret_source.SecretSourceKerberosAuthentications = self.get_secret_source_kerberos_authentications(
+                        secret_source_id=secret_source.Id)
+                else:
+                    raise Exception(f"{secret_source.AuthenticationTypeId} authentication type not founded")
 
         self.connections.append(connection)
         return connection
@@ -353,14 +414,21 @@ class OperationCacheService(IScoped):
             if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Sql.value:
                 data_integration_connection.Database = self.get_data_integration_connection_database(
                     data_integration_connection_id=data_integration_connection.Id)
-            if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.File.value:
+            elif data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.BigData.value:
+                data_integration_connection.BigData = self.get_data_integration_connection_big_data(
+                    data_integration_connection_id=data_integration_connection.Id)
+            elif data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.File.value:
                 data_integration_connection.File = self.get_data_integration_connection_file(
                     data_integration_connection_id=data_integration_connection.Id)
                 data_integration_connection.File.Csv = self.get_data_integration_connection_file_csv(
                     data_integration_connection_file_id=data_integration_connection.File.Id)
-            if data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Queue.value:
+            elif data_integration_connection.Connection.ConnectionTypeId == ConnectionTypes.Queue.value:
                 data_integration_connection.Queue = self.get_data_integration_connection_queue(
                     data_integration_connection_id=data_integration_connection.Id)
+            else:
+                raise Exception(
+                    f"{data_integration_connection.Connection.ConnectionTypeId} integration connection type not founded")
+
             self.data_integration_connections.append(data_integration_connection)
 
         self.data_integrations.append(data_integration)
