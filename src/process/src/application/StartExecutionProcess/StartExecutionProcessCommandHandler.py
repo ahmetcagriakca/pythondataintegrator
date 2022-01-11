@@ -18,8 +18,8 @@ from pdip.integrator.base import Integrator
 from pdip.logging.loggers.sql import SqlLogger
 
 from src.application.StartExecutionProcess.StartExecutionProcessCommand import StartExecutionProcessCommand
-from src.application.integrator.OperationConverter import OperationConverter
 from src.application.integrator.ProcessIntegratorEventManager import ProcessIntegratorEventManager
+from src.application.integrator.converters.OperationConverter import OperationConverter
 from src.domain.aps import ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
 from src.domain.operation import DataOperation, DataOperationJob
 
@@ -29,11 +29,9 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
     def __init__(self,
                  dispatcher: Dispatcher,
                  logger: SqlLogger,
-                 # repository_provider: RepositoryProvider,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logger
-        # self.repository_provider = repository_provider
         self.dispatcher = dispatcher
 
     def handle(self, command: StartExecutionProcessCommand):
@@ -62,7 +60,10 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
                                               command.DataOperationJobExecutionId,
                                               process_queue))
             operation_process.start()
+            max_check_count = 30
+            check_count = 0
             while True:
+                check_count += 1
                 operation_process.join(timeout=1)
                 if operation_process.is_alive():
                     result = process_queue.get(timeout=60)
@@ -71,7 +72,9 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
                         job_id=command.DataOperationJobExecutionId)
                     process_queue.task_done()
                     break
-
+                else:
+                    if check_count > max_check_count:
+                        break
             end_datetime = datetime.now()
             end = time.time()
             self.logger.info(
@@ -88,27 +91,37 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
             if manager is not None:
                 manager.shutdown()
 
-
     @transactionhandler
     def get_data_operation_name(self, data_operation_id):
         repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
-        data_operation_query = repository_provider.get(
-            DataOperation).filter_by(
-            Id=data_operation_id)
-        data_operation = data_operation_query.first()
+        data_operation = repository_provider.get(DataOperation).first(Id=data_operation_id)
         if data_operation is None:
             raise Exception('Operation Not Found')
+        return data_operation.Name
 
     @staticmethod
-    def start_process(root_directory: str, data_operation_id: int, job_id: int,
-                      data_operation_job_execution_id: int,
-                      process_queue: Queue):
-        pdi = Pdi(root_directory=root_directory, initialize_flask=False)
-        pdi.get(StartExecutionProcessCommandHandler).start(data_operation_id=data_operation_id, job_id=job_id,
-                                                           data_operation_job_execution_id=data_operation_job_execution_id,
-                                                           process_queue=process_queue)
+    def start_process(
+            root_directory: str,
+            data_operation_id: int,
+            job_id: int,
+            data_operation_job_execution_id: int,
+            process_queue: Queue
+    ):
+        pdi = Pdi(
+            root_directory=root_directory,
+            initialize_flask=False
+        )
+        pdi.get(StartExecutionProcessCommandHandler).start(
+            data_operation_id=data_operation_id,
+            job_id=job_id,
+            data_operation_job_execution_id=data_operation_job_execution_id,
+            process_queue=process_queue
+        )
 
-    def check_removed_job(self, ap_scheduler_job_id):
+    def check_removed_job(
+            self,
+            ap_scheduler_job_id
+    ):
         EVENT_JOB_REMOVED = 2 ** 10
         repository_provider = DependencyContainer.Instance.get(RepositoryProvider)
         job_detail_query = repository_provider.query(
@@ -128,8 +141,13 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
         DependencyContainer.Instance.get(RepositoryProvider).commit()
 
     @transactionhandler
-    def start(self, data_operation_id: int, job_id: int, data_operation_job_execution_id: int,
-              process_queue: Queue):
+    def start(
+            self,
+            data_operation_id: int,
+            job_id: int,
+            data_operation_job_execution_id: int,
+            process_queue: Queue
+    ):
         process_queue.put(f'{os.getppid()} initialized {current_process().name}({os.getpid()}) process')
         start = time.time()
         start_datetime = datetime.now()

@@ -1,18 +1,14 @@
 from typing import List
 
 from injector import inject
-from pdip.integrator.connection.domain.authentication.mechanism import MechanismTypes
-from pdip.integrator.connection.domain.authentication.type import AuthenticationTypes
-from pdip.integrator.connection.domain.bigdata import BigDataConnectionConfiguration
-from pdip.integrator.connection.domain.enums import ConnectionTypes, ConnectorTypes
-from pdip.integrator.connection.domain.server.base import Server
-from pdip.integrator.connection.domain.sql import SqlConnectionConfiguration
+from pdip.integrator.connection.domain.enums import ConnectionTypes
 from pdip.integrator.integration.domain.base import IntegrationConnectionSqlBase, IntegrationConnectionColumnBase, \
     IntegrationConnectionBase, IntegrationBase
 from pdip.integrator.integration.domain.base.integration import IntegrationConnectionBigDataBase
 from pdip.integrator.operation.domain import OperationIntegrationBase, OperationBase
 
 from src.application.integrator.OperationCacheService import OperationCacheService
+from src.application.integrator.converters.ConnectionConverter import ConnectionConverter
 from src.domain.base.connection import ConnectionBase
 from src.domain.base.integration import DataIntegrationBase, DataIntegrationConnectionBase
 from src.domain.base.operation import DataOperationBase
@@ -20,7 +16,12 @@ from src.domain.base.operation import DataOperationBase
 
 class OperationConverter:
     @inject
-    def __init__(self, operation_cache_service: OperationCacheService):
+    def __init__(
+            self,
+            connection_converter: ConnectionConverter,
+            operation_cache_service: OperationCacheService
+    ):
+        self.connection_converter = connection_converter
         self.operation_cache_service = operation_cache_service
 
     def convert(self, data_operation_id):
@@ -75,7 +76,7 @@ class OperationConverter:
             ConnectionType=ConnectionTypes(connection.ConnectionType.Id)
         )
         if integration_connection.ConnectionType == ConnectionTypes.Sql:
-            connection_sql = self.convert_connection_sql(connection=connection)
+            connection_sql = self.connection_converter.convert_connection_sql(connection=connection)
             integration_connection.Sql = IntegrationConnectionSqlBase(
                 Connection=connection_sql,
                 Schema=data_integration_connection.Database.Schema,
@@ -84,7 +85,7 @@ class OperationConverter:
             )
             integration_connection.Columns = self.convert_connection_columns(data_integration=data_integration)
         elif integration_connection.ConnectionType == ConnectionTypes.BigData:
-            connection_big_data = self.convert_connection_big_data(connection=connection)
+            connection_big_data = self.connection_converter.convert_connection_big_data(connection=connection)
             integration_connection.BigData = IntegrationConnectionBigDataBase(
                 Connection=connection_big_data,
                 Schema=data_integration_connection.BigData.Schema,
@@ -93,63 +94,6 @@ class OperationConverter:
             )
             integration_connection.Columns = self.convert_connection_columns(data_integration=data_integration)
         return integration_connection
-
-    def convert_connection_sql(self, connection: ConnectionBase) -> SqlConnectionConfiguration:
-        basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
-            connection_id=connection.Id)
-        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
-            connection_id=connection.Id)
-        connection_sql = SqlConnectionConfiguration(
-            Name=connection.Name,
-            ConnectionType=ConnectionTypes.Sql,
-            ConnectorType=ConnectorTypes(connection.Database.ConnectorTypeId),
-            Server=Server(
-                Host=connection_server.Host,
-                Port=connection_server.Port
-            ),
-            BasicAuthentication=basic_authentication,
-            Database=connection.Database.DatabaseName,
-            ServiceName=connection.Database.ServiceName,
-            Sid=connection.Database.Sid,
-        )
-        return connection_sql
-
-    def convert_connection_big_data(self, connection: ConnectionBase) -> SqlConnectionConfiguration:
-        basic_authentication = None
-        kerberos_authentication = None
-        authentication_mechanism_type = MechanismTypes.NoAuthentication
-        authentication_type = self.operation_cache_service.get_connection_authentication_type(
-            connection_id=connection.Id)
-        if authentication_type == AuthenticationTypes.BasicAuthentication:
-            basic_authentication = self.operation_cache_service.get_connection_basic_authentication_by_connection_id(
-                connection_id=connection.Id)
-            if basic_authentication.Password is None:
-                authentication_mechanism_type = MechanismTypes.UserName
-            elif basic_authentication.Password is not None:
-                authentication_mechanism_type = MechanismTypes.UserNamePassword
-
-        elif authentication_type == AuthenticationTypes.Kerberos:
-            kerberos_authentication = self.operation_cache_service.get_connection_kerberos_authentication_by_connection_id(
-                connection_id=connection.Id)
-            authentication_mechanism_type = MechanismTypes.Kerberos
-        connection_server = self.operation_cache_service.get_connection_server_by_connection_id(
-            connection_id=connection.Id)
-        connection_sql = BigDataConnectionConfiguration(
-            Name=connection.Name,
-            ConnectionType=ConnectionTypes.BigData,
-            ConnectorType=ConnectorTypes(connection.BigData.ConnectorTypeId),
-            Server=Server(
-                Host=connection_server.Host,
-                Port=connection_server.Port
-            ),
-            BasicAuthentication=basic_authentication,
-            KerberosAuthentication=kerberos_authentication,
-            AuthenticationMechanismType=authentication_mechanism_type,
-            Database=connection.BigData.DatabaseName,
-            Ssl=connection.BigData.Ssl,
-            UseOnlySspi=connection.BigData.UseOnlySspi,
-        )
-        return connection_sql
 
     def convert_connection_columns(self, data_integration: DataIntegrationBase) -> List[
         IntegrationConnectionColumnBase]:

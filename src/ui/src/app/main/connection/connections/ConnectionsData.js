@@ -31,12 +31,7 @@ function ConnectionsRow(props) {
 		history.push('/'.concat(path));
 	}
 	const handleClick = (event, row) => {
-		if (row.connectionType.id === 1) {
-			GotoComponent('connection/sql/' + row.id)
-		}
-		else if (row.connectionType.id === 4) {
-			GotoComponent('connection/bigdata/' + row.id)
-		}
+		GotoComponent('connection/' + row.id)
 	};
 	const checkSqlConnectionAction = (event, row) => {
 		dispatch(checkSqlConnection({ ConnectionName: row.name }))

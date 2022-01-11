@@ -3,12 +3,12 @@ from pdip.cqrs import Dispatcher
 from pdip.cqrs import ICommandHandler
 from pdip.exceptions import OperationalException
 
-from src.application.connection.CheckSqlConnection.CheckSqlConnectionCommand import \
-    CheckSqlConnectionCommand
+from src.application.connection.CheckConnection.CheckConnectionCommand import \
+    CheckConnectionCommand
 from src.application.rpc.clients.ProcessRpcClientService import ProcessRpcClientService
 
 
-class CheckSqlConnectionCommandHandler(ICommandHandler[CheckSqlConnectionCommand]):
+class CheckConnectionCommandHandler(ICommandHandler[CheckConnectionCommand]):
     @inject
     def __init__(self,
                  dispatcher: Dispatcher,
@@ -18,15 +18,14 @@ class CheckSqlConnectionCommandHandler(ICommandHandler[CheckSqlConnectionCommand
         self.dispatcher = dispatcher
         self.process_rpc_client_service = process_rpc_client_service
 
-    def handle(self, command: CheckSqlConnectionCommand):
+    def handle(self, command: CheckConnectionCommand):
         try:
-            self.process_rpc_client_service.call_check_sql_connection(
-                connection_name=command.request.ConnectionName)
+            self.process_rpc_client_service.call_check_connection(connection_id=command.request.ConnectionId)
         except ConnectionRefusedError as cre:
-            error_detail = "\n".join(cre.args)
-            message = f'{command.request.ConnectionName} getting error on checking count. Process machine is not accessible. Error:{error_detail}'
+            error_detail = str(cre)
+            message = f'{command.request.ConnectionId} getting error on connecting. Process machine is not accessible. Error:{error_detail}'
             raise OperationalException(message)
         except Exception as ex:
-            error_detail = "\n".join(ex.args)
-            message = f'{command.request.ConnectionName} getting error on connecting. Error:{error_detail}'
+            error_detail = str(ex)
+            message = f'{command.request.ConnectionId} getting error on connecting. Error:{error_detail}'
             raise OperationalException(message)

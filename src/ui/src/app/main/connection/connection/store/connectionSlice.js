@@ -58,11 +58,11 @@ export const deleteConnection = createAsyncThunk('connectionApp/connection/delet
 
 
 
-export const checkDatabaseConnection = createAsyncThunk('connectionApp/connection/checkDatabaseConnection', async (params, extra)  => {
+export const checkConnection = createAsyncThunk('connectionApp/connection/check', async (params, extra)  => {
 	try {
 		extra.dispatch(setLoading(true))
-		const response = await axios.post('/api/Connection/CheckDatabase', {
-			ConnectionName: params.ConnectionName,
+		const response = await axios.post('/api/Connection/Check', {
+			ConnectionId: params.ConnectionId,
 		});
 		const data = await response.data;
 		return data;
@@ -72,11 +72,11 @@ export const checkDatabaseConnection = createAsyncThunk('connectionApp/connectio
 	}
 });
 
-export const checkDatabaseTableRowCount = createAsyncThunk('connectionApp/connection/checkDatabaseTableRowCount', async (params, extra)  => {
+export const checkTableRowCount = createAsyncThunk('connectionApp/connection/checkTableRowCount', async (params, extra)  => {
 	try {
 		extra.dispatch(setLoading(true))
-		const response = await axios.post('/api/Connection/CheckDatabaseTableRowCount', {
-			ConnectionName: params.ConnectionName,
+		const response = await axios.post('/api/Connection/CheckTableRowCount', {
+			ConnectionId: params.ConnectionId,
 			Schema: params.Schema,
 			Table: params.Table,
 		});

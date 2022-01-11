@@ -53,8 +53,8 @@ class GetDataOperationJobExecutionIntegrationListSpecifications(IScoped):
         specified_query = self.repository_provider.query(
             DataOperationJobExecutionIntegration,
             DataOperationIntegration,
-            source_connection_subquery.c.ConnectionName.label("SourceConnectionName"),
-            target_connection_subquery.c.ConnectionName.label("TargetConnectionName"),
+            source_connection_subquery.c.ConnectionId.label("SourceConnectionName"),
+            target_connection_subquery.c.ConnectionId.label("TargetConnectionName"),
             total_affected_row_subquery.c.AffectedRowCount.label("AffectedRowCount")
         ) \
             .join(DataOperationIntegration, isouter=True) \

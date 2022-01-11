@@ -6,12 +6,12 @@ from pdip.dependency.container import DependencyContainer
 from rpyc import Service
 from rpyc.utils.server import ThreadedServer
 
-from src.application.CheckDatabaseConnection.CheckDatabaseConnectionCommand import CheckDatabaseConnectionCommand
-from src.application.CheckDatabaseConnection.CheckDatabaseConnectionRequest import CheckDatabaseConnectionRequest
-from src.application.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountCommand import \
-    CheckDatabaseTableRowCountCommand
-from src.application.CheckDatabaseTableRowCount.CheckDatabaseTableRowCountRequest import \
-    CheckDatabaseTableRowCountRequest
+from src.application.CheckConnection.CheckConnectionCommand import CheckConnectionCommand
+from src.application.CheckConnection.CheckConnectionRequest import CheckConnectionRequest
+from src.application.CheckTableRowCount.CheckTableRowCountCommand import \
+    CheckTableRowCountCommand
+from src.application.CheckTableRowCount.CheckTableRowCountRequest import \
+    CheckTableRowCountRequest
 from src.application.StartExecutionProcess.StartExecutionProcessCommand import StartExecutionProcessCommand
 from src.domain.configs.ProcessRpcServerConfig import ProcessRpcServerConfig
 
@@ -38,17 +38,15 @@ class ProcessService(Service, ISingleton):
         dispatcher: Dispatcher = Pdi().get(Dispatcher)
         dispatcher.dispatch(start_execution_command)
 
-    def exposed_check_database_connection(self, connection_name=None, *args, **kwargs):
+    def exposed_check_connection(self, connection_id=None, *args, **kwargs):
         dispatcher: Dispatcher = Pdi().get(Dispatcher)
 
-        req = CheckDatabaseConnectionRequest(ConnectionName=connection_name)
-        check_database_connection_command = CheckDatabaseConnectionCommand(
-            request=req)
+        req = CheckConnectionRequest(ConnectionId=connection_id)
+        check_database_connection_command = CheckConnectionCommand(request=req)
         dispatcher.dispatch(check_database_connection_command)
 
-    def exposed_check_database_table_row_count(self, connection_name=None, schema=None, table=None, *args, **kwargs):
+    def exposed_check_table_row_count(self, connection_id=None, schema=None, table=None, *args, **kwargs):
         dispatcher: Dispatcher = Pdi().get(Dispatcher)
-        req = CheckDatabaseTableRowCountRequest(ConnectionName=connection_name, Schema=schema, Table=table)
-        check_database_count_command = CheckDatabaseTableRowCountCommand(
-            request=req)
+        req = CheckTableRowCountRequest(ConnectionId=connection_id, Schema=schema, Table=table)
+        check_database_count_command = CheckTableRowCountCommand(request=req)
         dispatcher.dispatch(check_database_count_command)

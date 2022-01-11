@@ -263,7 +263,7 @@ class OperationCacheService(IScoped):
                 Connection.IsDeleted == 0,
                 Connection.Id == connection_id)).fetchone()
         if entity is None:
-            raise OperationalException(f"Connection not found on execution. Connection Id :{connection_id}")
+            raise OperationalException(f"Connection not found. Connection Id :{connection_id}")
         result = self.load_entity(cls=ConnectionBase, entity=entity)
         return result
 
@@ -274,7 +274,7 @@ class OperationCacheService(IScoped):
                 ConnectionType.Id == connection_type_id)).fetchone()
         if entity is None:
             raise OperationalException(
-                f"Connection type not found on execution. Connection Type Id :{connection_type_id}")
+                f"Connection type not found. Connection Type Id :{connection_type_id}")
         result = self.load_entity(cls=ConnectionTypeBase, entity=entity)
         return result
 
@@ -285,7 +285,7 @@ class OperationCacheService(IScoped):
                 ConnectionServer.ConnectionId == connection_id))
 
         if entities is None:
-            raise OperationalException(f"Connection detail not found on execution. Connection Id :{connection_id}")
+            raise OperationalException(f"Connection detail not found. Connection Id :{connection_id}")
         result_list = self.load_entities(cls=ConnectionServerBase, entities=entities)
         return result_list
 
@@ -296,7 +296,7 @@ class OperationCacheService(IScoped):
                 ConnectionSecret.ConnectionId == connection_id))
 
         if entities is None:
-            raise OperationalException(f"Connection detail not found on execution. Connection Id :{connection_id}")
+            raise OperationalException(f"Connection detail not found. Connection Id :{connection_id}")
         result_list = self.load_entities(cls=ConnectionSecretBase, entities=entities)
         return result_list
 
@@ -382,7 +382,7 @@ class OperationCacheService(IScoped):
         elif connection.ConnectionTypeId == ConnectionTypes.Queue.value:
             connection.Queue = self.get_connection_queue(connection_id=connection_id)
         else:
-            raise Exception(f"{connection.ConnectionTypeId} connection type not founded")
+            raise Exception(f"{connection.ConnectionTypeId} connection type not found")
         connection.ConnectionSecrets = self.get_connection_secrets(connection_id=connection_id)
         for connection_secret in connection.ConnectionSecrets:
             connection_secret.Secret = self.get_secret(secret_id=connection_secret.SecretId)
@@ -395,7 +395,7 @@ class OperationCacheService(IScoped):
                     secret_source.SecretSourceKerberosAuthentications = self.get_secret_source_kerberos_authentications(
                         secret_source_id=secret_source.Id)
                 else:
-                    raise Exception(f"{secret_source.AuthenticationTypeId} authentication type not founded")
+                    raise Exception(f"{secret_source.AuthenticationTypeId} authentication type not found")
 
         self.connections.append(connection)
         return connection
@@ -427,7 +427,7 @@ class OperationCacheService(IScoped):
                     data_integration_connection_id=data_integration_connection.Id)
             else:
                 raise Exception(
-                    f"{data_integration_connection.Connection.ConnectionTypeId} integration connection type not founded")
+                    f"{data_integration_connection.Connection.ConnectionTypeId} integration connection type not found")
 
             self.data_integration_connections.append(data_integration_connection)
 

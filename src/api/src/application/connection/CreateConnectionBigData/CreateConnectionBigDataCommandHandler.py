@@ -31,7 +31,7 @@ class CreateConnectionBigDataCommandHandler(ICommandHandler[CreateConnectionBigD
 
     def notify(self, id: int, name: str, check_existing: bool):
         data_list = []
-        data = NotificationAdditionalData(Key="Type", Value="ConnectionBigData")
+        data = NotificationAdditionalData(Key="Type", Value="Connection")
         data_list.append(data)
         data = NotificationAdditionalData(Key="Id", Value=id)
         data_list.append(data)

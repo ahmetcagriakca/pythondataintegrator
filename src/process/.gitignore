@@ -110,7 +110,6 @@ logs/
 openshift/
 Jenkinsfile
 application.dev.yml
-tests/integrationtests/temp
 Dockerfile.prod
 docker-compose.prod.yml
 Dockerfile.test

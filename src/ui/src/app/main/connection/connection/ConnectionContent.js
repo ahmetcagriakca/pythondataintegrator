@@ -3,26 +3,29 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getConnection, postConnection, checkDatabaseConnection, clearConnection, checkDatabaseTableRowCount, deleteConnection } from './store/connectionSlice';
-import { getConnectionTypeName, selectConnectionTypeName } from './store/connectionTypeNameSlice';
-import { getConnectorTypeName, selectConnectorTypeName } from './store/connectorTypeNameSlice';
 import Button from '@material-ui/core/Button';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import { filterFormStyles } from '../../common/styles/FilterFormStyles';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
 import Icon from '@material-ui/core/Icon';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Box from '@material-ui/core/Box';
 import { DateTimePicker } from "@material-ui/pickers";
-
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+
+import { getConnection, clearConnection, deleteConnection,checkConnection,checkTableRowCount } from './store/connectionSlice';
+
+import { postConnectionSql} from './store/connectionSqlSlice'
+import { postConnectionBigData} from './store/connectionBigDataSlice'
+import { getConnectionTypeName, selectConnectionTypeName } from './store/connectionTypeNameSlice';
+import { getConnectorTypeName } from './store/connectorTypeNameSlice';
+import { getAuthenticationTypeName } from './store/authenticationTypeNameSlice';
+
+import ConnectionSqlContent from "./sql/ConnectionSqlContent"
+import ConnectionBigDataContent from "./bigdata/ConnectionBigDataContent"
 
 function ConnectionContent() {
 	const dispatch = useDispatch();
@@ -39,24 +42,16 @@ function ConnectionContent() {
 		id: null,
 		name: '',
 		connectionType: null,
-		connectorType: null,
-		host: '',
-		port: null,
-		sid: '',
-		serviceName: '',
-		databaseName: '',
-		user: '',
-		password: '',
-		showPassword: false,
 		creationDate: new Date(),
 		isDeleted: true,
+		sql: null,
+		bigData: null,
 	});
 	const [disabilityStatus, setDisabilityStatus] = React.useState({});
 	const [readonlyStatus, setReadonlyStatus] = React.useState({});
 
 
 	const selectConnectionTypeNames = useSelector(selectConnectionTypeName);
-	const selectConnectorTypeNames = useSelector(selectConnectorTypeName);
 
 
 	const connection = useSelector(({ connectionApp }) => {
@@ -82,6 +77,7 @@ function ConnectionContent() {
 	useEffect(() => {
 		dispatch(getConnectionTypeName(routeParams));
 		dispatch(getConnectorTypeName(routeParams));
+		dispatch(getAuthenticationTypeName(routeParams));
 		if (routeParams.id && routeParams.id != null) {
 			dispatch(getConnection(routeParams));
 		}
@@ -91,21 +87,12 @@ function ConnectionContent() {
 	}, [dispatch, routeParams]);
 
 	useEffect(() => {
-		if (connection && connection != null) {
+		if (connection && connection != null ) {
 			setValues(connection);
 			setDisabilityStatus({
 				id: true,
 				name: ((connection.id && connection.id !== null) || connection.isDeleted === 1) ? true : false,
 				connectionType: ((connection.id && connection.id !== null) || connection.isDeleted === 1) ? true : false,
-				connectorType: (connection.isDeleted === 1) ? true : false,
-				host: (connection.isDeleted === 1),
-				port: (connection.isDeleted === 1),
-				sid: (connection.isDeleted === 1),
-				serviceName: (connection.isDeleted === 1),
-				databaseName: (connection.isDeleted === 1),
-				user: (connection.isDeleted === 1),
-				password: (connection.isDeleted === 1),
-				showPassword: false,
 				creationDate: true,
 				isDeleted: true,
 			})
@@ -114,20 +101,11 @@ function ConnectionContent() {
 				id: true,
 				name: ((connection.id && connection.id !== null)) ? true : false,
 				connectionType: ((connection.id && connection.id !== null)) ? true : false,
-				connectorType: false,
-				host: false,
-				port: false,
-				sid: false,
-				serviceName: false,
-				databaseName: false,
-				user: false,
-				password: false,
-				showPassword: false,
 				creationDate: true,
 				isDeleted: true,
 			})
 		}
-	}, [connection, selectConnectionTypeNames, selectConnectorTypeNames, setDisabilityStatus]);
+	}, [connection, selectConnectionTypeNames, setDisabilityStatus]);
 
 
 	const [open, setOpen] = React.useState(false);
@@ -143,31 +121,46 @@ function ConnectionContent() {
 	};
 
 	const save = event => {
-		dispatch(postConnection(values));
+		let record={}
+		switch (values.connectionType.id) {
+			case 1:
+				record = { ...values.sql }
+				record.name = values.name
+				dispatch(postConnectionSql(record));
+				break
+			case 2:
+				break
+			case 3:
+				break
+			case 4:
+				record = { ...values.bigData }
+				record.name = values.name
+				dispatch(postConnectionBigData(record));
+				break
+		}
 	};
 
 	const checkConnectionAction = event => {
-		routeParams.ConnectionName = values.name
-		dispatch(checkDatabaseConnection(routeParams));
+		routeParams.ConnectionId = values.id
+		dispatch(checkConnection(routeParams));
 	};
 
 	const deleteAction = event => {
 		dispatch(deleteConnection({ id: parseInt(routeParams.id) }));
 	};
-	const handleClickShowPassword = () => {
-		setValues({ ...values, showPassword: !values.showPassword });
-	};
-
-	const handleMouseDownPassword = (event) => {
-		event.preventDefault();
-	};
 
 	const checkCountAction = event => {
-		routeParams.ConnectionName = values.name
+		routeParams.ConnectionId = values.id
 		routeParams.Schema = schema
 		routeParams.Table = table
-		dispatch(checkDatabaseTableRowCount(routeParams));
+		dispatch(checkTableRowCount(routeParams));
 	};
+	const applyConnectionSqlChange = (data, index) => {
+		setValues({ ...values, sql: data });
+	}
+	const applyConnectionBigDataChange = (data, index) => {
+		setValues({ ...values, bigData: data });
+	}
 	return (
 
 		<React.Fragment>
@@ -253,47 +246,6 @@ function ConnectionContent() {
 							}}
 						/>
 					</Grid>
-					<Grid item xs>
-						<Autocomplete
-							id="country-select-demo"
-							style={{ width: '100%' }}
-							fullWidth={true}
-							autoHighlight
-							clearOnEscape
-							openOnFocus
-							options={selectConnectorTypeNames.filter(data => data.connectionTypeId === values.connectionType?.id)}
-							classes={{
-								option: classes.option,
-							}}
-							filterOptions={filterOptions}
-							getOptionLabel={(option) => option.name}
-							renderOption={(option) => (
-								<React.Fragment>
-									<span>{option.name}</span>
-								</React.Fragment>
-							)}
-							renderInput={(params) => (
-								<TextField
-									{...params}
-									label="Connector type"
-									variant="outlined"
-									inputProps={{
-										...params.inputProps,
-										autoComplete: 'new-password', // disable autocomplete and autofill
-									}}
-								/>
-							)}
-							InputLabelProps={{
-								shrink: true,
-							}}
-							value={values.connectorType}
-							disabled={disabilityStatus.connectorType}
-							readOnly={readonlyStatus.connectorType}
-							onChange={(event, newValue) => {
-								handleChangeValue(event, 'connectorType', newValue);
-							}}
-						/>
-					</Grid>
 
 					<Grid item xs>
 						<Box style={{ width: '100%' }}>
@@ -332,147 +284,20 @@ function ConnectionContent() {
 						</Box>
 					</Grid>
 				</Grid>
-				<Grid container spacing={3}>
-					<Grid item xs>
-						<TextField
-							id="standard-name"
-							label="Host"
-							InputLabelProps={{
-								shrink: true,
-							}}
-							disabled={disabilityStatus.host}
-							readOnly={readonlyStatus.host}
-							value={checkValue(values.host)}
-							fullWidth={true} onChange={handleChange('host')} />
-					</Grid>
-					<Grid item xs={2}>
-						<TextField
-							id="standard-name"
-							label="Port"
-							type="number"
-							fullWidth={true}
-							InputLabelProps={{
-								shrink: true,
-							}}
-							disabled={disabilityStatus.port}
-							readOnly={readonlyStatus.port}
-							value={checkValue(values.port)}
-							onChange={handleChange('port')}
-						/>
-					</Grid>
-				</Grid>
 				{
-					values.connectionType?.id === 1 ?
-						(
-							<Grid container spacing={3}>
-
-								{
-									values.connectorType?.id === 2 ?
-										(
-											<Grid item xs>
-												<TextField
-													id="standard-name"
-													label="Sid"
-													fullWidth={true}
-													InputLabelProps={{
-														shrink: true,
-													}}
-													disabled={disabilityStatus.sid}
-													readOnly={readonlyStatus.sid}
-													value={checkValue(values.sid)}
-													onChange={handleChange('sid')} />
-											</Grid>
-										) : ("")
-								}
-								{
-									values.connectorType?.id === 2 ?
-										(
-
-											<Grid item xs>
-												<TextField
-													id="standard-name"
-													label="ServiceName"
-													InputLabelProps={{
-														shrink: true,
-													}}
-													disabled={disabilityStatus.serviceName}
-													readOnly={readonlyStatus.serviceName}
-													value={checkValue(values.serviceName)}
-													fullWidth={true}
-													onChange={handleChange('serviceName')} />
-											</Grid>
-										) : ("")
-								}
-								{
-									values.connectorType?.id !== 2 ?
-										(
-											<Grid item xs>
-												<TextField
-													id="standard-name"
-													label="DatabaseName"
-													fullWidth={true}
-													InputLabelProps={{
-														shrink: true,
-													}}
-													disabled={disabilityStatus.databaseName}
-													readOnly={readonlyStatus.databaseName}
-													value={checkValue(values.databaseName)}
-													onChange={handleChange('databaseName')} />
-											</Grid>
-										) : ("")
-								}
-							</Grid>
-						) : ("")
+					values.connectionType?.id === 1 ? (
+						<ConnectionSqlContent
+							applyChange={applyConnectionSqlChange}
+						></ConnectionSqlContent>
+					) : ("")
 				}
-				<Grid container spacing={3}>
-					<Grid item xs>
-						<TextField
-							id="standard-name"
-							label="User"
-							fullWidth={true}
-							InputLabelProps={{
-								shrink: true,
-							}}
-							disabled={disabilityStatus.user}
-							readOnly={readonlyStatus.user}
-							value={checkValue(values.user)}
-							onChange={handleChange('user')} />
-					</Grid>
-					<Grid item xs>
-
-						<TextField
-							id="outlined-basic"
-							label='Password'
-							type={values.showPassword ? 'text' : 'password'}
-							InputProps={{
-								endAdornment: (
-									<InputAdornment position="end">
-										<IconButton
-											aria-label="toggle password visibility"
-											edge="end"
-											disabled={disabilityStatus.password}
-											onClick={handleClickShowPassword}
-											onMouseDown={handleMouseDownPassword}
-										>
-											{values.showPassword ? <Icon >visibility</Icon> : <Icon >visibility_off</Icon>}
-										</IconButton>
-									</InputAdornment>
-								)
-							}}
-							InputLabelProps={{
-								shrink: true,
-							}}
-							disabled={disabilityStatus.password}
-							readOnly={readonlyStatus.password}
-							value={checkValue(values.password)}
-							onChange={handleChange('password')}
-						/>
-					</Grid>
-					<Grid item xs>
-					</Grid>
-					<Grid item xs>
-					</Grid>
-				</Grid>
+				{
+					values.connectionType?.id === 4 ? (
+						<ConnectionBigDataContent
+							applyChange={applyConnectionBigDataChange}
+						></ConnectionBigDataContent>
+					) : ("")
+				}
 
 
 				{
@@ -514,7 +339,7 @@ function ConnectionContent() {
 												</Button>
 
 												{
-													connection.connectionType.id && connection.connectionType.id == 1 ? (
+													connection.connectionType?.id && connection.connectionType?.id == 1 ? (
 														<Button
 															variant="contained"
 															color="secondary"
@@ -530,16 +355,20 @@ function ConnectionContent() {
 											</ButtonGroup>
 										) : ("")
 									}
-									<Button
-										variant="contained"
-										color="primary"
-										size="large"
-										className={classes.button}
-										startIcon={<Icon >save</Icon>}
-										onClick={save}
-									>
-										Save
-									</Button>
+									{
+										values.connectionType?.id && values.connectionType?.id !== null ? (
+											<Button
+												variant="contained"
+												color="primary"
+												size="large"
+												className={classes.button}
+												startIcon={<Icon >save</Icon>}
+												onClick={save}
+											>
+												Save
+											</Button>
+										) : ("")
+									}
 								</ButtonGroup>
 							</Box>
 						) : ("")
@@ -590,9 +419,9 @@ function ConnectionContent() {
 					</Box>
 				</DialogContent>
 				<DialogActions>
-					<Button 
+					<Button
 						onClick={checkCountAction}
-s						variant="contained"
+						s variant="contained"
 						color="secondary"
 						size="large">
 						Check

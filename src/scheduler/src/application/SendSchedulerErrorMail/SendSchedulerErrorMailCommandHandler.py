@@ -32,11 +32,11 @@ class SendSchedulerErrorMailCommandHandler(ICommandHandler[SendSchedulerErrorMai
     def handle(self, command: SendSchedulerErrorMailCommand):
         try:
             data_operation_job_repository = self.repository_provider.get(DataOperationJob)
-            data_operation_job = data_operation_job_repository.first(JobId=command.JobId)
+            data_operation_job = data_operation_job_repository.first(ApSchedulerJobId=command.JobId)
             if data_operation_job is None:
                 raise OperationalException("Job definition not found")
-                operation_contacts = []
 
+            operation_contacts = []
             default_contacts = self.config_service.get_config_by_name("DataOperationDefaultContact")
             if default_contacts is not None and default_contacts != '':
                 default_contacts_emails = default_contacts.split(",")

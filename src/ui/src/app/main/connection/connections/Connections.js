@@ -37,11 +37,8 @@ function Connections() {
 	function GotoComponent(path) {
 		history.push('/'.concat(path));
 	}
-	const handleClickFist = (event, row) => {
-		GotoComponent('connection/sql')
-	};
-	const handleClickSecond = (event, row) => {
-		GotoComponent('connection/bigdata')
+	const handleClick = (event, row) => {
+		GotoComponent('connection')
 	};
 	return (
 		<div style={{ position: 'relative' }}>
@@ -62,12 +59,7 @@ function Connections() {
 						style={{ padding: '0 0 0 5px' }}
 					>
 						<Fab aria-label={"Add"} className={classes.fab} color={"primary"}
-							onClick={handleClickFist}>
-							<Icon>add</Icon>
-						</Fab>
-
-						<Fab aria-label={"Add"} style={{ margin: '0 0 0 65px' }} className={classes.fab} color={"primary"}
-							onClick={handleClickSecond}>
+							onClick={handleClick}>
 							<Icon>add</Icon>
 						</Fab>
 					</div>
