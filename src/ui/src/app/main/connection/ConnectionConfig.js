@@ -18,22 +18,6 @@ const ConnectionConfig = {
 		{
 			path: '/connection',
 			component: React.lazy(() => import('./connection/Connection'))
-		},
-		{
-			path: '/connection/sql/:id',
-			component: React.lazy(() => import('./connectionSql/ConnectionSql'))
-		},
-		{
-			path: '/connection/sql',
-			component: React.lazy(() => import('./connectionSql/ConnectionSql'))
-		},
-		{
-			path: '/connection/bigdata/:id',
-			component: React.lazy(() => import('./connectionBigData/ConnectionBigData'))
-		},
-		{
-			path: '/connection/bigdata',
-			component: React.lazy(() => import('./connectionBigData/ConnectionBigData'))
 		}
 	]
 };

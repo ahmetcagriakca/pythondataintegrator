@@ -339,7 +339,7 @@ function ConnectionContent() {
 												</Button>
 
 												{
-													connection.connectionType?.id && connection.connectionType?.id == 1 ? (
+													connection.connectionType?.id && (connection.connectionType?.id == 1 || connection.connectionType?.id == 4) ? (
 														<Button
 															variant="contained"
 															color="secondary"
