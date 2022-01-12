@@ -13,7 +13,7 @@ services:
       - POSTGRES_DB=pdi
       - PG_TRUST_LOCALNET=true
     volumes:
-      - /var/lib/pdipostgresql/data
+      - pythontdataintegrator_pgdata:/var/lib/postgresql/data
   
   pdi-notification:
     image: ${REGISTRY:-pythondataintegrator}/notification:${TAG:-latest}
@@ -111,3 +111,7 @@ services:
       - ./src/ui/nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - postgresql
+
+# Names our volume
+volumes:
+  pythontdataintegrator_pgdata:

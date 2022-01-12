@@ -218,11 +218,20 @@ function DataOperationIntegrationsData(props) {
 								id: uuid(),
 							}
 						},
+						bigData: {
+							id: uuid(),
+							connectorType: {
+								id: uuid(),
+							}
+						},
 						connectionType: {
 							id: uuid(),
 						}
 					},
 					database: {
+						id: uuid(),
+					},
+					bigData: {
 						id: uuid(),
 					}
 				},
@@ -236,11 +245,20 @@ function DataOperationIntegrationsData(props) {
 								id: uuid(),
 							}
 						},
+						bigData: {
+							id: uuid(),
+							connectorType: {
+								id: uuid(),
+							}
+						},
 						connectionType: {
 							id: uuid(),
 						}
 					},
 					database: {
+						id: uuid(),
+					},
+					bigData: {
 						id: uuid(),
 					}
 				},

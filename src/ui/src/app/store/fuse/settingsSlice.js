@@ -130,7 +130,6 @@ const settingsSlice = createSlice({
 			};
 		},
 		setDefaultSettings: (state, action) => {
-			debugger;
 			const defaults = generateSettings(state.defaults, action.payload);
 			const themes =
 				defaults.theme.main !== state.defaults.theme.main

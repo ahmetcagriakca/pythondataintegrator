@@ -25,10 +25,24 @@ export const getConnections = createAsyncThunk('connectionsApp/connections/getCo
 	}
 });
 
-export const checkDatabaseConnection = createAsyncThunk('connectionsApp/connections/checkDatabaseConnection', async (params, extra) => {
+export const checkSqlConnection = createAsyncThunk('connectionsApp/connections/checkSqlConnection', async (params, extra) => {
 	try {
 		extra.dispatch(setLoading(true))
-		const response = await axios.post('/api/Connection/CheckDatabase', {
+		const response = await axios.post('/api/Connection/CheckSql', {
+			ConnectionName: params.ConnectionName,
+		});
+		const data = await response.data;
+		return data;
+	} 
+	finally{
+		extra.dispatch(setLoading(false))
+	}
+});
+
+export const checkBigDataConnection = createAsyncThunk('connectionsApp/connections/checkBigDataConnection', async (params, extra) => {
+	try {
+		extra.dispatch(setLoading(true))
+		const response = await axios.post('/api/Connection/CheckBigData', {
 			ConnectionName: params.ConnectionName,
 		});
 		const data = await response.data;

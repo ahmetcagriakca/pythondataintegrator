@@ -15,7 +15,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const CommonSnackbar = () => {
-	debugger;
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const snackbarOpen = useSelector(state => state.snackbar.snackbarOpen);

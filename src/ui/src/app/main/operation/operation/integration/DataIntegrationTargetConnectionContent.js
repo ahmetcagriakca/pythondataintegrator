@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import { selectConnectionName } from '../store/connectionNameSlice';
 import DataIntegrationConnectionDatabaseContent from './DataIntegrationConnectionDatabaseContent';
+import DataIntegrationConnectionBigDataContent from './DataIntegrationConnectionBigDataContent';
 
 
 const useStyles = makeStyles(theme => ({
@@ -47,6 +48,12 @@ function DataIntegrationTargetConnectionContent(props) {
 
 	const applyDataIntegrationConnectionDatabaseChange = (data) => {
 		let newRow = { ...row, database: data }
+		setRow(newRow);
+		changeApply(newRow)
+	};
+
+	const applyDataIntegrationConnectionBigDataChange = (data) => {
+		let newRow = { ...row, bigData: data }
 		setRow(newRow);
 		changeApply(newRow)
 	};
@@ -95,6 +102,16 @@ function DataIntegrationTargetConnectionContent(props) {
 						<DataIntegrationConnectionDatabaseContent
 							rowData={row.database}
 							applyChange={applyDataIntegrationConnectionDatabaseChange}
+						/>
+					) : ('')
+			}
+
+			{
+				row?.connection?.connectionTypeId === 4 ?
+					(
+						<DataIntegrationConnectionBigDataContent
+							rowData={row.bigData}
+							applyChange={applyDataIntegrationConnectionBigDataChange}
 						/>
 					) : ('')
 			}

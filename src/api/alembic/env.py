@@ -27,7 +27,7 @@ application_config: ApplicationConfig = config_manager.get(ApplicationConfig)
 database_config: DatabaseConfig = config_manager.get(DatabaseConfig)
 connection_string = Utils.get_connection_string(database_config=database_config)
 
-from pdi.domain.base import Base
+from src.domain.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -38,28 +38,28 @@ from pdi.domain.base import Base
 
 
 # connection
-from pdi.domain.aps import ApSchedulerJob, ApSchedulerJobEvent, ApSchedulerJobsTable, ApSchedulerEvent
+from src.domain.aps import ApSchedulerJob, ApSchedulerJobEvent, ApSchedulerJobsTable, ApSchedulerEvent
 
 # connection
-from pdi.domain.connection import Connection, ConnectionDatabase, ConnectorType, ConnectionType, ConnectionFile, \
+from src.domain.connection import Connection, ConnectionDatabase, ConnectorType, ConnectionType, ConnectionFile, \
     ConnectionSecret, ConnectionQueue, ConnectionServer
 
 
 # integration
-from pdi.domain.integration import DataIntegration, DataIntegrationConnection, \
+from src.domain.integration import DataIntegration, DataIntegrationConnection, \
     DataIntegrationColumn, DataIntegrationConnectionDatabase, DataIntegrationConnectionFile, \
     DataIntegrationConnectionFileCsv,DataIntegrationConnectionQueue
 
 # common
-from pdi.domain.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent
+from src.domain.common import Log, OperationEvent, Status, ConfigParameter, OperationEvent
 
 # operation
-from pdi.domain.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
+from src.domain.operation import DataOperation, DataOperationIntegration, DataOperationJobExecution, \
     DataOperationJobExecutionEvent, DataOperationJobExecutionIntegration, DataOperationJobExecutionIntegrationEvent, \
     DataOperationJob, DataOperationContact, Definition
 
 # secret
-from pdi.domain.secret import Secret, SecretType, SecretSourceBasicAuthentication, SecretSource, AuthenticationType
+from src.domain.secret import Secret, SecretType, SecretSourceBasicAuthentication, SecretSource, AuthenticationType
 
 
 

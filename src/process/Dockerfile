@@ -15,6 +15,7 @@ ENV DOCKER_CONTENT_TRUST 1
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
+ENV DEBIAN_FRONTEND=noninteractive
 # Updates packages list for the image
 RUN apt-get update
 
@@ -56,6 +57,22 @@ RUN echo export LD_LIBRARY_PATH=/usr/lib/oracle/19.8/client64/lib/ >> /etc/bashr
 RUN echo export ORACLE_HOME=/usr/lib/oracle/19.8/client64 >> /et
 RUN pip install cx_Oracle
 
+# odbc impala driver install
+RUN wget https://downloads.cloudera.com/connectors/impala_odbc_2.6.14.1016/Linux/ClouderaImpalaODBC-2.6.14.1016-1.x86_64.rpm
+RUN alien -i ClouderaImpalaODBC-2.6.14.1016-1.x86_64.rpm
+# odbc impala driver configurations
+RUN echo "\n\
+[Cloudera ODBC Driver for Impala] \n\
+Driver=/opt/cloudera/impalaodbc/lib/64/libclouderaimpalaodbc64.so \n\
+KrbServiceName=impala \n" >> /etc/odbcinst.ini
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/cloudera/impalaodbc/lib/64
+RUN ldd /opt/cloudera/impalaodbc/lib/64/libclouderaimpalaodbc64.so
+
+# kerberos config and user install
+RUN apt-get install -y  krb5-config krb5-user
+RUN apt-get install -y dos2unix
+
+
 RUN     mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 RUN     pip install  --upgrade pip
@@ -67,14 +84,22 @@ RUN     python --version
 RUN     date
 
 COPY    . /usr/src/app
+RUN mkdir /usr/src/keytabs
+RUN chmod g+rwx generate_config_krb.sh
+RUN chmod g+rwx login_krb.sh
+RUN chmod g+rwx /etc/krb5.conf
 
+RUN dos2unix entrypoint.sh
+RUN dos2unix generate_config_krb.sh
+RUN dos2unix login_krb.sh
 # # openshift set permission to non-root users for /app directory
 RUN chgrp -R 0 /usr/src/app && \
     chmod -R g=u /usr/src/app && \
     chgrp -R 0 /etc/passwd && \
-    chmod -R g=u /etc/passwd
+    chmod -R g=u /etc/passwd && \
+    chgrp -R 0 /usr/src/keytabs && \
+    chmod -R g=u /usr/src/keytabs
 
-# # set running user 
 USER 1001
 ENTRYPOINT 	["/bin/sh"]
 CMD 	["entrypoint.sh"]

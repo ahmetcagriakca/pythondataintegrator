@@ -139,7 +139,7 @@ function MonthlyExecutionsWidget(props) {
 	const theme = useTheme();
 	const contrastTheme = useSelector(selectContrastMainTheme(theme.palette.primary.main));
 
-	const [dataset, setDataset] = useState('2021');
+	const [dataset, setDataset] = useState(String(new Date().getFullYear()));
 	const [options, setOptions] = useState(chartOptions1);
 	const data = _.merge({}, props.data);
 	useEffect(()=>{
