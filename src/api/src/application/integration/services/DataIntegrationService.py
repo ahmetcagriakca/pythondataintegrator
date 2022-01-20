@@ -49,13 +49,6 @@ class DataIntegrationService(IScoped):
                                           definition: Definition,
                                           old_definition: Definition
                                           ) -> DataIntegration:
-
-        # if data.IsTargetTruncate \
-        #         and ((data.TargetConnections.Database.Schema is None or data.TargetConnections.Database.Schema == '') \
-        #              or (
-        #                      data.TargetConnections.Database.TableName is None or data.TargetConnections.Database.TableName == '')):
-        #     raise OperationalException("TargetSchema and TargetTableName cannot be empty if IsTargetTruncate is true")
-
         if old_definition is not None:
             data_integration = self.data_integration_repository.first(IsDeleted=0,
                                                                       Code=data.Code,
@@ -138,14 +131,22 @@ class DataIntegrationService(IScoped):
     def delete_data_integration(self, code: str, definition_id: int):
 
         if code is not None and code != "":
-            data_integration = self.data_integration_repository.first(IsDeleted=0, Code=code,
-                                                                      DefinitionId=definition_id)
-            if data_integration is None:
+            if definition_id is not None:
+                data_integrations = self.data_integration_repository.filter_by(IsDeleted=0, Code=code,
+                                                                               DefinitionId=definition_id).all()
+            else:
+                data_integrations = self.data_integration_repository.table \
+                    .filter(DataIntegration.IsDeleted == 0) \
+                    .filter(DataIntegration.Code == code) \
+                    .filter(DataIntegration.DefinitionId == None) \
+                    .all()
+            if data_integrations is None or len(data_integrations) == 0:
                 raise OperationalException("Code not found")
         else:
             return "Code required"
-        self.data_integration_repository.delete_by_id(id=data_integration.Id)
-        for data_integration_connection in data_integration.Connections:
-            self.data_integration_connection_service.delete(data_integration_connection.Id)
-        for data_integration_column in data_integration.Columns:
-            self.data_integration_column_service.delete(data_integration_column.Id)
+        for data_integration in data_integrations:
+            self.data_integration_repository.delete_by_id(id=data_integration.Id)
+            for data_integration_connection in data_integration.Connections:
+                self.data_integration_connection_service.delete(data_integration_connection.Id)
+            for data_integration_column in data_integration.Columns:
+                self.data_integration_column_service.delete(data_integration_column.Id)
