@@ -186,7 +186,7 @@ function DataOperationContent() {
 				
 
 
-				switch (dataIntegration?.targetConnection?.connection?.connectionTypeId) {
+				switch (dataIntegration?.sourceConnection?.connection?.connectionTypeId) {
 					case 1:
 						let database = {
 							Schema: dataIntegration.sourceConnection.database.schema,

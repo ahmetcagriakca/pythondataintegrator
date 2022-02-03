@@ -8,6 +8,7 @@ from src.application.notification.SendNotification.SendNotificationCommand impor
 from src.application.notification.SendNotification.SendNotificationRequest import NotificationAdditionalData, \
     SendNotificationRequest
 from src.application.operation.DeleteDataOperation.DeleteDataOperationCommand import DeleteDataOperationCommand
+from src.application.operation.services.DataOperationJobService import DataOperationJobService
 from src.application.operation.services.DataOperationService import DataOperationService
 from src.application.schedule.DeleteCronJob.DeleteCronJobCommand import DeleteCronJobCommand
 from src.application.schedule.DeleteCronJob.DeleteCronJobRequest import DeleteCronJobRequest
@@ -19,17 +20,21 @@ class DeleteDataOperationCommandHandler(ICommandHandler[DeleteDataOperationComma
                  dispatcher: Dispatcher,
                  repository_provider: RepositoryProvider,
                  data_operation_service: DataOperationService,
+                 data_operation_job_service: DataOperationJobService,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.data_operation_job_service = data_operation_job_service
         self.repository_provider = repository_provider
         self.dispatcher = dispatcher
         self.data_operation_service = data_operation_service
 
     def handle(self, command: DeleteDataOperationCommand):
         data_operation = self.data_operation_service.get_by_id(id=command.request.Id)
-        if data_operation is  None:
+        if data_operation is None:
             raise OperationalException(f"{command.request.Id} Data Operation not found")
-        self.delete_exiting_cron_jobs(operation_name=data_operation.Name)
+        if self.data_operation_job_service.check_existing_cron_jobs_by_data_operation_id(
+                data_operation_id=data_operation.Id):
+            self.delete_exiting_cron_jobs(operation_name=data_operation.Name)
         result = self.data_operation_service.delete_data_operation(command.request.Id)
         self.repository_provider.commit()
         self.notify(message=result, id=command.request.Id)
