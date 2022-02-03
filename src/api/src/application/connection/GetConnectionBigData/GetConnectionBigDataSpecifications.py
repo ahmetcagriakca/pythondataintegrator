@@ -33,7 +33,7 @@ class GetConnectionBigDataSpecifications(IScoped):
             .join(SecretSourceKerberosAuthentication,
                   SecretSourceKerberosAuthentication.SecretSourceId == SecretSource.Id, isouter=True) \
             .join(ConnectionBigData, ConnectionBigData.ConnectionId == Connection.Id) \
-            .join(ConnectorType, or_(ConnectorType.Id == ConnectionBigData.ConnectorTypeId))
+            .join(ConnectorType, ConnectorType.Id == ConnectionBigData.ConnectorTypeId)
         specified_query = specified_query.filter(Connection.Id == query.request.Id)
         return specified_query
 

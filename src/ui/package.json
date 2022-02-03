@@ -125,6 +125,7 @@
     },
     "scripts": {
         "start": "set PORT=7000 && yarn run tailwind && react-scripts start",
+        "start:n17": "set PORT=7000 && yarn run tailwind && react-scripts --openssl-legacy-provider start",
         "build": "yarn run tailwind && yarn run purge-tailwind && cross-env GENERATE_SOURCEMAP=false react-scripts build",
         "tailwind": "tailwind build ./src/styles/tailwind-config.css -c ./tailwind.config.js -o ./src/styles/tailwind.css",
         "purge-tailwind": "node ./purge-tailwindcss.js",

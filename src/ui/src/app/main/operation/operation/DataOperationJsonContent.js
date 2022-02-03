@@ -145,19 +145,25 @@ function DataOperationJsonContent(props) {
 					}
 					operationIntegration.integration["sourceConnection"] = {
 						id: uuid(),
-						connection: sourceConnection,
-						database: {
-							id: uuid(),
-							schema: dataOperationIntegration.Integration.SourceConnections.Database.Schema,
-							tableName: dataOperationIntegration.Integration.SourceConnections.Database.TableName,
-							query: dataOperationIntegration.Integration.SourceConnections.Database.Query
-						},
-						bigData: {
-							id: uuid(),
-							schema: dataOperationIntegration.Integration.SourceConnections.BigData.Schema,
-							tableName: dataOperationIntegration.Integration.SourceConnections.BigData.TableName,
-							query: dataOperationIntegration.Integration.SourceConnections.BigData.Query
-						}
+						connection: sourceConnection
+					}
+					switch (sourceConnection.connectionTypeId) {
+						case 1:
+							operationIntegration.integration.sourceConnection["database"] = {
+								id: uuid(),
+								schema: dataOperationIntegration.Integration.SourceConnections.Database.Schema,
+								tableName: dataOperationIntegration.Integration.SourceConnections.Database.TableName,
+								query: dataOperationIntegration.Integration.SourceConnections.Database.Query
+							}
+							break;
+						case 4:
+							operationIntegration.integration.sourceConnection["bigData"] = {
+								id: uuid(),
+								schema: dataOperationIntegration.Integration.SourceConnections.BigData.Schema,
+								tableName: dataOperationIntegration.Integration.SourceConnections.BigData.TableName,
+								query: dataOperationIntegration.Integration.SourceConnections.BigData.Query
+							}
+							break;
 					}
 				}
 				else {
@@ -186,19 +192,26 @@ function DataOperationJsonContent(props) {
 					operationIntegration.integration["targetConnection"] = {
 						id: uuid(),
 						connection: targetConnection,
-						database: {
-							id: uuid(),
-							schema: dataOperationIntegration.Integration.TargetConnections.Database.Schema,
-							tableName: dataOperationIntegration.Integration.TargetConnections.Database.TableName,
-							query: dataOperationIntegration.Integration.TargetConnections.Database.Query
-						},
-						bigData: {
-							id: uuid(),
-							schema: dataOperationIntegration.Integration.TargetConnections.BigData.Schema,
-							tableName: dataOperationIntegration.Integration.TargetConnections.BigData.TableName,
-							query: dataOperationIntegration.Integration.TargetConnections.BigData.Query
-						}
 					}
+					switch (targetConnection.connectionTypeId) {
+						case 1:
+							operationIntegration.integration.targetConnection["database"] = {
+								id: uuid(),
+								schema: dataOperationIntegration.Integration.TargetConnections.Database.Schema,
+								tableName: dataOperationIntegration.Integration.TargetConnections.Database.TableName,
+								query: dataOperationIntegration.Integration.TargetConnections.Database.Query
+							}
+							break;
+						case 4:
+							operationIntegration.integration.targetConnection["bigData"] = {
+								id: uuid(),
+								schema: dataOperationIntegration.Integration.TargetConnections.BigData.Schema,
+								tableName: dataOperationIntegration.Integration.TargetConnections.BigData.TableName,
+								query: dataOperationIntegration.Integration.TargetConnections.BigData.Query
+							}
+							break;
+					}
+
 				}
 				else {
 					toast.error(dataOperationIntegration.Integration.Code + " target connection not found. Connection Name:" + dataOperationIntegration?.Integration?.TargetConnections?.ConnectionName, { position: toast.POSITION.BOTTOM_RIGHT })

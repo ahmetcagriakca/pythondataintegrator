@@ -3,10 +3,12 @@ from typing import List
 from injector import inject
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
+from sqlalchemy import or_
 
 from src.application.integration.services.DataIntegrationService import DataIntegrationService
 from src.application.operation.CreateDataOperation.CreateDataOperationIntegrationRequest import \
     CreateDataOperationIntegrationRequest
+from src.domain.integration import DataIntegration
 from src.domain.operation import DataOperation, DataOperationIntegration, Definition
 
 
@@ -87,6 +89,17 @@ class DataOperationIntegrationService(IScoped):
                 data_operation_integration.Limit = data_operation_integration_model.Limit
                 data_operation_integration.ProcessCount = data_operation_integration_model.ProcessCount
                 data_operation_integration.IsDeleted = 0
+            un_used_integrations = self.data_operation_integration_repository.table.join(DataIntegration) \
+                .filter(DataOperationIntegration.DataOperationId == data_operation.Id) \
+                .filter(DataIntegration.Code == data_operation_integration_model.Integration.Code) \
+                .filter(DataIntegration.Id != data_integration.Id) \
+                .filter(DataIntegration.IsDeleted == 0) \
+                .filter(or_(DataIntegration.DefinitionId != definition.Id, DataIntegration.DefinitionId == None)) \
+                .filter(DataOperationIntegration.IsDeleted == 0) \
+                .all()
+            for un_used_integration in un_used_integrations:
+                self.delete_by_id(un_used_integration.Id,
+                                  definition_id=un_used_integration.DataIntegration.DefinitionId)
 
         check_existing_integrations = self.get_all_by_data_operation_id(data_operation_id=data_operation.Id).all()
         for existing_integration in check_existing_integrations:
@@ -96,15 +109,16 @@ class DataOperationIntegrationService(IScoped):
                         existing_integration.DataIntegration.IsDeleted == 0:
                     found = True
             if not found:
-                self.delete_by_id(existing_integration.Id)
+                self.delete_by_id(existing_integration.Id, old_definition.Id)
 
     def delete_by_id(self,
                      id: int,
                      definition_id: int):
         data_operation_integration = self.get_by_id(id=id)
         self.data_operation_integration_repository.delete_by_id(id=id)
-        self.data_integration_service.delete_data_integration(code=data_operation_integration.DataIntegration.Code,
-                                                              definition_id=definition_id)
+        if data_operation_integration.DataIntegration.IsDeleted == 0:
+            self.data_integration_service.delete_data_integration(code=data_operation_integration.DataIntegration.Code,
+                                                                  definition_id=definition_id)
 
     def delete_by_data_operation_id(self,
                                     data_operation_id: int,
