@@ -10,14 +10,15 @@ import { selectWidgetsEntities, getWidgets } from './store/widgetsSlice';
 import ConnectionWidget from './widgets/ConnectionWidget';
 import DataOperationWidget from './widgets/DataOperationWidget';
 import DataOperationJobWidget from './widgets/DataOperationJobWidget';
-import DataOperationJobExecutionWidget from './widgets/DataOperationJobExecutionWidget';
+import DailyExecutionsWidget from './widgets/DailyExecutionsWidget';
 import SourceDataAffectedRowWidget from './widgets/SourceDataAffectedRowWidget';
 import MonthlyExecutionsWidget from './widgets/MonthlyExecutionsWidget';
+import ExecutionStatuses from './widgets/ExecutionStatuses';
 
 
 function AnalyticsDashboardApp() {
     const dispatch = useDispatch();
-	const widgets = useSelector(selectWidgetsEntities);
+    const widgets = useSelector(selectWidgetsEntities);
 
     useEffect(() => {
         dispatch(getWidgets());
@@ -63,14 +64,15 @@ function AnalyticsDashboardApp() {
                                     ) : ('')
                             }
                             {
-                                widgets.dataOperationJobExecutionWidget ?
+                                widgets.dailyExecutionsWidget ?
                                     (
                                         <div className="widget flex w-full sm:w-1/4 p-16">
-                                            <DataOperationJobExecutionWidget data={widgets.dataOperationJobExecutionWidget} />
+                                            <DailyExecutionsWidget data={widgets.dailyExecutionsWidget} />
                                         </div>
                                     ) : ('')
                             }
                         </div>
+
                         {
                             widgets.sourceDataAffectedRowWidget ?
                                 (
@@ -81,6 +83,17 @@ function AnalyticsDashboardApp() {
                                 ) : ('')
                         }
 
+                    </div>
+                    <div className="flex flex-wrap w-full md:w-320">
+        
+                        {
+                            widgets.executionStatuses ?
+                                (
+                                    <div className="widget w-full p-16">
+                                        <ExecutionStatuses data={widgets.executionStatuses} />
+                                    </div>
+                                ) : ('')
+                        }
                     </div>
 
                 </div>

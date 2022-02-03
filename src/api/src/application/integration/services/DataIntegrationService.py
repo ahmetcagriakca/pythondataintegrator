@@ -125,11 +125,9 @@ class DataIntegrationService(IScoped):
                 target_columns=data.TargetConnections.Columns)
 
         self.data_integration_connection_service.update(data_integration=data_integration, data=data)
-
         return data_integration
 
     def delete_data_integration(self, code: str, definition_id: int):
-
         if code is not None and code != "":
             if definition_id is not None:
                 data_integrations = self.data_integration_repository.filter_by(IsDeleted=0, Code=code,

@@ -5,6 +5,8 @@ from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 
 from src.application.dashboard.GetConnectionWidget.GetConnectionWidgetQuery import GetConnectionWidgetQuery
+from src.application.dashboard.GetDailyExecutionsWidget.GetDailyExecutionsWidgetQuery import \
+    GetDailyExecutionsWidgetQuery
 from src.application.dashboard.GetDashboardWidgets.GetDashboardWidgetsQuery import GetDashboardWidgetsQuery
 from src.application.dashboard.GetDashboardWidgets.GetDashboardWidgetsResponse import GetDashboardWidgetsResponse
 from src.application.dashboard.GetDashboardWidgets.GetDashboardWidgetsSpecifications import \
@@ -14,6 +16,8 @@ from src.application.dashboard.GetDataOperationJobExecutionWidget.GetDataOperati
 from src.application.dashboard.GetDataOperationJobWidget.GetDataOperationJobWidgetQuery import \
     GetDataOperationJobWidgetQuery
 from src.application.dashboard.GetDataOperationWidget.GetDataOperationWidgetQuery import GetDataOperationWidgetQuery
+from src.application.dashboard.GetExecutionStatusesWidget.GetExecutionStatusesWidgetQuery import \
+    GetExecutionStatusesWidgetQuery
 from src.application.dashboard.GetMonthlyExecutionsWidget.GetMonthlyExecutionsWidgetQuery import \
     GetMonthlyExecutionsWidgetQuery
 from src.application.dashboard.GetSourceDataAffectedRowWidget.GetSourceDataAffectedRowWidgetQuery import \
@@ -51,4 +55,10 @@ class GetDashboardWidgetsQueryHandler(IQueryHandler[GetDashboardWidgetsQuery], I
 
         source_data_affected_row_widget_data = self.dispatcher.dispatch(GetSourceDataAffectedRowWidgetQuery())
         result.Data.append(source_data_affected_row_widget_data.Data.WidgetData)
+
+        daily_executions_widget_data = self.dispatcher.dispatch(GetDailyExecutionsWidgetQuery())
+        result.Data.append(daily_executions_widget_data.Data.WidgetData)
+
+        execution_statuses_widget_data = self.dispatcher.dispatch(GetExecutionStatusesWidgetQuery())
+        result.Data.append(execution_statuses_widget_data.Data.WidgetData)
         return result

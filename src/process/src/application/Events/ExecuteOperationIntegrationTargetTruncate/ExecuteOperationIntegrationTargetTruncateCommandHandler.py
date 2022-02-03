@@ -25,7 +25,7 @@ class ExecuteOperationIntegrationTargetTruncateCommandHandler(
 
     def handle(self, command: ExecuteOperationIntegrationTargetTruncateCommand):
         try:
-            message = f'{command.request.OperationIntegration.Id}-{command.request.OperationIntegration.Order}-{command.request.OperationIntegration.Name}-Target truncate finished. (Affected Row Count:{command.request.RowCount}'
+            message = f'{command.request.OperationIntegration.Id}-{command.request.OperationIntegration.Order}-{command.request.OperationIntegration.Name}-Target truncate finished. (Affected Row Count:{command.request.RowCount})'
             self.logger.info(message, job_id=command.request.OperationIntegration.Execution.OperationExecutionId)
 
             self.data_operation_job_execution_integration_service.create_event(
