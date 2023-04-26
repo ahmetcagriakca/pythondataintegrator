@@ -10,17 +10,20 @@ from pdip.logging.loggers.sql import SqlLogger
 
 from src.application.connection.CreateConnectionBigData.CreateConnectionBigDataRequest import \
     CreateConnectionBigDataRequest
-from src.application.connection.CreateConnectionSql.CreateConnectionSqlRequest import \
-    CreateConnectionSqlRequest
 from src.application.connection.CreateConnectionFile.CreateConnectionFileRequest import CreateConnectionFileRequest
 from src.application.connection.CreateConnectionQueue.CreateConnectionQueueRequest import CreateConnectionQueueRequest
+from src.application.connection.CreateConnectionSql.CreateConnectionSqlRequest import \
+    CreateConnectionSqlRequest
+from src.application.connection.CreateConnectionWebService.CreateConnectionWebServiceRequest import \
+    CreateConnectionWebServiceRequest
 from src.application.connection.services.ConnectionBigDataService import ConnectionBigDataService
-from src.application.connection.services.ConnectionSqlService import ConnectionSqlService
 from src.application.connection.services.ConnectionFileService import ConnectionFileService
 from src.application.connection.services.ConnectionQueueService import ConnectionQueueService
 from src.application.connection.services.ConnectionSecretService import ConnectionSecretService
 from src.application.connection.services.ConnectionServerService import ConnectionServerService
+from src.application.connection.services.ConnectionSqlService import ConnectionSqlService
 from src.application.connection.services.ConnectionTypeService import ConnectionTypeService
+from src.application.connection.services.ConnectionWebServiceService import ConnectionWebServiceService
 from src.domain.connection.Connection import Connection
 
 
@@ -35,9 +38,11 @@ class ConnectionService(IScoped):
                  connection_big_data_service: ConnectionBigDataService,
                  connection_file_service: ConnectionFileService,
                  connection_queue_service: ConnectionQueueService,
+                 connection_web_service_service: ConnectionWebServiceService,
                  connection_secret_service: ConnectionSecretService,
                  connection_server_service: ConnectionServerService
                  ):
+        self.connection_web_service_service = connection_web_service_service
         self.connection_big_data_service = connection_big_data_service
         self.repository_provider = repository_provider
         self.connection_queue_service = connection_queue_service
@@ -210,6 +215,45 @@ class ConnectionService(IScoped):
                                                  protocol=request.Protocol, mechanism=request.Mechanism)
         return connection
 
+    def create_connection_web_service(self, request: CreateConnectionWebServiceRequest) -> Connection:
+        """
+        Create File connection
+        """
+        connection = self.get_by_name(name=request.Name)
+        if connection is None:
+            connection = self.create_connection(name=request.Name,
+                                                connection_type_id=ConnectionTypes.WebService.value)
+            self.connection_secret_service.create_basic_authentication(connection=connection, user=request.User,
+                                                                       password=request.Password)
+            for server in request.Servers:
+                self.connection_server_service.create(connection=connection, host=server.Host, port=server.Port)
+            self.connection_web_service_service.create(connection=connection, connector_type_id=request.ConnectorTypeId,
+                                                       ssl=request.Ssl, wsdl=request.Soap.Wsdl)
+            connection = self.connection_repository.first(Id=connection.Id)
+        else:
+            self.connection_secret_service.update_basic_authentication(connection=connection, user=request.User,
+                                                                       password=request.Password)
+
+            for server in request.Servers:
+                connection_server = self.connection_server_service.get_by_server_info(connection_id=connection.Id,
+                                                                                      host=server.Host,
+                                                                                      port=server.Port)
+                if connection_server is not None:
+                    self.connection_server_service.update(connection=connection, host=server.Host, port=server.Port)
+                else:
+                    self.connection_server_service.create(connection=connection, host=server.Host, port=server.Port)
+
+            connection_servers = self.connection_server_service.get_all_by_connection_id(connection_id=connection.Id)
+            for connection_server in connection_servers:
+                check = [server for server in request.Servers if
+                         server.Host == connection_server.Host and server.Port == connection_server.Port]
+                if check is None or len(check) == 0:
+                    self.connection_server_service.delete(id=connection_server.Id)
+
+            self.connection_web_service_service.update(connection=connection, connector_type_id=request.ConnectorTypeId,
+                                                       ssl=request.Ssl, wsdl=request.Soap.Wsdl)
+        return connection
+
     def delete_connection(self, id: int):
         """
         Delete Database connection
@@ -223,6 +267,8 @@ class ConnectionService(IScoped):
             self.connection_database_service.delete(id=connection.Database.Id)
         if connection.File is not None:
             self.connection_file_service.delete(id=connection.File.Id)
+        if connection.BigData is not None:
+            self.connection_big_data_service.delete(id=connection.File.Id)
 
         if connection.ConnectionServers is not None:
             for connection_server in connection.ConnectionServers:

@@ -31,70 +31,11 @@ function AnalyticsDashboardApp() {
     return (
         <div className="w-full">
 
-            <MonthlyExecutionsWidget data={widgets.monthlyExecutionsWidget} />
 
             <FuseAnimate animation="transition.slideUpIn" delay={200}>
 
                 <div className="flex flex-col md:flex-row sm:p-8 container">
 
-                    <div className="flex flex-1 flex-col min-w-0">
-                        <div className="flex flex-col sm:flex sm:flex-row pb-32">
-                            {
-                                widgets.connectionWidget ?
-                                    (
-                                        <div className="widget flex w-full sm:w-1/4 p-16">
-                                            <ConnectionWidget data={widgets.connectionWidget} />
-                                        </div>
-                                    ) : ('')
-                            }
-                            {
-                                widgets.dataOperationWidget ?
-                                    (
-                                        <div className="widget flex w-full sm:w-1/4 p-16">
-                                            <DataOperationWidget data={widgets.dataOperationWidget} />
-                                        </div>
-                                    ) : ('')
-                            }
-                            {
-                                widgets.dataOperationJobWidget ?
-                                    (
-                                        <div className="widget flex w-full sm:w-1/4 p-16">
-                                            <DataOperationJobWidget data={widgets.dataOperationJobWidget} />
-                                        </div>
-                                    ) : ('')
-                            }
-                            {
-                                widgets.dailyExecutionsWidget ?
-                                    (
-                                        <div className="widget flex w-full sm:w-1/4 p-16">
-                                            <DailyExecutionsWidget data={widgets.dailyExecutionsWidget} />
-                                        </div>
-                                    ) : ('')
-                            }
-                        </div>
-
-                        {
-                            widgets.sourceDataAffectedRowWidget ?
-                                (
-                                    <div className="widget w-full p-16 pb-32">
-
-                                        <SourceDataAffectedRowWidget data={widgets.sourceDataAffectedRowWidget} />
-                                    </div>
-                                ) : ('')
-                        }
-
-                    </div>
-                    <div className="flex flex-wrap w-full md:w-320">
-        
-                        {
-                            widgets.executionStatuses ?
-                                (
-                                    <div className="widget w-full p-16">
-                                        <ExecutionStatuses data={widgets.executionStatuses} />
-                                    </div>
-                                ) : ('')
-                        }
-                    </div>
 
                 </div>
             </FuseAnimate>

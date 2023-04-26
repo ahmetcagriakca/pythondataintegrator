@@ -27,11 +27,11 @@ const useStyles = makeStyles({
         textOverflow: 'ellipsis',
     },
 });
-function ExecutionStatuses(props) {
+function ExecutionStatuses({datas}) {
     const classes = useStyles();
     const theme = useTheme();
     const [dataset, setDataset] = useState('today');
-    const data = _.merge({}, props.data);
+    const data = _.merge({}, datas);
 
     return (
         <Card className="w-full rounded-8 shadow">

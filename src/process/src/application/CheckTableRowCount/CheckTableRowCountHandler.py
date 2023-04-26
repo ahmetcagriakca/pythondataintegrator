@@ -53,7 +53,7 @@ class CheckTableRowCountHandler(ICommandHandler[CheckTableRowCountCommand]):
         table = command.request.Table
         if schema is not None and schema != '' and table is not None and table != '':
             try:
-                count_query = context.connector.get_table_select_query(selected_rows='1 first_column',
+                count_query = context.dialect.get_table_select_query(selected_rows='1 first_column',
                                                                        schema=schema,
                                                                        table=table)
                 count = context.get_table_count(query=count_query)

@@ -4,7 +4,7 @@ from injector import inject
 from pdip.data.repository import RepositoryProvider
 from pdip.integrator.domain.enums import StatusTypes
 from pdip.integrator.domain.enums.events import EVENT_EXECUTION_INTEGRATION_INITIALIZED
-from pdip.integrator.integration.base import OperationIntegrationInitializer
+from pdip.integrator.initializer.execution.integration import OperationIntegrationExecutionInitializer
 from pdip.integrator.operation.domain import OperationIntegrationBase
 from pdip.logging.loggers.console import ConsoleLogger
 
@@ -13,7 +13,7 @@ from src.domain.operation import DataOperationJobExecutionIntegration, DataOpera
     DataOperationJobExecution, DataOperationIntegration
 
 
-class ProcessOperationIntegrationInitializer(OperationIntegrationInitializer):
+class ProcessOperationIntegrationExecutionInitializer(OperationIntegrationExecutionInitializer):
     @inject
     def __init__(self, logger: ConsoleLogger,
                  repository_provider: RepositoryProvider,
@@ -48,3 +48,4 @@ class ProcessOperationIntegrationInitializer(OperationIntegrationInitializer):
         self.repository_provider.commit()
         self.repository_provider.close()
         operation_integration.Execution.Id = data_operation_job_execution_integration_id
+        return operation_integration

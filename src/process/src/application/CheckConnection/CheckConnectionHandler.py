@@ -1,3 +1,6 @@
+import subprocess
+from subprocess import Popen, PIPE
+
 from injector import inject
 from pdip.cqrs import Dispatcher, ICommandHandler
 from pdip.data.decorators import transactionhandler
@@ -34,12 +37,19 @@ class CheckConnectionHandler(ICommandHandler[CheckConnectionCommand]):
 
     @transactionhandler
     def handle(self, command: CheckConnectionCommand):
+
         connection = self.operation_cache_service.initialize_connection(command.request.ConnectionId)
         if connection.ConnectionType.Id == ConnectionTypes.Sql.value:
             connection_config = self.connection_converter.convert_connection_sql(connection=connection)
             context = self.sql_provider.get_context_by_config(connection_config)
         elif connection.ConnectionType.Id == ConnectionTypes.BigData.value:
             connection_config = self.connection_converter.convert_connection_big_data(connection=connection)
+            username = connection_config.KerberosAuthentication.Principal
+            realm = connection_config.KerberosAuthentication.KrbRealm
+            password=connection_config.KerberosAuthentication.Password
+            success = subprocess.run(['kinit', '%s@%s' % (username, realm)], input=password.encode(), stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.DEVNULL).returncode
+            ret_val= not bool(success)
             context = self.big_data_provider.get_context_by_config(connection_config)
 
         try:

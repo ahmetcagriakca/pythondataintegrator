@@ -6,7 +6,7 @@ from src.domain.base import Base
 from src.domain.base.connection.ConnectionSecretBase import ConnectionSecretBase
 
 
-class ConnectionSecret(ConnectionSecretBase, Entity, Base):
+class ConnectionSecret(Entity,ConnectionSecretBase,  Base):
     __tablename__ = "ConnectionSecret"
     __table_args__ = {"schema": "Connection"}
     ConnectionId = Column(Integer, ForeignKey('Connection.Connection.Id'))

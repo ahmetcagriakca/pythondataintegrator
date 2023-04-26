@@ -1,12 +1,13 @@
 from typing import List
 
 from injector import inject
+from pdip.integrator.connection.domain.base import ConnectionColumnBase
 from pdip.integrator.connection.domain.enums import ConnectionTypes
-from pdip.integrator.integration.domain.base import IntegrationConnectionSqlBase, IntegrationConnectionColumnBase, \
-    IntegrationConnectionBase, IntegrationBase
-from pdip.integrator.integration.domain.base.integration import IntegrationConnectionBigDataBase
+from pdip.integrator.connection.domain.types.sql.base import ConnectionSqlBase
+from pdip.integrator.integration.domain.base import IntegrationBase, IntegrationConnectionBase
 from pdip.integrator.operation.domain import OperationIntegrationBase, OperationBase
 
+from pdip.integrator.connection.domain.types.bigdata.base import ConnectionBigDataBase
 from src.application.integrator.OperationCacheService import OperationCacheService
 from src.application.integrator.converters.ConnectionConverter import ConnectionConverter
 from src.domain.base.connection import ConnectionBase
@@ -77,7 +78,7 @@ class OperationConverter:
         )
         if integration_connection.ConnectionType == ConnectionTypes.Sql:
             connection_sql = self.connection_converter.convert_connection_sql(connection=connection)
-            integration_connection.Sql = IntegrationConnectionSqlBase(
+            integration_connection.Sql = ConnectionSqlBase(
                 Connection=connection_sql,
                 Schema=data_integration_connection.Database.Schema,
                 ObjectName=data_integration_connection.Database.TableName,
@@ -86,7 +87,7 @@ class OperationConverter:
             integration_connection.Columns = self.convert_connection_columns(data_integration=data_integration)
         elif integration_connection.ConnectionType == ConnectionTypes.BigData:
             connection_big_data = self.connection_converter.convert_connection_big_data(connection=connection)
-            integration_connection.BigData = IntegrationConnectionBigDataBase(
+            integration_connection.BigData = ConnectionBigDataBase(
                 Connection=connection_big_data,
                 Schema=data_integration_connection.BigData.Schema,
                 ObjectName=data_integration_connection.BigData.TableName,
@@ -96,11 +97,11 @@ class OperationConverter:
         return integration_connection
 
     def convert_connection_columns(self, data_integration: DataIntegrationBase) -> List[
-        IntegrationConnectionColumnBase]:
+        ConnectionColumnBase]:
         if data_integration.Columns is not None and len(data_integration.Columns) > 0:
             integration_connection_columns = []
             for data_integration_column in data_integration.Columns:
-                column = IntegrationConnectionColumnBase(
+                column = ConnectionColumnBase(
                     Name=data_integration_column.SourceColumnName)
                 integration_connection_columns.append(column)
             return integration_connection_columns

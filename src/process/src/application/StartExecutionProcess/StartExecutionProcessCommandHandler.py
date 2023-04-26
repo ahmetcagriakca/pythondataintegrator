@@ -1,5 +1,6 @@
 import multiprocessing
 import os
+import subprocess
 import time
 import traceback
 from datetime import datetime
@@ -15,10 +16,10 @@ from pdip.data.decorators import transactionhandler
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency.container import DependencyContainer
 from pdip.integrator.base import Integrator
+from pdip.integrator.connection.domain.enums import ConnectionTypes
 from pdip.logging.loggers.sql import SqlLogger
 
 from src.application.StartExecutionProcess.StartExecutionProcessCommand import StartExecutionProcessCommand
-from src.application.integrator.ProcessIntegratorEventManager import ProcessIntegratorEventManager
 from src.application.integrator.converters.OperationConverter import OperationConverter
 from src.domain.aps import ApSchedulerJob, ApSchedulerEvent, ApSchedulerJobEvent
 from src.domain.operation import DataOperation, DataOperationJob
@@ -29,8 +30,10 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
     def __init__(self,
                  dispatcher: Dispatcher,
                  logger: SqlLogger,
+                 integrator: Integrator,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.integrator = integrator
         self.logger = logger
         self.dispatcher = dispatcher
 
@@ -157,9 +160,22 @@ class StartExecutionProcessCommandHandler(ICommandHandler[StartExecutionProcessC
         try:
 
             operation_converter = DependencyContainer.Instance.get(OperationConverter)
-            process_integrator_event_manager = DependencyContainer.Instance.get(ProcessIntegratorEventManager)
             operation = operation_converter.convert(data_operation_id=data_operation_id)
-            integrator = Integrator(integrator_event_manager=process_integrator_event_manager)
+            for operation_integration in operation.Integrations:
+                if operation_integration.Integration.SourceConnections is not None and \
+                        operation_integration.Integration.SourceConnections.ConnectionType is not None and \
+                        operation_integration.Integration.SourceConnections.ConnectionType == ConnectionTypes.BigData and \
+                        operation_integration.Integration.SourceConnections.ConnectionType.BigData is not None:
+                    connection_config = operation_integration.Integration.SourceConnections.BigData.Connection
+                    username = connection_config.KerberosAuthentication.Principal
+                    realm = connection_config.KerberosAuthentication.KrbRealm
+                    password = connection_config.KerberosAuthentication.Password
+                    success = subprocess.run(['kinit', '%s@%s' % (username, realm)], input=password.encode(),
+                                             stdout=subprocess.DEVNULL,
+                                             stderr=subprocess.DEVNULL).returncode
+                    ret_val = not bool(success)
+                    break
+            integrator = DependencyContainer.Instance.get(Integrator)
             integrator.integrate(operation, execution_id=data_operation_job_execution_id, ap_scheduler_job_id=job_id)
             self.logger.info(
                 f"{data_operation_id}-{job_id} Data Operations Finished",

@@ -17,4 +17,5 @@ psutil==5.8.0
 dataclasses==0.6
 requests==2.26.0
 mysql-connector-python==8.0.26
-pdip==0.5.2
+dataclasses-json==0.5.6
+pdip==0.5.8

@@ -134,14 +134,13 @@ const chartOptions1 = {
 	  }
 	}
   }
-function MonthlyExecutionsWidget(props) {
-	const classes = useStyles(props);
-	const theme = useTheme();
+function MonthlyExecutionsWidget({datas, theme}) {
+	const classes = useStyles(theme);
 	const contrastTheme = useSelector(selectContrastMainTheme(theme.palette.primary.main));
 
 	const [dataset, setDataset] = useState(String(new Date().getFullYear()));
 	const [options, setOptions] = useState(chartOptions1);
-	const data = _.merge({}, props.data);
+	const data = _.merge({}, datas);
 	useEffect(()=>{
 		let dataOptions=data.options
 		setOptions(chartOptions1)

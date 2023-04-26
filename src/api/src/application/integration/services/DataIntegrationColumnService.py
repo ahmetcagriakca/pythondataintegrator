@@ -4,7 +4,10 @@ from injector import inject
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
+from pdip.integrator.connection.domain.base import ConnectionColumnBase
 from pdip.integrator.connection.domain.enums import ConnectorTypes, ConnectionTypes
+from pdip.integrator.connection.types.bigdata.base import BigDataProvider
+from pdip.integrator.connection.types.sql.base import SqlProvider
 
 from src.domain.connection.Connection import Connection
 from src.domain.integration.DataIntegration import DataIntegration
@@ -39,48 +42,85 @@ class DataIntegrationColumnService(IScoped):
         data_integration_columns = self.data_integration_column_repository.filter_by(IsDeleted=0,
                                                                                      DataIntegration=data_integration)
 
-        column_rows = [(data_integration_column.ResourceType, data_integration_column.SourceColumnName,
-                        data_integration_column.TargetColumnName) for data_integration_column in
-                       data_integration_columns]
-        selected_rows = ""
-        if connection.ConnectionType.Id == ConnectionTypes.Sql.value:
-            if connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
-                for column_row in column_rows:
-                    selected_rows += f'{"" if column_row == column_rows[0] else ", "}`{column_row[1].strip()}`'
-                query = f'SELECT {selected_rows} FROM `{schema}`.`{table_name}`'
+        query = None
+        if data_integration_columns is not None and len(data_integration_columns) > 0:
 
-            else:
-                for column_row in column_rows:
-                    selected_rows += f'{"" if column_row == column_rows[0] else ", "}"{column_row[1].strip()}"'
-                query = f'SELECT {selected_rows} FROM "{schema}"."{table_name}"'
-        elif connection.ConnectionType.Id == ConnectionTypes.BigData.value:
-            for column_row in column_rows:
-                selected_rows += f'{"" if column_row == column_rows[0] else ", "}{column_row[1].strip()}'
-            query = f'SELECT {selected_rows} FROM {schema}.{table_name}'
+            column_rows = [ConnectionColumnBase(Name=data_integration_column.SourceColumnName,
+                                                Type=data_integration_column.ResourceType)
+                           for data_integration_column in data_integration_columns]
+            if connection.ConnectionType.Id == ConnectionTypes.Sql.value:
+                context = SqlProvider().get_context(
+                    connector_type=ConnectorTypes(connection.Database.ConnectorTypeId),
+                    host=connection.ConnectionServers[0].Host,
+                    port=connection.ConnectionServers[0].Port,
+                    user=None,
+                    password=None,
+                    database=connection.Database.DatabaseName,
+                    service_name=connection.Database.ServiceName,
+                    sid=connection.Database.Sid
+                )
+                query = context.dialect.prepare_select_query(schema=schema, table=table_name, columns=column_rows)
+            elif connection.ConnectionType.Id == ConnectionTypes.BigData.value:
+                context = BigDataProvider().get_context(
+                    connector_type=ConnectorTypes(connection.Database.ConnectorTypeId),
+                    host=connection.ConnectionServers[0].Host,
+                    port=connection.ConnectionServers[0].Port,
+                    user=None,
+                    password=None,
+                    database=connection.Database.DatabaseName,
+                    service_name=connection.Database.ServiceName,
+                    sid=connection.Database.Sid
+                )
+                query = context.dialect.get(schema=schema, table_name=table_name, columns=column_rows)
         return query
 
     def get_target_query(self, connection: Connection, data_integration: DataIntegration, schema: str, table_name: str):
 
         data_integration_columns = self.data_integration_column_repository.filter_by(IsDeleted=0,
                                                                                      DataIntegration=data_integration)
-        insert_row_columns = ""
-        insert_row_values = ""
-        if connection.ConnectionType.Id == ConnectionTypes.Sql.value:
-            if connection.Database.ConnectorTypeId == ConnectorTypes.MYSQL.value:
-                for column in data_integration_columns:
-                    insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}`{column.TargetColumnName}`'
-                    insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
-                query = f'INSERT INTO `{schema}`.`{table_name}`({insert_row_columns}) VALUES ({insert_row_values})'
-            else:
-                for column in data_integration_columns:
-                    insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}"{column.TargetColumnName}"'
-                    insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
-                query = f'INSERT INTO "{schema}"."{table_name}"({insert_row_columns}) VALUES ({insert_row_values})'
-        elif connection.ConnectionType.Id == ConnectionTypes.BigData.value:
-            for column in data_integration_columns:
-                insert_row_columns += f'{"" if column == data_integration_columns[0] else ", "}{column.TargetColumnName}'
-                insert_row_values += f'{"" if column == data_integration_columns[0] else ", "}:{column.SourceColumnName}'
-            query = f'INSERT INTO {schema}.{table_name}({insert_row_columns}) VALUES ({insert_row_values})'
+
+        query = None
+        if data_integration_columns is not None and len(data_integration_columns) > 0:
+            source_column_rows = [ConnectionColumnBase(Name=data_integration_column.SourceColumnName,
+                                                       Type=data_integration_column.ResourceType)
+                                  for data_integration_column in data_integration_columns]
+            target_column_rows = [ConnectionColumnBase(Name=data_integration_column.TargetColumnName,
+                                                       Type=data_integration_column.ResourceType)
+                                  for data_integration_column in data_integration_columns]
+            if connection.ConnectionType.Id == ConnectionTypes.Sql.value:
+                context = SqlProvider().get_context(
+                    connector_type=ConnectorTypes(connection.Database.ConnectorTypeId),
+                    host=connection.ConnectionServers[0].Host,
+                    port=connection.ConnectionServers[0].Port,
+                    user=None,
+                    password=None,
+                    database=connection.Database.DatabaseName,
+                    service_name=connection.Database.ServiceName,
+                    sid=connection.Database.Sid
+                )
+                query = context.generate_insert_query(
+                    source_columns=source_column_rows,
+                    target_columns=target_column_rows,
+                    schema=schema,
+                    table=table_name
+                )
+            elif connection.ConnectionType.Id == ConnectionTypes.BigData.value:
+                context = BigDataProvider().get_context(
+                    connector_type=ConnectorTypes(connection.Database.ConnectorTypeId),
+                    host=connection.ConnectionServers[0].Host,
+                    port=connection.ConnectionServers[0].Port,
+                    user=None,
+                    password=None,
+                    database=connection.Database.DatabaseName,
+                    service_name=connection.Database.ServiceName,
+                    sid=connection.Database.Sid
+                )
+                query = context.generate_insert_query(
+                    source_columns=source_column_rows,
+                    target_columns=target_column_rows,
+                    schema=schema,
+                    table=table_name
+                )
         return query
 
     def insert(self,
@@ -113,7 +153,7 @@ class DataIntegrationColumnService(IScoped):
 
         if len(source_columns_list) != len(target_columns_list):
             raise OperationalException("Source and Target Column List must be equal")
-        
+
         data_integration_columns = self.data_integration_column_repository.filter_by(
             DataIntegration=data_integration)
         for data_integration_column in data_integration_columns:

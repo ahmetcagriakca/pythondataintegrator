@@ -1,9 +1,11 @@
+import _ from '@lodash';
 import React from 'react';
 import {withStyles, Card, Icon, Typography} from '@material-ui/core';
 import {Line} from 'react-chartjs-2';
 
-const DataOperationWidget = ({data, theme}) => {
+const DataOperationWidget = ({datas, theme}) => {
 
+	const data = _.merge({}, datas);
     const dataWithColors = data.datasets.map(obj => ({
         ...obj,
         borderColor    : theme.palette.error.main,

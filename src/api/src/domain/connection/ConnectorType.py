@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 from src.domain.base import Base
 from src.domain.base.connection.ConnectorTypeBase import ConnectorTypeBase
+from src.domain.connection.ConnectionWebService import ConnectionWebService
 from src.domain.connection.ConnectionBigData import ConnectionBigData
 from src.domain.connection.ConnectionDatabase import ConnectionDatabase
 from src.domain.connection.ConnectionFile import ConnectionFile
@@ -22,3 +23,4 @@ class ConnectorType(ConnectorTypeBase, Entity, Base):
     BigDatas: List[ConnectionBigData] = relationship("ConnectionBigData", back_populates="ConnectorType")
     Files: List[ConnectionFile] = relationship("ConnectionFile", back_populates="ConnectorType")
     Queues: List[ConnectionQueue] = relationship("ConnectionQueue", back_populates="ConnectorType")
+    WebServices: List[ConnectionWebService] = relationship("ConnectionWebService", back_populates="ConnectorType")

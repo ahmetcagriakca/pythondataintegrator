@@ -5,7 +5,7 @@ from pdip.data.repository import RepositoryProvider
 from pdip.exceptions import OperationalException
 from pdip.integrator.domain.enums import StatusTypes
 from pdip.integrator.domain.enums.events import EVENT_EXECUTION_INITIALIZED
-from pdip.integrator.operation.base import OperationInitializer
+from pdip.integrator.initializer.execution.operation import OperationExecutionInitializer
 from pdip.integrator.operation.domain import OperationBase
 from pdip.logging.loggers.console import ConsoleLogger
 
@@ -13,7 +13,7 @@ from src.domain.common import Status, OperationEvent
 from src.domain.operation import DataOperationJobExecution, DataOperationJobExecutionEvent, DataOperationJob
 
 
-class ProcessOperationInitializer(OperationInitializer):
+class ProcessOperationExecutionInitializer(OperationExecutionInitializer):
     @inject
     def __init__(self,
                  logger: ConsoleLogger,
@@ -32,6 +32,7 @@ class ProcessOperationInitializer(OperationInitializer):
             for operation_integration in operation.Integrations:
                 if operation_integration.Execution is not None:
                     operation_integration.Execution.OperationExecutionId = operation.Execution.Id
+        return operation
 
     def create_execution(self, operation_id, ap_scheduler_job_id):
         data_operation_job = self.get_data_operation_job_by_operation_and_job_id(

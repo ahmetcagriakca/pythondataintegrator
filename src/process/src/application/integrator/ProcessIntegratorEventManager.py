@@ -1,7 +1,7 @@
 from injector import inject
 from pdip.cqrs import Dispatcher
 from pdip.dependency import IScoped
-from pdip.integrator.base import IntegratorEventManager
+from pdip.integrator.event.base import IntegratorEventManager
 from pdip.integrator.operation.domain import OperationBase, OperationIntegrationBase
 from pdip.logging.loggers.sql import SqlLogger
 

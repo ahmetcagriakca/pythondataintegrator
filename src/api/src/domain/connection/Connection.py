@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 from src.domain.base import Base
 from src.domain.base.connection.ConnectionBase import ConnectionBase
+from src.domain.connection import ConnectionWebService
 from src.domain.connection.ConnectionBigData import ConnectionBigData
 from src.domain.connection.ConnectionDatabase import ConnectionDatabase
 from src.domain.connection.ConnectionFile import ConnectionFile
@@ -25,6 +26,7 @@ class Connection(ConnectionBase, Entity, Base):
     BigData: ConnectionBigData = relationship("ConnectionBigData", uselist=False, backref="Connection")
     File: ConnectionFile = relationship("ConnectionFile", uselist=False, backref="Connection")
     Queue: ConnectionQueue = relationship("ConnectionQueue", uselist=False, backref="Connection")
+    WebService: ConnectionWebService = relationship("ConnectionWebService", uselist=False, backref="Connection")
     ConnectionType = relationship("ConnectionType", back_populates="Connections")
     ConnectionSecrets: List[ConnectionSecret] = relationship("ConnectionSecret", back_populates="Connection")
     ConnectionServers: List[ConnectionServer] = relationship("ConnectionServer", back_populates="Connection")

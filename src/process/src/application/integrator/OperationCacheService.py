@@ -6,7 +6,7 @@ from pdip.data.decorators import transactionhandler
 from pdip.data.repository import RepositoryProvider
 from pdip.dependency import IScoped
 from pdip.exceptions import OperationalException
-from pdip.integrator.connection.domain.authentication.basic import BasicAuthentication
+from pdip.integrator.connection.domain.authentication.basic import ConnectionBasicAuthentication
 from pdip.integrator.connection.domain.authentication.kerberos import KerberosAuthentication
 from pdip.integrator.connection.domain.authentication.type import AuthenticationTypes
 from pdip.integrator.connection.domain.enums import ConnectionTypes
@@ -121,12 +121,12 @@ class OperationCacheService(IScoped):
 
         return AuthenticationTypes(authentication_type_id)
 
-    def get_connection_basic_authentication_by_connection_id(self, connection_id: int) -> BasicAuthentication:
+    def get_connection_basic_authentication_by_connection_id(self, connection_id: int) -> ConnectionBasicAuthentication:
         connection = self.get_connection_by_id(connection_id=connection_id)
         secret_source_basic_authentication: SecretSourceBasicAuthentication = \
             connection.ConnectionSecrets[0].Secret.SecretSources[0].SecretSourceBasicAuthentications[0]
 
-        connection_basic_authentication = BasicAuthentication(
+        connection_basic_authentication = ConnectionBasicAuthentication(
             User=self.crypto_service.decrypt(secret_source_basic_authentication.User),
             Password=self.crypto_service.decrypt(secret_source_basic_authentication.Password)
         )

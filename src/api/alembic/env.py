@@ -26,6 +26,7 @@ config_manager = ConfigManager(root_directory,module_finder=module_finder)
 application_config: ApplicationConfig = config_manager.get(ApplicationConfig)
 database_config: DatabaseConfig = config_manager.get(DatabaseConfig)
 connection_string = Utils.get_connection_string(database_config=database_config)
+# module_finder.import_modules('src.domain')
 
 from src.domain.base import Base
 
@@ -42,7 +43,7 @@ from src.domain.aps import ApSchedulerJob, ApSchedulerJobEvent, ApSchedulerJobsT
 
 # connection
 from src.domain.connection import Connection, ConnectionDatabase, ConnectorType, ConnectionType, ConnectionFile, \
-    ConnectionSecret, ConnectionQueue, ConnectionServer
+    ConnectionSecret, ConnectionQueue, ConnectionServer, ConnectionBigData, ConnectionWebService,ConnectionWebServiceSoap
 
 
 # integration

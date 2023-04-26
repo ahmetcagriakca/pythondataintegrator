@@ -4,9 +4,10 @@ import { useTheme } from '@material-ui/core/styles';
 import { Line } from 'react-chartjs-2';
 import _ from '@lodash';
 
-function ConnectionWidget(props) {
+
+function ConnectionWidget({datas}) {
 	const theme = useTheme();
-	const data = _.merge({}, props.data);
+	const data = _.merge({}, datas);
 
 	return (
 		<Card className="w-full rounded-8 shadow">

@@ -1,6 +1,5 @@
 from injector import inject
 from pdip.cqrs import ICommandHandler
-from pdip.data.decorators import transactionhandler
 from rpyc import connect
 
 from src.application.StartProcess.StartProcessCommand import StartProcessCommand

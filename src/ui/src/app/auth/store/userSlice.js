@@ -63,7 +63,7 @@ const initialState = {
 	role: [], // guest
 	data: {
 		displayName: 'PDI',
-		photoURL: 'assets/images/logos/turkcell-logo.png',
+		photoURL: 'assets/images/logos/pdi-logo.png',
 		email: 'PDI_INFO',
 		shortcuts: ['calendar', 'mail', 'contacts', 'todo']
 	}
