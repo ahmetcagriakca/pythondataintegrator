@@ -57,7 +57,7 @@ RUN echo export LD_LIBRARY_PATH=/usr/lib/oracle/19.8/client64/lib/ >> /etc/bashr
 RUN echo export ORACLE_HOME=/usr/lib/oracle/19.8/client64 >> /et
 RUN pip install cx_Oracle
 
-# odbc impala driver install
+# start odbc impala driver install
 RUN wget https://downloads.cloudera.com/connectors/impala_odbc_2.6.14.1016/Linux/ClouderaImpalaODBC-2.6.14.1016-1.x86_64.rpm
 RUN alien -i ClouderaImpalaODBC-2.6.14.1016-1.x86_64.rpm
 # odbc impala driver configurations
@@ -72,6 +72,26 @@ RUN ldd /opt/cloudera/impalaodbc/lib/64/libclouderaimpalaodbc64.so
 RUN apt-get install -y  krb5-config krb5-user
 RUN apt-get install -y dos2unix
 
+# end odbc impala driver install 
+
+# start odbc clickhouse driver install 
+RUN mkdir /opt/clickhouse
+WORKDIR /opt/clickhouse
+RUN wget "https://github.com/ClickHouse/clickhouse-odbc/releases/download/v1.1.4.20200302/clickhouse-odbc-1.1.4-Linux.tar.gz" 
+RUN tar xvzf clickhouse-odbc-1.1.4-Linux.tar.gz
+RUN mkdir -p /opt/clickhouse/lib/64/
+RUN cp clickhouse-odbc-1.1.4-Linux/lib64/*.so /opt/clickhouse/lib/64/
+
+RUN echo "\n\
+[ClickHouse ODBC Driver (ANSI)]\n\
+Description=ODBC Driver (ANSI) for ClickHouse\n\
+Driver=/opt/clickhouse/lib/64/libclickhouseodbc.so\n\
+UsageCount=1\n" >> /etc/odbcinst.ini
+
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/clickhouse/lib/64/
+RUN ldd /opt/clickhouse/lib/64/libclickhouseodbc.so
+
+# end odbc clickhouse driver install 
 
 RUN     mkdir -p /usr/src/app
 WORKDIR /usr/src/app
