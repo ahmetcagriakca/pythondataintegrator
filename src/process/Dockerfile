@@ -86,12 +86,12 @@ RUN     date
 COPY    . /usr/src/app
 RUN mkdir /usr/src/keytabs
 RUN chmod g+rwx generate_config_krb.sh
-RUN chmod g+rwx login_krb.sh
-RUN chmod g+rwx /etc/krb5.conf
+# RUN chmod g+rwx login_krb.sh
+# RUN chmod g+rwx /etc/krb5.conf
 
 RUN dos2unix entrypoint.sh
 RUN dos2unix generate_config_krb.sh
-RUN dos2unix login_krb.sh
+# RUN dos2unix login_krb.sh
 # # openshift set permission to non-root users for /app directory
 RUN chgrp -R 0 /usr/src/app && \
     chmod -R g=u /usr/src/app && \

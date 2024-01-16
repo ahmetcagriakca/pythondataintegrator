@@ -5,7 +5,6 @@ from pdip.integrator.connection.domain.enums import ConnectionTypes
 from pdip.integrator.connection.types.bigdata.base import BigDataProvider
 from pdip.integrator.connection.types.sql.base import SqlProvider
 from pdip.logging.loggers.sql import SqlLogger
-from pyodbc import ProgrammingError
 
 from src.application.CheckTableRowCount.CheckTableRowCountCommand import \
     CheckTableRowCountCommand
@@ -54,9 +53,9 @@ class CheckTableRowCountHandler(ICommandHandler[CheckTableRowCountCommand]):
         if schema is not None and schema != '' and table is not None and table != '':
             try:
                 count_query = context.dialect.get_table_select_query(selected_rows='1 first_column',
-                                                                       schema=schema,
-                                                                       table=table)
-                count = context.get_table_count(query=count_query)
+                                                                     schema=schema,
+                                                                     table=table)
+                count = context.get_count_for_query(query=count_query)
                 count_of_table = f'"{schema}"."{table}" has {count} row'
             except Exception as ex:
                 message = f'{connection.Name} "{schema}"."{table}" count of table getting error! Error: {ex}'

@@ -76,7 +76,11 @@ class ConnectionSeed(Seed):
                     {
                         "ConnectionType": "Database",
                         "Name": "Impala",
-                    }
+                    },
+                    {
+                        "ConnectionType": "Database",
+                        "Name": "CLICKHOUSE",
+                    },
                 ]
                 for connector_type_json in connector_type_list:
                     connection_type = connection_type_repository.filter_by(

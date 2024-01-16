@@ -80,7 +80,7 @@ class DataIntegrationColumnService(IScoped):
                                                                                      DataIntegration=data_integration)
 
         query = None
-        if data_integration_columns is not None and len(data_integration_columns) > 0:
+        if data_integration_columns is not None and data_integration_columns.count() > 0:
             source_column_rows = [ConnectionColumnBase(Name=data_integration_column.SourceColumnName,
                                                        Type=data_integration_column.ResourceType)
                                   for data_integration_column in data_integration_columns]
