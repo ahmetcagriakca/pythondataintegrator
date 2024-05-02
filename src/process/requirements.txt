@@ -1,6 +1,6 @@
 pytest==6.1.1
 requests==2.26.0
 rpyc==5.0.1
-pdip[preferred]==0.5.15
-pdip[cryptography]==0.5.15
-pdip[integrator]==0.5.15
+pdip[preferred]==0.5.16
+pdip[cryptography]==0.5.16
+pdip[integrator]==0.5.16
